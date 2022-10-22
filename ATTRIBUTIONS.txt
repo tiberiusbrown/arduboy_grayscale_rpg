@@ -1,0 +1,21 @@
+Some tiles and sprites are derived from prior work:
+
+Monochrome RPG
+Kenney
+CC1.0
+https://www.kenney.nl/assets/monochrome-rpg
+
+Gameboy Tileset
+ArMM1991
+CC0 Public Domain
+https://opengameart.org/content/gameboy-tileset
+
+GameBoy Style Home Interior Tileset
+MonkeyImage
+Public Domain
+https://monkeyimage.itch.io/home-interior-tilesheet-gameboy-styled
+
+8-Directional Game Boy Character Template
+GibbonGL
+Public Domain
+https://gibbongl.itch.io/8-directional-gameboy-character-template
