@@ -4,9 +4,9 @@
 
 void initialize()
 {
-	nframe = 0;
-	px = 128;
-	py = 112;
-	pdir = 1;
-	pmoving = false;
+    nframe = 0;
+    px = 128;
+    py = 112;
+    pdir = 0;
+    pmoving = false;
 }

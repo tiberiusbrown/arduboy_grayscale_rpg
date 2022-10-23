@@ -12,8 +12,14 @@ using int24_t = __int24;
 using uint24_t = __uint24;
 #else
 #define PROGMEM
-inline uint8_t pgm_read_byte(void const* p) { return *(uint8_t const*)p; }
-inline uint16_t pgm_read_word(void const* p) { return *(uint16_t const*)p; }
+inline uint8_t pgm_read_byte(void const* p)
+{
+    return *(uint8_t const*)p;
+}
+inline uint16_t pgm_read_word(void const* p)
+{
+    return *(uint16_t const*)p;
+}
 constexpr uint8_t BLACK = 0;
 constexpr uint8_t DARK_GRAY = 1;
 constexpr uint8_t LIGHT_GRAY = 2;
@@ -33,36 +39,31 @@ constexpr uint8_t MAP_CHUNK_H = 32;
 constexpr uint8_t MAP_CHUNK_W = 32;
 constexpr uint8_t CHUNK_SCRIPT_SIZE = 32;
 
-struct map_chunk_t
-{
+struct map_chunk_t {
     // number of tiles in a chunk must match the screen
     // dimensions when using 16x16 tiles
-    union
-    {
+    union {
         uint8_t tiles_flat[32];
         uint8_t tiles[4][8];
     };
     uint8_t script[CHUNK_SCRIPT_SIZE];
 };
 
-struct sdata_dialog
-{
+struct sdata_dialog {
     char message[256];
 };
 
 extern uint8_t nframe;
 
-extern union
-{
+extern union {
     sdata_dialog dialog;
 } sdata;
 
-extern uint8_t pdir;     // player direction: 0/1/2/3 = N/S/W/E
-extern bool pmoving;     // whether player is moving
-extern uint16_t px, py;  // player position (in pixels)
+extern uint8_t pdir;    // player direction
+extern bool pmoving;    // whether player is moving
+extern uint16_t px, py; // player position (in pixels)
 
-struct active_chunk_t
-{
+struct active_chunk_t {
     map_chunk_t chunk;
 };
 // 0 1
@@ -74,14 +75,14 @@ extern uint8_t btns_down, btns_pressed;
 
 // platform.cpp
 //     platform abstraction methods
-void platform_drawoverwrite(
-    int16_t x, int16_t y, uint8_t const* bitmap, uint8_t frame);
-void platform_drawoverwrite(
-    int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t const* bitmap);
-void platform_drawplusmask(
-    int16_t x, int16_t y, uint8_t const* bitmap, uint8_t frame);
-void platform_drawplusmask(
-    int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t const* bitmap);
+void platform_drawoverwrite(int16_t x, int16_t y, uint8_t const* bitmap,
+                            uint8_t frame);
+void platform_drawoverwrite(int16_t x, int16_t y, uint8_t w, uint8_t h,
+                            uint8_t const* bitmap);
+void platform_drawplusmask(int16_t x, int16_t y, uint8_t const* bitmap,
+                           uint8_t frame);
+void platform_drawplusmask(int16_t x, int16_t y, uint8_t w, uint8_t h,
+                           uint8_t const* bitmap);
 void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num);
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);

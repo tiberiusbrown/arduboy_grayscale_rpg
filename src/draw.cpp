@@ -1,33 +1,31 @@
 #include "common.hpp"
 
-#include "generated/font_img.hpp"
 #include "generated/font_adv.hpp"
-#include "generated/tile_img.hpp"
+#include "generated/font_img.hpp"
 #include "generated/player_img.hpp"
+#include "generated/tile_img.hpp"
 
 void draw_player()
 {
-    uint8_t f = pdir * 4;
-    if(pmoving)
-        f += ((nframe >> 2) & 3);
-    platform_drawplusmask(
-        64 - 8, 32 - 8,
-        PLAYER_IMG, f);
+    uint8_t f = pdir * 3;
+    if(pmoving) {
+        uint8_t t = ((nframe >> 2) & 3);
+        if(t >= 2) t = (t - 2) * 2;
+        f += t;
+    }
+    platform_drawplusmask(64 - 8, 32 - 8, PLAYER_IMG, f);
 }
 
 static void draw_chunk(uint8_t i, int16_t ox, int16_t oy)
 {
     uint8_t* tiles = active_chunks[i].chunk.tiles_flat;
-    for(uint8_t r = 0, n = 0; r < 64; r += 16)
-    {
+    for(uint8_t r = 0, n = 0; r < 64; r += 16) {
         int16_t y = oy + r;
-        if(y <= -16 || y >= 64)
-        {
+        if(y <= -16 || y >= 64) {
             n += 8;
             continue;
         }
-        for(uint8_t c = 0; c < 128; c += 16, ++n)
-        {
+        for(uint8_t c = 0; c < 128; c += 16, ++n) {
             int16_t x = ox + c;
             platform_drawoverwrite(x, y, TILE_IMG, tiles[n]);
         }
@@ -52,10 +50,8 @@ void draw_text(uint8_t x, uint8_t y, char const* str)
 {
     char t;
     uint8_t cx = x;
-    while((t = pgm_read_byte(str++)) != '\0')
-    {
-        if(t == '\n')
-        {
+    while((t = pgm_read_byte(str++)) != '\0') {
+        if(t == '\n') {
             y += 9;
             cx = x;
             continue;

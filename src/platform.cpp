@@ -20,8 +20,8 @@ void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num)
 extern int gplane;
 extern uint8_t pixels[2][128 * 64];
 
-static uint8_t get_bitmap_bit(
-    uint8_t const* bitmap, uint8_t w, uint8_t h, uint8_t x, uint8_t y)
+static uint8_t get_bitmap_bit(uint8_t const* bitmap, uint8_t w, uint8_t h,
+                              uint8_t x, uint8_t y)
 {
     uint8_t page = y / 8;
     uint8_t byte = bitmap[page * w + x];
@@ -29,16 +29,14 @@ static uint8_t get_bitmap_bit(
 }
 #endif
 
-void platform_drawoverwrite(
-    int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t const* bitmap)
+void platform_drawoverwrite(int16_t x, int16_t y, uint8_t w, uint8_t h,
+                            uint8_t const* bitmap)
 {
 #ifdef ARDUINO
     a.drawOverwrite(x, y, w, h, bitmap);
 #else
-    for(uint8_t r = 0; r < h; ++r)
-    {
-        for(uint8_t c = 0; c < w; ++c)
-        {
+    for(uint8_t r = 0; r < h; ++r) {
+        for(uint8_t c = 0; c < w; ++c) {
             int py = y + r;
             int px = x + c;
             if(px < 0 || py < 0) continue;
@@ -50,16 +48,14 @@ void platform_drawoverwrite(
 #endif
 }
 
-void platform_drawplusmask(
-    int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t const* bitmap)
+void platform_drawplusmask(int16_t x, int16_t y, uint8_t w, uint8_t h,
+                           uint8_t const* bitmap)
 {
 #ifdef ARDUINO
     a.drawPlusMask(x, y, w, h, bitmap);
 #else
-    for(uint8_t r = 0; r < h; ++r)
-    {
-        for(uint8_t c = 0; c < w; ++c)
-        {
+    for(uint8_t r = 0; r < h; ++r) {
+        for(uint8_t c = 0; c < w; ++c) {
             int py = y + r;
             int px = x + c;
             if(px < 0 || py < 0) continue;
@@ -72,29 +68,28 @@ void platform_drawplusmask(
 #endif
 }
 
-void platform_drawoverwrite(
-    int16_t x, int16_t y, uint8_t const* bitmap, uint8_t frame)
+void platform_drawoverwrite(int16_t x, int16_t y, uint8_t const* bitmap,
+                            uint8_t frame)
 {
 #ifdef ARDUINO
     a.drawOverwrite(x, y, bitmap, frame);
 #else
     uint8_t w = pgm_read_byte(bitmap++);
     uint8_t h = pgm_read_byte(bitmap++);
-    platform_drawoverwrite(
-        x, y, w, h, bitmap + ((frame * 2 + gplane) * (w * h / 8)));
+    platform_drawoverwrite(x, y, w, h,
+                           bitmap + ((frame * 2 + gplane) * (w * h / 8)));
 #endif
 }
 
-void platform_drawplusmask(
-    int16_t x, int16_t y, uint8_t const* bitmap, uint8_t frame)
+void platform_drawplusmask(int16_t x, int16_t y, uint8_t const* bitmap,
+                           uint8_t frame)
 {
 #ifdef ARDUINO
     a.drawPlusMask(x, y, bitmap, frame);
 #else
     uint8_t w = pgm_read_byte(bitmap++);
     uint8_t h = pgm_read_byte(bitmap++);
-    platform_drawplusmask(
-        x, y, w, h, bitmap + (frame * 3 * (w * h / 8)));
+    platform_drawplusmask(x, y, w, h, bitmap + (frame * 3 * (w * h / 8)));
 #endif
 }
 
