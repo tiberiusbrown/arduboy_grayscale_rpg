@@ -143,7 +143,7 @@
   </object>
   <object id="8" x="55.5" y="104.25">
    <properties>
-    <property name="script" value="$tmsg {the quick brown fox jumps over the lazy dog?!. nonsense!}"/>
+    <property name="script" value="$tmsg {the quick brown fox jumps over the lazy dog?!. What complete and utter nonsense... I wish I were a dragon! That'd be really cool!}"/>
    </properties>
    <point/>
   </object>

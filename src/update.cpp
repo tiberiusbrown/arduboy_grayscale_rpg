@@ -69,18 +69,44 @@ static void update_map()
     ++nframe;
 }
 
+static void skip_dialog_animation(uint8_t third_newline) {
+    auto& d = sdata.dialog;
+    uint8_t i;
+    for(i = 0; d.message[i] != '\0' && i != third_newline; ++i) {}
+    d.char_progress = i;
+}
+
 static void update_dialog()
 {
     auto& d = sdata.dialog;
-    if(btns_pressed & (BTN_A | BTN_B)) {
-        if(d.message[d.char_progress] == '\0') {
+    uint8_t third_newline = 255;
+    {
+        uint8_t n = 0;
+        for(uint8_t i = 0; i < sizeof(d.message) && d.message[i] != '\0'; ++i) {
+            if(d.message[i] == '\n' && ++n == 3) {
+                third_newline = i + 1;
+                break;
+            }
+        }
+    }
+    if(btns_down & BTN_B) skip_dialog_animation(third_newline);
+    if(btns_pressed & BTN_A) {
+        if(d.char_progress == third_newline) {
+            for(uint8_t i = 0; ; ++i) {
+                d.message[i] = d.message[i + third_newline];
+                if(d.message[i] == '\0') break;
+            }
+            d.char_progress = 0;
+        }
+        else if(d.message[d.char_progress] == '\0') {
             change_state(STATE_MAP);
         } else {
-            // while(d.message[++d.char_progress] != '\0') {};
+            //skip_dialog_animation(third_newline);
         }
     } else {
         for(uint8_t i = 0; i < 2; ++i)
             if(d.message[d.char_progress] != '\0') ++d.char_progress;
+        if(d.char_progress > third_newline) d.char_progress = third_newline;
     }
 }
 
@@ -93,8 +119,7 @@ static void update_tp()
         py = d.ty * 16 + 8;
         load_chunks();
     }
-    if(d.frame == TELEPORT_TRANSITION_FRAMES * 2)
-        change_state(STATE_MAP);
+    if(d.frame == TELEPORT_TRANSITION_FRAMES * 2) change_state(STATE_MAP);
 }
 
 void update()
