@@ -82,7 +82,7 @@ int main(int argc, char** argv)
             int p0 = pixels[0][i];
             int p1 = pixels[1][i];
 #if MUTED_PALETTE
-            uint8_t p = uint8_t((p0 * 0x40 + p1 * 0x80 + 0x20) & 0xff);
+            uint8_t p = uint8_t((p0 * 0x40 + p1 * 0x80 + 0x10) & 0xff);
 #else
             uint8_t p = uint8_t((p0 * 0x55 + p1 * 0xaa) & 0xff);
 #endif

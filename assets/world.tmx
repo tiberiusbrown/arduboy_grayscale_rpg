@@ -137,13 +137,13 @@
  <objectgroup id="2" name="Scripts">
   <object id="5" x="23.5" y="103.75">
    <properties>
-    <property name="script" value="$tmsg {This is the sign on the left!}"/>
+    <property name="script" value="$tmsg {THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG!?.}"/>
    </properties>
    <point/>
   </object>
   <object id="8" x="55.5" y="104.25">
    <properties>
-    <property name="script" value="$tmsg {This is the sign on the right!}"/>
+    <property name="script" value="$tmsg {the quick brown fox jumps over the lazy dog?!. nonsense!}"/>
    </properties>
    <point/>
   </object>

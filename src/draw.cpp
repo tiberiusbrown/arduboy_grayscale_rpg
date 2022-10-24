@@ -1,6 +1,6 @@
 #include "common.hpp"
 
-#include "generated/font_adv.hpp"
+#include "font_adv.hpp"
 #include "generated/font_img.hpp"
 
 #include "generated/tile_img.hpp"

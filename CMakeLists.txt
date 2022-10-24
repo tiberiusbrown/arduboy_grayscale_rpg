@@ -26,6 +26,7 @@ add_executable(arduboy_grayscale_rpg
     src/common.hpp
     src/common.cpp
     src/draw.cpp
+    src/font_adv.hpp
     src/init.cpp
     src/main_sdl.cpp
     src/map.cpp

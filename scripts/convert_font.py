@@ -1,6 +1,6 @@
 from extract_sprite_planes import extract
 
-ps = extract('font_masked.png', 8, 8)
+ps = extract('font.png', 8, 8)
 
 def charstr(c):
     if c == 32: return '[space]'
