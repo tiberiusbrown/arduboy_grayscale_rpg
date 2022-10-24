@@ -137,7 +137,10 @@
  <objectgroup id="2" name="Scripts">
   <object id="5" x="23.5" y="103.75">
    <properties>
-    <property name="script" value="$tmsg {THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG!?.}"/>
+    <property name="script">jmp skip_first
+$tmsg {THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG!?.}
+skip_first:
+$tmsg {HELLO SECOND MESSAGE!}</property>
    </properties>
    <point/>
   </object>

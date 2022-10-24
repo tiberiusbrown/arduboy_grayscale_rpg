@@ -1,6 +1,7 @@
 #include "common.hpp"
 
 #include "generated/fxdata.h"
+#include "script_commands.hpp"
 #include "tile_solid.hpp"
 
 static bool run_chunk()
@@ -68,6 +69,46 @@ static bool run_chunk()
             sdata.tp.ty = ty;
             return true;
         }
+
+        case CMD_ADD: {
+            uint8_t t = c.script[chunk_instr++];
+            uint8_t dst = t & 0xf;
+            uint8_t src = t >> 4;
+            chunk_regs[dst] += chunk_regs[src];
+            break;
+        }
+
+        case CMD_ADDI: {
+            uint8_t t = c.script[chunk_instr++];
+            int8_t imm = (int8_t)c.script[chunk_instr++];
+            uint8_t dst = t & 0xf;
+            uint8_t src = t >> 4;
+            chunk_regs[dst] = chunk_regs[src] + imm;
+            break;
+        }
+
+        case CMD_SUB: {
+            uint8_t t = c.script[chunk_instr++];
+            uint8_t dst = t & 0xf;
+            uint8_t src = t >> 4;
+            chunk_regs[dst] -= chunk_regs[src];
+            break;
+        }            
+
+        case CMD_JMP: chunk_instr = c.script[chunk_instr]; break;
+        case CMD_BRZ: {
+            uint8_t t = c.script[chunk_instr++];
+            uint8_t i = c.script[chunk_instr++];
+            if(chunk_regs[t] == 0) chunk_instr = i;
+            break;
+        }
+        case CMD_BRN: {
+            uint8_t t = c.script[chunk_instr++];
+            uint8_t i = c.script[chunk_instr++];
+            if(chunk_regs[t] < 0) chunk_instr = i;
+            break;
+        }
+
         default: break;
         }
     }
@@ -80,11 +121,15 @@ bool run_chunks()
         running_chunk = 0;
         chunk_instr = 0;
         chunks_are_running = true;
+        for(auto& r : chunk_regs)
+            r = 0;
     }
     while(running_chunk < 4) {
         if(run_chunk()) return true;
         ++running_chunk;
         chunk_instr = 0;
+        for(auto& r : chunk_regs)
+            r = 0;
     }
     chunks_are_running = false;
     return false;
@@ -110,7 +155,7 @@ void load_chunks()
     uint8_t cx = uint8_t(uint16_t(px - 64) >> 7);
     uint8_t cy = uint8_t(uint16_t(py - 32) >> 6);
 
-    // TODO: optimize shifting map
+    // TODO: optimize shifting map?
     // if(loaded_cx == cx && loaded_cy == cy)
     //	return;
 

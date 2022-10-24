@@ -32,6 +32,7 @@ add_executable(arduboy_grayscale_rpg
     src/map.cpp
     src/platform.cpp
     src/render.cpp
+    src/script_commands.hpp
     src/tile_solid.hpp
     src/update.cpp
     )

@@ -10,6 +10,7 @@ ARDUBOY_NO_USB
 
 void loop()
 {
+    a.idle();
     if(!a.nextFrame())
         return;
     FX::disableOLED();

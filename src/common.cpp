@@ -25,3 +25,4 @@ uint8_t btns_down, btns_pressed;
 bool chunks_are_running;
 uint8_t running_chunk;
 uint8_t chunk_instr;
+int8_t chunk_regs[16];

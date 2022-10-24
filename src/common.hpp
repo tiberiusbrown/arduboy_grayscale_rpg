@@ -55,41 +55,6 @@ constexpr uint8_t MAP_CHUNK_H = 32;
 constexpr uint8_t MAP_CHUNK_W = 32;
 constexpr uint8_t CHUNK_SCRIPT_SIZE = 32;
 
-// chunk script commands
-enum {
-    // end
-    // terminate script
-    CMD_END,
-
-    // msg {message}
-    // show message
-    CMD_MSG,
-
-    // dlg <portrait> {message}
-    // show message with portrait image
-    CMD_DLG,
-
-    // tmsg <tile> {message}
-    // if <tile> is selected, msg {message}
-    CMD_TMSG,
-
-    // tdlg <tile> <portrait> {message}
-    // if <tile> is selected, dlg <portrait> {message}
-    CMD_TDLG,
-
-    // tp <tx16> <ty16>
-    // teleport player to specified tile coordinates
-    CMD_TP,
-
-    // ttp <tile> <tx16> <ty16>
-    // if <tile> is selected, tp <tx16> <ty16>
-    CMD_TTP,
-
-    // ttp <tile> <tx16> <ty16>
-    // if player walks onto <tile>, tp <tx16> <ty16>
-    CMD_WTP,
-};
-
 struct map_chunk_t {
     // number of tiles in a chunk must match the screen
     // dimensions when using 16x16 tiles
@@ -112,6 +77,7 @@ extern uint8_t state;
 extern bool chunks_are_running;
 extern uint8_t running_chunk;
 extern uint8_t chunk_instr;
+extern int8_t chunk_regs[16];
 
 struct sdata_dialog {
     uint8_t portrait;
