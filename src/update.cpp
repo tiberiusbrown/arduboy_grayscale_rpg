@@ -1,7 +1,26 @@
 #include "common.hpp"
 
-void update()
+static int8_t const DIRX[8] PROGMEM = {
+    0, -1, -1, -1, 0, 1, 1, 1,
+};
+static int8_t const DIRY[8] PROGMEM = {
+    1, 1, 0, -1, -1, -1, 0, 1,
+};
+
+static void update_map()
 {
+    if(chunks_are_running && run_chunks()) return;
+
+    selx = sely = uint16_t(-1);
+    if(btns_pressed & BTN_A) {
+        int8_t dx = (int8_t)pgm_read_byte(&DIRX[pdir]) * 8;
+        int8_t dy = (int8_t)pgm_read_byte(&DIRY[pdir]) * 8;
+        selx = (px + dx) >> 4;
+        sely = (py + dy + 4) >> 4;
+    }
+
+    if(run_chunks()) return;
+
     int8_t dx = 0, dy = 0;
     if(btns_down & BTN_UP) dy -= 1;
     if(btns_down & BTN_DOWN) dy += 1;
@@ -45,7 +64,47 @@ void update()
         px += nx;
         py += ny;
     }
-    update_chunks();
+    load_chunks();
 
     ++nframe;
+}
+
+static void update_dialog()
+{
+    auto& d = sdata.dialog;
+    if(btns_pressed & (BTN_A | BTN_B)) {
+        if(d.message[d.char_progress] == '\0') {
+            change_state(STATE_MAP);
+        } else {
+            // while(d.message[++d.char_progress] != '\0') {};
+        }
+    } else {
+        for(uint8_t i = 0; i < 2; ++i)
+            if(d.message[d.char_progress] != '\0') ++d.char_progress;
+    }
+}
+
+static void update_tp()
+{
+    auto& d = sdata.tp;
+    ++d.frame;
+    if(d.frame == TELEPORT_TRANSITION_FRAMES) {
+        px = d.tx * 16 + 8;
+        py = d.ty * 16 + 8;
+        load_chunks();
+    }
+    if(d.frame == TELEPORT_TRANSITION_FRAMES * 2)
+        change_state(STATE_MAP);
+}
+
+void update()
+{
+    using update_func = void (*)();
+    static update_func const FUNCS[] PROGMEM = {
+        update_map,
+        update_dialog,
+        update_tp,
+    };
+
+    (pgmptr(&FUNCS[state]))();
 }

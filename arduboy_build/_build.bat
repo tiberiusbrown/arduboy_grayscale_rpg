@@ -2,18 +2,7 @@
 
 cd /d %~dp0
 
-cd ..\assets
-python convert_font.py
-if NOT %errorlevel%==0 goto error
-python convert_sprites.py
-if NOT %errorlevel%==0 goto error
-python convert_map.py
-if NOT %errorlevel%==0 goto error
-
-cd ..\arduboy_build
-python fxdata-build.py fxdata.txt
-if NOT %errorlevel%==0 goto error
-move /y fxdata.h ..\src\generated\fxdata.h > nul
+call ..\assets\_update_generated.bat subcall
 if NOT %errorlevel%==0 goto error
 
 cd ..\src
@@ -49,7 +38,7 @@ del _map2.txt
 rem create arduboy file
 tar -a -cf arduboy_grayscale_rpg.zip arduboy_grayscale_rpg.hex fxdata.bin info.json LICENSE.txt banner_700x192.png banner_128x64.png
 if NOT %errorlevel%==0 goto error
-move /y arduboy_grayscale_rpg.zip arduboy_grayscale_rpg.arduboy > nul
+move /y arduboy_grayscale_rpg.zip ..\arduboy_grayscale_rpg.arduboy > nul
 if NOT %errorlevel%==0 goto error
 
 python flashcart-builder.py flashcart-index.csv
@@ -58,6 +47,7 @@ if NOT %errorlevel%==0 goto error
 goto end
 :error
 pause
+exit /b 1
 :end
 
-pause
+timeout 10

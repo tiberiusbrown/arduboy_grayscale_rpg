@@ -2,8 +2,14 @@
 
 #include "generated/font_adv.hpp"
 #include "generated/font_img.hpp"
-#include "generated/player_img.hpp"
+
 #include "generated/tile_img.hpp"
+
+#if PLAYER_IMG_IN_PROG
+#include "generated/player_img.hpp"
+#else
+#include "generated/fxdata.h"
+#endif
 
 void draw_player()
 {
@@ -13,7 +19,11 @@ void draw_player()
         if(t >= 2) t = (t - 2) * 2;
         f += t;
     }
+#if PLAYER_IMG_IN_PROG
     platform_drawplusmask(64 - 8, 32 - 8, PLAYER_IMG, f);
+#else
+    platform_fx_drawplusmask(64 - 8, 32 - 8, PLAYER_IMG, f);
+#endif
 }
 
 static void draw_chunk(uint8_t i, int16_t ox, int16_t oy)
@@ -50,7 +60,7 @@ void draw_text(uint8_t x, uint8_t y, char const* str)
 {
     char t;
     uint8_t cx = x;
-    while((t = pgm_read_byte(str++)) != '\0') {
+    while((t = *str++) != '\0') {
         if(t == '\n') {
             y += 9;
             cx = x;
@@ -60,6 +70,27 @@ void draw_text(uint8_t x, uint8_t y, char const* str)
         uint8_t const* bitmap = &FONT_IMG[t * 24];
         platform_drawplusmask(cx, y, 8, 8, bitmap);
         cx += pgm_read_byte(&FONT_ADV[t]);
+    }
+}
+
+void wrap_text(char* str, uint8_t w)
+{
+    uint8_t i = 0;
+    uint8_t x = 0;
+    char t;
+    while((t = str[i++]) != '\0') {
+        if(t == '\n') {
+            x = 0;
+            continue;
+        }
+        t -= ' ';
+        x += pgm_read_byte(&FONT_ADV[t]);
+        if(x > w) {
+            --i;
+            while(t != ' ' && i != 0)
+                t = str[--i];
+            if(i != 0) str[i] = '\n';
+        }
     }
 }
 

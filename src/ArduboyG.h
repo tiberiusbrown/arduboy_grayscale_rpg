@@ -160,7 +160,7 @@ extern uint8_t  current_plane;
 #if defined(ABG_SYNC_THREE_PHASE)
 extern uint8_t  current_phase;
 #endif
-extern bool     needs_display; // needs display work
+extern bool volatile needs_display; // needs display work
 
 void send_cmds_(uint8_t const* d, uint8_t n);
 void send_cmds_prog_(uint8_t const* d, uint8_t n);
@@ -942,7 +942,7 @@ uint8_t  current_plane;
 #if defined(ABG_SYNC_THREE_PHASE)
 uint8_t  current_phase;
 #endif
-bool     needs_display;
+bool volatile needs_display;
 
 void send_cmds_(uint8_t const* d, uint8_t n)
 {

@@ -1,11 +1,12 @@
 #define ABG_IMPLEMENTATION
-#define ABG_UPDATE_EVERY_N_DEFAULT 2
 #include "common.hpp"
 
 #include "ArduboyFX.h"
 #include "generated/fxdata.h"
 
 decltype(a) a;
+
+ARDUBOY_NO_USB
 
 void loop()
 {

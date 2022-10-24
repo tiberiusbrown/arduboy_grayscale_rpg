@@ -9,4 +9,6 @@ void initialize()
     py = 112;
     pdir = 0;
     pmoving = false;
+    chunks_are_running = false;
+    change_state(STATE_MAP);
 }

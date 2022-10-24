@@ -7,6 +7,8 @@
 
 #include "common.hpp"
 
+#define MUTED_PALETTE 1
+
 int gplane;
 uint8_t pixels[2][128 * 64];
 uint8_t tex_pixels[128 * 63 * 3];
@@ -14,6 +16,7 @@ uint8_t tex_pixels[128 * 63 * 3];
 int main(int argc, char** argv)
 {
     constexpr int ZOOM = 4;
+    bool fullscreen = false;
     SDL_Init(SDL_INIT_EVERYTHING);
     SDL_Window* window;
     SDL_Renderer* renderer;
@@ -31,9 +34,20 @@ int main(int argc, char** argv)
 
     bool quit = false;
     while(!quit) {
+
         SDL_Event e;
         while(SDL_PollEvent(&e)) {
             if(e.type == SDL_QUIT) quit = true;
+            if(e.type == SDL_KEYDOWN &&
+               e.key.keysym.scancode == SDL_SCANCODE_F11) {
+                fullscreen = !fullscreen;
+                if(fullscreen) {
+                    SDL_SetWindowFullscreen(window,
+                                            SDL_WINDOW_FULLSCREEN_DESKTOP);
+                } else {
+                    SDL_SetWindowFullscreen(window, 0);
+                }
+            }
         }
 
         static int frame = 0;
@@ -67,14 +81,43 @@ int main(int argc, char** argv)
         for(int i = 0; i < 128 * 63; ++i) {
             int p0 = pixels[0][i];
             int p1 = pixels[1][i];
+#if MUTED_PALETTE
+            uint8_t p = uint8_t((p0 * 0x40 + p1 * 0x80 + 0x20) & 0xff);
+#else
             uint8_t p = uint8_t((p0 * 0x55 + p1 * 0xaa) & 0xff);
+#endif
             tex_pixels[i * 3 + 0] = p;
             tex_pixels[i * 3 + 1] = p;
             tex_pixels[i * 3 + 2] = p;
         }
 
         SDL_UpdateTexture(tex, nullptr, tex_pixels, 128 * 3);
-        SDL_RenderCopy(renderer, tex, nullptr, nullptr);
+
+        {
+            int x = 0, y = 0, w = 0, h = 0, z = 0;
+            float r = 128.f / 63.f;
+            SDL_GetWindowSize(window, &w, &h);
+            float wr = (float)w / (float)h;
+            while(128 * z <= w && 63 * z <= h)
+                ++z;
+            --z;
+            if(z == 0) {
+                if(wr < r) {
+                    h = int((float)w / r + 0.5f);
+                    y = h / 2;
+                } else {
+                    w = int((float)h * r + 0.5f);
+                    x = w / 2;
+                }
+            } else {
+                x = (w - 128 * z) / 2;
+                y = (h - 63 * z) / 2;
+                w = 128 * z;
+                h = 63 * z;
+            }
+            SDL_Rect rect{x, y, w, h};
+            SDL_RenderCopy(renderer, tex, nullptr, &rect);
+        }
 
         SDL_RenderPresent(renderer);
     }

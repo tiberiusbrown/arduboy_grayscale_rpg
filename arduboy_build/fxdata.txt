@@ -1,1 +1,6 @@
-raw_t RPGDATA = "rpgdata.bin"
+raw_t MAPDATA = "mapdata.bin"
+raw_t STRINGDATA = "stringdata.bin"
+
+// the following should correspond to options in common.h
+raw_t PORTRAIT_IMG = "portrait_img.bin"
+raw_t PLAYER_IMG = "player_img.bin"

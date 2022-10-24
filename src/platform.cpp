@@ -93,6 +93,57 @@ void platform_drawplusmask(int16_t x, int16_t y, uint8_t const* bitmap,
 #endif
 }
 
+void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
+                               uint8_t frame)
+{
+#ifdef ARDUINO
+    FX::drawBitmap(x, y, addr, frame * 2 + a.currentPlane(), dbmOverwrite);
+#else
+    uint8_t const* bitmap = &FXDATA[addr];
+    bitmap++;
+    uint8_t w = *bitmap++;
+    bitmap++;
+    uint8_t h = *bitmap++;
+    bitmap += w * h / 8 * (frame * 2 + gplane);
+    for(uint8_t r = 0; r < h; ++r) {
+        for(uint8_t c = 0; c < w; ++c) {
+            int py = y + r;
+            int px = x + c;
+            if(px < 0 || py < 0) continue;
+            if(px >= 128 || py >= 64) continue;
+            uint8_t p = get_bitmap_bit(bitmap, w, h, c, r);
+            pixels[gplane][py * 128 + px] = p;
+        }
+    }
+#endif
+}
+
+void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
+                              uint8_t frame)
+{
+#ifdef ARDUINO
+    FX::drawBitmap(x, y, addr, frame * 2 + a.currentPlane(), dbmMasked);
+#else
+    uint8_t const* bitmap = &FXDATA[addr];
+    bitmap++;
+    uint8_t w = *bitmap++;
+    bitmap++;
+    uint8_t h = *bitmap++;
+    bitmap += w * h / 4 * (frame * 2 + gplane);
+    for(uint8_t r = 0; r < h; ++r) {
+        for(uint8_t c = 0; c < w; ++c) {
+            int py = y + r;
+            int px = x + c;
+            if(px < 0 || py < 0) continue;
+            if(px >= 128 || py >= 64) continue;
+            uint8_t p = get_bitmap_bit(bitmap, w * 2, h, c * 2 + 0, r);
+            uint8_t m = get_bitmap_bit(bitmap, w * 2, h, c * 2 + 1, r);
+            if(m) pixels[gplane][py * 128 + px] = p;
+        }
+    }
+#endif
+}
+
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c)
 {
 #ifdef ARDUINO
@@ -102,7 +153,7 @@ void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c)
     for(uint8_t i = 0; i != h; ++i)
         for(uint8_t j = 0; j != w; ++j)
             if(unsigned(y + i) < 64 && unsigned(x + j) < 128)
-                pixels[gplane][(y + i) * 128 + j] = c;
+                pixels[gplane][(y + i) * 128 + (x + j)] = c;
 #endif
 }
 
