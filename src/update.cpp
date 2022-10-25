@@ -115,14 +115,14 @@ static void update_tp()
 {
     auto& d = sdata.tp;
     ++d.frame;
-    // terminate old chunk scripts
-    chunks_are_running = false;
     if(d.frame == TELEPORT_TRANSITION_FRAMES) {
         px = d.tx * 16 + 8;
         py = d.ty * 16 + 8;
+        // terminate old chunk scripts
+        chunks_are_running = false;
         load_chunks();
+        run_chunks();
     }
-    run_chunks();
     if(d.frame == TELEPORT_TRANSITION_FRAMES * 2) change_state(STATE_MAP);
 }
 

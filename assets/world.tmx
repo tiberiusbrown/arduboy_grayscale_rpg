@@ -137,7 +137,11 @@
  <objectgroup id="2" name="Scripts">
   <object id="5" x="23.5" y="103.75">
    <properties>
-    <property name="script">$brnt skip_to_end
+    <property name="script">brfc !sign_first_read no_chest
+st 27 138
+no_chest:
+
+$brnt skip_to_end
 
 brfs !sign_first_read skip_first
 fs !sign_first_read
@@ -148,14 +152,6 @@ skip_first:
 msg {Why are you reading this sign again? You've already read it!}
 
 skip_to_end:</property>
-   </properties>
-   <point/>
-  </object>
-  <object id="12" x="55.75" y="119.25">
-   <properties>
-    <property name="script">brfc !sign_first_read no_chest
-$st 138
-no_chest:</property>
    </properties>
    <point/>
   </object>
