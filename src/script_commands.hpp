@@ -22,6 +22,9 @@ Action Instructions
     tdlg <tile> <portrait> {string}
         If player selects <tile>, dlg <portrait> {string}
 
+    Teleportation instructions terminate the script processing, as they cause
+    a chunk reload to occur.
+
     tp <tx> <ty>
         Teleport player to specified tile coordinates
         
@@ -29,7 +32,7 @@ Action Instructions
         If player selects <tile>, tp <tx> <ty>
         
     wtp <tile> <tx> <ty>
-        If player walks onto tile, tp <tx> <ty>
+        If player walks onto <tile>, tp <tx> <ty>
         
 ALU Instructions
 
@@ -44,6 +47,9 @@ ALU Instructions
 
     sub <rdst> <rsrc>
         <rdst> = <rdst> + <rsrc>
+
+    fc <flag>
+        Clear <flag>
         
 Control Instructions
 
@@ -52,14 +58,26 @@ Control Instructions
 
     jmp label
         Unconditionally branch to label
-        
+
     brz <reg> label
         If <reg> is zero, jmp label
-        
+
     brn <reg> label
         If <reg> is nonzero, jmp label
+
+    brfs <flag> label
+        If <flag> is set, jmp label
+
+    brfc <flag> label
+        If <flag> is cleared, jmp label
         
-Other Assembly 
+    brnt <tile> label
+        If player is NOT selecting <tile>, jmp label
+        
+    brnt <tile> label
+        If player is NOT walking on <tile>, jmp label
+
+Other Assembly Syntax
 
     Shortcut          Meaning
     ==========================================================================
@@ -68,7 +86,11 @@ Other Assembly
     $tdlg             tdlg $T
     $ttp              ttp $T
     $wtp              wtp $T
-    label:            label the position of the following instruction
+    $brnt             brnt $T
+    $brnw             brnw $T
+    label_name:       label the position of the following instruction
+    !flag_name        unique flag identifier (auto-assigns to index)
+    {string message}  unique string identifier (auto-assigns to index)
 
 */
 
@@ -88,8 +110,13 @@ enum {
     CMD_ADD,
     CMD_ADDI,
     CMD_SUB,
+    CMD_FS,
     
     CMD_JMP,
     CMD_BRZ,
     CMD_BRN,
+    CMD_BRFS,
+    CMD_BRFC,
+    CMD_BRNT,
+    CMD_BRNW,
 };

@@ -5,10 +5,13 @@
 void initialize()
 {
     nframe = 0;
+    chunks_are_running = false;
+
     px = 128;
     py = 112;
     pdir = 0;
     pmoving = false;
-    chunks_are_running = false;
     change_state(STATE_MAP);
+    for(auto& f : story_flags)
+        f = 0;
 }

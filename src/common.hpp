@@ -1,11 +1,13 @@
 #pragma once
 
-#include <stdint.h>
-
 #define PLAYER_IMG_IN_PROG 0
 #define PORTRAIT_IMG_IN_PROG 0
 
 #define TELEPORT_TRANSITION_FRAMES 16
+
+#include <stdint.h>
+
+#include "generated/story_flags.hpp"
 
 #ifdef ARDUINO
 #define ABG_SYNC_PARK_ROW
@@ -71,6 +73,8 @@ enum {
     STATE_MAP,    // moving around on the map
     STATE_DIALOG, // message or dialog
     STATE_TP,     // player is teleporting (e.g., entering building or cave)
+    STATE_NEW,    // new game: erase flag data
+    STATE_LOAD,   // load game: load save info, copy save flags to flag page
 };
 extern uint8_t state;
 
@@ -99,6 +103,10 @@ extern bool pmoving;        // whether player is moving
 extern uint16_t px, py;     // player position (in pixels)
 extern uint16_t selx, sely; // selected tile
 
+extern uint8_t story_flags[STORY_FLAG_BYTES];
+void story_flag_set(uint16_t index);
+bool story_flag_get(uint16_t index);
+
 struct active_chunk_t {
     map_chunk_t chunk;
 };
@@ -126,6 +134,14 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
                               uint8_t frame);
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
+#if 0
+void platform_fx_clear_flag(uint16_t index);
+bool platform_fx_get_flag(uint16_t index);
+void platform_fx_erase_save_sector(uint16_t page);
+void platform_fx_write_save_page(uint16_t page, void const* data);
+void platform_fx_read_save_page(uint16_t page, void* data);
+bool platform_fx_busy();
+#endif
 
 // draw.cpp
 void draw_text(uint8_t x, uint8_t y, char const* str); // str NOT in prog

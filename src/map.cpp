@@ -77,7 +77,6 @@ static bool run_chunk()
             chunk_regs[dst] += chunk_regs[src];
             break;
         }
-
         case CMD_ADDI: {
             uint8_t t = c.script[chunk_instr++];
             int8_t imm = (int8_t)c.script[chunk_instr++];
@@ -86,14 +85,19 @@ static bool run_chunk()
             chunk_regs[dst] = chunk_regs[src] + imm;
             break;
         }
-
         case CMD_SUB: {
             uint8_t t = c.script[chunk_instr++];
             uint8_t dst = t & 0xf;
             uint8_t src = t >> 4;
             chunk_regs[dst] -= chunk_regs[src];
             break;
-        }            
+        }
+        case CMD_FS: {
+            uint16_t f = c.script[chunk_instr++];
+            f |= (uint16_t(c.script[chunk_instr++]) << 8);
+            story_flag_set(f);
+            break;
+        }
 
         case CMD_JMP: chunk_instr = c.script[chunk_instr]; break;
         case CMD_BRZ: {
@@ -106,6 +110,28 @@ static bool run_chunk()
             uint8_t t = c.script[chunk_instr++];
             uint8_t i = c.script[chunk_instr++];
             if(chunk_regs[t] < 0) chunk_instr = i;
+            break;
+        }
+        case CMD_BRFS:
+        case CMD_BRFC: {
+            uint16_t f = c.script[chunk_instr++];
+            f |= (uint16_t(c.script[chunk_instr++]) << 8);
+            uint8_t t = c.script[chunk_instr++];
+            bool fs = story_flag_get(f);
+            if(instr == CMD_BRFC) fs = !fs;
+            if(fs) chunk_instr = t;
+            break;
+        }
+        case CMD_BRNT: {
+            uint8_t t = c.script[chunk_instr++];
+            uint8_t i = c.script[chunk_instr++];
+            if(t != sel_tile) chunk_instr = i;
+            break;
+        }
+        case CMD_BRNW: {
+            uint8_t t = c.script[chunk_instr++];
+            uint8_t i = c.script[chunk_instr++];
+            if(t != walk_tile) chunk_instr = i;
             break;
         }
 

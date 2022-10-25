@@ -50,6 +50,8 @@ for obj in tm.layers[1]:
             t = t.replace('$tdlg ', 'tdlg $T ')
             t = t.replace('$ttp ', 'ttp $T ')
             t = t.replace('$wtp ', 'wtp $T ')
+            t = t.replace('$brnt ', 'brnt $T ')
+            t = t.replace('$brnw ', 'brnw $T ')
             t = t.replace('$T', str(tile))
             s = s + t + '\n'
     b = script_assembler.assemble(s)
@@ -64,6 +66,13 @@ for chunk in range(CHUNKS_W * CHUNKS_H):
     b = bs[chunk]
     for i in range(len(b)):
         bytes[index + i] = b[i]
+
+# write story_flags.hpp
+with open('../src/generated/story_flags.hpp', 'w') as f:
+    f.write('#pragma once\n\n')
+    n = len(script_assembler.flags)
+    n = 1 if n == 0 else (n + 7) / 8
+    f.write('constexpr int STORY_FLAG_BYTES = %d;\n' % n)
 
 # write mapdata.bin
 with open('../arduboy_build/mapdata.bin', 'wb') as f:

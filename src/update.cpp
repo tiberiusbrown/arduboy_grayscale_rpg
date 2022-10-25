@@ -99,7 +99,8 @@ static void update_dialog()
             d.char_progress = 0;
         }
         else if(d.message[d.char_progress] == '\0') {
-            change_state(STATE_MAP);
+            if(!(chunks_are_running && run_chunks()))
+                change_state(STATE_MAP);
         } else {
             //skip_dialog_animation(third_newline);
         }
@@ -117,6 +118,8 @@ static void update_tp()
     if(d.frame == TELEPORT_TRANSITION_FRAMES) {
         px = d.tx * 16 + 8;
         py = d.ty * 16 + 8;
+        // terminate old chunk scripts
+        chunks_are_running = false;
         load_chunks();
     }
     if(d.frame == TELEPORT_TRANSITION_FRAMES * 2) change_state(STATE_MAP);

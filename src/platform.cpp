@@ -5,6 +5,10 @@
 #else
 #include "generated/fxdata_emulated.hpp"
 #include <string.h>
+#include <assert.h>
+#include <SDL.h>
+static uint8_t SAVE_BLOCK[8192];
+static uint64_t ticks_when_ready = 0;
 #endif
 
 void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num)
@@ -12,6 +16,7 @@ void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num)
 #ifdef ARDUINO
     FX::readDataBytes(addr, dst, num);
 #else
+    assert(SDL_GetTicks64() >= ticks_when_ready);
     memcpy(dst, &FXDATA[addr], num);
 #endif
 }
@@ -99,6 +104,7 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
 #ifdef ARDUINO
     FX::drawBitmap(x, y, addr, frame * 2 + a.currentPlane(), dbmOverwrite);
 #else
+    assert(SDL_GetTicks64() >= ticks_when_ready);
     uint8_t const* bitmap = &FXDATA[addr];
     bitmap++;
     uint8_t w = *bitmap++;
@@ -124,6 +130,7 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
 #ifdef ARDUINO
     FX::drawBitmap(x, y, addr, frame * 2 + a.currentPlane(), dbmMasked);
 #else
+    assert(SDL_GetTicks64() >= ticks_when_ready);
     uint8_t const* bitmap = &FXDATA[addr];
     bitmap++;
     uint8_t w = *bitmap++;
@@ -168,3 +175,84 @@ void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c)
     platform_fillrect(x + w - 1, y, 1, h, c);
 #endif
 }
+
+#if 0
+
+void platform_fx_clear_flag(uint16_t index)
+{
+    uint16_t addr = 4096 + index / 8;
+    uint8_t mask = ~(1 << (index % 8));
+#ifdef ARDUINO
+    FX::writeEnable();
+    FX::seekCommand(SFC_WRITE, (uint24_t(FX::programSavePage) << 8) + addr);
+    FX::writeByte(mask);
+    FX::disable();
+#else
+    SAVE_BLOCK[addr] &= mask;
+#endif
+}
+
+bool platform_fx_get_flag(uint16_t index)
+{
+    uint16_t addr = 4096 + index / 8;
+    uint8_t mask = 1 << (index % 8);
+#ifdef ARDUINO
+    uint8_t data;
+    FX::readSaveBytes(addr, &data, 1);
+    return (data & mask) != 0;
+#else
+    return (SAVE_BLOCK[addr] & mask) != 0;
+#endif
+}
+
+void platform_fx_erase_save_sector(uint16_t page)
+{
+#ifdef ARDUINO
+    FX::eraseSaveBlock(page);
+#else
+    uint64_t now = SDL_GetTicks64();
+    assert(now >= ticks_when_ready);
+    ticks_when_ready = now + 150;
+    for(int i = 0; i < 256; ++i)
+        SAVE_BLOCK[page * 256 + i] = 0xff;
+#endif
+}
+void platform_fx_write_save_page(uint16_t page, void const* data)
+{
+#ifdef ARDUINO
+    // eww cast to non const
+    FX::writeSavePage(page, (uint8_t*)data);
+#else
+    uint64_t now = SDL_GetTicks64();
+    assert(now >= ticks_when_ready);
+    ticks_when_ready = now + 2;
+    uint8_t const* u8data = (uint8_t const*)data;
+    for(int i = 0; i < 256; ++i)
+        SAVE_BLOCK[page * 256 + i] &= u8data[i];
+#endif
+}
+void platform_fx_read_save_page(uint16_t page, void* data)
+{
+#ifdef ARDUINO
+    FX::readSaveBytes(uint24_t(page) << 8, (uint8_t*)data, 256);
+#else
+    uint8_t* u8data = (uint8_t*)data;
+    for(int i = 0; i < 256; ++i)
+        u8data[i] = SAVE_BLOCK[page * 256 + i];
+#endif
+}
+
+bool platform_fx_busy()
+{
+#ifdef ARDUINO
+    FX::enable();
+    FX::writeByte(SFC_READSTATUS1);
+    bool busy = ((FX::readByte() & 1) != 0);
+    FX::disable();
+    return busy;
+#else
+    return SDL_GetTicks64() >= ticks_when_ready;
+#endif
+}
+
+#endif
