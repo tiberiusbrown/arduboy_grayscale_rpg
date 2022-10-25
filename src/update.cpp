@@ -79,7 +79,6 @@ static void skip_dialog_animation(uint8_t third_newline) {
 static void update_dialog()
 {
     auto& d = sdata.dialog;
-    pmoving = false;
     uint8_t third_newline = 255;
     {
         uint8_t n = 0;
@@ -115,15 +114,15 @@ static void update_dialog()
 static void update_tp()
 {
     auto& d = sdata.tp;
-    pmoving = false;
     ++d.frame;
+    // terminate old chunk scripts
+    chunks_are_running = false;
     if(d.frame == TELEPORT_TRANSITION_FRAMES) {
         px = d.tx * 16 + 8;
         py = d.ty * 16 + 8;
-        // terminate old chunk scripts
-        chunks_are_running = false;
         load_chunks();
     }
+    run_chunks();
     if(d.frame == TELEPORT_TRANSITION_FRAMES * 2) change_state(STATE_MAP);
 }
 
@@ -136,5 +135,6 @@ void update()
         update_tp,
     };
 
+    pmoving = false;
     (pgmptr(&FUNCS[state]))();
 }

@@ -39,6 +39,7 @@ static bool run_chunk()
             if(instr == CMD_TDLG) t1 = c.script[chunk_instr++];
             uint16_t stri = c.script[chunk_instr++];
             stri |= uint16_t(c.script[chunk_instr++]) << 8;
+            if(state != STATE_MAP) break;
             if((instr == CMD_TMSG || instr == CMD_TDLG) && t0 != sel_tile)
                 break;
             change_state(STATE_DIALOG);
@@ -62,6 +63,7 @@ static bool run_chunk()
             tx |= uint16_t(c.script[chunk_instr++]) << 8;
             ty = c.script[chunk_instr++];
             ty |= uint16_t(c.script[chunk_instr++]) << 8;
+            if(state != STATE_MAP) break;
             if(instr == CMD_TTP && t != sel_tile) break;
             if(instr == CMD_WTP && t != walk_tile) break;
             change_state(STATE_TP);
