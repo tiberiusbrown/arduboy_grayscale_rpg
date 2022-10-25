@@ -1,17 +1,65 @@
 #ifndef ARDUINO
 
-#include <SDL.h>
-
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
+
+#include <SDL.h>
 
 #include "common.hpp"
 
 #define MUTED_PALETTE 1
+#define EXCLUDE_LAST_ROW 1
+
+constexpr int FBH = EXCLUDE_LAST_ROW ? 63 : 64;
+
+#ifndef NDEBUG
+#include "gif.h"
+static GifWriter gif;
+static bool gif_recording = false;
+static uint64_t gif_frame_time = 0;
+#endif
 
 int gplane;
 uint8_t pixels[2][128 * 64];
-uint8_t tex_pixels[128 * 63 * 3];
+uint8_t tex_pixels[128 * 63 * 4];
+
+static void send_gif_frame(int ds = 3)
+{
+#ifndef NDEBUG
+    if(gif_recording) {
+        uint64_t t = SDL_GetTicks64();
+        double dt = double(t - gif_frame_time) / 1000.0;
+        gif_frame_time = t;
+        //GifWriteFrame(&gif, tex_pixels, 128, FBH, int(dt * 100 + 1.5), 2);
+        GifWriteFrame(&gif, tex_pixels, 128, FBH, ds);
+    }
+#endif
+}
+
+static void screen_recording_toggle()
+{
+#ifndef NDEBUG
+    if(gif_recording) {
+        GifEnd(&gif);
+        gif_recording = false;
+    } else {
+        char fname[256];
+        time_t rawtime;
+        struct tm* ti;
+        time(&rawtime);
+        ti = localtime(&rawtime);
+        snprintf(fname, sizeof(fname), "recording_%04d%02d%02d%02d%02d%02d.gif",
+                 ti->tm_year + 1900, ti->tm_mon + 1, ti->tm_mday,
+                 ti->tm_hour + 1, ti->tm_min, ti->tm_sec);
+        GifBegin(&gif, fname, 128, FBH, 33);
+        gif_frame_time = SDL_GetTicks64();
+        gif_recording = true;
+        send_gif_frame(0);
+    }
+#endif
+}
 
 int main(int argc, char** argv)
 {
@@ -21,14 +69,14 @@ int main(int argc, char** argv)
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
-    if(0 != SDL_CreateWindowAndRenderer(128 * ZOOM, 63 * ZOOM,
+    if(0 != SDL_CreateWindowAndRenderer(128 * ZOOM, FBH * ZOOM,
                                         SDL_WINDOW_ALLOW_HIGHDPI |
                                             SDL_WINDOW_RESIZABLE,
                                         &window, &renderer))
         goto error_quit;
 
-    SDL_Texture* tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24,
-                                         SDL_TEXTUREACCESS_STREAMING, 128, 63);
+    SDL_Texture* tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888,
+                                         SDL_TEXTUREACCESS_STREAMING, 128, FBH);
 
     initialize();
 
@@ -48,6 +96,8 @@ int main(int argc, char** argv)
                     SDL_SetWindowFullscreen(window, 0);
                 }
             }
+            if(e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_R)
+                screen_recording_toggle();
         }
 
         static int frame = 0;
@@ -75,10 +125,12 @@ int main(int argc, char** argv)
         gplane = 1;
         render();
 
+        if(frame == 1) send_gif_frame();
+
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        for(int i = 0; i < 128 * 63; ++i) {
+        for(int i = 0; i < 128 * FBH; ++i) {
             int p0 = pixels[0][i];
             int p1 = pixels[1][i];
 #if MUTED_PALETTE
@@ -86,19 +138,20 @@ int main(int argc, char** argv)
 #else
             uint8_t p = uint8_t((p0 * 0x55 + p1 * 0xaa) & 0xff);
 #endif
-            tex_pixels[i * 3 + 0] = p;
-            tex_pixels[i * 3 + 1] = p;
-            tex_pixels[i * 3 + 2] = p;
+            tex_pixels[i * 4 + 0] = p;
+            tex_pixels[i * 4 + 1] = p;
+            tex_pixels[i * 4 + 2] = p;
+            tex_pixels[i * 4 + 3] = 0xff;
         }
 
-        SDL_UpdateTexture(tex, nullptr, tex_pixels, 128 * 3);
+        SDL_UpdateTexture(tex, nullptr, tex_pixels, 128 * 4);
 
         {
             int x = 0, y = 0, w = 0, h = 0, z = 0;
-            float r = 128.f / 63.f;
+            float r = 128.f / float(FBH);
             SDL_GetWindowSize(window, &w, &h);
             float wr = (float)w / (float)h;
-            while(128 * z <= w && 63 * z <= h)
+            while(128 * z <= w && FBH * z <= h)
                 ++z;
             --z;
             if(z == 0) {
@@ -108,19 +161,28 @@ int main(int argc, char** argv)
                 } else {
                     w = int((float)h * r + 0.5f);
                     x = w / 2;
-                }
+                } 
             } else {
                 x = (w - 128 * z) / 2;
-                y = (h - 63 * z) / 2;
+                y = (h - FBH * z) / 2;
                 w = 128 * z;
-                h = 63 * z;
+                h = FBH * z;
             }
             SDL_Rect rect{x, y, w, h};
             SDL_RenderCopy(renderer, tex, nullptr, &rect);
         }
 
+        if(gif_recording) {
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 128);
+            SDL_Rect rect{10, 10, 20, 20};
+            SDL_RenderFillRect(renderer, &rect);
+        }
+
         SDL_RenderPresent(renderer);
     }
+
+    if(gif_recording) screen_recording_toggle();
 
     SDL_DestroyTexture(tex);
 

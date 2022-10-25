@@ -6,28 +6,41 @@ flags = {}
 
 MAX_STRING_LENGTH = 253
 
-CMD_END  =  0
+from enum import IntEnum, auto
 
-CMD_MSG  =  1
-CMD_DLG  =  2
-CMD_TMSG =  3
-CMD_TDLG =  4
-CMD_TP   =  5
-CMD_TTP  =  6
-CMD_WTP  =  7
+class AutoNumber(IntEnum):
+    def __new__(self):
+        value = len(self.__members__)
+        obj = int.__new__(self)
+        obj._value_ = value
+        return obj
 
-CMD_ADD  =  8
-CMD_ADDI =  9
-CMD_SUB  = 10
-CMD_FS   = 11
+class CMD(AutoNumber):
 
-CMD_JMP  = 12
-CMD_BRZ  = 13
-CMD_BRN  = 14
-CMD_BRFS = 15
-CMD_BRFC = 16
-CMD_BRNT = 17
-CMD_BRNW = 18
+    END  = ()
+
+    MSG  = ()
+    DLG  = ()
+    TMSG = ()
+    TDLG = ()
+    TP   = ()
+    TTP  = ()
+    WTP  = ()
+
+    ADD  = ()
+    ADDI = ()
+    SUB  = ()
+
+    FS   = ()
+    ST   = ()
+
+    JMP  = ()
+    BRZ  = ()
+    BRN  = ()
+    BRFS = ()
+    BRFC = ()
+    BRNT = ()
+    BRNW = ()
 
 # TODO: merge duplicate strings
 def addstring(b, s):
@@ -81,93 +94,98 @@ def assemble(s):
     while i < len(s):
     
         if s[i] == 'end':
-            b.append(CMD_END); i += 1
+            b.append(CMD.END); i += 1
     
         elif s[i] == 'msg':
-            b.append(CMD_MSG); i += 1
+            b.append(CMD.MSG); i += 1
             addstring(b, s[i]); i += 1
             
         elif s[i] == 'tmsg':
-            b.append(CMD_TMSG); i += 1
+            b.append(CMD.TMSG); i += 1
             b.append(int(s[i])); i += 1
             addstring(b, s[i]); i += 1
             
         elif s[i] == 'dlg':
-            b.append(CMD_DLG); i += 1
+            b.append(CMD.DLG); i += 1
             b.append(int(s[i])); i += 1
             addstring(b, s[i]); i += 1
             
         elif s[i] == 'tdlg':
-            b.append(CMD_TDLG); i += 1
+            b.append(CMD.TDLG); i += 1
             b.append(int(s[i])); i += 1
             b.append(int(s[i])); i += 1
             addstring(b, s[i]); i += 1
             
         elif s[i] == 'tp':
-            b.append(CMD_TP); i += 1
+            b.append(CMD.TP); i += 1
             append16(b, s[i]); i += 1
             append16(b, s[i]); i += 1
             
         elif s[i] == 'ttp':
-            b.append(CMD_TTP); i += 1
+            b.append(CMD.TTP); i += 1
             b.append(int(s[i])); i += 1
             append16(b, s[i]); i += 1
             append16(b, s[i]); i += 1
             
         elif s[i] == 'wtp':
-            b.append(CMD_WTP); i += 1
+            b.append(CMD.WTP); i += 1
             b.append(int(s[i])); i += 1
             append16(b, s[i]); i += 1
             append16(b, s[i]); i += 1
             
         elif s[i] == 'add':
-            b.append(CMD_ADD); i += 1
+            b.append(CMD.ADD); i += 1
             b.append(dstreg(s[i]) + (reg(s[i+1])<<4)); i += 2
             
         elif s[i] == 'addi':
-            b.append(CMD_ADDI); i += 1
+            b.append(CMD.ADDI); i += 1
             b.append(dstreg(s[i]) + (reg(s[i+1])<<4)); i += 2
             b.append(int(s[i])); i += 1
             
         elif s[i] == 'sub':
-            b.append(CMD_SUB); i += 1
+            b.append(CMD.SUB); i += 1
             b.append(dstreg(s[i]) + (reg(s[i+1])<<4)); i += 2
             
         elif s[i] == 'fs':
-            b.append(CMD_FS); i += 1
+            b.append(CMD.FS); i += 1
             addflag(b, s[i]); i += 1
             
+        elif s[i] == 'st':
+            b.append(CMD.ST); i += 1
+            b.append(int(s[i])); i += 1
+            b.append(int(s[i])); i += 1
+            
         elif s[i] == 'jmp':
-            b.append(CMD_JMP); i += 1
+            b.append(CMD.JMP); i += 1
             b.append(s[i]); i += 1
             
         elif s[i] == 'brz':
-            b.append(CMD_BRZ); i += 1
+            b.append(CMD.BRZ); i += 1
             b.append(reg(s[i])); i += 1
             b.append(s[i]); i += 1
             
         elif s[i] == 'brn':
-            b.append(CMD_BRN); i += 1
+            b.append(CMD.BRN); i += 1
             b.append(reg(s[i])); i += 1
             b.append(s[i]); i += 1
             
         elif s[i] == 'brfs':
-            b.append(CMD_BRFS); i += 1
+            b.append(CMD.BRFS); i += 1
             addflag(b, s[i]); i += 1
             b.append(s[i]); i += 1
             
         elif s[i] == 'brfc':
-            b.append(CMD_BRFC); i += 1
+            b.append(CMD.BRFC); i += 1
             addflag(b, s[i]); i += 1
             b.append(s[i]); i += 1
             
         elif s[i] == 'brnt':
-            b.append(CMD_BRNT); i += 1
+            b.append(CMD.BRNT); i += 1
             b.append(int(s[i])); i += 1
             b.append(s[i]); i += 1
             
         elif s[i] == 'brnw':
-            b.append(CMD_BRNW); i += 1
+            b.append(CMD.BRNW); i += 1
             b.append(int(s[i])); i += 1
             b.append(s[i]); i += 1
             
@@ -191,9 +209,21 @@ def assemble(s):
     for i in range(len(b)):
         if isinstance(b[i], str):
             if b[i] in labels:
-                b[i] = labels[b[i]]
+                b[i] = labels[b[i]] - (i + 1)
             else:
                 print('Unknown label: "%s"' % b[i])
                 sys.exit(1)
     
+    #print(b)
+    
+    # check valid byte values
+    for i in range(len(b)):
+        if isinstance(b[i], CMD):
+            b[i] = b[i]._value_
+        if b[i] < 0:
+            b[i] += 256
+        if b[i] >= 256:
+            print('Value out of range: %d' % x)
+            sys.exit(1)
+
     return b

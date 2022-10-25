@@ -24,7 +24,7 @@ static bool run_chunk()
         if(dx < 8 && dy < 4) sel_tile = dy * 8 + dx;
     }
     while(chunk_instr < CHUNK_SCRIPT_SIZE) {
-        uint8_t instr = c.script[chunk_instr++];
+        script_command_t instr = (script_command_t)c.script[chunk_instr++];
         switch(instr) {
         case CMD_END:
             return false;
@@ -92,24 +92,31 @@ static bool run_chunk()
             chunk_regs[dst] -= chunk_regs[src];
             break;
         }
+
         case CMD_FS: {
             uint16_t f = c.script[chunk_instr++];
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
             story_flag_set(f);
             break;
         }
+        case CMD_ST: {
+            uint8_t t = c.script[chunk_instr++];
+            uint8_t i = c.script[chunk_instr++];
+            c.tiles_flat[t] = i;
+            break;
+        }
 
-        case CMD_JMP: chunk_instr = c.script[chunk_instr]; break;
+        case CMD_JMP: chunk_instr += c.script[chunk_instr]; break;
         case CMD_BRZ: {
             uint8_t t = c.script[chunk_instr++];
             uint8_t i = c.script[chunk_instr++];
-            if(chunk_regs[t] == 0) chunk_instr = i;
+            if(chunk_regs[t] == 0) chunk_instr += i;
             break;
         }
         case CMD_BRN: {
             uint8_t t = c.script[chunk_instr++];
             uint8_t i = c.script[chunk_instr++];
-            if(chunk_regs[t] < 0) chunk_instr = i;
+            if(chunk_regs[t] < 0) chunk_instr += i;
             break;
         }
         case CMD_BRFS:
@@ -119,19 +126,19 @@ static bool run_chunk()
             uint8_t t = c.script[chunk_instr++];
             bool fs = story_flag_get(f);
             if(instr == CMD_BRFC) fs = !fs;
-            if(fs) chunk_instr = t;
+            if(fs) chunk_instr += t;
             break;
         }
         case CMD_BRNT: {
             uint8_t t = c.script[chunk_instr++];
             uint8_t i = c.script[chunk_instr++];
-            if(t != sel_tile) chunk_instr = i;
+            if(t != sel_tile) chunk_instr += i;
             break;
         }
         case CMD_BRNW: {
             uint8_t t = c.script[chunk_instr++];
             uint8_t i = c.script[chunk_instr++];
-            if(t != walk_tile) chunk_instr = i;
+            if(t != walk_tile) chunk_instr += i;
             break;
         }
 

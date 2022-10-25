@@ -48,8 +48,13 @@ ALU Instructions
     sub <rdst> <rsrc>
         <rdst> = <rdst> + <rsrc>
 
+Game Manipulation
+
     fc <flag>
         Clear <flag>
+        
+    st <tile> <tile_img>
+        Overwrite image at <tile> with <tile_img>
         
 Control Instructions
 
@@ -88,6 +93,7 @@ Other Assembly Syntax
     $wtp              wtp $T
     $brnt             brnt $T
     $brnw             brnw $T
+    $st               st $T
     label_name:       label the position of the following instruction
     !flag_name        unique flag identifier (auto-assigns to index)
     {string message}  unique string identifier (auto-assigns to index)
@@ -96,7 +102,7 @@ Other Assembly Syntax
 
 #pragma once
 
-enum {
+enum script_command_t {
     CMD_END,
 
     CMD_MSG,
@@ -110,7 +116,9 @@ enum {
     CMD_ADD,
     CMD_ADDI,
     CMD_SUB,
+    
     CMD_FS,
+    CMD_ST,
     
     CMD_JMP,
     CMD_BRZ,

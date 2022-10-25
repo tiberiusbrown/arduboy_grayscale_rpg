@@ -19,8 +19,6 @@ static void update_map()
         sely = (py + dy + 4) >> 4;
     }
 
-    if(run_chunks()) return;
-
     int8_t dx = 0, dy = 0;
     if(btns_down & BTN_UP) dy -= 1;
     if(btns_down & BTN_DOWN) dy += 1;
@@ -64,7 +62,9 @@ static void update_map()
         px += nx;
         py += ny;
     }
+
     load_chunks();
+    if(run_chunks()) return;
 
     ++nframe;
 }
@@ -79,6 +79,7 @@ static void skip_dialog_animation(uint8_t third_newline) {
 static void update_dialog()
 {
     auto& d = sdata.dialog;
+    pmoving = false;
     uint8_t third_newline = 255;
     {
         uint8_t n = 0;
@@ -114,6 +115,7 @@ static void update_dialog()
 static void update_tp()
 {
     auto& d = sdata.tp;
+    pmoving = false;
     ++d.frame;
     if(d.frame == TELEPORT_TRANSITION_FRAMES) {
         px = d.tx * 16 + 8;

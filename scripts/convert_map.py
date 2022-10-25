@@ -52,6 +52,7 @@ for obj in tm.layers[1]:
             t = t.replace('$wtp ', 'wtp $T ')
             t = t.replace('$brnt ', 'brnt $T ')
             t = t.replace('$brnw ', 'brnw $T ')
+            t = t.replace('$st ', 'st $T ')
             t = t.replace('$T', str(tile))
             s = s + t + '\n'
     b = script_assembler.assemble(s)
@@ -64,6 +65,7 @@ for obj in tm.layers[1]:
 for chunk in range(CHUNKS_W * CHUNKS_H):
     index = (32 + CHUNK_SCRIPT_SIZE) * chunk + 32
     b = bs[chunk]
+    #if len(b) > 0: print(b)
     for i in range(len(b)):
         bytes[index + i] = b[i]
 
