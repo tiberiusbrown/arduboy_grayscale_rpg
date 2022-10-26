@@ -1,14 +1,17 @@
 #include "common.hpp"
 
+#include <string.h>
+
 #include "generated/fxdata.h"
 #include "script_commands.hpp"
 #include "tile_solid.hpp"
 
 static bool run_chunk()
 {
-    auto& c = active_chunks[running_chunk].chunk;
-    uint16_t tx = uint8_t(loaded_cx + (running_chunk & 1)) * 8;
-    uint16_t ty = uint8_t(loaded_cy + (running_chunk >> 1)) * 4;
+    auto& ac = active_chunks[running_chunk];
+    auto& c = ac.chunk;
+    uint16_t tx = ac.cx * 8;
+    uint16_t ty = ac.cy * 4;
     uint8_t walk_tile = 255;
     {
         // TODO: could these be uint8_t
@@ -172,17 +175,33 @@ bool run_chunks()
 
 static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
 {
-    map_chunk_t* chunk = &active_chunks[index].chunk;
+    active_chunk_t& active_chunk = active_chunks[index];
+    map_chunk_t* chunk = &active_chunk.chunk;
+    if(active_chunk.cx == cx && active_chunk.cy == cy) return;
+    memset(&active_chunk, 0, sizeof(active_chunk));
+    active_chunk.cx = cx;
+    active_chunk.cy = cy;
     if(cx == 255 || cy == 255) {
         for(uint8_t i = 0; i < 32; ++i)
             chunk->tiles_flat[i] = 30;
         for(uint8_t i = 0; i < CHUNK_SCRIPT_SIZE; ++i)
             chunk->script[i] = 0;
+        chunk->enemy.type = 0;
         return;
     }
     uint16_t ci = cy * MAP_CHUNK_W + cx;
     uint24_t addr = uint24_t(ci) * sizeof(map_chunk_t);
     platform_fx_read_data_bytes(addr, chunk, sizeof(map_chunk_t));
+
+    // initialize enemy
+    {
+        auto& e = active_chunk.enemy_state;
+        auto const& info = active_chunk.chunk.enemy;
+        e.x = (info.path[0] & 7) * 16;
+        e.y = ((info.path[0] >> 3) & 3) * 16;
+        e.frames_rem = 1;
+        e.dir = 0xff;
+    }
 }
 
 void load_chunks()
@@ -190,12 +209,40 @@ void load_chunks()
     uint8_t cx = uint8_t(uint16_t(px - 64) >> 7);
     uint8_t cy = uint8_t(uint16_t(py - 32) >> 6);
 
-    // TODO: optimize shifting map?
-    // if(loaded_cx == cx && loaded_cy == cy)
-    //	return;
-
-    loaded_cx = cx;
-    loaded_cy = cy;
+    // shift chunks if possible
+    // this way, enemies don't visibly reset as the player moves between chunks
+    uint8_t pcx = active_chunks[0].cx;
+    uint8_t pcy = active_chunks[0].cy;
+    if(cx == pcx) {
+        if(cy == uint8_t(pcy + 1)) {
+            // shift up
+            memcpy(&active_chunks[0], &active_chunks[2],
+                   sizeof(active_chunk_t));
+            memcpy(&active_chunks[1], &active_chunks[3],
+                   sizeof(active_chunk_t));
+        } else if(cy == uint8_t(pcy - 1)) {
+            // shift down
+            memcpy(&active_chunks[2], &active_chunks[0],
+                   sizeof(active_chunk_t));
+            memcpy(&active_chunks[3], &active_chunks[1],
+                   sizeof(active_chunk_t));
+        }
+    }
+    if(cy == pcy) {
+        if(cx == uint8_t(pcx + 1)) {
+            // shift left
+            memcpy(&active_chunks[0], &active_chunks[1],
+                   sizeof(active_chunk_t));
+            memcpy(&active_chunks[2], &active_chunks[3],
+                   sizeof(active_chunk_t));
+        } else if(cx == uint8_t(pcx - 1)) {
+            // shift right
+            memcpy(&active_chunks[1], &active_chunks[0],
+                   sizeof(active_chunk_t));
+            memcpy(&active_chunks[3], &active_chunks[2],
+                   sizeof(active_chunk_t));
+        }
+    }
 
     load_chunk(0, cx + 0, cy + 0);
     load_chunk(1, cx + 1, cy + 0);
@@ -207,8 +254,8 @@ bool tile_is_solid(uint16_t tx, uint16_t ty)
 {
     uint8_t cx = uint8_t(tx >> 7);
     uint8_t cy = uint8_t(ty >> 6);
-    cx -= loaded_cx;
-    cy -= loaded_cy;
+    cx -= active_chunks[0].cx;
+    cy -= active_chunks[0].cy;
     if(cx > 1 || cy > 1) return true;
     uint8_t x = uint8_t(tx & 0x7f) >> 4;
     uint8_t y = uint8_t(ty & 0x3f) >> 4;

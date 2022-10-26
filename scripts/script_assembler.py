@@ -78,14 +78,19 @@ def dstreg(s):
         sys.exit(1)
     return x
     
-def addflag(b, s):
-    if s[0] != '!':
+def flag(s):
+    if s is None:
+        s = 'MF_' + str(len(flags))
+    elif s[0] != '!':
         print('Expected flag, got "%s"' % s)
         sys.exit(1)
     if s not in flags:
         n = len(flags)
         flags[s] = n
-    append16(b, flags[s])
+    return flags[s]
+    
+def addflag(b, s):
+    append16(b, flag(s))
 
 def assemble(s):
     b = []

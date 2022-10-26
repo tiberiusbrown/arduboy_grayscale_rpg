@@ -12,10 +12,15 @@ https://opengameart.org/content/gameboy-tileset
 
 GameBoy Style Home Interior Tileset
 MonkeyImage
-Public Domain
+Public Domain / Unlicensed
 https://monkeyimage.itch.io/home-interior-tilesheet-gameboy-styled
 
 8-Directional Game Boy Character Template
 GibbonGL
-Public Domain
+Public Domain / Unlicensed
 https://gibbongl.itch.io/8-directional-gameboy-character-template
+
+GB Studio Character pack
+Parabellum Games
+Public Domain / Unlicensed
+https://parabellum-games.itch.io/gb-studio-character-pack

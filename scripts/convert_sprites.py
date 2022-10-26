@@ -51,3 +51,4 @@ convert(BASE + 'tile_img.hpp', 'TILE_IMG', 'tiles.png', 16, 16)
 
 convert(BINBASE + 'portrait_img.bin', 'PORTRAIT_IMG', 'portraits.png', 32, 32)
 convert(BINBASE + 'player_img.bin', 'PLAYER_IMG', 'player_sprites.png', 16, 16)
+convert(BINBASE + 'enemy_img.bin', 'ENEMY_IMG', 'enemy_sprites.png', 16, 16)

@@ -33,7 +33,6 @@ uint16_t px, py;
 uint16_t selx, sely;
 
 active_chunk_t active_chunks[4];
-uint8_t loaded_cx, loaded_cy;
 
 uint8_t btns_down, btns_pressed;
 

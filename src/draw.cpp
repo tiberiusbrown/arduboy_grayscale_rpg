@@ -2,33 +2,42 @@
 
 #include "font_adv.hpp"
 #include "generated/font_img.hpp"
-
+#include "generated/fxdata.h"
 #include "generated/tile_img.hpp"
 
 #if PLAYER_IMG_IN_PROG
 #include "generated/player_img.hpp"
-#else
-#include "generated/fxdata.h"
 #endif
 
 void draw_player()
 {
-    uint8_t f = pdir * 3;
-    if(pmoving) {
-        uint8_t t = ((nframe >> 2) & 3);
-        if(t >= 2) t = (t - 2) * 2;
-        f += t;
-    }
+    uint8_t f = pdir * 4;
+    if(pmoving) f += ((nframe >> 2) & 3);
 #if PLAYER_IMG_IN_PROG
-    platform_drawplusmask(64 - 8, 32 - 8, PLAYER_IMG, f);
+    platform_drawplusmask(64 - 8, 32 - 8 - 4, PLAYER_IMG, f);
 #else
-    platform_fx_drawplusmask(64 - 8, 32 - 8, PLAYER_IMG, f);
+    platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, PLAYER_IMG, f);
 #endif
+}
+
+static inline void draw_enemy(enemy_info_t const& info, enemy_state_t const& e,
+                              int16_t ox, int16_t oy)
+{
+    uint8_t f = (info.type - 1) * 16;
+    uint8_t d = e.dir;
+    if(!(d & 0x80)) {
+        f += d * 2;
+        f += ((nframe >> 3) & 3);
+    }
+    platform_fx_drawplusmask(ox + e.x, oy + e.y, ENEMY_IMG, f);
+    //platform_fillrect(ox + e.x, oy + e.y, 16, 16, BLACK);
 }
 
 static void draw_chunk(uint8_t i, int16_t ox, int16_t oy)
 {
-    uint8_t* tiles = active_chunks[i].chunk.tiles_flat;
+    auto const& ac = active_chunks[i];
+    // draw tiles
+    uint8_t const* tiles = ac.chunk.tiles_flat;
     for(uint8_t r = 0, n = 0; r < 64; r += 16) {
         int16_t y = oy + r;
         if(y <= -16 || y >= 64) {
@@ -40,6 +49,10 @@ static void draw_chunk(uint8_t i, int16_t ox, int16_t oy)
             platform_drawoverwrite(x, y, TILE_IMG, tiles[n]);
         }
     }
+
+    // draw enemy
+    if(ac.chunk.enemy.path_num != 0)
+        draw_enemy(ac.chunk.enemy, ac.enemy_state, ox, oy);
 }
 
 void draw_tiles()

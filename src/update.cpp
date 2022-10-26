@@ -7,6 +7,54 @@ static int8_t const DIRY[8] PROGMEM = {
     1, 1, 0, -1, -1, -1, 0, 1,
 };
 
+static inline void update_enemy(enemy_info_t const& info, enemy_state_t& e)
+{
+    if(info.path_num == 0) return;
+
+    if(nframe & 1) return;
+
+    if(e.dir < 8) {
+        e.x += (int8_t)pgm_read_byte(&DIRX[e.dir]);
+        e.y += (int8_t)pgm_read_byte(&DIRY[e.dir]);
+    }
+
+    if(--e.frames_rem == 0) {
+        if(!(e.dir & 0x80)) {
+            uint8_t t = info.path[e.path_index];
+            if(t & 0xe0) {
+                // delay
+                e.frames_rem = (t >> 5) * 16;
+                e.dir = 0xff;
+                return;
+            }
+        }
+        if(++e.path_index == info.path_num) e.path_index = 0;
+        uint8_t t = info.path[e.path_index];
+        uint8_t x = (t & 7) * 16;
+        uint8_t y = ((t >> 3) & 3) * 16;
+        if(x < e.x) {
+            e.dir = 2;
+            e.frames_rem = e.x - x;
+        } else if(x > e.x) {
+            e.dir = 6;
+            e.frames_rem = x - e.x;
+        } else if(y < e.y) {
+            e.dir = 4;
+            e.frames_rem = e.y - y;
+        } else {
+            e.dir = 0;
+            e.frames_rem = y - e.y;
+        }
+    }
+}
+
+static void update_enemies()
+{
+    for(auto& c : active_chunks) {
+        update_enemy(c.chunk.enemy, c.enemy_state);
+    }
+}
+
 static void update_map()
 {
     if(chunks_are_running && run_chunks()) return;
@@ -16,7 +64,7 @@ static void update_map()
         int8_t dx = (int8_t)pgm_read_byte(&DIRX[pdir]) * 8;
         int8_t dy = (int8_t)pgm_read_byte(&DIRY[pdir]) * 8;
         selx = (px + dx) >> 4;
-        sely = (py + dy + 4) >> 4;
+        sely = (py + dy) >> 4;
     }
 
     int8_t dx = 0, dy = 0;
@@ -46,10 +94,10 @@ static void update_map()
         py += dy;
 
         int8_t nx = 0, ny = 0;
-        if(tile_is_solid(px - 3, py + 1)) ++nx, ++ny;
-        if(tile_is_solid(px + 3, py + 1)) --nx, ++ny;
-        if(tile_is_solid(px - 3, py + 7)) ++nx, --ny;
-        if(tile_is_solid(px + 3, py + 7)) --nx, --ny;
+        if(tile_is_solid(px - 3, py - 3)) ++nx, ++ny;
+        if(tile_is_solid(px + 3, py - 3)) --nx, ++ny;
+        if(tile_is_solid(px - 3, py + 3)) ++nx, --ny;
+        if(tile_is_solid(px + 3, py + 3)) --nx, --ny;
 
         if(nx > 1) nx = 1;
         if(nx < -1) nx = -1;
@@ -66,10 +114,13 @@ static void update_map()
     load_chunks();
     if(run_chunks()) return;
 
+    update_enemies();
+
     ++nframe;
 }
 
-static void skip_dialog_animation(uint8_t third_newline) {
+static void skip_dialog_animation(uint8_t third_newline)
+{
     auto& d = sdata.dialog;
     uint8_t i;
     for(i = 0; d.message[i] != '\0' && i != third_newline; ++i) {}
@@ -92,17 +143,15 @@ static void update_dialog()
     if(btns_down & BTN_B) skip_dialog_animation(third_newline);
     if(btns_pressed & BTN_A) {
         if(d.char_progress == third_newline) {
-            for(uint8_t i = 0; ; ++i) {
+            for(uint8_t i = 0;; ++i) {
                 d.message[i] = d.message[i + third_newline];
                 if(d.message[i] == '\0') break;
             }
             d.char_progress = 0;
-        }
-        else if(d.message[d.char_progress] == '\0') {
-            if(!(chunks_are_running && run_chunks()))
-                change_state(STATE_MAP);
+        } else if(d.message[d.char_progress] == '\0') {
+            if(!(chunks_are_running && run_chunks())) change_state(STATE_MAP);
         } else {
-            //skip_dialog_animation(third_newline);
+            // skip_dialog_animation(third_newline);
         }
     } else {
         for(uint8_t i = 0; i < 2; ++i)
