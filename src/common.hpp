@@ -123,6 +123,7 @@ struct enemy_state_t {
     uint8_t x, y, dir;
     uint8_t path_index;
     uint8_t frames_rem;
+    bool active;
 };
 
 struct active_chunk_t {

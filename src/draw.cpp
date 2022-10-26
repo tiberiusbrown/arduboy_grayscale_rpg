@@ -23,14 +23,14 @@ void draw_player()
 static inline void draw_enemy(enemy_info_t const& info, enemy_state_t const& e,
                               int16_t ox, int16_t oy)
 {
+    if(!e.active) return;
     uint8_t f = (info.type - 1) * 16;
     uint8_t d = e.dir;
     if(!(d & 0x80)) {
         f += d * 2;
         f += ((nframe >> 3) & 3);
     }
-    platform_fx_drawplusmask(ox + e.x, oy + e.y, ENEMY_IMG, f);
-    //platform_fillrect(ox + e.x, oy + e.y, 16, 16, BLACK);
+    platform_fx_drawplusmask(ox + e.x, oy + e.y - 4, ENEMY_IMG, f);
 }
 
 static void draw_chunk(uint8_t i, int16_t ox, int16_t oy)

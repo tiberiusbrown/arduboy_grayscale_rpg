@@ -9,8 +9,7 @@ static int8_t const DIRY[8] PROGMEM = {
 
 static inline void update_enemy(enemy_info_t const& info, enemy_state_t& e)
 {
-    if(info.path_num == 0) return;
-
+    if(!e.active) return;
     if(nframe & 1) return;
 
     if(e.dir < 8) {

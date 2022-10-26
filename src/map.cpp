@@ -201,6 +201,7 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
         e.y = ((info.path[0] >> 3) & 3) * 16;
         e.frames_rem = 1;
         e.dir = 0xff;
+        e.active = (info.path_num == 0 || !story_flag_get(info.flag));
     }
 }
 
