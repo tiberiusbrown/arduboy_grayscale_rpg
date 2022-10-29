@@ -27,8 +27,6 @@ def convert(fout, sym, fname, sw, sh, num = 0):
             f.write('};\n')
     if fout[-4:] == '.bin':
         with open(fout, 'wb') as f:
-            f.write(bytearray([0, sw]));
-            f.write(bytearray([0, sh]));
             for i in range(ps[0]):
                 if len(ps) > 3:
                     for j in range(sbytes):
@@ -45,10 +43,7 @@ def convert(fout, sym, fname, sw, sh, num = 0):
 BASE = '../src/generated/'
 BINBASE = '../arduboy_build/'
 
-convert(BASE + 'player_img.hpp', 'PLAYER_IMG', 'player_sprites.png', 16, 16)
-convert(BASE + 'portrait_img.hpp', 'PORTRAIT_IMG', 'portraits.png', 32, 32)
-convert(BASE + 'tile_img.hpp', 'TILE_IMG', 'tiles.png', 16, 16)
-
 convert(BINBASE + 'portrait_img.bin', 'PORTRAIT_IMG', 'portraits.png', 32, 32)
 convert(BINBASE + 'player_img.bin', 'PLAYER_IMG', 'player_sprites.png', 16, 16)
 convert(BINBASE + 'enemy_img.bin', 'ENEMY_IMG', 'enemy_sprites.png', 16, 16)
+convert(BINBASE + 'tile_img.bin', 'TILE_IMG', 'tiles.png', 16, 16)

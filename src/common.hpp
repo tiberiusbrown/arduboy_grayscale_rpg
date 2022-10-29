@@ -1,8 +1,5 @@
 #pragma once
 
-#define PLAYER_IMG_IN_PROG 0
-#define PORTRAIT_IMG_IN_PROG 0
-
 #define TELEPORT_TRANSITION_FRAMES 16
 
 #include <stdint.h>
@@ -146,9 +143,9 @@ void platform_drawplusmask(int16_t x, int16_t y, uint8_t w, uint8_t h,
                            uint8_t const* bitmap);
 void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num);
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
-                               uint8_t frame);
+                               uint8_t frame, uint8_t w, uint8_t h);
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
-                              uint8_t frame);
+                              uint8_t frame, uint8_t w, uint8_t h);
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 #if 0

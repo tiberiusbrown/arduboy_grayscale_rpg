@@ -3,21 +3,12 @@
 #include "font_adv.hpp"
 #include "generated/font_img.hpp"
 #include "generated/fxdata.h"
-#include "generated/tile_img.hpp"
-
-#if PLAYER_IMG_IN_PROG
-#include "generated/player_img.hpp"
-#endif
 
 void draw_player()
 {
     uint8_t f = pdir * 4;
     if(pmoving) f += ((nframe >> 2) & 3);
-#if PLAYER_IMG_IN_PROG
-    platform_drawplusmask(64 - 8, 32 - 8 - 4, PLAYER_IMG, f);
-#else
-    platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, PLAYER_IMG, f);
-#endif
+    platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, PLAYER_IMG, f, 16, 16);
 }
 
 static inline void draw_enemy(enemy_t const& e, int16_t ox, int16_t oy)
@@ -29,7 +20,7 @@ static inline void draw_enemy(enemy_t const& e, int16_t ox, int16_t oy)
         f += d * 2;
         f += ((nframe >> 3) & 3);
     }
-    platform_fx_drawplusmask(ox + e.x, oy + e.y - 4, ENEMY_IMG, f);
+    platform_fx_drawplusmask(ox + e.x, oy + e.y - 4, ENEMY_IMG, f, 16, 16);
 }
 
 static void draw_chunk(uint8_t i, int16_t ox, int16_t oy)
@@ -45,7 +36,7 @@ static void draw_chunk(uint8_t i, int16_t ox, int16_t oy)
         }
         for(uint8_t c = 0; c < 128; c += 16, ++n) {
             int16_t x = ox + c;
-            platform_drawoverwrite(x, y, TILE_IMG, tiles[n]);
+            platform_fx_drawoverwrite(x, y, TILE_IMG, tiles[n], 16, 16);
         }
     }
 

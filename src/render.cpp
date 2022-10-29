@@ -1,10 +1,6 @@
 #include "common.hpp"
 
-#if PORTRAIT_IMG_IN_PROG
-#include "generated/portrait_img.hpp"
-#else
 #include "generated/fxdata.h"
-#endif
 
 static void render_map()
 {
@@ -19,11 +15,7 @@ static void render_dialog()
     auto& d = sdata.dialog;
     if(d.portrait != 255) {
         platform_fillrect(0, 2, 33, 33, BLACK);
-#if PORTRAIT_IMG_IN_PROG
-        platform_drawoverwrite(0, 3, PORTRAIT_IMG, d.portrait);
-#else
-        platform_fx_drawoverwrite(0, 3, PORTRAIT_IMG, d.portrait);
-#endif
+        platform_fx_drawoverwrite(0, 3, PORTRAIT_IMG, d.portrait, 32, 32);
     }
 
     platform_fillrect(0, 35, 128, 28, BLACK);
