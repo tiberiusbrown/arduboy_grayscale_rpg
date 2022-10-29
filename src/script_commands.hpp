@@ -50,8 +50,20 @@ ALU Instructions
 
 Game Manipulation
 
+    fs <flag>
+        Set <flag>
+
     fc <flag>
         Clear <flag>
+
+    ft <flag>
+        Toggle <flag>
+
+    ep <enemy_type> <path_name>
+        Set the enemy path.
+
+    epf <flag> <enemy_type> <path_name>
+        If <flag> is cleared, ep <enemy_type> <path_name>
         
     st <tile> <tile_img>
         Overwrite image at <tile> with <tile_img>
@@ -79,7 +91,7 @@ Control Instructions
     brnt <tile> label
         If player is NOT selecting <tile>, jmp label
         
-    brnt <tile> label
+    brnw <tile> label
         If player is NOT walking on <tile>, jmp label
 
 Other Assembly Syntax
@@ -118,6 +130,10 @@ enum script_command_t {
     CMD_SUB,
     
     CMD_FS,
+    CMD_FC,
+    CMD_FT,
+    CMD_EP,
+    CMD_EPF,
     CMD_ST,
     
     CMD_JMP,

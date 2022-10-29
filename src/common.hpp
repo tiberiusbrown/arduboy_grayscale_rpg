@@ -58,16 +58,6 @@ constexpr uint8_t MAP_CHUNK_W = 32;
 constexpr uint8_t CHUNK_SCRIPT_SIZE = 32;
 constexpr uint8_t CHUNK_SPRITE_PATH_SIZE = 8;
 
-struct enemy_info_t {
-    uint16_t flag;
-    uint8_t type;
-    uint8_t path_num;
-    // path byte:
-    //     bits 0-5: destination tile (0-31)
-    //     bits 5-7: delay cycles
-    uint8_t path[CHUNK_SPRITE_PATH_SIZE];
-};
-
 struct map_chunk_t {
     // number of tiles in a chunk must match the screen
     // dimensions when using 16x16 tiles
@@ -76,7 +66,6 @@ struct map_chunk_t {
         uint8_t tiles[4][8];
     };
     uint8_t script[CHUNK_SCRIPT_SIZE];
-    enemy_info_t enemy;
 };
 
 extern uint8_t nframe;
@@ -117,11 +106,19 @@ extern uint16_t selx, sely; // selected tile
 
 extern uint8_t story_flags[STORY_FLAG_BYTES];
 void story_flag_set(uint16_t index);
+void story_flag_clr(uint16_t index);
+void story_flag_tog(uint16_t index);
 bool story_flag_get(uint16_t index);
 
-struct enemy_state_t {
+struct enemy_t {
     uint8_t x, y, dir;
-    uint8_t path_index;
+    uint8_t type;
+    uint8_t path_num;
+    // path byte:
+    //     bits 0-5: destination tile (0-31)
+    //     bits 5-7: delay cycles
+    uint8_t path[CHUNK_SPRITE_PATH_SIZE];
+    uint8_t path_index; // index of current destination
     uint8_t frames_rem;
     bool active;
 };
@@ -129,7 +126,7 @@ struct enemy_state_t {
 struct active_chunk_t {
     map_chunk_t chunk;
     uint8_t cx, cy;
-    enemy_state_t enemy_state;
+    enemy_t enemy;
 };
 // 0 1
 // 2 3

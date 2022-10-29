@@ -20,11 +20,10 @@ void draw_player()
 #endif
 }
 
-static inline void draw_enemy(enemy_info_t const& info, enemy_state_t const& e,
-                              int16_t ox, int16_t oy)
+static inline void draw_enemy(enemy_t const& e, int16_t ox, int16_t oy)
 {
     if(!e.active) return;
-    uint8_t f = (info.type - 1) * 16;
+    uint8_t f = (e.type - 1) * 16;
     uint8_t d = e.dir;
     if(!(d & 0x80)) {
         f += d * 2;
@@ -51,8 +50,8 @@ static void draw_chunk(uint8_t i, int16_t ox, int16_t oy)
     }
 
     // draw enemy
-    if(ac.chunk.enemy.path_num != 0)
-        draw_enemy(ac.chunk.enemy, ac.enemy_state, ox, oy);
+    if(ac.enemy.path_num != 0)
+        draw_enemy(ac.enemy, ox, oy);
 }
 
 void draw_tiles()

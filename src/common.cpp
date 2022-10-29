@@ -15,6 +15,20 @@ void story_flag_set(uint16_t index)
     story_flags[i] |= m;
 }
 
+void story_flag_clr(uint16_t index)
+{
+    uint8_t i = index >> 3;
+    uint8_t m = 1 << (index & 7);
+    story_flags[i] &= ~m;
+}
+
+void story_flag_tog(uint16_t index)
+{
+    uint8_t i = index >> 3;
+    uint8_t m = 1 << (index & 7);
+    story_flags[i] ^= m;
+}
+
 bool story_flag_get(uint16_t index)
 {
     uint8_t i = index >> 3;

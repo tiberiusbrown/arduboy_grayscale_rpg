@@ -32,6 +32,10 @@ class CMD(AutoNumber):
     SUB  = ()
 
     FS   = ()
+    FC   = ()
+    FT   = ()
+    EP   = ()
+    EPF  = ()
     ST   = ()
 
     JMP  = ()
@@ -92,7 +96,13 @@ def flag(s):
 def addflag(b, s):
     append16(b, flag(s))
 
-def assemble(s):
+def addpath(b, s, eps):
+    if s not in eps:
+        print('Path "%s" not found' % s)
+        sys.exit(1)
+    b += eps[s]
+
+def assemble(s, eps):
     b = []
     s = [x for x in re.findall('\{[^}]*}|\S+', s)]
     i = 0
@@ -154,6 +164,25 @@ def assemble(s):
         elif s[i] == 'fs':
             b.append(CMD.FS); i += 1
             addflag(b, s[i]); i += 1
+            
+        elif s[i] == 'fc':
+            b.append(CMD.FC); i += 1
+            addflag(b, s[i]); i += 1
+            
+        elif s[i] == 'ft':
+            b.append(CMD.FT); i += 1
+            addflag(b, s[i]); i += 1
+            
+        elif s[i] == 'ep':
+            b.append(CMD.EP); i += 1
+            b.append(int(s[i])); i += 1
+            addpath(b, s[i], eps); i += 1
+            
+        elif s[i] == 'epf':
+            b.append(CMD.EPF); i += 1
+            addflag(b, s[i]); i += 1
+            b.append(int(s[i])); i += 1
+            addpath(b, s[i], eps); i += 1
             
         elif s[i] == 'st':
             b.append(CMD.ST); i += 1

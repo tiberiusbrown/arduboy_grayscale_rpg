@@ -6,6 +6,14 @@
 #include "script_commands.hpp"
 #include "tile_solid.hpp"
 
+static void reset_enemy(enemy_t& e) {
+    e.x = (e.path[0] & 7) * 16;
+    e.y = ((e.path[0] >> 3) & 3) * 16;
+    e.frames_rem = 1;
+    e.dir = 0xff;
+    e.active = (e.path_num == 0);
+}
+
 static bool run_chunk()
 {
     auto& ac = active_chunks[running_chunk];
@@ -42,7 +50,7 @@ static bool run_chunk()
             if(instr == CMD_TDLG) t1 = c.script[chunk_instr++];
             uint16_t stri = c.script[chunk_instr++];
             stri |= uint16_t(c.script[chunk_instr++]) << 8;
-            if(state != STATE_MAP) break;
+            if(state == STATE_TP) break; // don't execute during teleports
             if((instr == CMD_TMSG || instr == CMD_TDLG) && t0 != sel_tile)
                 break;
             change_state(STATE_DIALOG);
@@ -102,6 +110,44 @@ static bool run_chunk()
             uint16_t f = c.script[chunk_instr++];
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
             story_flag_set(f);
+            break;
+        }
+        case CMD_FC: {
+            uint16_t f = c.script[chunk_instr++];
+            f |= (uint16_t(c.script[chunk_instr++]) << 8);
+            story_flag_clr(f);
+            break;
+        }
+        case CMD_FT: {
+            uint16_t f = c.script[chunk_instr++];
+            f |= (uint16_t(c.script[chunk_instr++]) << 8);
+            story_flag_tog(f);
+            break;
+        }
+        case CMD_EP:
+        case CMD_EPF: {
+            uint16_t f;
+            if(instr == CMD_EPF) {
+                f = c.script[chunk_instr++];
+                f |= (uint16_t(c.script[chunk_instr++]) << 8);
+            }
+            uint8_t id = c.script[chunk_instr++];
+            uint8_t n = c.script[chunk_instr++];
+            if(instr == CMD_EPF && story_flag_get(f)) {
+                ac.enemy.active = false;
+                chunk_instr += n;
+                break;
+            }
+            bool reset = false;
+            if(ac.enemy.type != id) reset = true;
+            ac.enemy.type = id;
+            for(uint8_t j = 0; j < n; ++j) {
+                if(ac.enemy.path[j] != c.script[chunk_instr]) reset = true;
+                ac.enemy.path[j] = c.script[chunk_instr++];
+            }
+            ac.enemy.path_num = n;
+            ac.enemy.active = (n > 0);
+            if(reset) reset_enemy(ac.enemy);
             break;
         }
         case CMD_ST: {
@@ -186,23 +232,12 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
             chunk->tiles_flat[i] = 30;
         for(uint8_t i = 0; i < CHUNK_SCRIPT_SIZE; ++i)
             chunk->script[i] = 0;
-        chunk->enemy.type = 0;
+        active_chunk.enemy.type = 0;
         return;
     }
     uint16_t ci = cy * MAP_CHUNK_W + cx;
     uint24_t addr = uint24_t(ci) * sizeof(map_chunk_t);
     platform_fx_read_data_bytes(addr, chunk, sizeof(map_chunk_t));
-
-    // initialize enemy
-    {
-        auto& e = active_chunk.enemy_state;
-        auto const& info = active_chunk.chunk.enemy;
-        e.x = (info.path[0] & 7) * 16;
-        e.y = ((info.path[0] >> 3) & 3) * 16;
-        e.frames_rem = 1;
-        e.dir = 0xff;
-        e.active = (info.path_num == 0 || !story_flag_get(info.flag));
-    }
 }
 
 void load_chunks()

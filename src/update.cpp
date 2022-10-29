@@ -7,7 +7,21 @@ static int8_t const DIRY[8] PROGMEM = {
     1, 1, 0, -1, -1, -1, 0, 1,
 };
 
-static inline void update_enemy(enemy_info_t const& info, enemy_state_t& e)
+void reset_enemy(enemy_t& e) {
+
+}
+
+static inline bool enemy_contacts_player(active_chunk_t const& c) {
+    auto const& e = c.enemy;
+    uint16_t ex = c.cx * 128 + e.x;
+    uint16_t ey = c.cy *  64 + e.y;
+    // TODO: make these uint8_t
+    uint16_t dx = px - ex + 4;
+    uint16_t dy = py - ey + 4;
+    return dx <= 24 && dy <= 24;
+}
+
+static inline void update_enemy(enemy_t& e)
 {
     if(!e.active) return;
     if(nframe & 1) return;
@@ -19,7 +33,7 @@ static inline void update_enemy(enemy_info_t const& info, enemy_state_t& e)
 
     if(--e.frames_rem == 0) {
         if(!(e.dir & 0x80)) {
-            uint8_t t = info.path[e.path_index];
+            uint8_t t = e.path[e.path_index];
             if(t & 0xe0) {
                 // delay
                 e.frames_rem = (t >> 5) * 16;
@@ -27,8 +41,8 @@ static inline void update_enemy(enemy_info_t const& info, enemy_state_t& e)
                 return;
             }
         }
-        if(++e.path_index == info.path_num) e.path_index = 0;
-        uint8_t t = info.path[e.path_index];
+        if(++e.path_index == e.path_num) e.path_index = 0;
+        uint8_t t = e.path[e.path_index];
         uint8_t x = (t & 7) * 16;
         uint8_t y = ((t >> 3) & 3) * 16;
         if(x < e.x) {
@@ -45,12 +59,13 @@ static inline void update_enemy(enemy_info_t const& info, enemy_state_t& e)
             e.frames_rem = y - e.y;
         }
     }
+
 }
 
 static void update_enemies()
 {
     for(auto& c : active_chunks) {
-        update_enemy(c.chunk.enemy, c.enemy_state);
+        update_enemy(c.enemy);
     }
 }
 
