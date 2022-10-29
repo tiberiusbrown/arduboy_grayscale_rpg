@@ -23,8 +23,8 @@ static bool run_chunk()
     uint8_t walk_tile = 255;
     {
         // TODO: could these be uint8_t
-        uint16_t dx = uint16_t((px >> 4) - tx);
-        uint16_t dy = uint16_t((py >> 4) - ty);
+        uint16_t dx = uint16_t(((px + 8) >> 4) - tx);
+        uint16_t dy = uint16_t(((py + 8) >> 4) - ty);
         if(dx < 8 && dy < 4) walk_tile = dy * 8 + dx;
     }
     uint8_t sel_tile = 255;
@@ -223,16 +223,17 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
 {
     active_chunk_t& active_chunk = active_chunks[index];
     map_chunk_t* chunk = &active_chunk.chunk;
-    if(active_chunk.cx == cx && active_chunk.cy == cy) return;
-    memset(&active_chunk, 0, sizeof(active_chunk));
-    active_chunk.cx = cx;
-    active_chunk.cy = cy;
+    if(active_chunk.cx != cx || active_chunk.cy != cy) {
+        memset(&active_chunk, 0, sizeof(active_chunk));
+        active_chunk.cx = cx;
+        active_chunk.cy = cy;
+    }
     if(cx == 255 || cy == 255) {
         for(uint8_t i = 0; i < 32; ++i)
             chunk->tiles_flat[i] = 30;
         for(uint8_t i = 0; i < CHUNK_SCRIPT_SIZE; ++i)
             chunk->script[i] = 0;
-        active_chunk.enemy.type = 0;
+        active_chunk.enemy.active = false;
         return;
     }
     uint16_t ci = cy * MAP_CHUNK_W + cx;
@@ -242,8 +243,8 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
 
 void load_chunks()
 {
-    uint8_t cx = uint8_t(uint16_t(px - 64) >> 7);
-    uint8_t cy = uint8_t(uint16_t(py - 32) >> 6);
+    uint8_t cx = uint8_t(uint16_t(px - 64 + 8) >> 7);
+    uint8_t cy = uint8_t(uint16_t(py - 32 + 8) >> 6);
 
     // shift chunks if possible
     // this way, enemies don't visibly reset as the player moves between chunks

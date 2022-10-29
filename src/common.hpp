@@ -163,6 +163,7 @@ void wrap_text(char* str, uint8_t w); // replace ' ' with '\n' to wrap to width
 void draw_frame(uint8_t x, uint8_t y, uint8_t w, uint8_t h);
 void draw_tiles();
 void draw_player();
+void draw_sprites();
 
 // map.cpp
 bool tile_is_solid(uint16_t tx, uint16_t ty); // tx,ty in pixels

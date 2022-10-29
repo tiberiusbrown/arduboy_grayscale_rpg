@@ -203,10 +203,10 @@ end:</property>
   </object>
  </objectgroup>
  <objectgroup color="#ff0000" id="3" name="Paths">
-  <object id="44" name="!circling_guard" class="1" x="151.333" y="41">
+  <object id="44" name="!circling_guard" class="0" x="151.333" y="41">
    <polyline points="0,0 0,17.6667 16.3333,17.6667 16,-0.666667"/>
   </object>
-  <object id="45" name="!first_guard" class="1" x="247.667" y="135.333">
+  <object id="45" name="!first_guard" class="0" x="247.667" y="135.333">
    <polyline points="0,0 0.333333,34.6667"/>
   </object>
  </objectgroup>

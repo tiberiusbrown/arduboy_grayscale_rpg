@@ -16,8 +16,8 @@ static inline bool enemy_contacts_player(active_chunk_t const& c) {
     uint16_t ex = c.cx * 128 + e.x;
     uint16_t ey = c.cy *  64 + e.y;
     // TODO: make these uint8_t
-    uint16_t dx = px - ex + 4;
-    uint16_t dy = py - ey + 4;
+    uint16_t dx = px - ex + 12;
+    uint16_t dy = py - ey + 12;
     return dx <= 24 && dy <= 24;
 }
 
@@ -108,10 +108,10 @@ static void update_map()
         py += dy;
 
         int8_t nx = 0, ny = 0;
-        if(tile_is_solid(px - 3, py - 3)) ++nx, ++ny;
-        if(tile_is_solid(px + 3, py - 3)) --nx, ++ny;
-        if(tile_is_solid(px - 3, py + 3)) ++nx, --ny;
-        if(tile_is_solid(px + 3, py + 3)) --nx, --ny;
+        if(tile_is_solid(px +  5, py +  5)) ++nx, ++ny;
+        if(tile_is_solid(px + 11, py +  5)) --nx, ++ny;
+        if(tile_is_solid(px +  5, py + 11)) ++nx, --ny;
+        if(tile_is_solid(px + 11, py + 11)) --nx, --ny;
 
         if(nx > 1) nx = 1;
         if(nx < -1) nx = -1;

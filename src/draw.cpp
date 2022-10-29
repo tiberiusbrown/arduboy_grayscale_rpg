@@ -4,29 +4,81 @@
 #include "generated/font_img.hpp"
 #include "generated/fxdata.h"
 
-void draw_player()
-{
-    uint8_t f = pdir * 4;
-    if(pmoving) f += ((nframe >> 2) & 3);
-    platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, PLAYER_IMG, f, 16, 16);
-}
+struct draw_sprite_entry {
+    uint24_t addr;
+    uint8_t frame;
+    int16_t x, y;
+};
 
-static inline void draw_enemy(enemy_t const& e, int16_t ox, int16_t oy)
+static uint8_t add_enemy_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
+                                      int16_t ox, int16_t oy)
 {
-    if(!e.active) return;
-    uint8_t f = (e.type - 1) * 16;
+    auto const& e = active_chunks[ci].enemy;
+    if(!e.active) return 0;
+    uint8_t f = e.type * 16;
     uint8_t d = e.dir;
     if(!(d & 0x80)) {
         f += d * 2;
         f += ((nframe >> 3) & 3);
     }
-    platform_fx_drawplusmask(ox + e.x, oy + e.y - 4, ENEMY_IMG, f, 16, 16);
+    entry->addr = ENEMY_IMG;
+    entry->frame = f;
+    entry->x = ox + e.x;
+    entry->y = oy + e.y - 4;
+    return 1;
 }
 
-static void draw_chunk(uint8_t i, int16_t ox, int16_t oy)
+void draw_sprites()
+{
+    draw_sprite_entry entries[5]; // increase as necessary
+    uint8_t n = 0;
+
+    // player sprite
+    {
+        uint8_t f = pdir * 4;
+        if(pmoving) f += ((nframe >> 2) & 3);
+        entries[n++] = {PLAYER_IMG, f, 64 - 8, 32 - 8 - 4};
+    }
+
+    // chunk enemies
+    {
+        uint16_t tx = px - 64 + 8;
+        uint16_t ty = py - 32 + 8;
+        uint8_t cx = uint8_t(tx >> 7);
+        uint8_t cy = uint8_t(ty >> 6);
+        int16_t ox = -int16_t(tx & 0x7f);
+        int16_t oy = -int16_t(ty & 0x3f);
+        n += add_enemy_sprite_entry(&entries[n], 0, ox, oy);
+        n += add_enemy_sprite_entry(&entries[n], 1, ox + 128, oy);
+        n += add_enemy_sprite_entry(&entries[n], 2, ox, oy + 64);
+        n += add_enemy_sprite_entry(&entries[n], 3, ox + 128, oy + 64);
+    }
+
+    // sort sprites
+    for(uint8_t i = 1; i < n; ++i) {
+        for(uint8_t j = i; j > 0 && entries[j - 1].y > entries[j].y; --j) {
+            auto t = entries[j];
+            entries[j] = entries[j - 1];
+            entries[j - 1] = t;
+        }
+    }
+
+    for(uint8_t i = 0; i < n; ++i) {
+        platform_fx_drawplusmask(entries[i].x, entries[i].y, entries[i].addr,
+                                 entries[i].frame, 16, 16);
+    }
+}
+
+void draw_player()
+{
+    uint8_t f = pdir * 4;
+    if(pmoving) f += ((nframe >> 2) & 3);
+    platform_fx_drawplusmask(64, 32 - 4, PLAYER_IMG, f, 16, 16);
+}
+
+static void draw_chunk_tiles(uint8_t i, int16_t ox, int16_t oy)
 {
     auto const& ac = active_chunks[i];
-    // draw tiles
     uint8_t const* tiles = ac.chunk.tiles_flat;
     for(uint8_t r = 0, n = 0; r < 64; r += 16) {
         int16_t y = oy + r;
@@ -39,24 +91,20 @@ static void draw_chunk(uint8_t i, int16_t ox, int16_t oy)
             platform_fx_drawoverwrite(x, y, TILE_IMG, tiles[n], 16, 16);
         }
     }
-
-    // draw enemy
-    if(ac.enemy.path_num != 0)
-        draw_enemy(ac.enemy, ox, oy);
 }
 
 void draw_tiles()
 {
-    uint16_t tx = px - 64;
-    uint16_t ty = py - 32;
+    uint16_t tx = px - 64 + 8;
+    uint16_t ty = py - 32 + 8;
     uint8_t cx = uint8_t(tx >> 7);
     uint8_t cy = uint8_t(ty >> 6);
     int16_t ox = -int16_t(tx & 0x7f);
     int16_t oy = -int16_t(ty & 0x3f);
-    draw_chunk(0, ox, oy);
-    draw_chunk(1, ox + 128, oy);
-    draw_chunk(2, ox, oy + 64);
-    draw_chunk(3, ox + 128, oy + 64);
+    draw_chunk_tiles(0, ox, oy);
+    draw_chunk_tiles(1, ox + 128, oy);
+    draw_chunk_tiles(2, ox, oy + 64);
+    draw_chunk_tiles(3, ox + 128, oy + 64);
 }
 
 void draw_text(uint8_t x, uint8_t y, char const* str)

@@ -5,7 +5,7 @@
 static void render_map()
 {
     draw_tiles();
-    draw_player();
+    draw_sprites();
 }
 
 static void render_dialog()
@@ -38,6 +38,7 @@ static void render_tp()
         uint8_t h = YB * t;
         uint8_t h2 = 64 - h * 2;
         draw_tiles();
+        draw_sprites();
         platform_fillrect(0, 0, 128, h, BLACK);
         platform_fillrect(0, 64 - h, 128, h, BLACK);
         platform_fillrect(0, h, w, h2, BLACK);
