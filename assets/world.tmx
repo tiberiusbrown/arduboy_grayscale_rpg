@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="128" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="48">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="128" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="49">
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer id="1" name="Tiles" width="256" height="128">
   <data encoding="csv">
@@ -200,6 +200,14 @@ fs !first_guard_msg
 end:</property>
    </properties>
    <point/>
+  </object>
+  <object id="48" x="231.5" y="153.25" width="17" height="16.75">
+   <properties>
+    <property name="script">brne end
+msg {Hey! You aren't allowed past the bridge!}
+tp 11 9
+end:</property>
+   </properties>
   </object>
  </objectgroup>
  <objectgroup color="#ff0000" id="3" name="Paths">

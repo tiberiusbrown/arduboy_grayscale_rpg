@@ -73,7 +73,7 @@ void draw_player()
 {
     uint8_t f = pdir * 4;
     if(pmoving) f += ((nframe >> 2) & 3);
-    platform_fx_drawplusmask(64, 32 - 4, PLAYER_IMG, f, 16, 16);
+    platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, PLAYER_IMG, f, 16, 16);
 }
 
 static void draw_chunk_tiles(uint8_t i, int16_t ox, int16_t oy)

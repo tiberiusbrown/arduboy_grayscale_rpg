@@ -52,7 +52,7 @@ constexpr uint8_t BTN_B = 0x04;
 
 constexpr uint8_t MAP_CHUNK_H = 32;
 constexpr uint8_t MAP_CHUNK_W = 32;
-constexpr uint8_t CHUNK_SCRIPT_SIZE = 32;
+constexpr uint8_t CHUNK_SCRIPT_SIZE = 64;
 constexpr uint8_t CHUNK_SPRITE_PATH_SIZE = 8;
 
 struct map_chunk_t {
@@ -92,7 +92,7 @@ struct sdata_tp {
 };
 extern union sdata_t {
     sdata_dialog dialog;
-    sdata_tp     tp;
+    sdata_tp tp;
 } sdata;
 void change_state(uint8_t new_state);
 
@@ -166,6 +166,7 @@ void draw_player();
 void draw_sprites();
 
 // map.cpp
+bool enemy_contacts_player(active_chunk_t const& c);
 bool tile_is_solid(uint16_t tx, uint16_t ty); // tx,ty in pixels
 void load_chunks();
 bool run_chunks(); // returns true if state interrupt occurred

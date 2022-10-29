@@ -8,7 +8,7 @@ tm = pytmx.TiledMap('world.tmx')
 
 CHUNKS_W = 32
 CHUNKS_H = 32
-CHUNK_SCRIPT_SIZE = 32
+CHUNK_SCRIPT_SIZE = 64
 CHUNK_ENEMY_PATH_SIZE = 8
 
 TILES_W = CHUNKS_W * 8

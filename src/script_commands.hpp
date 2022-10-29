@@ -94,6 +94,9 @@ Control Instructions
     brnw <tile> label
         If player is NOT walking on <tile>, jmp label
 
+    brne label
+        If player is NOT walking into chunk enemy, jmp label
+
 Other Assembly Syntax
 
     Shortcut          Meaning
@@ -143,4 +146,5 @@ enum script_command_t {
     CMD_BRFC,
     CMD_BRNT,
     CMD_BRNW,
+    CMD_BRNE,
 };

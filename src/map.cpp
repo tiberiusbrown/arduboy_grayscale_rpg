@@ -74,7 +74,7 @@ static bool run_chunk()
             tx |= uint16_t(c.script[chunk_instr++]) << 8;
             ty = c.script[chunk_instr++];
             ty |= uint16_t(c.script[chunk_instr++]) << 8;
-            if(state != STATE_MAP) break;
+            //if(state != STATE_MAP) break;
             if(instr == CMD_TTP && t != sel_tile) break;
             if(instr == CMD_WTP && t != walk_tile) break;
             change_state(STATE_TP);
@@ -190,6 +190,12 @@ static bool run_chunk()
             uint8_t t = c.script[chunk_instr++];
             uint8_t i = c.script[chunk_instr++];
             if(t != walk_tile) chunk_instr += i;
+            break;
+        }
+        case CMD_BRNE: {
+            uint8_t i = c.script[chunk_instr++];
+            if(!enemy_contacts_player(ac)) chunk_instr += i;
+            //else __debugbreak();
             break;
         }
 

@@ -11,7 +11,7 @@ void reset_enemy(enemy_t& e) {
 
 }
 
-static inline bool enemy_contacts_player(active_chunk_t const& c) {
+bool enemy_contacts_player(active_chunk_t const& c) {
     auto const& e = c.enemy;
     uint16_t ex = c.cx * 128 + e.x;
     uint16_t ey = c.cy *  64 + e.y;
@@ -179,8 +179,8 @@ static void update_tp()
     auto& d = sdata.tp;
     ++d.frame;
     if(d.frame == TELEPORT_TRANSITION_FRAMES) {
-        px = d.tx * 16 + 8;
-        py = d.ty * 16 + 8;
+        px = d.tx * 16;
+        py = d.ty * 16;
         // terminate old chunk scripts
         chunks_are_running = false;
         load_chunks();
