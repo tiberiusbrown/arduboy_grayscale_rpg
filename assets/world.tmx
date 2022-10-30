@@ -204,7 +204,7 @@ end:</property>
   <object id="48" x="231.5" y="153.25" width="17" height="16.75">
    <properties>
     <property name="script">brne end
-msg {Hey! You aren't allowed past the bridge!}
+dlg 4 {Hey! You aren't allowed past the bridge!}
 tp 11 9
 end:</property>
    </properties>
