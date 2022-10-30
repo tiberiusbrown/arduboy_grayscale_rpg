@@ -77,8 +77,8 @@ static void update_map()
     if(btns_pressed & BTN_A) {
         int8_t dx = (int8_t)pgm_read_byte(&DIRX[pdir]) * 8;
         int8_t dy = (int8_t)pgm_read_byte(&DIRY[pdir]) * 8;
-        selx = (px + dx) >> 4;
-        sely = (py + dy) >> 4;
+        selx = (px + 8 + dx) >> 4;
+        sely = (py + 8 + dy) >> 4;
     }
 
     int8_t dx = 0, dy = 0;
