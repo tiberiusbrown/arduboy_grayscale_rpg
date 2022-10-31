@@ -30,8 +30,7 @@ static void draw_battle_background()
     uint8_t t = 0x23;
     for(uint8_t r = 0; r < 4; ++r)
         for(uint8_t c = 0; c < 8; ++c, t ^= (t >> 3) ^ (t << 1))
-            platform_fx_drawoverwrite(c * 16, r * 16, TILE_IMG,
-                                      pgm_read_byte(&TS[t & 3]), 16, 16);
+            draw_tile(c * 16, r * 16, pgm_read_byte(&TS[t & 3]));
     platform_fillrect(33, 37, 14, 12, WHITE);
     platform_drawrect(35, 39, 10, 8, LIGHT_GRAY);
     platform_fillrect(81, 37, 14, 12, WHITE);

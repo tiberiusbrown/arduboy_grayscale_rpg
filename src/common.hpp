@@ -1,5 +1,6 @@
 #pragma once
 
+#define TILES_IN_PROG 1
 #define TELEPORT_TRANSITION_FRAMES 16
 
 #include <stdint.h>
@@ -177,6 +178,7 @@ bool platform_fx_busy();
 #endif
 
 // draw.cpp
+void draw_tile(int16_t x, int16_t y, uint8_t t);
 void draw_text(uint8_t x, uint8_t y, char const* str); // str NOT in prog
 void wrap_text(char* str, uint8_t w); // replace ' ' with '\n' to wrap to width
 void draw_frame(uint8_t x, uint8_t y, uint8_t w, uint8_t h);

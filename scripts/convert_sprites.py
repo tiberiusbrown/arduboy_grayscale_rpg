@@ -43,6 +43,8 @@ def convert(fout, sym, fname, sw, sh, num = 0):
 BASE = '../src/generated/'
 BINBASE = '../arduboy_build/'
 
+convert(BASE + 'tile_img.hpp', 'TILE_IMG_PROG', 'tiles.png', 16, 16)
+
 convert(BINBASE + 'portrait_img.bin', '', 'portraits.png', 32, 32)
 convert(BINBASE + 'player_img.bin', '', 'player_sprites.png', 16, 16)
 convert(BINBASE + 'enemy_img.bin', '', 'enemy_sprites.png', 16, 16)

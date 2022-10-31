@@ -4,6 +4,10 @@
 #include "generated/font_img.hpp"
 #include "generated/fxdata.h"
 
+#if TILES_IN_PROG
+#include "generated/tile_img.hpp"
+#endif
+
 static uint8_t add_enemy_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
                                       int16_t ox, int16_t oy)
 {
@@ -73,7 +77,16 @@ void draw_player()
 {
     uint8_t f = pdir * 4;
     if(pmoving) f += ((nframe >> 2) & 3);
-    platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, PLAYER_IMG, f, 16, 16);
+    platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, PLAYER_IMG + 2, f, 16, 16);
+}
+
+void draw_tile(int16_t x, int16_t y, uint8_t t)
+{
+#if TILES_IN_PROG
+    platform_drawoverwrite(x, y, TILE_IMG_PROG, t);
+#else
+    platform_fx_drawoverwrite(x, y, TILE_IMG, t, 16, 16);
+#endif
 }
 
 static void draw_chunk_tiles(uint8_t i, int16_t ox, int16_t oy)
@@ -89,7 +102,11 @@ static void draw_chunk_tiles(uint8_t i, int16_t ox, int16_t oy)
         if(state == STATE_DIALOG && y >= 35) break;
         for(uint8_t c = 0; c < 128; c += 16, ++n) {
             int16_t x = ox + c;
+#if TILES_IN_PROG
+            platform_drawoverwrite(x, y, TILE_IMG_PROG, tiles[n]);
+#else
             platform_fx_drawoverwrite(x, y, TILE_IMG, tiles[n], 16, 16);
+#endif
         }
     }
 }
