@@ -4,12 +4,6 @@
 #include "generated/font_img.hpp"
 #include "generated/fxdata.h"
 
-struct draw_sprite_entry {
-    uint24_t addr;
-    uint8_t frame;
-    int16_t x, y;
-};
-
 static uint8_t add_enemy_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
                                       int16_t ox, int16_t oy)
 {
@@ -19,13 +13,31 @@ static uint8_t add_enemy_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     uint8_t d = e.dir;
     if(!(d & 0x80)) {
         f += d * 2;
-        f += ((nframe >> 3) & 3);
+        f += ((nframe >> 2) & 3);
     }
     entry->addr = ENEMY_IMG;
     entry->frame = f;
     entry->x = ox + e.x;
     entry->y = oy + e.y - 4;
     return 1;
+}
+
+void sort_and_draw_sprites(draw_sprite_entry* entries, uint8_t n)
+{
+    // sort sprites
+    for(uint8_t i = 1; i < n; ++i) {
+        for(uint8_t j = i; j > 0 && entries[j - 1].y > entries[j].y; --j) {
+            auto t = entries[j];
+            entries[j] = entries[j - 1];
+            entries[j - 1] = t;
+        }
+    }
+
+    // draw sprites
+    for(uint8_t i = 0; i < n; ++i) {
+        platform_fx_drawplusmask(entries[i].x, entries[i].y, entries[i].addr,
+                                 entries[i].frame, 16, 16);
+    }
 }
 
 void draw_sprites()
@@ -54,19 +66,7 @@ void draw_sprites()
         n += add_enemy_sprite_entry(&entries[n], 3, ox + 128, oy + 64);
     }
 
-    // sort sprites
-    for(uint8_t i = 1; i < n; ++i) {
-        for(uint8_t j = i; j > 0 && entries[j - 1].y > entries[j].y; --j) {
-            auto t = entries[j];
-            entries[j] = entries[j - 1];
-            entries[j - 1] = t;
-        }
-    }
-
-    for(uint8_t i = 0; i < n; ++i) {
-        platform_fx_drawplusmask(entries[i].x, entries[i].y, entries[i].addr,
-                                 entries[i].frame, 16, 16);
-    }
+    sort_and_draw_sprites(entries, n);
 }
 
 void draw_player()
@@ -86,6 +86,7 @@ static void draw_chunk_tiles(uint8_t i, int16_t ox, int16_t oy)
             n += 8;
             continue;
         }
+        if(state == STATE_DIALOG && y >= 35) break;
         for(uint8_t c = 0; c < 128; c += 16, ++n) {
             int16_t x = ox + c;
             platform_fx_drawoverwrite(x, y, TILE_IMG, tiles[n], 16, 16);

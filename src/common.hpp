@@ -11,6 +11,7 @@
 #define ABG_UPDATE_EVERY_N_DEFAULT 2
 #define ABG_PRECHARGE_CYCLES 1
 #define ABG_DISCHARGE_CYCLES 1
+#define ABG_FPS_DEFAULT 120
 #include "ArduboyG.h"
 extern ArduboyGBase a;
 using int24_t = __int24;
@@ -71,8 +72,7 @@ enum {
     STATE_MAP,    // moving around on the map
     STATE_DIALOG, // message or dialog
     STATE_TP,     // player is teleporting (e.g., entering building or cave)
-    STATE_NEW,    // new game: erase flag data
-    STATE_LOAD,   // load game: load save info, copy save flags to flag page
+    STATE_BATTLE,
 };
 extern uint8_t state;
 
@@ -90,9 +90,28 @@ struct sdata_tp {
     uint16_t tx, ty;
     uint8_t frame;
 };
+struct sdata_battle {
+    enum phase_t {
+        PHASE_ALERT, // '!' over player
+        PHASE_INTRO, // fancy "Battle Start!"
+        PHASE_BATTLE,
+        PHASE_OUTRO, // fancy "Victory!"
+    } phase;
+    uint8_t frame;
+    bool remove_enemy;
+    uint8_t enemy_chunk;
+    uint8_t enemies[4];
+    uint8_t ehealth[4];
+    uint8_t eap[4];
+    uint8_t pdef, edef; // party/enemy defender (-1 for none)
+    uint8_t esel; // enemy select
+    uint8_t psel; // party member select
+    uint8_t msel; // menu select
+};
 extern union sdata_t {
     sdata_dialog dialog;
     sdata_tp tp;
+    sdata_battle battle;
 } sdata;
 void change_state(uint8_t new_state);
 
@@ -143,9 +162,9 @@ void platform_drawplusmask(int16_t x, int16_t y, uint8_t w, uint8_t h,
                            uint8_t const* bitmap);
 void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num);
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
-                               uint8_t frame, uint8_t w, uint8_t h);
+                               uint16_t frame, uint8_t w, uint8_t h);
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
-                              uint8_t frame, uint8_t w, uint8_t h);
+                              uint16_t frame, uint8_t w, uint8_t h);
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 #if 0
@@ -164,6 +183,12 @@ void draw_frame(uint8_t x, uint8_t y, uint8_t w, uint8_t h);
 void draw_tiles();
 void draw_player();
 void draw_sprites();
+struct draw_sprite_entry {
+    uint24_t addr;
+    uint8_t frame;
+    int16_t x, y;
+};
+void sort_and_draw_sprites(draw_sprite_entry* entries, uint8_t n);
 
 // map.cpp
 bool enemy_contacts_player(active_chunk_t const& c);
@@ -176,6 +201,10 @@ void update();
 
 // render.cpp
 void render();
+
+// battle.cpp
+void update_battle();
+void render_battle();
 
 // init.cpp
 void initialize();

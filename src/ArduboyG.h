@@ -930,11 +930,14 @@ namespace abg_detail
 #if !defined(ABG_UPDATE_EVERY_N_DEFAULT)
 #define ABG_UPDATE_EVERY_N_DEFAULT 1
 #endif
+#if !defined(ABG_FPS_DEFAULT)
+#define ABG_FPS_DEFAULT 135
+#endif
 
 #if defined(ABG_TIMER3)
-uint16_t timer_counter = F_CPU / 64 / 135;
+uint16_t timer_counter = F_CPU / 64 / ABG_FPS_DEFAULT;
 #elif defined(ABG_TIMER4)
-uint16_t timer_counter = F_CPU / 256 / 135;
+uint16_t timer_counter = F_CPU / 256 / ABG_FPS_DEFAULT;
 #endif
 uint8_t  update_counter;
 uint8_t  update_every_n = ABG_UPDATE_EVERY_N_DEFAULT;

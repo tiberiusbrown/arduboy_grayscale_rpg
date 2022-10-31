@@ -43,7 +43,10 @@ def convert(fout, sym, fname, sw, sh, num = 0):
 BASE = '../src/generated/'
 BINBASE = '../arduboy_build/'
 
-convert(BINBASE + 'portrait_img.bin', 'PORTRAIT_IMG', 'portraits.png', 32, 32)
-convert(BINBASE + 'player_img.bin', 'PLAYER_IMG', 'player_sprites.png', 16, 16)
-convert(BINBASE + 'enemy_img.bin', 'ENEMY_IMG', 'enemy_sprites.png', 16, 16)
-convert(BINBASE + 'tile_img.bin', 'TILE_IMG', 'tiles.png', 16, 16)
+convert(BINBASE + 'portrait_img.bin', '', 'portraits.png', 32, 32)
+convert(BINBASE + 'player_img.bin', '', 'player_sprites.png', 16, 16)
+convert(BINBASE + 'enemy_img.bin', '', 'enemy_sprites.png', 16, 16)
+convert(BINBASE + 'tile_img.bin', '', 'tiles.png', 16, 16)
+convert(BINBASE + 'battle_menu_img.bin', '', 'battle_menu.png', 32, 48)
+convert(BINBASE + 'battle_start_img.bin', '', 'battle_start.png', 144, 16)
+convert(BINBASE + 'battle_banner_img.bin', '', 'battle_banner.png', 144, 24)

@@ -7,12 +7,9 @@ static int8_t const DIRY[8] PROGMEM = {
     1, 1, 0, -1, -1, -1, 0, 1,
 };
 
-void reset_enemy(enemy_t& e) {
-
-}
-
 bool enemy_contacts_player(active_chunk_t const& c) {
     auto const& e = c.enemy;
+    if(!e.active) return false;
     uint16_t ex = c.cx * 128 + e.x;
     uint16_t ey = c.cy *  64 + e.y;
     // TODO: make these uint8_t
@@ -215,6 +212,7 @@ void update()
         update_map,
         update_dialog,
         update_tp,
+        update_battle,
     };
 
     pmoving = false;

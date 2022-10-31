@@ -54,6 +54,7 @@ void render()
         render_map,
         render_dialog,
         render_tp,
+        render_battle,
     };
 
     (pgmptr(&FUNCS[state]))();

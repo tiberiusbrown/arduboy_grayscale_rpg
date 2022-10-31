@@ -62,6 +62,26 @@ static bool run_chunk()
             wrap_text(sdata.dialog.message, 128);
             return true;
         }
+        case CMD_BAT:
+        case CMD_EBAT: {
+            uint8_t f = c.script[chunk_instr++];
+            f |= uint16_t(c.script[chunk_instr++]) << 8;
+            uint8_t e[4];
+            e[0] = c.script[chunk_instr++];
+            e[1] = c.script[chunk_instr++];
+            e[2] = c.script[chunk_instr++];
+            e[3] = c.script[chunk_instr++];
+            if(story_flag_get(f)) break;
+            change_state(STATE_BATTLE);
+            sdata.battle.remove_enemy = (instr == CMD_EBAT);
+            sdata.battle.enemy_chunk = running_chunk;
+            for(uint8_t i = 0; i < 4; ++i)
+                sdata.battle.enemies[i] = e[i];
+            sdata.battle.phase = sdata_battle::PHASE_INTRO;
+            sdata.battle.pdef = sdata.battle.edef = 255;
+            story_flag_set(f);
+            return true;
+        }
 
             // teleport
         case CMD_TP:
@@ -229,10 +249,15 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
 {
     active_chunk_t& active_chunk = active_chunks[index];
     map_chunk_t* chunk = &active_chunk.chunk;
+    uint16_t ci = cy * MAP_CHUNK_W + cx;
+    uint24_t addr = uint24_t(ci) * sizeof(map_chunk_t);
     if(active_chunk.cx != cx || active_chunk.cy != cy) {
         memset(&active_chunk, 0, sizeof(active_chunk));
         active_chunk.cx = cx;
         active_chunk.cy = cy;
+    } else if(cx != 255 && cy != 255) {
+        platform_fx_read_data_bytes(addr, chunk->tiles_flat, 32);
+        return;
     }
     if(cx == 255 || cy == 255) {
         for(uint8_t i = 0; i < 32; ++i)
@@ -242,8 +267,6 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
         active_chunk.enemy.active = false;
         return;
     }
-    uint16_t ci = cy * MAP_CHUNK_W + cx;
-    uint24_t addr = uint24_t(ci) * sizeof(map_chunk_t);
     platform_fx_read_data_bytes(addr, chunk, sizeof(map_chunk_t));
 }
 

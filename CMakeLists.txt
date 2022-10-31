@@ -23,6 +23,7 @@ FetchContent_MakeAvailable(SDL2)
 project(arduboy_grayscale_rpg)
 add_executable(arduboy_grayscale_rpg
     .clang-format
+    src/battle.cpp
     src/common.hpp
     src/common.cpp
     src/draw.cpp

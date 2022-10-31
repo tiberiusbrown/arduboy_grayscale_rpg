@@ -22,6 +22,12 @@ Action Instructions
     tdlg <tile> <portrait> {string}
         If player selects <tile>, dlg <portrait> {string}
 
+    bat <flag> <enemy_type> <enemy_type> <enemy_type> <enemy_type>
+        If <flag> is cleared, start a battle with enemies and set <flag>
+
+    ebat <flag> <enemy_type> <enemy_type> <enemy_type> <enemy_type>
+        Same as 'bat' but remove chunk enemy immediately (avoids glitch frame)
+
     Teleportation instructions terminate the script processing, as they cause
     a chunk reload to occur.
 
@@ -124,6 +130,8 @@ enum script_command_t {
     CMD_DLG,
     CMD_TMSG,
     CMD_TDLG,
+    CMD_BAT,
+    CMD_EBAT,
     CMD_TP,
     CMD_TTP,
     CMD_WTP,

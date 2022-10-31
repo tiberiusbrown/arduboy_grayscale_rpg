@@ -370,7 +370,7 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
 #endif
 
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
-                               uint8_t frame, uint8_t w, uint8_t h)
+                               uint16_t frame, uint8_t w, uint8_t h)
 {
 #ifdef ARDUINO
     platform_fx_drawbitmap(x, y, addr, frame, dbmOverwrite, w, h);
@@ -392,7 +392,7 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
 }
 
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
-                              uint8_t frame, uint8_t w, uint8_t h)
+                              uint16_t frame, uint8_t w, uint8_t h)
 {
 #ifdef ARDUINO
     platform_fx_drawbitmap(x, y, addr, frame, dbmMasked, w, h);

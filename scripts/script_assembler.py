@@ -23,6 +23,8 @@ class CMD(AutoNumber):
     DLG  = ()
     TMSG = ()
     TDLG = ()
+    BAT  = ()
+    EBAT = ()
     TP   = ()
     TTP  = ()
     WTP  = ()
@@ -103,6 +105,10 @@ def addpath(b, s, eps):
         sys.exit(1)
     b += eps[s]
 
+def etype(s):
+    if s == '-': return 255
+    return int(s)
+
 def assemble(s, eps):
     b = []
     s = [x for x in re.findall('\{[^}]*}|\S+', s)]
@@ -131,6 +137,22 @@ def assemble(s, eps):
             b.append(int(s[i])); i += 1
             b.append(int(s[i])); i += 1
             addstring(b, s[i]); i += 1
+            
+        elif s[i] == 'bat':
+            b.append(CMD.BAT); i += 1
+            addflag(b, s[i]); i += 1
+            b.append(etype(s[i])); i += 1
+            b.append(etype(s[i])); i += 1
+            b.append(etype(s[i])); i += 1
+            b.append(etype(s[i])); i += 1
+            
+        elif s[i] == 'ebat':
+            b.append(CMD.EBAT); i += 1
+            addflag(b, s[i]); i += 1
+            b.append(etype(s[i])); i += 1
+            b.append(etype(s[i])); i += 1
+            b.append(etype(s[i])); i += 1
+            b.append(etype(s[i])); i += 1
             
         elif s[i] == 'tp':
             b.append(CMD.TP); i += 1
