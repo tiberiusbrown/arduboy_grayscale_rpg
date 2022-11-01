@@ -42,12 +42,12 @@ void platform_drawoverwrite(int16_t x, int16_t y, uint8_t w, uint8_t h,
 #else
     for(uint8_t r = 0; r < h; ++r) {
         for(uint8_t c = 0; c < w; ++c) {
-            int py = y + r;
-            int px = x + c;
-            if(px < 0 || py < 0) continue;
-            if(px >= 128 || py >= 64) continue;
+            int tpy = y + r;
+            int tpx = x + c;
+            if(tpx < 0 || tpy < 0) continue;
+            if(tpx >= 128 || tpy >= 64) continue;
             uint8_t p = get_bitmap_bit(bitmap, w, h, c, r);
-            pixels[gplane][py * 128 + px] = p;
+            pixels[gplane][tpy * 128 + tpx] = p;
         }
     }
 #endif
@@ -61,13 +61,13 @@ void platform_drawplusmask(int16_t x, int16_t y, uint8_t w, uint8_t h,
 #else
     for(uint8_t r = 0; r < h; ++r) {
         for(uint8_t c = 0; c < w; ++c) {
-            int py = y + r;
-            int px = x + c;
-            if(px < 0 || py < 0) continue;
-            if(px >= 128 || py >= 64) continue;
+            int tpy = y + r;
+            int tpx = x + c;
+            if(tpx < 0 || tpy < 0) continue;
+            if(tpx >= 128 || tpy >= 64) continue;
             uint8_t p = get_bitmap_bit(bitmap, w * 3, h, c * 3 + gplane, r);
             uint8_t m = get_bitmap_bit(bitmap, w * 3, h, c * 3 + 2, r);
-            if(m) pixels[gplane][py * 128 + px] = p;
+            if(m) pixels[gplane][tpy * 128 + tpx] = p;
         }
     }
 #endif
@@ -380,12 +380,12 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     bitmap += w * h / 8 * (frame * 2 + gplane);
     for(uint8_t r = 0; r < h; ++r) {
         for(uint8_t c = 0; c < w; ++c) {
-            int py = y + r;
-            int px = x + c;
-            if(px < 0 || py < 0) continue;
-            if(px >= 128 || py >= 64) continue;
+            int tpy = y + r;
+            int tpx = x + c;
+            if(tpx < 0 || tpy < 0) continue;
+            if(tpx >= 128 || tpy >= 64) continue;
             uint8_t p = get_bitmap_bit(bitmap, w, h, c, r);
-            pixels[gplane][py * 128 + px] = p;
+            pixels[gplane][tpy * 128 + tpx] = p;
         }
     }
 #endif
@@ -402,13 +402,13 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     bitmap += w * h / 4 * (frame * 2 + gplane);
     for(uint8_t r = 0; r < h; ++r) {
         for(uint8_t c = 0; c < w; ++c) {
-            int py = y + r;
-            int px = x + c;
-            if(px < 0 || py < 0) continue;
-            if(px >= 128 || py >= 64) continue;
+            int tpy = y + r;
+            int tpx = x + c;
+            if(tpx < 0 || tpy < 0) continue;
+            if(tpx >= 128 || tpy >= 64) continue;
             uint8_t p = get_bitmap_bit(bitmap, w * 2, h, c * 2 + 0, r);
             uint8_t m = get_bitmap_bit(bitmap, w * 2, h, c * 2 + 1, r);
-            if(m) pixels[gplane][py * 128 + px] = p;
+            if(m) pixels[gplane][tpy * 128 + tpx] = p;
         }
     }
 #endif

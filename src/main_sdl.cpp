@@ -50,7 +50,7 @@ static void screen_recording_toggle()
         struct tm* ti;
         time(&rawtime);
         ti = localtime(&rawtime);
-        snprintf(fname, sizeof(fname), "recording_%04d%02d%02d%02d%02d%02d.gif",
+        (void)snprintf(fname, sizeof(fname), "recording_%04d%02d%02d%02d%02d%02d.gif",
                  ti->tm_year + 1900, ti->tm_mon + 1, ti->tm_mday,
                  ti->tm_hour + 1, ti->tm_min, ti->tm_sec);
         GifBegin(&gif, fname, 128, FBH, 33);
@@ -69,11 +69,13 @@ int main(int argc, char** argv)
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
-    if(0 != SDL_CreateWindowAndRenderer(128 * ZOOM, FBH * ZOOM,
-                                        SDL_WINDOW_ALLOW_HIGHDPI |
-                                            SDL_WINDOW_RESIZABLE,
-                                        &window, &renderer))
-        goto error_quit;
+    window = SDL_CreateWindow("arduboy_grayscale_rpg",
+        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        128 * ZOOM, FBH * ZOOM, SDL_WINDOW_ALLOW_HIGHDPI |
+        SDL_WINDOW_RESIZABLE);
+    if(!window) goto error_destroy_window;
+    renderer = SDL_CreateRenderer(window, -1, 0);
+    if(!renderer) goto error_destroy_renderer;
 
     SDL_Texture* tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888,
                                          SDL_TEXTUREACCESS_STREAMING, 128, FBH);
@@ -190,7 +192,10 @@ int main(int argc, char** argv)
     SDL_DestroyRenderer(renderer);
     return 0;
 
-error_quit:
+error_destroy_renderer:
+    SDL_DestroyRenderer(renderer);
+error_destroy_window:
+    SDL_DestroyWindow(window);
     SDL_Quit();
     return -1;
 }

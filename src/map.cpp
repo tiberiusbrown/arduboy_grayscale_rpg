@@ -11,27 +11,24 @@ static void reset_enemy(enemy_t& e) {
     e.y = ((e.path[0] >> 3) & 3) * 16;
     e.frames_rem = 1;
     e.dir = 0xff;
-    e.active = (e.path_num == 0);
+    e.active = (e.path_num > 0);
 }
 
 static bool run_chunk()
 {
     auto& ac = active_chunks[running_chunk];
     auto& c = ac.chunk;
-    uint16_t tx = ac.cx * 8;
-    uint16_t ty = ac.cy * 4;
     uint8_t walk_tile = 255;
-    {
-        // TODO: could these be uint8_t
-        uint16_t dx = uint16_t(((px + 8) >> 4) - tx);
-        uint16_t dy = uint16_t(((py + 8) >> 4) - ty);
-        if(dx < 8 && dy < 4) walk_tile = dy * 8 + dx;
-    }
     uint8_t sel_tile = 255;
     {
-        // TODO: could these be uint8_t
-        uint16_t dx = uint16_t(selx - tx);
-        uint16_t dy = uint16_t(sely - ty);
+        uint16_t tx = ac.cx * 8;
+        uint16_t ty = ac.cy * 4;
+        uint16_t dx, dy; // TODO: could these be uint8_t
+        dx = uint16_t(((px + 8) >> 4) - tx);
+        dy = uint16_t(((py + 8) >> 4) - ty);
+        if(dx < 8 && dy < 4) walk_tile = dy * 8 + dx;
+        dx = uint16_t(selx - tx);
+        dy = uint16_t(sely - ty);
         if(dx < 8 && dy < 4) sel_tile = dy * 8 + dx;
     }
     while(chunk_instr < CHUNK_SCRIPT_SIZE) {
