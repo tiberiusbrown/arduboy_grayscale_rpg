@@ -14,6 +14,8 @@ def extract(fname, sw, sh, num = 0):
     if 'transparency' in im.info:
         masked = True
         pm = [0] * (num * sbytes)
+        
+    im = im.convert('RGBA')
 
     index = 0
     for i in range(num):
@@ -25,7 +27,18 @@ def extract(fname, sw, sh, num = 0):
                 b1 = 0
                 bm = 0
                 for tr in range(8):
-                    x = im.getpixel((c + ic, r + ir * 8 + 7 - tr))
+                    rgba = im.getpixel((c + ic, r + ir * 8 + 7 - tr))
+                    x = 0
+                    if rgba[0] > 0xc0:
+                        x = 3
+                    elif rgba[0] > 0x80:
+                        x = 2
+                    elif rgba[0] > 0x40:
+                        x = 1
+                    if masked:
+                        x += 1
+                    if rgba[3] == 0:
+                        x = 0
                     if masked:
                         bm = (bm << 1)
                         if x != 0:
