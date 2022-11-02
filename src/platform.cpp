@@ -34,40 +34,22 @@ static uint8_t get_bitmap_bit(uint8_t const* bitmap, uint8_t w, uint8_t h,
 }
 #endif
 
-void platform_drawoverwrite(int16_t x, int16_t y, uint8_t w, uint8_t h,
-                            uint8_t const* bitmap)
+void platform_drawoverwritemonochrome(int16_t x, int16_t y, uint8_t w,
+                                      uint8_t h, uint8_t const* bitmap)
 {
 #ifdef ARDUINO
-    a.drawOverwrite(x, y, w, h, bitmap);
+    a.drawOverwriteMonochrome(x, y, w, h, bitmap);
 #else
-    for(uint8_t r = 0; r < h; ++r) {
-        for(uint8_t c = 0; c < w; ++c) {
+    for(uint8_t r = 0; r < h; ++r)
+    {
+        for(uint8_t c = 0; c < w; ++c)
+        {
             int tpy = y + r;
             int tpx = x + c;
             if(tpx < 0 || tpy < 0) continue;
             if(tpx >= 128 || tpy >= 64) continue;
             uint8_t p = get_bitmap_bit(bitmap, w, h, c, r);
             pixels[gplane][tpy * 128 + tpx] = p;
-        }
-    }
-#endif
-}
-
-void platform_drawplusmask(int16_t x, int16_t y, uint8_t w, uint8_t h,
-                           uint8_t const* bitmap)
-{
-#ifdef ARDUINO
-    a.drawPlusMask(x, y, w, h, bitmap);
-#else
-    for(uint8_t r = 0; r < h; ++r) {
-        for(uint8_t c = 0; c < w; ++c) {
-            int tpy = y + r;
-            int tpx = x + c;
-            if(tpx < 0 || tpy < 0) continue;
-            if(tpx >= 128 || tpy >= 64) continue;
-            uint8_t p = get_bitmap_bit(bitmap, w * 3, h, c * 3 + gplane, r);
-            uint8_t m = get_bitmap_bit(bitmap, w * 3, h, c * 3 + 2, r);
-            if(m) pixels[gplane][tpy * 128 + tpx] = p;
         }
     }
 #endif
@@ -81,20 +63,8 @@ void platform_drawoverwrite(int16_t x, int16_t y, uint8_t const* bitmap,
 #else
     uint8_t w = pgm_read_byte(bitmap++);
     uint8_t h = pgm_read_byte(bitmap++);
-    platform_drawoverwrite(x, y, w, h,
-                           bitmap + ((frame * 2 + gplane) * (w * h / 8)));
-#endif
-}
-
-void platform_drawplusmask(int16_t x, int16_t y, uint8_t const* bitmap,
-                           uint8_t frame)
-{
-#ifdef ARDUINO
-    a.drawPlusMask(x, y, bitmap, frame);
-#else
-    uint8_t w = pgm_read_byte(bitmap++);
-    uint8_t h = pgm_read_byte(bitmap++);
-    platform_drawplusmask(x, y, w, h, bitmap + (frame * 3 * (w * h / 8)));
+    platform_drawoverwritemonochrome(
+        x, y, w, h, bitmap + ((frame * 2 + gplane) * (w * h / 8)));
 #endif
 }
 
@@ -109,11 +79,13 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
     // determine render width
     int16_t skipleft = 0;
     uint8_t renderwidth;
-    if(x < 0) {
+    if(x < 0)
+    {
         skipleft = -x;
         if(width - skipleft < WIDTH) renderwidth = width - skipleft;
         else renderwidth = WIDTH;
-    } else {
+    }
+    else {
         if(x + width > WIDTH) renderwidth = WIDTH - x;
         else renderwidth = width;
     }
@@ -121,12 +93,14 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
     // determine render height
     int16_t skiptop;     // pixel to be skipped at the top
     int8_t renderheight; // in pixels
-    if(y < 0) {
+    if(y < 0)
+    {
         skiptop = -y & -8; // optimized -y / 8 * 8
         if(height - skiptop <= HEIGHT) renderheight = height - skiptop;
         else renderheight = HEIGHT + (y & 7);
         skiptop >>= 3; // pixels to displayrows
-    } else {
+    }
+    else {
         skiptop = 0;
         if(y + height > HEIGHT) renderheight = HEIGHT - y;
         else renderheight = height;
@@ -136,7 +110,8 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
                    skiptop) *
             width +
         skipleft;
-    if(mode & dbmMasked) {
+    if(mode & dbmMasked)
+    {
         offset += offset; // double for masked bitmaps
         width += width;
     }
@@ -320,7 +295,8 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
 #else
     uint8_t lastmask =
         bitShiftRightMaskUInt8(8 - height); // mask for bottom most pixels
-    do {
+    do
+    {
         seekData(address);
         address += width;
         mode &= ~(_BV(dbfExtraRow));
@@ -329,20 +305,23 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
         uint8_t rowmask = 0xFF;
         if(renderheight < 8) rowmask = lastmask;
         wait();
-        for(uint8_t c = 0; c < renderwidth; c++) {
+        for(uint8_t c = 0; c < renderwidth; c++)
+        {
             uint8_t bitmapbyte = readUnsafe();
             if(mode & _BV(dbfReverseBlack)) bitmapbyte ^= rowmask;
             uint8_t maskbyte = rowmask;
             if(mode & _BV(dbfWhiteBlack)) maskbyte = bitmapbyte;
             if(mode & _BV(dbfBlack)) bitmapbyte = 0;
             uint16_t bitmap = multiplyUInt8(bitmapbyte, yshift);
-            if(mode & _BV(dbfMasked)) {
+            if(mode & _BV(dbfMasked))
+            {
                 wait();
                 uint8_t tmp = readUnsafe();
                 if((mode & dbfWhiteBlack) == 0) maskbyte = tmp;
             }
             uint16_t mask = multiplyUInt8(maskbyte, yshift);
-            if(displayrow >= 0) {
+            if(displayrow >= 0)
+            {
                 uint8_t pixels = bitmap;
                 uint8_t display = Arduboy2Base::sBuffer[displayoffset];
                 if((mode & _BV(dbfInvert)) == 0) pixels ^= display;
@@ -350,7 +329,8 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
                 pixels ^= display;
                 Arduboy2Base::sBuffer[displayoffset] = pixels;
             }
-            if(mode & _BV(dbfExtraRow)) {
+            if(mode & _BV(dbfExtraRow))
+            {
                 uint8_t display = Arduboy2Base::sBuffer[displayoffset + WIDTH];
                 uint8_t pixels = bitmap >> 8;
                 if((mode & dbfInvert) == 0) pixels ^= display;
@@ -378,8 +358,10 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     assert(SDL_GetTicks64() >= ticks_when_ready);
     uint8_t const* bitmap = &FXDATA[addr];
     bitmap += w * h / 8 * (frame * 2 + gplane);
-    for(uint8_t r = 0; r < h; ++r) {
-        for(uint8_t c = 0; c < w; ++c) {
+    for(uint8_t r = 0; r < h; ++r)
+    {
+        for(uint8_t c = 0; c < w; ++c)
+        {
             int tpy = y + r;
             int tpx = x + c;
             if(tpx < 0 || tpy < 0) continue;
@@ -400,8 +382,10 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     assert(SDL_GetTicks64() >= ticks_when_ready);
     uint8_t const* bitmap = &FXDATA[addr];
     bitmap += w * h / 4 * (frame * 2 + gplane);
-    for(uint8_t r = 0; r < h; ++r) {
-        for(uint8_t c = 0; c < w; ++c) {
+    for(uint8_t r = 0; r < h; ++r)
+    {
+        for(uint8_t c = 0; c < w; ++c)
+        {
             int tpy = y + r;
             int tpx = x + c;
             if(tpx < 0 || tpy < 0) continue;

@@ -13,7 +13,8 @@ static void render_dialog()
     render_map();
 
     auto& d = sdata.dialog;
-    if(d.portrait != 255) {
+    if(d.portrait != 255)
+    {
         platform_fillrect(0, 2, 33, 33, BLACK);
         platform_fx_drawoverwrite(0, 3, PORTRAIT_IMG, d.portrait, 32, 32);
     }
@@ -29,11 +30,11 @@ static void render_tp()
 {
     auto const& d = sdata.tp;
     uint8_t t = d.frame;
-    if(t > TELEPORT_TRANSITION_FRAMES)
-        t = TELEPORT_TRANSITION_FRAMES * 2 - t;
+    if(t > TELEPORT_TRANSITION_FRAMES) t = TELEPORT_TRANSITION_FRAMES * 2 - t;
     constexpr uint8_t XB = 64 / TELEPORT_TRANSITION_FRAMES;
     constexpr uint8_t YB = 32 / TELEPORT_TRANSITION_FRAMES;
-    if(t != TELEPORT_TRANSITION_FRAMES) {
+    if(t != TELEPORT_TRANSITION_FRAMES)
+    {
         uint8_t w = XB * t;
         uint8_t h = YB * t;
         uint8_t h2 = 64 - h * 2;

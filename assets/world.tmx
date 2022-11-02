@@ -194,8 +194,8 @@ skip_to_end:</property>
    <properties>
     <property name="script">$brnw end
 brfs !first_guard_msg end
-dlg 0 {There's someone patrolling at the other end of the bridge! Let's make this message super long to test performance as well. How's it look?}
-dlg 1 {Maybe we can sneak around him.}
+dlg 0 {There's a guard patrolling at the other end of the bridge!}
+dlg 1 {Maybe we can sneak past him.}
 fs !first_guard_msg
 end:</property>
    </properties>
@@ -219,15 +219,6 @@ end:</property>
  </objectgroup>
  <objectgroup color="#ff0000" id="3" name="Paths">
   <object id="44" name="!circling_guard" class="1" x="151.833" y="39.5">
-   <polyline points="0,0 0,17.6667 16.3333,17.6667 16,-0.666667"/>
-  </object>
-  <object id="50" name="!circling_guard" class="1" x="103.333" y="104.5">
-   <polyline points="0,0 0,17.6667 16.3333,17.6667 16,-0.666667"/>
-  </object>
-  <object id="51" name="!circling_guard" class="1" x="104.333" y="137.5">
-   <polyline points="0,0 0,17.6667 16.3333,17.6667 16,-0.666667"/>
-  </object>
-  <object id="52" name="!circling_guard" class="1" x="133.833" y="106.5">
    <polyline points="0,0 0,17.6667 16.3333,17.6667 16,-0.666667"/>
   </object>
   <object id="45" name="!first_guard" class="0" x="247.667" y="135.333">

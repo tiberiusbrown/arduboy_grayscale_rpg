@@ -17,8 +17,16 @@
 extern ArduboyGBase a;
 using int24_t = __int24;
 using uint24_t = __uint24;
+inline uint8_t plane()
+{
+    return a.currentPlane();
+}
 #else
 #define PROGMEM
+inline char const* PSTR(char const* str)
+{
+    return str;
+}
 inline uint8_t pgm_read_byte(void const* p)
 {
     return *(uint8_t*)p;
@@ -37,6 +45,11 @@ constexpr uint8_t LIGHT_GRAY = 2;
 constexpr uint8_t WHITE = 3;
 using int24_t = int32_t;
 using uint24_t = uint32_t;
+extern int gplane;
+inline uint8_t plane()
+{
+    return (uint8_t)gplane;
+}
 #endif
 
 // useful when T is a pointer type, like function pointer or char const*
@@ -57,10 +70,12 @@ constexpr uint8_t MAP_CHUNK_W = 32;
 constexpr uint8_t CHUNK_SCRIPT_SIZE = 64;
 constexpr uint8_t CHUNK_SPRITE_PATH_SIZE = 8;
 
-struct map_chunk_t {
+struct map_chunk_t
+{
     // number of tiles in a chunk must match the screen
     // dimensions when using 16x16 tiles
-    union {
+    union
+    {
         uint8_t tiles_flat[32];
         uint8_t tiles[4][8];
     };
@@ -69,7 +84,8 @@ struct map_chunk_t {
 
 extern uint8_t nframe;
 
-enum {
+enum
+{
     STATE_MAP,    // moving around on the map
     STATE_DIALOG, // message or dialog
     STATE_TP,     // player is teleporting (e.g., entering building or cave)
@@ -82,34 +98,55 @@ extern uint8_t running_chunk;
 extern uint8_t chunk_instr;
 extern int8_t chunk_regs[16];
 
-struct sdata_dialog {
+struct sdata_dialog
+{
     uint8_t portrait;
     uint8_t char_progress;
     char message[254];
 };
-struct sdata_tp {
+struct sdata_tp
+{
     uint16_t tx, ty;
     uint8_t frame;
 };
-struct sdata_battle {
-    enum phase_t {
-        PHASE_ALERT, // '!' over player
-        PHASE_INTRO, // fancy "Battle Start!"
-        PHASE_BATTLE,
-        PHASE_OUTRO, // fancy "Victory!"
+
+struct party_member_t
+{
+    uint8_t id;
+    uint8_t hp;
+    uint8_t ap;
+};
+extern party_member_t party[4];
+extern uint8_t nparty;
+
+struct sdata_battle
+{
+    enum phase_t
+    {
+        PHASE_ALERT,   // '!' over player
+        PHASE_INTRO,   // fancy "Battle Start!"
+        PHASE_MENU,
+        PHASE_ESEL,    // select enemy
+        PHASE_PATTACK, // party attack animation
+        PHASE_EATTACK, // enemy attack animation
+        PHASE_OUTRO,   // fancy "Victory!"
     } phase;
     uint8_t frame;
+    uint16_t flag;
     bool remove_enemy;
     uint8_t enemy_chunk;
-    uint8_t enemies[4];
-    uint8_t ehealth[4];
-    uint8_t eap[4];
+    party_member_t enemies[4];
     uint8_t pdef, edef; // party/enemy defender (-1 for none)
-    uint8_t esel; // enemy select
-    uint8_t psel; // party member select
-    uint8_t msel; // menu select
+    uint8_t esel;       // enemy select
+    uint8_t psel;       // party member select
+    uint8_t msel;       // menu select
+    int8_t menuy;       // menu position
+    int8_t menuy_target;
+    phase_t prev_phase;
+    phase_t next_phase;
 };
-extern union sdata_t {
+extern union sdata_t
+{
     sdata_dialog dialog;
     sdata_tp tp;
     sdata_battle battle;
@@ -127,7 +164,8 @@ void story_flag_clr(uint16_t index);
 void story_flag_tog(uint16_t index);
 bool story_flag_get(uint16_t index);
 
-struct enemy_t {
+struct enemy_t
+{
     uint8_t x, y, dir;
     uint8_t type;
     uint8_t path_num;
@@ -140,7 +178,8 @@ struct enemy_t {
     bool active;
 };
 
-struct active_chunk_t {
+struct active_chunk_t
+{
     map_chunk_t chunk;
     uint8_t cx, cy;
     enemy_t enemy;
@@ -155,12 +194,8 @@ extern uint8_t btns_down, btns_pressed;
 //     platform abstraction methods
 void platform_drawoverwrite(int16_t x, int16_t y, uint8_t const* bitmap,
                             uint8_t frame);
-void platform_drawoverwrite(int16_t x, int16_t y, uint8_t w, uint8_t h,
-                            uint8_t const* bitmap);
-void platform_drawplusmask(int16_t x, int16_t y, uint8_t const* bitmap,
-                           uint8_t frame);
-void platform_drawplusmask(int16_t x, int16_t y, uint8_t w, uint8_t h,
-                           uint8_t const* bitmap);
+void platform_drawoverwritemonochrome(int16_t x, int16_t y, uint8_t w,
+                                      uint8_t h, uint8_t const* bitmap);
 void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num);
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
                                uint16_t frame, uint8_t w, uint8_t h);
@@ -179,13 +214,15 @@ bool platform_fx_busy();
 
 // draw.cpp
 void draw_tile(int16_t x, int16_t y, uint8_t t);
-void draw_text(uint8_t x, uint8_t y, char const* str); // str NOT in prog
+void draw_text(uint8_t x, uint8_t y, char const* str);      // str in RAM
+void draw_text_prog(uint8_t x, uint8_t y, char const* str); // str in PROGMEM
 void wrap_text(char* str, uint8_t w); // replace ' ' with '\n' to wrap to width
 void draw_frame(uint8_t x, uint8_t y, uint8_t w, uint8_t h);
 void draw_tiles();
 void draw_player();
 void draw_sprites();
-struct draw_sprite_entry {
+struct draw_sprite_entry
+{
     uint24_t addr;
     uint8_t frame;
     int16_t x, y;

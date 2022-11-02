@@ -14,8 +14,13 @@ void initialize()
     change_state(STATE_MAP);
     for(auto& f : story_flags)
         f = 0;
-    for(auto& ac : active_chunks) {
+    for(auto& ac : active_chunks)
+    {
         memset(&ac, 0, sizeof(ac));
         ac.cx = ac.cy = 255;
     }
+
+    nparty = 1;
+    party[0].id = 0;
+    party[0].hp = 10;
 }

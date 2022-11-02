@@ -158,7 +158,7 @@ extern uint8_t  update_counter;
 extern uint8_t  update_every_n;
 extern uint8_t  current_plane;
 #if defined(ABG_SYNC_THREE_PHASE)
-extern uint8_t  current_phase;
+extern uint8_t volatile current_phase;
 #endif
 extern bool volatile needs_display; // needs display work
 
@@ -195,6 +195,12 @@ template<SpriteMode SPRITE_MODE> void draw_sprite(
     uint8_t w, uint8_t h,
     uint8_t const* image, uint8_t frame,
     uint8_t const* mask, uint8_t mask_frame);
+
+template<SpriteMode SPRITE_MODE> void draw_sprite_dispatch(
+    int16_t x, int16_t y,
+    uint8_t w, uint8_t h,
+    uint8_t pages,
+    uint8_t const* image, uint8_t const* mask);
 
 template<SpriteMode SPRITE_MODE> inline void draw_sprite(
     int16_t x, int16_t y,
@@ -595,16 +601,14 @@ struct ArduboyG_Common : public BASE
         }
     }
     
-    void drawOverwrite(
+    void drawOverwriteMonochrome(
         int16_t x, int16_t y,
         uint8_t w, uint8_t h,
         uint8_t const* bitmap)
     {
-        static_assert(MODE != ABG_Mode::L4_Triplane,
-            "drawOverwrite does not support L4_Triplane mode");
         static_assert(FLAGS & ABG_Flags::OptimizeDrawOverwrite,
-            "Sized drawOverwrite requires ABG_Flags::OptimizeDrawOverwrite");
-        draw_sprite<SpriteMode::Overwrite>(x, y, w, h, bitmap, 0, nullptr, 0);
+            "drawOverwriteMonochrome requires ABG_Flags::OptimizeDrawOverwrite");
+        draw_sprite_dispatch<SpriteMode::Overwrite>(x, y, w, h, (h + 7) / 8, bitmap, nullptr);
     }
     
     void drawPlusMask(
@@ -615,16 +619,6 @@ struct ArduboyG_Common : public BASE
         static_assert(MODE != ABG_Mode::L4_Triplane,
             "drawOverwrite does not support L4_Triplane mode");
         draw_sprite<SpriteMode::PlusMask>(x, y, bitmap, frame, nullptr, 0);
-    }
-    
-    void drawPlusMask(
-        int16_t x, int16_t y,
-        uint8_t w, uint8_t h,
-        uint8_t const* bitmap)
-    {
-        static_assert(MODE != ABG_Mode::L4_Triplane,
-            "drawPlusMask does not support L4_Triplane mode");
-        draw_sprite<SpriteMode::PlusMask>(x, y, w, h, bitmap, 0, nullptr, 0);
     }
 
     void drawExternalMask(
@@ -1056,7 +1050,6 @@ template<SpriteMode SPRITE_MODE> void draw_sprite(
     if(image == nullptr) return;
     if(SPRITE_MODE == SpriteMode::ExternalMask && mask == nullptr) return;
 
-    
     uint8_t pages = h;
     asm volatile(
         "lsr %[pages]\n"
@@ -1081,6 +1074,15 @@ template<SpriteMode SPRITE_MODE> void draw_sprite(
             image += plane_bytes * frame * 3;
     }
     
+    draw_sprite_dispatch<SPRITE_MODE>(x, y, w, h, pages, image, mask);
+}
+
+template<SpriteMode SPRITE_MODE> void draw_sprite_dispatch(
+    int16_t x, int16_t y,
+    uint8_t w, uint8_t h,
+    uint8_t pages,
+    uint8_t const* image, uint8_t const* mask)
+{
     uint8_t shift_coef;
     uint16_t shift_mask;
     {
@@ -1604,6 +1606,22 @@ template void draw_sprite<SpriteMode::ExternalMask>(
     uint8_t w, uint8_t h,
     uint8_t const* image, uint8_t frame,
     uint8_t const* mask, uint8_t mask_frame);
+
+template void draw_sprite_dispatch<SpriteMode::Overwrite>(
+    int16_t x, int16_t y,
+    uint8_t w, uint8_t h,
+    uint8_t pages,
+    uint8_t const* image, uint8_t const* mask);
+template void draw_sprite_dispatch<SpriteMode::PlusMask>(
+    int16_t x, int16_t y,
+    uint8_t w, uint8_t h,
+    uint8_t pages,
+    uint8_t const* image, uint8_t const* mask);
+template void draw_sprite_dispatch<SpriteMode::ExternalMask>(
+    int16_t x, int16_t y,
+    uint8_t w, uint8_t h,
+    uint8_t pages,
+    uint8_t const* image, uint8_t const* mask);
 
 }
 

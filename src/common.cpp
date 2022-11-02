@@ -56,3 +56,6 @@ uint8_t chunk_instr;
 int8_t chunk_regs[16];
 
 uint8_t story_flags[STORY_FLAG_BYTES];
+
+party_member_t party[4];
+uint8_t nparty;

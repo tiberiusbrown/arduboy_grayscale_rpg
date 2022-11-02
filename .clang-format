@@ -1,6 +1,6 @@
 ColumnLimit: 80
 
-BreakBeforeBraces: Linux
+BreakBeforeBraces: Allman
 
 AllowShortFunctionsOnASingleLine: Inline
 AllowShortBlocksOnASingleLine: Empty

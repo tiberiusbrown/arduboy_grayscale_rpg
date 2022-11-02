@@ -7,11 +7,12 @@ static int8_t const DIRY[8] PROGMEM = {
     1, 1, 0, -1, -1, -1, 0, 1,
 };
 
-bool enemy_contacts_player(active_chunk_t const& c) {
+bool enemy_contacts_player(active_chunk_t const& c)
+{
     auto const& e = c.enemy;
     if(!e.active) return false;
     uint16_t ex = c.cx * 128 + e.x;
-    uint16_t ey = c.cy *  64 + e.y;
+    uint16_t ey = c.cy * 64 + e.y;
     // TODO: make these uint8_t
     uint16_t dx = px - ex + 12;
     uint16_t dy = py - ey + 12;
@@ -23,15 +24,19 @@ static inline void update_enemy(enemy_t& e)
     if(!e.active) return;
     if(nframe & 1) return;
 
-    if(e.dir < 8) {
+    if(e.dir < 8)
+    {
         e.x += (int8_t)pgm_read_byte(&DIRX[e.dir]);
         e.y += (int8_t)pgm_read_byte(&DIRY[e.dir]);
     }
 
-    if(--e.frames_rem == 0) {
-        if(!(e.dir & 0x80)) {
+    if(--e.frames_rem == 0)
+    {
+        if(!(e.dir & 0x80))
+        {
             uint8_t t = e.path[e.path_index];
-            if(t & 0xe0) {
+            if(t & 0xe0)
+            {
                 // delay
                 e.frames_rem = (t >> 5) * 16;
                 e.dir = 0xff;
@@ -42,26 +47,30 @@ static inline void update_enemy(enemy_t& e)
         uint8_t t = e.path[e.path_index];
         uint8_t x = (t & 7) * 16;
         uint8_t y = ((t >> 3) & 3) * 16;
-        if(x < e.x) {
+        if(x < e.x)
+        {
             e.dir = 2;
             e.frames_rem = e.x - x;
-        } else if(x > e.x) {
+        }
+        else if(x > e.x) {
             e.dir = 6;
             e.frames_rem = x - e.x;
-        } else if(y < e.y) {
+        }
+        else if(y < e.y) {
             e.dir = 4;
             e.frames_rem = e.y - y;
-        } else {
+        }
+        else {
             e.dir = 0;
             e.frames_rem = y - e.y;
         }
     }
-
 }
 
 static void update_enemies()
 {
-    for(auto& c : active_chunks) {
+    for(auto& c : active_chunks)
+    {
         update_enemy(c.enemy);
     }
 }
@@ -71,7 +80,8 @@ static void update_map()
     if(chunks_are_running && run_chunks()) return;
 
     selx = sely = uint16_t(-1);
-    if(btns_pressed & BTN_A) {
+    if(btns_pressed & BTN_A)
+    {
         int8_t dx = (int8_t)pgm_read_byte(&DIRX[pdir]) * 8;
         int8_t dy = (int8_t)pgm_read_byte(&DIRY[pdir]) * 8;
         selx = (px + 8 + dx) >> 4;
@@ -86,15 +96,19 @@ static void update_map()
 
     pmoving = !(dx == 0 && dy == 0);
 
-    if(pmoving) {
-        if(dy < 0) {
+    if(pmoving)
+    {
+        if(dy < 0)
+        {
             if(dx < 0) pdir = 3;
             else if(dx == 0) pdir = 4;
             else pdir = 5;
-        } else if(dy == 0) {
+        }
+        else if(dy == 0) {
             if(dx < 0) pdir = 2;
             else pdir = 6;
-        } else {
+        }
+        else {
             if(dx < 0) pdir = 1;
             else if(dx == 0) pdir = 0;
             else pdir = 7;
@@ -106,9 +120,9 @@ static void update_map()
 
         uint8_t m = 0;
         int8_t nx = 0, ny = 0;
-        if(tile_is_solid(px +  5, py +  5)) ++nx, ++ny, m |= 1;
-        if(tile_is_solid(px + 11, py +  5)) --nx, ++ny, m |= 2;
-        if(tile_is_solid(px +  5, py + 11)) ++nx, --ny, m |= 4;
+        if(tile_is_solid(px + 5, py + 5)) ++nx, ++ny, m |= 1;
+        if(tile_is_solid(px + 11, py + 5)) --nx, ++ny, m |= 2;
+        if(tile_is_solid(px + 5, py + 11)) ++nx, --ny, m |= 4;
         if(tile_is_solid(px + 11, py + 11)) --nx, --ny, m |= 8;
 
         if(nx > 1) nx = 1;
@@ -119,19 +133,23 @@ static void update_map()
         if(ny == dy) ny = 0;
 
         // diagonal corrections: if the player is running into a corner
-        if(m == 1 && pdir == 3) {
+        if(m == 1 && pdir == 3)
+        {
             if(tile_is_solid(px + 5, py + 6)) ny = 0;
             else nx = 0;
         }
-        if(m == 2 && pdir == 5) {
+        if(m == 2 && pdir == 5)
+        {
             if(tile_is_solid(px + 11, py + 6)) ny = 0;
             else nx = 0;
         }
-        if(m == 4 && pdir == 1) {
+        if(m == 4 && pdir == 1)
+        {
             if(tile_is_solid(px + 5, py + 10)) ny = 0;
             else nx = 0;
         }
-        if(m == 8 && pdir == 7) {
+        if(m == 8 && pdir == 7)
+        {
             if(tile_is_solid(px + 11, py + 10)) ny = 0;
             else nx = 0;
         }
@@ -163,27 +181,35 @@ static void update_dialog()
     uint8_t third_newline = 255;
     {
         uint8_t n = 0;
-        for(uint8_t i = 0; i < sizeof(d.message) && d.message[i] != '\0'; ++i) {
-            if(d.message[i] == '\n' && ++n == 3) {
+        for(uint8_t i = 0; i < sizeof(d.message) && d.message[i] != '\0'; ++i)
+        {
+            if(d.message[i] == '\n' && ++n == 3)
+            {
                 third_newline = i + 1;
                 break;
             }
         }
     }
     if(btns_down & BTN_B) skip_dialog_animation(third_newline);
-    if(btns_pressed & BTN_A) {
-        if(d.char_progress == third_newline) {
-            for(uint8_t i = 0;; ++i) {
+    if(btns_pressed & BTN_A)
+    {
+        if(d.char_progress == third_newline)
+        {
+            for(uint8_t i = 0;; ++i)
+            {
                 d.message[i] = d.message[i + third_newline];
                 if(d.message[i] == '\0') break;
             }
             d.char_progress = 0;
-        } else if(d.message[d.char_progress] == '\0') {
+        }
+        else if(d.message[d.char_progress] == '\0') {
             if(!(chunks_are_running && run_chunks())) change_state(STATE_MAP);
-        } else {
+        }
+        else {
             // skip_dialog_animation(third_newline);
         }
-    } else {
+    }
+    else {
         for(uint8_t i = 0; i < 2; ++i)
             if(d.message[d.char_progress] != '\0') ++d.char_progress;
         if(d.char_progress > third_newline) d.char_progress = third_newline;
@@ -194,7 +220,8 @@ static void update_tp()
 {
     auto& d = sdata.tp;
     ++d.frame;
-    if(d.frame == TELEPORT_TRANSITION_FRAMES) {
+    if(d.frame == TELEPORT_TRANSITION_FRAMES)
+    {
         px = d.tx * 16;
         py = d.ty * 16;
         // terminate old chunk scripts

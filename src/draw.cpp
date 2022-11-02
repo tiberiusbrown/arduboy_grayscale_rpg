@@ -15,7 +15,8 @@ static uint8_t add_enemy_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     if(!e.active) return 0;
     uint8_t f = e.type * 16;
     uint8_t d = e.dir;
-    if(!(d & 0x80)) {
+    if(!(d & 0x80))
+    {
         f += d * 2;
         f += ((nframe >> 2) & 3);
     }
@@ -29,8 +30,10 @@ static uint8_t add_enemy_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
 void sort_and_draw_sprites(draw_sprite_entry* entries, uint8_t n)
 {
     // sort sprites
-    for(uint8_t i = 1; i < n; ++i) {
-        for(uint8_t j = i; j > 0 && entries[j - 1].y > entries[j].y; --j) {
+    for(uint8_t i = 1; i < n; ++i)
+    {
+        for(uint8_t j = i; j > 0 && entries[j - 1].y > entries[j].y; --j)
+        {
             auto t = entries[j];
             entries[j] = entries[j - 1];
             entries[j - 1] = t;
@@ -38,7 +41,8 @@ void sort_and_draw_sprites(draw_sprite_entry* entries, uint8_t n)
     }
 
     // draw sprites
-    for(uint8_t i = 0; i < n; ++i) {
+    for(uint8_t i = 0; i < n; ++i)
+    {
         platform_fx_drawplusmask(entries[i].x, entries[i].y, entries[i].addr,
                                  entries[i].frame, 16, 16);
     }
@@ -93,14 +97,17 @@ static void draw_chunk_tiles(uint8_t i, int16_t ox, int16_t oy)
 {
     auto const& ac = active_chunks[i];
     uint8_t const* tiles = ac.chunk.tiles_flat;
-    for(uint8_t r = 0, n = 0; r < 64; r += 16) {
+    for(uint8_t r = 0, n = 0; r < 64; r += 16)
+    {
         int16_t y = oy + r;
-        if(y <= -16 || y >= 64) {
+        if(y <= -16 || y >= 64)
+        {
             n += 8;
             continue;
         }
         if(state == STATE_DIALOG && y >= 35) break;
-        for(uint8_t c = 0; c < 128; c += 16, ++n) {
+        for(uint8_t c = 0; c < 128; c += 16, ++n)
+        {
             int16_t x = ox + c;
 #if TILES_IN_PROG
             platform_drawoverwrite(x, y, TILE_IMG_PROG, tiles[n]);
@@ -125,21 +132,34 @@ void draw_tiles()
     draw_chunk_tiles(3, ox + 128, oy + 64);
 }
 
-void draw_text(uint8_t x, uint8_t y, char const* str)
+static void draw_text_ex(uint8_t x, uint8_t y, char const* str, bool prog)
 {
     char t;
     uint8_t cx = x;
-    while((t = *str++) != '\0') {
-        if(t == '\n') {
+    while((t = (prog ? (char)pgm_read_byte(str++) : *str++)) != '\0')
+    {
+        if(t == '\n')
+        {
             y += 9;
             cx = x;
             continue;
         }
         t -= ' ';
-        uint8_t const* bitmap = &FONT_IMG[t * 24];
-        platform_drawplusmask(cx, y, 8, 8, bitmap);
-        cx += pgm_read_byte(&FONT_ADV[t]);
+        uint8_t const* bitmap = &FONT_IMG[t * 16];
+        uint8_t adv = pgm_read_byte(&FONT_ADV[t]);
+        platform_drawoverwritemonochrome(cx, y, adv, 8, bitmap + plane() * 8);
+        cx += adv;
     }
+}
+
+void draw_text(uint8_t x, uint8_t y, char const* str)
+{
+    draw_text_ex(x, y, str, false);
+}
+
+void draw_text_prog(uint8_t x, uint8_t y, char const* str)
+{
+    draw_text_ex(x, y, str, true);
 }
 
 void wrap_text(char* str, uint8_t w)
@@ -147,14 +167,17 @@ void wrap_text(char* str, uint8_t w)
     uint8_t i = 0;
     uint8_t x = 0;
     char t;
-    while((t = str[i++]) != '\0') {
-        if(t == '\n') {
+    while((t = str[i++]) != '\0')
+    {
+        if(t == '\n')
+        {
             x = 0;
             continue;
         }
         t -= ' ';
         x += pgm_read_byte(&FONT_ADV[t]);
-        if(x > w) {
+        if(x > w)
+        {
             --i;
             while(t != ' ' && i != 0)
                 t = str[--i];

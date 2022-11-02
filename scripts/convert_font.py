@@ -14,8 +14,9 @@ with open('../src/generated/font_img.hpp', 'w') as f:
     for i in range(96):
         for j in range(8):
             f.write(' 0x%02x,' % ps[1][i * 8 + j])
+        for j in range(8):
             f.write(' 0x%02x,' % ps[2][i * 8 + j])
-            f.write(' 0x%02x,' % ps[3][i * 8 + j])
+            #f.write(' 0x%02x,' % ps[3][i * 8 + j])
         f.write(' /* %s */\n' % charstr(i + 32))
         if i < 95:
             f.write('   ')

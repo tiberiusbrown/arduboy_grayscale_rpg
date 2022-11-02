@@ -12,13 +12,13 @@ Action Instructions
 
     msg {string}
         Show a message
-        
+
     dlg <portrait> {string}
         Show a message with a portrait image
-        
+
     tmsg <tile> {string}
         If player selects <tile>, msg {string}
-    
+
     tdlg <tile> <portrait> {string}
         If player selects <tile>, dlg <portrait> {string}
 
@@ -33,13 +33,13 @@ Action Instructions
 
     tp <tx> <ty>
         Teleport player to specified tile coordinates
-        
+
     ttp <tile> <tx> <ty>
         If player selects <tile>, tp <tx> <ty>
-        
+
     wtp <tile> <tx> <ty>
         If player walks onto <tile>, tp <tx> <ty>
-        
+
 ALU Instructions
 
     Note: register 0 is fixed at zero. Writes to this register do nothing.
@@ -70,10 +70,10 @@ Game Manipulation
 
     epf <flag> <enemy_type> <path_name>
         If <flag> is cleared, ep <enemy_type> <path_name>
-        
+
     st <tile> <tile_img>
         Overwrite image at <tile> with <tile_img>
-        
+
 Control Instructions
 
     end
@@ -93,10 +93,10 @@ Control Instructions
 
     brfc <flag> label
         If <flag> is cleared, jmp label
-        
+
     brnt <tile> label
         If player is NOT selecting <tile>, jmp label
-        
+
     brnw <tile> label
         If player is NOT walking on <tile>, jmp label
 
@@ -123,7 +123,8 @@ Other Assembly Syntax
 
 #pragma once
 
-enum script_command_t {
+enum script_command_t
+{
     CMD_END,
 
     CMD_MSG,
@@ -135,18 +136,18 @@ enum script_command_t {
     CMD_TP,
     CMD_TTP,
     CMD_WTP,
-    
+
     CMD_ADD,
     CMD_ADDI,
     CMD_SUB,
-    
+
     CMD_FS,
     CMD_FC,
     CMD_FT,
     CMD_EP,
     CMD_EPF,
     CMD_ST,
-    
+
     CMD_JMP,
     CMD_BRZ,
     CMD_BRN,

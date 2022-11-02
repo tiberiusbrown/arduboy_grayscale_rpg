@@ -28,11 +28,12 @@ uint8_t tex_pixels[128 * 63 * 4];
 static void send_gif_frame(int ds = 3)
 {
 #ifndef NDEBUG
-    if(gif_recording) {
+    if(gif_recording)
+    {
         uint64_t t = SDL_GetTicks64();
         double dt = double(t - gif_frame_time) / 1000.0;
         gif_frame_time = t;
-        //GifWriteFrame(&gif, tex_pixels, 128, FBH, int(dt * 100 + 1.5), 2);
+        // GifWriteFrame(&gif, tex_pixels, 128, FBH, int(dt * 100 + 1.5), 2);
         GifWriteFrame(&gif, tex_pixels, 128, FBH, ds);
     }
 #endif
@@ -41,18 +42,21 @@ static void send_gif_frame(int ds = 3)
 static void screen_recording_toggle()
 {
 #ifndef NDEBUG
-    if(gif_recording) {
+    if(gif_recording)
+    {
         GifEnd(&gif);
         gif_recording = false;
-    } else {
+    }
+    else {
         char fname[256];
         time_t rawtime;
         struct tm* ti;
         time(&rawtime);
         ti = localtime(&rawtime);
-        (void)snprintf(fname, sizeof(fname), "recording_%04d%02d%02d%02d%02d%02d.gif",
-                 ti->tm_year + 1900, ti->tm_mon + 1, ti->tm_mday,
-                 ti->tm_hour + 1, ti->tm_min, ti->tm_sec);
+        (void)snprintf(fname, sizeof(fname),
+                       "recording_%04d%02d%02d%02d%02d%02d.gif",
+                       ti->tm_year + 1900, ti->tm_mon + 1, ti->tm_mday,
+                       ti->tm_hour + 1, ti->tm_min, ti->tm_sec);
         GifBegin(&gif, fname, 128, FBH, 33);
         gif_frame_time = SDL_GetTicks64();
         gif_recording = true;
@@ -69,10 +73,9 @@ int main(int argc, char** argv)
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
-    window = SDL_CreateWindow("arduboy_grayscale_rpg",
-        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        128 * ZOOM, FBH * ZOOM, SDL_WINDOW_ALLOW_HIGHDPI |
-        SDL_WINDOW_RESIZABLE);
+    window = SDL_CreateWindow("arduboy_grayscale_rpg", SDL_WINDOWPOS_UNDEFINED,
+                              SDL_WINDOWPOS_UNDEFINED, 128 * ZOOM, FBH * ZOOM,
+                              SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
     if(!window) goto error_destroy_window;
     renderer = SDL_CreateRenderer(window, -1, 0);
     if(!renderer) goto error_destroy_renderer;
@@ -83,18 +86,23 @@ int main(int argc, char** argv)
     initialize();
 
     bool quit = false;
-    while(!quit) {
+    while(!quit)
+    {
 
         SDL_Event e;
-        while(SDL_PollEvent(&e)) {
+        while(SDL_PollEvent(&e))
+        {
             if(e.type == SDL_QUIT) quit = true;
             if(e.type == SDL_KEYDOWN &&
-               e.key.keysym.scancode == SDL_SCANCODE_F11) {
+               e.key.keysym.scancode == SDL_SCANCODE_F11)
+            {
                 fullscreen = !fullscreen;
-                if(fullscreen) {
+                if(fullscreen)
+                {
                     SDL_SetWindowFullscreen(window,
                                             SDL_WINDOW_FULLSCREEN_DESKTOP);
-                } else {
+                }
+                else {
                     SDL_SetWindowFullscreen(window, 0);
                 }
             }
@@ -104,7 +112,8 @@ int main(int argc, char** argv)
 
         static int frame = 0;
 
-        if(frame == 0) {
+        if(frame == 0)
+        {
             auto const* k = SDL_GetKeyboardState(nullptr);
             uint8_t b = 0;
             if(k[SDL_SCANCODE_UP]) b |= BTN_UP;
@@ -132,7 +141,8 @@ int main(int argc, char** argv)
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        for(int i = 0; i < 128 * FBH; ++i) {
+        for(int i = 0; i < 128 * FBH; ++i)
+        {
             int p0 = pixels[0][i];
             int p1 = pixels[1][i];
 #if MUTED_PALETTE
@@ -156,15 +166,19 @@ int main(int argc, char** argv)
             while(128 * z <= w && FBH * z <= h)
                 ++z;
             --z;
-            if(z == 0) {
-                if(wr < r) {
+            if(z == 0)
+            {
+                if(wr < r)
+                {
                     h = int((float)w / r + 0.5f);
                     y = h / 2;
-                } else {
+                }
+                else {
                     w = int((float)h * r + 0.5f);
                     x = w / 2;
-                } 
-            } else {
+                }
+            }
+            else {
                 x = (w - 128 * z) / 2;
                 y = (h - FBH * z) / 2;
                 w = 128 * z;
@@ -174,7 +188,8 @@ int main(int argc, char** argv)
             SDL_RenderCopy(renderer, tex, nullptr, &rect);
         }
 
-        if(gif_recording) {
+        if(gif_recording)
+        {
             SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
             SDL_SetRenderDrawColor(renderer, 255, 0, 0, 128);
             SDL_Rect rect{10, 10, 20, 20};

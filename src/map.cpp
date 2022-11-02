@@ -6,7 +6,8 @@
 #include "script_commands.hpp"
 #include "tile_solid.hpp"
 
-static void reset_enemy(enemy_t& e) {
+static void reset_enemy(enemy_t& e)
+{
     e.x = (e.path[0] & 7) * 16;
     e.y = ((e.path[0] >> 3) & 3) * 16;
     e.frames_rem = 1;
@@ -31,9 +32,11 @@ static bool run_chunk()
         dy = uint16_t(sely - ty);
         if(dx < 8 && dy < 4) sel_tile = dy * 8 + dx;
     }
-    while(chunk_instr < CHUNK_SCRIPT_SIZE) {
+    while(chunk_instr < CHUNK_SCRIPT_SIZE)
+    {
         script_command_t instr = (script_command_t)c.script[chunk_instr++];
-        switch(instr) {
+        switch(instr)
+        {
         case CMD_END:
             return false;
 
@@ -41,7 +44,8 @@ static bool run_chunk()
         case CMD_MSG:
         case CMD_DLG:
         case CMD_TMSG:
-        case CMD_TDLG: {
+        case CMD_TDLG:
+        {
             uint8_t t0, t1;
             if(instr != CMD_MSG) t0 = c.script[chunk_instr++];
             if(instr == CMD_TDLG) t1 = c.script[chunk_instr++];
@@ -60,7 +64,8 @@ static bool run_chunk()
             return true;
         }
         case CMD_BAT:
-        case CMD_EBAT: {
+        case CMD_EBAT:
+        {
             uint8_t f = c.script[chunk_instr++];
             f |= uint16_t(c.script[chunk_instr++]) << 8;
             uint8_t e[4];
@@ -73,9 +78,15 @@ static bool run_chunk()
             sdata.battle.remove_enemy = (instr == CMD_EBAT);
             sdata.battle.enemy_chunk = running_chunk;
             for(uint8_t i = 0; i < 4; ++i)
-                sdata.battle.enemies[i] = e[i];
+            {
+                auto& enemy = sdata.battle.enemies[i];
+                enemy.id = e[i];
+            }
             sdata.battle.phase = sdata_battle::PHASE_INTRO;
             sdata.battle.pdef = sdata.battle.edef = 255;
+            sdata.battle.flag = f;
+            for(auto& p : party)
+                p.ap = 0;
             story_flag_set(f);
             return true;
         }
@@ -83,7 +94,8 @@ static bool run_chunk()
             // teleport
         case CMD_TP:
         case CMD_TTP:
-        case CMD_WTP: {
+        case CMD_WTP:
+        {
             uint8_t t;
             if(instr != CMD_TP) t = c.script[chunk_instr++];
             uint16_t tx, ty;
@@ -91,7 +103,7 @@ static bool run_chunk()
             tx |= uint16_t(c.script[chunk_instr++]) << 8;
             ty = c.script[chunk_instr++];
             ty |= uint16_t(c.script[chunk_instr++]) << 8;
-            //if(state != STATE_MAP) break;
+            // if(state != STATE_MAP) break;
             if(instr == CMD_TTP && t != sel_tile) break;
             if(instr == CMD_WTP && t != walk_tile) break;
             change_state(STATE_TP);
@@ -100,14 +112,16 @@ static bool run_chunk()
             return true;
         }
 
-        case CMD_ADD: {
+        case CMD_ADD:
+        {
             uint8_t t = c.script[chunk_instr++];
             uint8_t dst = t & 0xf;
             uint8_t src = t >> 4;
             chunk_regs[dst] += chunk_regs[src];
             break;
         }
-        case CMD_ADDI: {
+        case CMD_ADDI:
+        {
             uint8_t t = c.script[chunk_instr++];
             int8_t imm = (int8_t)c.script[chunk_instr++];
             uint8_t dst = t & 0xf;
@@ -115,7 +129,8 @@ static bool run_chunk()
             chunk_regs[dst] = chunk_regs[src] + imm;
             break;
         }
-        case CMD_SUB: {
+        case CMD_SUB:
+        {
             uint8_t t = c.script[chunk_instr++];
             uint8_t dst = t & 0xf;
             uint8_t src = t >> 4;
@@ -123,34 +138,40 @@ static bool run_chunk()
             break;
         }
 
-        case CMD_FS: {
+        case CMD_FS:
+        {
             uint16_t f = c.script[chunk_instr++];
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
             story_flag_set(f);
             break;
         }
-        case CMD_FC: {
+        case CMD_FC:
+        {
             uint16_t f = c.script[chunk_instr++];
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
             story_flag_clr(f);
             break;
         }
-        case CMD_FT: {
+        case CMD_FT:
+        {
             uint16_t f = c.script[chunk_instr++];
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
             story_flag_tog(f);
             break;
         }
         case CMD_EP:
-        case CMD_EPF: {
+        case CMD_EPF:
+        {
             uint16_t f;
-            if(instr == CMD_EPF) {
+            if(instr == CMD_EPF)
+            {
                 f = c.script[chunk_instr++];
                 f |= (uint16_t(c.script[chunk_instr++]) << 8);
             }
             uint8_t id = c.script[chunk_instr++];
             uint8_t n = c.script[chunk_instr++];
-            if(instr == CMD_EPF && story_flag_get(f)) {
+            if(instr == CMD_EPF && story_flag_get(f))
+            {
                 ac.enemy.active = false;
                 chunk_instr += n;
                 break;
@@ -158,7 +179,8 @@ static bool run_chunk()
             bool reset = false;
             if(ac.enemy.type != id) reset = true;
             ac.enemy.type = id;
-            for(uint8_t j = 0; j < n; ++j) {
+            for(uint8_t j = 0; j < n; ++j)
+            {
                 if(ac.enemy.path[j] != c.script[chunk_instr]) reset = true;
                 ac.enemy.path[j] = c.script[chunk_instr++];
             }
@@ -167,7 +189,8 @@ static bool run_chunk()
             if(reset) reset_enemy(ac.enemy);
             break;
         }
-        case CMD_ST: {
+        case CMD_ST:
+        {
             uint8_t t = c.script[chunk_instr++];
             uint8_t i = c.script[chunk_instr++];
             c.tiles_flat[t] = i;
@@ -175,20 +198,23 @@ static bool run_chunk()
         }
 
         case CMD_JMP: chunk_instr += c.script[chunk_instr]; break;
-        case CMD_BRZ: {
+        case CMD_BRZ:
+        {
             uint8_t t = c.script[chunk_instr++];
             uint8_t i = c.script[chunk_instr++];
             if(chunk_regs[t] == 0) chunk_instr += i;
             break;
         }
-        case CMD_BRN: {
+        case CMD_BRN:
+        {
             uint8_t t = c.script[chunk_instr++];
             uint8_t i = c.script[chunk_instr++];
             if(chunk_regs[t] < 0) chunk_instr += i;
             break;
         }
         case CMD_BRFS:
-        case CMD_BRFC: {
+        case CMD_BRFC:
+        {
             uint16_t f = c.script[chunk_instr++];
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
             uint8_t t = c.script[chunk_instr++];
@@ -197,22 +223,25 @@ static bool run_chunk()
             if(fs) chunk_instr += t;
             break;
         }
-        case CMD_BRNT: {
+        case CMD_BRNT:
+        {
             uint8_t t = c.script[chunk_instr++];
             uint8_t i = c.script[chunk_instr++];
             if(t != sel_tile) chunk_instr += i;
             break;
         }
-        case CMD_BRNW: {
+        case CMD_BRNW:
+        {
             uint8_t t = c.script[chunk_instr++];
             uint8_t i = c.script[chunk_instr++];
             if(t != walk_tile) chunk_instr += i;
             break;
         }
-        case CMD_BRNE: {
+        case CMD_BRNE:
+        {
             uint8_t i = c.script[chunk_instr++];
             if(!enemy_contacts_player(ac)) chunk_instr += i;
-            //else __debugbreak();
+            // else __debugbreak();
             break;
         }
 
@@ -224,14 +253,16 @@ static bool run_chunk()
 
 bool run_chunks()
 {
-    if(!chunks_are_running) {
+    if(!chunks_are_running)
+    {
         running_chunk = 0;
         chunk_instr = 0;
         chunks_are_running = true;
         for(auto& r : chunk_regs)
             r = 0;
     }
-    while(running_chunk < 4) {
+    while(running_chunk < 4)
+    {
         if(run_chunk()) return true;
         ++running_chunk;
         chunk_instr = 0;
@@ -248,15 +279,18 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
     map_chunk_t* chunk = &active_chunk.chunk;
     uint16_t ci = cy * MAP_CHUNK_W + cx;
     uint24_t addr = uint24_t(ci) * sizeof(map_chunk_t);
-    if(active_chunk.cx != cx || active_chunk.cy != cy) {
+    if(active_chunk.cx != cx || active_chunk.cy != cy)
+    {
         memset(&active_chunk, 0, sizeof(active_chunk));
         active_chunk.cx = cx;
         active_chunk.cy = cy;
-    } else if(cx != 255 && cy != 255) {
+    }
+    else if(cx != 255 && cy != 255) {
         platform_fx_read_data_bytes(addr, chunk->tiles_flat, 32);
         return;
     }
-    if(cx == 255 || cy == 255) {
+    if(cx == 255 || cy == 255)
+    {
         for(uint8_t i = 0; i < 32; ++i)
             chunk->tiles_flat[i] = 30;
         for(uint8_t i = 0; i < CHUNK_SCRIPT_SIZE; ++i)
@@ -276,14 +310,17 @@ void load_chunks()
     // this way, enemies don't visibly reset as the player moves between chunks
     uint8_t pcx = active_chunks[0].cx;
     uint8_t pcy = active_chunks[0].cy;
-    if(cx == pcx) {
-        if(cy == uint8_t(pcy + 1)) {
+    if(cx == pcx)
+    {
+        if(cy == uint8_t(pcy + 1))
+        {
             // shift up
             memcpy(&active_chunks[0], &active_chunks[2],
                    sizeof(active_chunk_t));
             memcpy(&active_chunks[1], &active_chunks[3],
                    sizeof(active_chunk_t));
-        } else if(cy == uint8_t(pcy - 1)) {
+        }
+        else if(cy == uint8_t(pcy - 1)) {
             // shift down
             memcpy(&active_chunks[2], &active_chunks[0],
                    sizeof(active_chunk_t));
@@ -291,14 +328,17 @@ void load_chunks()
                    sizeof(active_chunk_t));
         }
     }
-    if(cy == pcy) {
-        if(cx == uint8_t(pcx + 1)) {
+    if(cy == pcy)
+    {
+        if(cx == uint8_t(pcx + 1))
+        {
             // shift left
             memcpy(&active_chunks[0], &active_chunks[1],
                    sizeof(active_chunk_t));
             memcpy(&active_chunks[2], &active_chunks[3],
                    sizeof(active_chunk_t));
-        } else if(cx == uint8_t(pcx - 1)) {
+        }
+        else if(cx == uint8_t(pcx - 1)) {
             // shift right
             memcpy(&active_chunks[1], &active_chunks[0],
                    sizeof(active_chunk_t));
