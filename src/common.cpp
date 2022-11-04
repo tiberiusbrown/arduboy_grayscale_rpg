@@ -2,6 +2,12 @@
 
 #include <string.h>
 
+enemy_info_t const ENEMY_INFO[] PROGMEM =
+{
+    { 0, 10, },
+    { 1, 10, },
+};
+
 void change_state(uint8_t new_state)
 {
     state = new_state;

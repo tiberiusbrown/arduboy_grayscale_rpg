@@ -58,6 +58,13 @@ template <class T> inline T pgmptr(T const* p)
     return (T)pgm_read_ptr(p);
 }
 
+template<class T> void tswap(T& a, T& b)
+{
+    T t = a;
+    a = b;
+    b = t;
+}
+
 constexpr uint8_t BTN_UP = 0x80;
 constexpr uint8_t BTN_DOWN = 0x10;
 constexpr uint8_t BTN_LEFT = 0x20;
@@ -119,18 +126,25 @@ struct party_member_t
 extern party_member_t party[4];
 extern uint8_t nparty;
 
+struct enemy_info_t
+{
+    uint8_t sprite;
+    uint8_t speed;
+};
+extern enemy_info_t const ENEMY_INFO[] PROGMEM;
+
+enum battle_phase_t
+{
+    BPHASE_ALERT,   // '!' over player
+    BPHASE_INTRO,   // fancy "Battle Start!"
+    BPHASE_MENU,
+    BPHASE_ESEL,    // select enemy
+    BPHASE_PATTACK, // party attack animation
+    BPHASE_EATTACK, // enemy attack animation
+    BPHASE_OUTRO,   // fancy "Victory!"
+};
 struct sdata_battle
 {
-    enum phase_t
-    {
-        PHASE_ALERT,   // '!' over player
-        PHASE_INTRO,   // fancy "Battle Start!"
-        PHASE_MENU,
-        PHASE_ESEL,    // select enemy
-        PHASE_PATTACK, // party attack animation
-        PHASE_EATTACK, // enemy attack animation
-        PHASE_OUTRO,   // fancy "Victory!"
-    } phase;
     uint8_t frame;
     uint16_t flag;
     bool remove_enemy;
@@ -140,10 +154,15 @@ struct sdata_battle
     uint8_t esel;       // enemy select
     uint8_t psel;       // party member select
     uint8_t msel;       // menu select
+    uint8_t msely;
     int8_t menuy;       // menu position
     int8_t menuy_target;
-    phase_t prev_phase;
-    phase_t next_phase;
+    battle_phase_t phase;
+    battle_phase_t prev_phase;
+    battle_phase_t next_phase;
+    uint8_t attack_order[8];
+    uint8_t num_attackers;
+    uint8_t current_attacker;
 };
 extern union sdata_t
 {
@@ -193,14 +212,14 @@ extern uint8_t btns_down, btns_pressed;
 // platform.cpp
 //     platform abstraction methods
 void platform_drawoverwrite(int16_t x, int16_t y, uint8_t const* bitmap,
-                            uint8_t frame);
+    uint8_t frame);
 void platform_drawoverwritemonochrome(int16_t x, int16_t y, uint8_t w,
-                                      uint8_t h, uint8_t const* bitmap);
+    uint8_t h, uint8_t const* bitmap);
 void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num);
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
-                               uint16_t frame, uint8_t w, uint8_t h);
+    uint16_t frame, uint8_t w, uint8_t h);
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
-                              uint16_t frame, uint8_t w, uint8_t h);
+    uint16_t frame, uint8_t w, uint8_t h);
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 #if 0

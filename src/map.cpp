@@ -82,7 +82,7 @@ static bool run_chunk()
                 auto& enemy = sdata.battle.enemies[i];
                 enemy.id = e[i];
             }
-            sdata.battle.phase = sdata_battle::PHASE_INTRO;
+            sdata.battle.phase = BPHASE_INTRO;
             sdata.battle.pdef = sdata.battle.edef = 255;
             sdata.battle.flag = f;
             for(auto& p : party)

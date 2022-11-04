@@ -23,4 +23,7 @@ void initialize()
     nparty = 1;
     party[0].id = 0;
     party[0].hp = 10;
+    party[1].id = 255;
+    party[2].id = 255;
+    party[3].id = 255;
 }

@@ -26,7 +26,7 @@ extern int gplane;
 extern uint8_t pixels[2][128 * 64];
 
 static uint8_t get_bitmap_bit(uint8_t const* bitmap, uint8_t w, uint8_t h,
-                              uint8_t x, uint8_t y)
+    uint8_t x, uint8_t y)
 {
     uint8_t page = y / 8;
     uint8_t byte = bitmap[page * w + x];
@@ -35,7 +35,7 @@ static uint8_t get_bitmap_bit(uint8_t const* bitmap, uint8_t w, uint8_t h,
 #endif
 
 void platform_drawoverwritemonochrome(int16_t x, int16_t y, uint8_t w,
-                                      uint8_t h, uint8_t const* bitmap)
+    uint8_t h, uint8_t const* bitmap)
 {
 #ifdef ARDUINO
     a.drawOverwriteMonochrome(x, y, w, h, bitmap);
@@ -56,7 +56,7 @@ void platform_drawoverwritemonochrome(int16_t x, int16_t y, uint8_t w,
 }
 
 void platform_drawoverwrite(int16_t x, int16_t y, uint8_t const* bitmap,
-                            uint8_t frame)
+    uint8_t frame)
 {
 #ifdef ARDUINO
     a.drawOverwrite(x, y, bitmap, frame);
@@ -70,8 +70,8 @@ void platform_drawoverwrite(int16_t x, int16_t y, uint8_t const* bitmap,
 
 #ifdef ARDUINO
 static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
-                                   uint16_t frame, uint8_t mode, int16_t width,
-                                   int16_t height)
+    uint16_t frame, uint8_t mode, int16_t width,
+    int16_t height)
 {
     // return if the bitmap is completely off screen
     if(x + width <= 0 || x >= WIDTH || y + height <= 0 || y >= HEIGHT) return;
@@ -107,8 +107,8 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
     }
     uint24_t offset =
         (uint24_t)((frame * 2 + a.currentPlane()) * ((height + 7) / 8) +
-                   skiptop) *
-            width +
+            skiptop) *
+        width +
         skipleft;
     if(mode & dbmMasked)
     {
@@ -277,20 +277,20 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
         "   brge    .+2                                 \n"
         "   rjmp    1b ;render_row                      \n"
         : [address] "+r"(address), [mode] "+r"(mode), [rowmask] "=&d"(rowmask),
-          [bitmap] "=&r"(bitmap), [renderheight] "+d"(renderheight),
-          [displayrow] "+d"(displayrow)
+        [bitmap] "=&r"(bitmap), [renderheight] "+d"(renderheight),
+        [displayrow] "+d"(displayrow)
         : [width] "r"(width), [height] "r"(height), [yshift] "r"(yshift),
-          [renderwidth] "r"(renderwidth),
-          [buffer] "e"(Arduboy2Base::sBuffer + displayoffset),
+        [renderwidth] "r"(renderwidth),
+        [buffer] "e"(Arduboy2Base::sBuffer + displayoffset),
 
-          [fxport] "I"(_SFR_IO_ADDR(FX_PORT)), [fxbit] "I"(FX_BIT),
-          [cmd] "I"(SFC_READ), [spdr] "I"(_SFR_IO_ADDR(SPDR)),
-          [datapage] ""(&FX::programDataPage), [spsr] "I"(_SFR_IO_ADDR(SPSR)),
-          [spif] "I"(SPIF), [lastrow] "I"(HEIGHT / 8 - 1),
-          [displaywidth] ""(WIDTH), [reverseblack] "I"(dbfReverseBlack),
-          [whiteblack] "I"(dbfWhiteBlack), [black] "I"(dbfBlack),
-          [masked] "I"(dbfMasked), [invert] "I"(dbfInvert),
-          [extrarow] "I"(dbfExtraRow)
+        [fxport] "I"(_SFR_IO_ADDR(FX_PORT)), [fxbit] "I"(FX_BIT),
+        [cmd] "I"(SFC_READ), [spdr] "I"(_SFR_IO_ADDR(SPDR)),
+        [datapage] ""(&FX::programDataPage), [spsr] "I"(_SFR_IO_ADDR(SPSR)),
+        [spif] "I"(SPIF), [lastrow] "I"(HEIGHT / 8 - 1),
+        [displaywidth] ""(WIDTH), [reverseblack] "I"(dbfReverseBlack),
+        [whiteblack] "I"(dbfWhiteBlack), [black] "I"(dbfBlack),
+        [masked] "I"(dbfMasked), [invert] "I"(dbfInvert),
+        [extrarow] "I"(dbfExtraRow)
         : "r24", "r25");
 #else
     uint8_t lastmask =
@@ -350,7 +350,7 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
 #endif
 
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
-                               uint16_t frame, uint8_t w, uint8_t h)
+    uint16_t frame, uint8_t w, uint8_t h)
 {
 #ifdef ARDUINO
     platform_fx_drawbitmap(x, y, addr, frame, dbmOverwrite, w, h);
@@ -374,7 +374,7 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
 }
 
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
-                              uint16_t frame, uint8_t w, uint8_t h)
+    uint16_t frame, uint8_t w, uint8_t h)
 {
 #ifdef ARDUINO
     platform_fx_drawbitmap(x, y, addr, frame, dbmMasked, w, h);
