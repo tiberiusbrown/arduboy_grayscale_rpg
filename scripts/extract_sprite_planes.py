@@ -1,11 +1,11 @@
 from PIL import Image
 
-def extract(fname, sw, sh, num = 0):
+def extract(fname, sw, sh, num = 0, start = 0):
 
     im = Image.open(fname)
     
     if num == 0:
-        num = im.width * im.height // (sw * sh)
+        num = im.width * im.height // (sw * sh) - start
 
     sbytes = sw * sh // 8
     p0 = [0] * (num * sbytes)
@@ -18,7 +18,7 @@ def extract(fname, sw, sh, num = 0):
     im = im.convert('RGBA')
 
     index = 0
-    for i in range(num):
+    for i in range(start, start + num):
         r = (i // (im.width // sw)) * sh
         c = (i % (im.width // sw)) * sw
         for ir in range(sh // 8):

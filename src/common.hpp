@@ -1,6 +1,5 @@
 #pragma once
 
-#define TILES_IN_PROG 1
 #define TELEPORT_TRANSITION_FRAMES 16
 
 #include <stdint.h>

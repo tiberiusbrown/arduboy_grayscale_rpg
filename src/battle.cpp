@@ -124,7 +124,7 @@ void update_battle()
 
 static void draw_battle_background()
 {
-    static constexpr uint8_t TS[] PROGMEM = { 162, 163, 178, 179 };
+    static constexpr uint8_t TS[] PROGMEM = { 10, 11, 26, 27 };
     uint8_t t = 0x23;
     for(uint8_t r = 0; r < 4; ++r)
         for(uint8_t c = 0; c < 8; ++c, t ^= (t >> 3) ^ (t << 1))
