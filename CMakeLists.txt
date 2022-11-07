@@ -21,7 +21,11 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(SDL2)
 
 project(arduboy_grayscale_rpg)
-add_executable(arduboy_grayscale_rpg
+set(EXEFLAG)
+if(MSVC)
+    set(EXEFLAG WIN32)
+endif()
+add_executable(arduboy_grayscale_rpg ${EXEFLAG}
     .editorconfig
     src/battle.cpp
     src/common.hpp

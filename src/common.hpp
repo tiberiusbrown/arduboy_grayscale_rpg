@@ -145,6 +145,7 @@ enum battle_phase_t
 struct sdata_battle
 {
     uint8_t frame;
+    uint8_t selframe;
     uint16_t flag;
     bool remove_enemy;
     uint8_t enemy_chunk;

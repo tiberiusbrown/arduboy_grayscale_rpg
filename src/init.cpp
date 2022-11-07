@@ -7,7 +7,7 @@ void initialize()
     nframe = 0;
     chunks_are_running = false;
 
-    px = 120;
+    px = 100;
     py = 135;
     pdir = 0;
     pmoving = false;

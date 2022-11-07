@@ -72,6 +72,7 @@ void update_battle()
     d.menuy = (d.menuy + d.menuy_target) / 2;
     d.msely = (d.msely + d.msel * 10) / 2;
     ++d.frame;
+    if(++d.selframe >= 7) d.selframe = 0;
     switch(d.phase)
     {
     case BPHASE_INTRO:
@@ -186,6 +187,12 @@ static void draw_selection_arrow(uint8_t x, uint8_t y)
     platform_fx_drawplusmask(x + 4, y - 8 + f, BATTLE_ARROW_IMG, 0, 7, 8);
 }
 
+static void draw_selection_outline(uint8_t x, uint8_t y)
+{
+    auto const& d = sdata.battle;
+    platform_fx_drawplusmask(x - 3, y - 3, BATTLE_SELECT_IMG, d.selframe, 22, 24);
+}
+
 static void draw_battle_sprites()
 {
     auto const& d = sdata.battle;
@@ -263,6 +270,12 @@ void render_battle()
         platform_fx_drawplusmask(74, d.menuy, BATTLE_MENU_CHAIN_IMG, 0, 3, 16);
         platform_fx_drawoverwrite(48, d.menuy + 11, BATTLE_MENU_IMG, 0, 32, 40);
         draw_text_prog(50, d.menuy + 12 + d.msely, PSTR("\x7f"));
+    }
+    if(d.phase == BPHASE_MENU || d.phase == BPHASE_ESEL)
+    {
+        uint8_t x = pgm_read_byte(&PPOS[d.psel * 2 + 0]);
+        uint8_t y = pgm_read_byte(&PPOS[d.psel * 2 + 1]);
+        draw_selection_outline(x, y);
     }
     if(d.phase == BPHASE_ESEL)
     {

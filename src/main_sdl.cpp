@@ -17,9 +17,9 @@ constexpr int FBH = EXCLUDE_LAST_ROW ? 63 : 64;
 #ifndef NDEBUG
 #include "gif.h"
 static GifWriter gif;
-static bool gif_recording = false;
 static uint64_t gif_frame_time = 0;
 #endif
+static bool gif_recording = false;
 
 int gplane;
 uint8_t pixels[2][128 * 64];
