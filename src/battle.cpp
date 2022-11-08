@@ -2,7 +2,14 @@
 
 #include "generated/fxdata.h"
 
-constexpr uint8_t ATTACK_FRAMES = 16;
+constexpr uint8_t SPRITE_MOVE_SPEED = 2;
+
+static constexpr uint8_t PPOS[] PROGMEM = {
+    16, 14, 16, 38, 0, 14, 0, 38,
+};
+static constexpr uint8_t EPOS[] PROGMEM = {
+    96, 14, 96, 38, 112, 14, 112, 38,
+};
 
 static uint8_t get_party_speed(uint8_t id)
 {
@@ -43,11 +50,46 @@ static void init_attack_order() {
     d.num_attackers = n;
 }
 
+static void init_sprites()
+{
+    auto& d = sdata.battle;
+    for(uint8_t i = 0; i < nparty; ++i)
+    {
+        auto& s = d.sprites[i];
+        s.active = true;
+        s.x = pgm_read_byte(&PPOS[i * 2 + 0]);
+        s.y = pgm_read_byte(&PPOS[i * 2 + 1]);
+        s.addr = SPRITES_IMG;
+        s.frame_base = party[i].id * 16;
+    }
+    for(uint8_t i = 0; i < 4; ++i)
+    {
+        uint8_t id = d.enemies[i].id;
+        if(id == 255) continue;
+        auto& s = d.sprites[i + 4];
+        s.active = true;
+        s.x = pgm_read_byte(&EPOS[i * 2 + 0]);
+        s.y = pgm_read_byte(&EPOS[i * 2 + 1]);
+        s.addr = SPRITES_IMG;
+        s.frame_base = id * 16;
+    }
+    for(auto& s : d.sprites)
+    {
+        s.bx = s.tx = s.x;
+        s.by = s.ty = s.y;
+    }
+}
+
 static void battle_enemy_attack(uint8_t i)
 {
     auto& d = sdata.battle;
     auto& e = d.enemies[i];
-    
+
+    // TODO
+    d.defender_id = 0;
+    if(d.pdef != 255)
+        d.defender_id = d.pdef;
+    d.phase = BPHASE_ATTACK1;
 }
 
 static void battle_next_turn()
@@ -55,7 +97,7 @@ static void battle_next_turn()
     auto& d = sdata.battle;
     if(++d.current_attacker >= d.num_attackers)
         d.current_attacker = 0;
-    uint8_t id = d.attack_order[d.current_attacker];
+    uint8_t id = d.attacker_id = d.attack_order[d.current_attacker];
     if(id < 4)
     {
         d.phase = BPHASE_MENU;
@@ -63,6 +105,54 @@ static void battle_next_turn()
     else
     {
         battle_enemy_attack(id - 4);
+    }
+    auto& s = d.sprites[d.current_attacker];
+    s.tx = s.bx;
+    s.ty = s.by;
+    d.next_phase = d.phase;
+    d.phase = BPHASE_SPRITES;
+}
+
+static void update_battle_sprites()
+{
+    auto& d = sdata.battle;
+    uint8_t nf = (d.frame >> 2) & 3;
+    d.sprites_done = true;
+    for(auto& s : d.sprites)
+    {
+        if(!s.active) continue;
+        if(s.x == s.tx && s.y == s.ty)
+        {
+            s.frame_dir = 0;
+            continue;
+        }
+        d.sprites_done = false;
+
+        if(s.ty < s.y)
+        {
+            s.frame_dir = 8;
+            s.y -= SPRITE_MOVE_SPEED;
+            if(s.y < s.ty) s.y = s.ty;
+        }
+        else if(s.ty > s.y)
+        {
+            s.frame_dir = 0;
+            s.y += SPRITE_MOVE_SPEED;
+            if(s.y > s.ty) s.y = s.ty;
+        }
+        if(s.tx < s.x)
+        {
+            s.frame_dir = 4;
+            s.x -= SPRITE_MOVE_SPEED;
+            if(s.x < s.tx) s.x = s.tx;
+        }
+        else if(s.tx > s.x)
+        {
+            s.frame_dir = 12;
+            s.x += SPRITE_MOVE_SPEED;
+            if(s.x > s.tx) s.x = s.tx;
+        }
+        s.frame_dir += nf;
     }
 }
 
@@ -73,6 +163,7 @@ void update_battle()
     d.msely = (d.msely + d.msel * 10) / 2;
     ++d.frame;
     if(++d.selframe >= 7) d.selframe = 0;
+    update_battle_sprites();
     switch(d.phase)
     {
     case BPHASE_INTRO:
@@ -82,22 +173,35 @@ void update_battle()
         if(d.frame == 33)
         {
             init_attack_order();
+            init_sprites();
+            d.esel = 4;
             d.frame = 0;
             d.current_attacker = d.num_attackers;
-            battle_next_turn();
+            d.phase = BPHASE_NEXT;
         }
+        break;
+    case BPHASE_NEXT:
+        battle_next_turn();
         break;
     case BPHASE_MENU:
         d.menuy_target = 0;
         if(btns_pressed & BTN_A)
         {
+            d.menuy_target = -51;
             if(d.msel == 0)
             {
-                d.menuy_target = -51;
                 d.frame = 0;
                 d.prev_phase = BPHASE_MENU;
-                d.next_phase = BPHASE_PATTACK;
+                d.next_phase = BPHASE_ATTACK1;
                 d.phase = BPHASE_ESEL;
+            }
+            else if(d.msel == 1)
+            {
+                d.phase = BPHASE_DEFEND;
+            }
+            else
+            {
+                d.phase = BPHASE_OUTRO;
             }
         }
         if(btns_pressed & BTN_DOWN && ++d.msel == 4) d.msel = 0;
@@ -110,15 +214,66 @@ void update_battle()
         if((btns_pressed & BTN_A) && d.enemies[d.esel].id != 255)
             d.frame = 0, d.phase = d.next_phase;
         break;
-    case BPHASE_PATTACK:
-        if(d.frame == ATTACK_FRAMES)
-            ; // TODO: process attack hit
-        if(d.frame == ATTACK_FRAMES * 3)
-            battle_next_turn();
+    case BPHASE_ATTACK1:
+    {
+        uint8_t i = d.attacker_id;
+        auto& s = d.sprites[i];
+        if(i < 4)
+            s.tx = 64, d.defender_id = d.esel;
+        else
+            s.tx = 48;
+        s.ty = d.sprites[d.defender_id].ty;
+        d.phase = BPHASE_SPRITES;
+        d.next_phase = BPHASE_ATTACK2;
+        break;
+    }
+    case BPHASE_ATTACK2:
+        // TODO: attack/damage animation
+        // just delay for now
+        d.frame = -20;
+        d.phase = BPHASE_DELAY;
+        d.next_phase = BPHASE_ATTACK3;
+        break;
+    case BPHASE_ATTACK3:
+    {
+        auto& s = d.sprites[d.attacker_id];
+        s.tx = s.bx;
+        s.ty = s.by;
+        d.phase = BPHASE_SPRITES;
+        d.next_phase = BPHASE_NEXT;
+        break;
+    }
+    case BPHASE_DEFEND:
+    {
+        auto& s = d.sprites[d.attacker_id];
+        uint8_t di;
+        if(d.attacker_id < 4)
+            s.tx = 32, di = d.pdef, d.pdef = d.attacker_id;
+        else
+            s.tx = 80, di = d.edef, d.edef = d.attacker_id;
+        s.ty = 30;
+        if(di != 255)
+        {
+            auto& ds = d.sprites[di];
+            ds.tx = ds.bx;
+            ds.ty = ds.by;
+        }
+        d.phase = BPHASE_SPRITES;
+        d.next_phase = BPHASE_NEXT;
+        break;
+    }
+    case BPHASE_SPRITES:
+        if(d.sprites_done)
+            d.phase = d.next_phase;
+        break;
+    case BPHASE_DELAY:
+        if(d.frame == 0)
+            d.phase = d.next_phase;
         break;
     case BPHASE_OUTRO:
         // resume state
-        if(!(chunks_are_running && run_chunks())) change_state(STATE_MAP);
+        if(!(chunks_are_running && run_chunks()))
+            change_state(STATE_MAP);
     default: break;
     }
 }
@@ -134,49 +289,6 @@ static void draw_battle_background()
     platform_drawrect(35, 39, 10, 8, LIGHT_GRAY);
     platform_fillrect(81, 37, 14, 12, WHITE);
     platform_drawrect(83, 39, 10, 8, LIGHT_GRAY);
-}
-
-static constexpr uint8_t PPOS[] PROGMEM = {
-    16, 14, 16, 38, 0, 14, 0, 38,
-};
-static constexpr uint8_t EPOS[] PROGMEM = {
-    96, 14, 96, 38, 112, 14, 112, 38,
-};
-
-static void party_sprite_pos(uint8_t i, uint8_t& f, int16_t& x, int16_t& y)
-{
-    auto const& d = sdata.battle;
-    f = 0;
-    uint8_t tx = pgm_read_byte(&PPOS[i * 2 + 0]);
-    uint8_t ty = pgm_read_byte(&PPOS[i * 2 + 1]);
-    if(d.phase == BPHASE_PATTACK &&
-        d.attack_order[d.current_attacker] == i)
-    {
-        uint8_t dx = 72 - 8;
-        uint8_t dy = 32 - 8;
-        uint8_t nf = (d.frame >> 2) & 3;
-        if(d.frame <= ATTACK_FRAMES)
-        {
-            f = (i == 0 ? 6 : 3) * 4 + nf;
-            x = tx + (dx - tx) * d.frame / ATTACK_FRAMES;
-            y = ty + (dy - ty) * d.frame / ATTACK_FRAMES;
-        }
-        else if(d.frame >= ATTACK_FRAMES * 2)
-        {
-            f = (i == 0 ? 2 : 1) * 4 + nf;
-            uint8_t of = d.frame - ATTACK_FRAMES * 2;
-            x = dx + (tx - dx) * of / ATTACK_FRAMES;
-            y = dy + (ty - dy) * of / ATTACK_FRAMES;
-        }
-        else
-        {
-            x = dx, y = dy;
-        }
-    }
-    else
-    {
-        x = tx, y = ty;
-    }
 }
 
 static void draw_selection_arrow(uint8_t x, uint8_t y)
@@ -196,44 +308,18 @@ static void draw_selection_outline(uint8_t x, uint8_t y)
 static void draw_battle_sprites()
 {
     auto const& d = sdata.battle;
-    static constexpr uint8_t PARTY_IMG[] PROGMEM = {
-        2,
-        2,
-        2,
-    };
+    static constexpr uint8_t PARTY_IMG[] PROGMEM = { 0, 255, 255, 255, };
     draw_sprite_entry entries[8];
     uint8_t n = 0;
 
-    // party
-    for(uint8_t i = 0; i < nparty; ++i)
+    for(auto const& s : d.sprites)
     {
+        if(!s.active) continue;
         auto& e = entries[n++];
-        if(party[i].id == 0)
-        {
-            e.addr = PLAYER_IMG;
-            e.frame = 0;
-        }
-        else {
-            e.addr = ENEMY_IMG;
-            e.frame = pgm_read_byte(&PARTY_IMG[party[i].id - 1]) * 16;
-        }
-        uint8_t f;
-        party_sprite_pos(i, f, e.x, e.y);
-        e.frame += f;
-        //e.x = pgm_read_byte(&PPOS[i * 2 + 0]);
-        //e.y = pgm_read_byte(&PPOS[i * 2 + 1]);
-    }
-
-    // enemies
-    for(uint8_t i = 0; i < 4; ++i)
-    {
-        uint8_t t = d.enemies[i].id;
-        if(t == 255) continue;
-        auto& e = entries[n++];
-        e.addr = ENEMY_IMG;
-        e.frame = t * 16;
-        e.x = pgm_read_byte(&EPOS[i * 2 + 0]);
-        e.y = pgm_read_byte(&EPOS[i * 2 + 1]);
+        e.x = s.x;
+        e.y = s.y;
+        e.addr = s.addr;
+        e.frame = s.frame_base + s.frame_dir;
     }
 
     sort_and_draw_sprites(entries, n);
@@ -273,14 +359,12 @@ void render_battle()
     }
     if(d.phase == BPHASE_MENU || d.phase == BPHASE_ESEL)
     {
-        uint8_t x = pgm_read_byte(&PPOS[d.psel * 2 + 0]);
-        uint8_t y = pgm_read_byte(&PPOS[d.psel * 2 + 1]);
-        draw_selection_outline(x, y);
+        auto const& s = d.sprites[d.attacker_id];
+        draw_selection_outline(s.x, s.y);
     }
     if(d.phase == BPHASE_ESEL)
     {
-        uint8_t x = pgm_read_byte(&EPOS[d.esel * 2 + 0]);
-        uint8_t y = pgm_read_byte(&EPOS[d.esel * 2 + 1]);
-        draw_selection_arrow(x, y);
+        auto const& s = d.sprites[d.esel];
+        draw_selection_arrow(s.x, s.y);
     }
 }

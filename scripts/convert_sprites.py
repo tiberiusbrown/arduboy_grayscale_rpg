@@ -48,7 +48,7 @@ convert(BINBASE + 'tile_img.bin', '', 'tiles.png', 16, 16, 192, 64)
 
 convert(BINBASE + 'portrait_img.bin', '', 'portraits.png', 32, 32)
 convert(BINBASE + 'player_img.bin', '', 'player_sprites.png', 16, 16)
-convert(BINBASE + 'enemy_img.bin', '', 'enemy_sprites.png', 16, 16)
+convert(BINBASE + 'sprites_img.bin', '', 'sprites.png', 16, 16)
 convert(BINBASE + 'battle_menu_chain_img.bin', '', 'battle_menu_chain.png', 3, 16)
 convert(BINBASE + 'battle_menu_img.bin', '', 'battle_menu.png', 32, 40)
 convert(BINBASE + 'battle_arrow_img.bin', '', 'battle_arrow.png', 7, 8)

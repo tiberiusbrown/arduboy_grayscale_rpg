@@ -137,13 +137,13 @@
   <object id="58" x="138" y="143" width="12" height="14">
    <properties>
     <property name="script">brne end
-ebat !guard 0 0 0 -
+ebat !guard 1 1 1 -
 end:</property>
    </properties>
   </object>
  </objectgroup>
  <objectgroup color="#ff0000" id="3" name="Paths">
-  <object id="53" name="!guard" class="0" x="133.773" y="136.545">
+  <object id="53" name="!guard" class="1" x="133.773" y="136.545">
    <polyline points="0,0 17.8182,1.45455"/>
   </object>
  </objectgroup>

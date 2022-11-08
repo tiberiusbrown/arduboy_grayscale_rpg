@@ -136,11 +136,26 @@ enum battle_phase_t
 {
     BPHASE_ALERT,   // '!' over player
     BPHASE_INTRO,   // fancy "Battle Start!"
+    BPHASE_NEXT,
     BPHASE_MENU,
     BPHASE_ESEL,    // select enemy
-    BPHASE_PATTACK, // party attack animation
-    BPHASE_EATTACK, // enemy attack animation
+    BPHASE_ATTACK1, // attack animation (charge)
+    BPHASE_ATTACK2, // attack animation (damage)
+    BPHASE_ATTACK3, // attack animation (return)
+    BPHASE_DEFEND,  // move to defense
+    BPHASE_SPRITES, // wait until sprites are done
+    BPHASE_DELAY,   // delay until frame == 0 (set frame to -N)
     BPHASE_OUTRO,   // fancy "Victory!"
+};
+struct battle_sprite_t
+{
+    bool active;
+    uint8_t x, y;   // current pos
+    uint8_t tx, ty; // target pos
+    uint8_t bx, by; // base pos
+    uint24_t addr;
+    uint16_t frame_base;
+    uint8_t frame_dir;
 };
 struct sdata_battle
 {
@@ -151,19 +166,28 @@ struct sdata_battle
     uint8_t enemy_chunk;
     party_member_t enemies[4];
     uint8_t pdef, edef; // party/enemy defender (-1 for none)
+
     uint8_t esel;       // enemy select
     uint8_t psel;       // party member select
     uint8_t msel;       // menu select
     uint8_t msely;
     int8_t menuy;       // menu position
     int8_t menuy_target;
+
     battle_phase_t phase;
     battle_phase_t prev_phase;
     battle_phase_t next_phase;
+
     uint8_t attack_order[8];
     uint8_t num_attackers;
     uint8_t current_attacker;
+    uint8_t attacker_id;
+    uint8_t defender_id;
+
+    battle_sprite_t sprites[8];
+    bool sprites_done;
 };
+static_assert(sizeof(sdata_battle) < 256, "battle state data too large");
 extern union sdata_t
 {
     sdata_dialog dialog;

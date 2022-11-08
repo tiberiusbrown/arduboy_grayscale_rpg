@@ -5,7 +5,7 @@
 #include "generated/fxdata.h"
 #include "generated/tile_img.hpp"
 
-static uint8_t add_enemy_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
+static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
                                       int16_t ox, int16_t oy)
 {
     auto const& e = active_chunks[ci].enemy;
@@ -17,7 +17,7 @@ static uint8_t add_enemy_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
         f += d * 2;
         f += ((nframe >> 2) & 3);
     }
-    entry->addr = ENEMY_IMG;
+    entry->addr = SPRITES_IMG;
     entry->frame = f;
     entry->x = ox + e.x;
     entry->y = oy + e.y - 4;
@@ -65,10 +65,10 @@ void draw_sprites()
         uint8_t cy = uint8_t(ty >> 6);
         int16_t ox = -int16_t(tx & 0x7f);
         int16_t oy = -int16_t(ty & 0x3f);
-        n += add_enemy_sprite_entry(&entries[n], 0, ox, oy);
-        n += add_enemy_sprite_entry(&entries[n], 1, ox + 128, oy);
-        n += add_enemy_sprite_entry(&entries[n], 2, ox, oy + 64);
-        n += add_enemy_sprite_entry(&entries[n], 3, ox + 128, oy + 64);
+        n += add_sprite_entry(&entries[n], 0, ox, oy);
+        n += add_sprite_entry(&entries[n], 1, ox + 128, oy);
+        n += add_sprite_entry(&entries[n], 2, ox, oy + 64);
+        n += add_sprite_entry(&entries[n], 3, ox + 128, oy + 64);
     }
 
     sort_and_draw_sprites(entries, n);

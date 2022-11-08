@@ -20,10 +20,11 @@ void initialize()
         ac.cx = ac.cy = 255;
     }
 
-    nparty = 1;
+    nparty = 2;
     party[0].id = 0;
     party[0].hp = 10;
-    party[1].id = 255;
+    party[1].id = 3;
+    party[1].hp = 10;
     party[2].id = 255;
     party[3].id = 255;
 }
