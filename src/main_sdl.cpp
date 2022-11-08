@@ -3,6 +3,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 #include <time.h>
 
 #include <SDL.h>
@@ -14,12 +15,11 @@
 
 constexpr int FBH = EXCLUDE_LAST_ROW ? 63 : 64;
 
-#ifndef NDEBUG
-#include "gif.h"
-static GifWriter gif;
-static uint64_t gif_frame_time = 0;
-#endif
+#include "gifenc.h"
+static ge_GIF* gif;
 static bool gif_recording = false;
+static int gif_ds;
+static uint8_t gif_prev[128 * FBH];
 
 int gplane;
 uint8_t pixels[2][128 * 64];
@@ -27,42 +27,57 @@ uint8_t tex_pixels[128 * 63 * 4];
 
 static void send_gif_frame(int ds = 3)
 {
-#ifndef NDEBUG
     if(gif_recording)
     {
-        uint64_t t = SDL_GetTicks64();
-        double dt = double(t - gif_frame_time) / 1000.0;
-        gif_frame_time = t;
-        // GifWriteFrame(&gif, tex_pixels, 128, FBH, int(dt * 100 + 1.5), 2);
-        GifWriteFrame(&gif, tex_pixels, 128, FBH, ds);
+        for(int i = 0; i < 128 * FBH; ++i)
+            gif->frame[i] = pixels[0][i] + pixels[1][i] * 2;
+        gif_ds += ds;
+        if(gif_ds > 0 && 0 != memcmp(gif_prev, gif->frame, sizeof(gif_prev)))
+        {
+            ge_add_frame(gif, gif_ds);
+            memcpy(gif_prev, gif->frame, sizeof(gif_prev));
+            gif_ds = 0;
+        }
     }
-#endif
 }
 
 static void screen_recording_toggle()
 {
-#ifndef NDEBUG
+    char fname[256];
+    time_t rawtime;
+    struct tm* ti;
+    time(&rawtime);
+    ti = localtime(&rawtime);
+    (void)snprintf(fname, sizeof(fname),
+        "recording_%04d%02d%02d%02d%02d%02d.gif",
+        ti->tm_year + 1900, ti->tm_mon + 1, ti->tm_mday,
+        ti->tm_hour + 1, ti->tm_min, ti->tm_sec);
     if(gif_recording)
     {
-        GifEnd(&gif);
-        gif_recording = false;
+        send_gif_frame(0);
+        ge_close_gif(gif);
     }
-    else {
-        char fname[256];
-        time_t rawtime;
-        struct tm* ti;
-        time(&rawtime);
-        ti = localtime(&rawtime);
-        (void)snprintf(fname, sizeof(fname),
-                       "recording_%04d%02d%02d%02d%02d%02d.gif",
-                       ti->tm_year + 1900, ti->tm_mon + 1, ti->tm_mday,
-                       ti->tm_hour + 1, ti->tm_min, ti->tm_sec);
-        GifBegin(&gif, fname, 128, FBH, 33);
-        gif_frame_time = SDL_GetTicks64();
-        gif_recording = true;
+    else
+    {
+        uint8_t palette[] = {
+#if MUTED_PALETTE
+            0x10, 0x10, 0x10,
+            0x50, 0x50, 0x50,
+            0x90, 0x90, 0x90,
+            0xd0, 0xd0, 0xd0,
+#else
+            0x00, 0x00, 0x00,
+            0x55, 0x55, 0x55,
+            0xaa, 0xaa, 0xaa,
+            0xff, 0xff, 0xff,
+#endif
+        };
+        gif = ge_new_gif(fname, 128, FBH, palette, 2, -1, 0);
+        gif_ds = 0;
+        memset(gif_prev, 0, sizeof(gif_prev));
         send_gif_frame(0);
     }
-#endif
+    gif_recording = !gif_recording;
 }
 
 int main(int argc, char** argv)
