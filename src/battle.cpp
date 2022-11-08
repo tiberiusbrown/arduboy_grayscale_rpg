@@ -4,11 +4,13 @@
 
 constexpr uint8_t SPRITE_MOVE_SPEED = 2;
 
+constexpr uint8_t DEFEND_Y = 20;
+
 static constexpr uint8_t PPOS[] PROGMEM = {
-    16, 14, 16, 38, 0, 14, 0, 38,
+    16, 9, 16, 33, 0, 14, 0, 38,
 };
 static constexpr uint8_t EPOS[] PROGMEM = {
-    96, 14, 96, 38, 112, 14, 112, 38,
+    96, 9, 96, 33, 112, 14, 112, 38,
 };
 
 static uint8_t get_party_speed(uint8_t id)
@@ -208,12 +210,18 @@ void update_battle()
         if(btns_pressed & BTN_UP && d.msel-- == 0) d.msel = 3;
         break;
     case BPHASE_ESEL:
-        if(btns_pressed & (BTN_UP | BTN_DOWN)) d.esel ^= 1;
-        if(btns_pressed & (BTN_LEFT | BTN_RIGHT)) d.esel ^= 2;
+    {
+        uint8_t esel = d.esel;
+        if(btns_pressed & BTN_UP) esel &= ~1;
+        if(btns_pressed & BTN_DOWN) esel |= 1;
+        if(btns_pressed & BTN_LEFT) esel &= ~2;
+        if(btns_pressed & BTN_RIGHT) esel |= 2;
         if(btns_pressed & BTN_B) d.phase = d.prev_phase;
-        if((btns_pressed & BTN_A) && d.enemies[d.esel].id != 255)
+        if(d.enemies[esel - 4].id != 255) d.esel = esel;
+        if((btns_pressed & BTN_A) && d.enemies[d.esel - 4].id != 255)
             d.frame = 0, d.phase = d.next_phase;
         break;
+    }
     case BPHASE_ATTACK1:
     {
         uint8_t i = d.attacker_id;
@@ -251,7 +259,7 @@ void update_battle()
             s.tx = 32, di = d.pdef, d.pdef = d.attacker_id;
         else
             s.tx = 80, di = d.edef, d.edef = d.attacker_id;
-        s.ty = 30;
+        s.ty = DEFEND_Y;
         if(di != 255)
         {
             auto& ds = d.sprites[di];
@@ -285,10 +293,10 @@ static void draw_battle_background()
     for(uint8_t r = 0; r < 4; ++r)
         for(uint8_t c = 0; c < 8; ++c, t ^= (t >> 3) ^ (t << 1))
             draw_tile(c * 16, r * 16, pgm_read_byte(&TS[t & 3]));
-    platform_fillrect(33, 37, 14, 12, WHITE);
-    platform_drawrect(35, 39, 10, 8, LIGHT_GRAY);
-    platform_fillrect(81, 37, 14, 12, WHITE);
-    platform_drawrect(83, 39, 10, 8, LIGHT_GRAY);
+    platform_fillrect(33, DEFEND_Y + 7, 14, 12, WHITE);
+    platform_drawrect(35, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
+    platform_fillrect(81, DEFEND_Y + 7, 14, 12, WHITE);
+    platform_drawrect(83, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
 }
 
 static void draw_selection_arrow(uint8_t x, uint8_t y)
