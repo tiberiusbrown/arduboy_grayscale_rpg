@@ -134,7 +134,7 @@ extern enemy_info_t const ENEMY_INFO[] PROGMEM;
 
 enum battle_phase_t
 {
-    BPHASE_ALERT,   // '!' over player
+    BPHASE_ALERT,   // battle alert animation
     BPHASE_INTRO,   // fancy "Battle Start!"
     BPHASE_NEXT,
     BPHASE_MENU,

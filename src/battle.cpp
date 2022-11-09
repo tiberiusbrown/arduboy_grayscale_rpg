@@ -102,10 +102,12 @@ static void battle_next_turn()
     uint8_t id = d.attacker_id = d.attack_order[d.current_attacker];
     if(id < 4)
     {
+        if(d.pdef == id) d.pdef = 255;
         d.phase = BPHASE_MENU;
     }
     else
     {
+        if(d.edef == id) d.edef = 255;
         battle_enemy_attack(id - 4);
     }
     auto& s = d.sprites[d.current_attacker];
@@ -168,6 +170,11 @@ void update_battle()
     update_battle_sprites();
     switch(d.phase)
     {
+    case BPHASE_ALERT:
+        pdir = (pdir + 1) & 7;
+        if(d.frame == 24)
+            d.frame = 0, d.phase = BPHASE_INTRO;
+        break;
     case BPHASE_INTRO:
         d.menuy = d.menuy_target = -51;
         if(d.frame == 8 && d.remove_enemy)
@@ -336,6 +343,12 @@ static void draw_battle_sprites()
 void render_battle()
 {
     auto const& d = sdata.battle;
+    if(d.phase == BPHASE_ALERT)
+    {
+        draw_tiles();
+        draw_sprites();
+        return;
+    }
     if(d.phase == BPHASE_INTRO)
     {
         int16_t x;

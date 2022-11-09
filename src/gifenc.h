@@ -1,3 +1,5 @@
+#ifndef ARDUINO
+
 #ifndef GIFENC_H
 #define GIFENC_H
 
@@ -30,3 +32,5 @@ extern "C" {
 }
 #endif
 #endif /* GIFENC_H */
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef ARDUINO
+
 #include "gifenc.h"
 
 #include <stdio.h>
@@ -328,3 +330,5 @@ ge_close_gif(ge_GIF* gif)
     close(gif->fd);
     free(gif);
 }
+
+#endif
