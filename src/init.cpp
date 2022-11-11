@@ -6,6 +6,7 @@ void initialize()
 {
     nframe = 0;
     chunks_are_running = false;
+    rand_seed = 0xcafe;
 
     px = 100;
     py = 135;
@@ -22,8 +23,8 @@ void initialize()
 
     nparty = 2;
     party[0].id = 0;
-    party[0].hp = 10;
-    party[1].id = 3;
+    party[0].hp = 20;
+    party[1].id = 1;
     party[1].hp = 10;
     party[2].id = 255;
     party[3].id = 255;

@@ -24,9 +24,8 @@ static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     return 1;
 }
 
-void sort_and_draw_sprites(draw_sprite_entry* entries, uint8_t n)
+void sort_sprites(draw_sprite_entry* entries, uint8_t n)
 {
-    // sort sprites
     for(uint8_t i = 1; i < n; ++i)
     {
         for(uint8_t j = i; j > 0 && entries[j - 1].y > entries[j].y; --j)
@@ -36,8 +35,12 @@ void sort_and_draw_sprites(draw_sprite_entry* entries, uint8_t n)
             entries[j - 1] = t;
         }
     }
+}
 
-    // draw sprites
+void sort_and_draw_sprites(draw_sprite_entry* entries, uint8_t n)
+{
+    sort_sprites(entries, n);
+
     for(uint8_t i = 0; i < n; ++i)
     {
         platform_fx_drawplusmask(entries[i].x, entries[i].y, entries[i].addr,
@@ -152,6 +155,25 @@ void draw_text(uint8_t x, uint8_t y, char const* str)
 void draw_text_prog(uint8_t x, uint8_t y, char const* str)
 {
     draw_text_ex(x, y, str, true);
+}
+
+static uint8_t text_width_ex(char const* str, bool prog)
+{
+    uint8_t w = 0;
+    char t;
+    while((t = (prog ? (char)pgm_read_byte(str++) : *str++)) != '\0')
+        w += pgm_read_byte(&FONT_ADV[t - ' ']);
+    return w;
+}
+
+uint8_t text_width(char const* str)
+{
+    return text_width_ex(str, false);
+}
+
+uint8_t text_width_prog(char const* str)
+{
+    return text_width_ex(str, true);
 }
 
 void wrap_text(char* str, uint8_t w)

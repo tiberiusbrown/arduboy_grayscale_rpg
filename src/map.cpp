@@ -80,10 +80,13 @@ static bool run_chunk()
             for(uint8_t i = 0; i < 4; ++i)
             {
                 auto& enemy = sdata.battle.enemies[i];
-                enemy.id = e[i];
+                uint8_t id = e[i];
+                enemy.id = id;
+                enemy.hp = pgm_read_byte(&ENEMY_INFO[id].hp);
             }
             sdata.battle.phase = BPHASE_ALERT;
-            sdata.battle.pdef = sdata.battle.edef = 255;
+            sdata.battle.pdef = sdata.battle.edef = -1;
+            sdata.battle.defender_id = -1;
             sdata.battle.flag = f;
             for(auto& p : party)
                 p.ap = 0;

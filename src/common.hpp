@@ -20,7 +20,10 @@ inline uint8_t plane()
 {
     return a.currentPlane();
 }
+#define MY_ASSERT(cond__) (void)0
 #else
+#include <assert.h>
+#define MY_ASSERT(cond__) assert(cond__)
 #define PROGMEM
 inline char const* PSTR(char const* str)
 {
@@ -129,8 +132,19 @@ struct enemy_info_t
 {
     uint8_t sprite;
     uint8_t speed;
+    uint8_t hp;
+    char const* name;
 };
 extern enemy_info_t const ENEMY_INFO[] PROGMEM;
+
+struct party_info_t
+{
+    uint8_t sprite;
+    uint8_t speed;
+    uint8_t hp;
+    char const* name;
+};
+extern party_info_t const PARTY_INFO[4] PROGMEM;
 
 enum battle_phase_t
 {
@@ -150,12 +164,16 @@ enum battle_phase_t
 struct battle_sprite_t
 {
     bool active;
+    uint8_t asleep;
+    uint8_t damaged;
     uint8_t x, y;   // current pos
     uint8_t tx, ty; // target pos
     uint8_t bx, by; // base pos
-    uint24_t addr;
+    uint8_t move_speed;
     uint16_t frame_base;
     uint8_t frame_dir;
+    uint8_t hp;     // health bar width
+    uint8_t hpt;    // health bar width target
 };
 struct sdata_battle
 {
@@ -180,7 +198,7 @@ struct sdata_battle
 
     uint8_t attack_order[8];
     uint8_t num_attackers;
-    uint8_t current_attacker;
+    uint8_t attacker_index;
     uint8_t attacker_id;
     uint8_t defender_id;
 
@@ -188,6 +206,7 @@ struct sdata_battle
     bool sprites_done;
 };
 static_assert(sizeof(sdata_battle) < 256, "battle state data too large");
+constexpr int X = sizeof(sdata_battle);
 extern union sdata_t
 {
     sdata_dialog dialog;
@@ -233,6 +252,10 @@ extern active_chunk_t active_chunks[4];
 
 extern uint8_t btns_down, btns_pressed;
 
+extern uint16_t rand_seed;
+uint8_t u8rand();
+uint8_t u8rand(uint8_t m);
+
 // platform.cpp
 //     platform abstraction methods
 void platform_drawoverwrite(int16_t x, int16_t y, uint8_t const* bitmap,
@@ -260,6 +283,8 @@ void draw_tile(int16_t x, int16_t y, uint8_t t);
 void draw_text(uint8_t x, uint8_t y, char const* str);      // str in RAM
 void draw_text_prog(uint8_t x, uint8_t y, char const* str); // str in PROGMEM
 void wrap_text(char* str, uint8_t w); // replace ' ' with '\n' to wrap to width
+uint8_t text_width(char const* str);
+uint8_t text_width_prog(char const* str);
 void draw_frame(uint8_t x, uint8_t y, uint8_t w, uint8_t h);
 void draw_tiles();
 void draw_player();
@@ -270,6 +295,7 @@ struct draw_sprite_entry
     uint8_t frame;
     int16_t x, y;
 };
+void sort_sprites(draw_sprite_entry* entries, uint8_t n);
 void sort_and_draw_sprites(draw_sprite_entry* entries, uint8_t n);
 
 // map.cpp
