@@ -34,6 +34,56 @@ static uint8_t get_bitmap_bit(uint8_t const* bitmap, uint8_t w, uint8_t h,
 }
 #endif
 
+#if FADE_USING_CONTRAST
+extern float fade_factor;
+#else
+static uint8_t const FADE[] PROGMEM =
+{
+    0x00, 0x22, 0x00, 0x00, 0x00, 0x22, 0x00, 0x44,
+    0x88, 0x22, 0x00, 0x44, 0x88, 0x22, 0x88, 0x44,
+    0x99, 0x22, 0x88, 0x44, 0x99, 0x22, 0x88, 0x55,
+    0x99, 0x66, 0x88, 0x55, 0x99, 0x66, 0x99, 0x55,
+    0x99, 0x66, 0x99, 0x77, 0xdd, 0x66, 0x99, 0x77,
+    0xdd, 0xee, 0x99, 0x77, 0xdd, 0xee, 0xdd, 0x77,
+    0xdd, 0xff, 0xdd, 0x77, 0xff, 0xff, 0xdd, 0x77,
+    0xff, 0xff, 0xdd, 0xff, 0xff, 0xff, 0xff, 0xff,
+};
+#endif
+
+void platform_fade(uint8_t f)
+{
+#if FADE_USING_CONTRAST
+    if(f > 15) f = 15;
+    f *= 17;
+#ifdef ARDUINO
+    a.setContrast(f);
+#else
+    fade_factor = float(f) / 255;
+#endif
+#else
+    uint8_t const* fade = &FADE[f * 4];
+#ifdef ARDUINO
+    uint8_t* b = a.getBuffer();
+    for(uint16_t i = 0; i < 1024; i += 4)
+    {
+        b[i + 0] &= pgm_read_byte(fade + 0);
+        b[i + 1] &= pgm_read_byte(fade + 1);
+        b[i + 2] &= pgm_read_byte(fade + 2);
+        b[i + 3] &= pgm_read_byte(fade + 3);
+}
+#else
+    for(uint8_t r = 0; r < 64; ++r)
+    {
+        for(uint8_t c = 0; c < 128; ++c)
+        {
+            if(!((fade[c % 4] >> (r % 8)) & 1))
+                pixels[gplane][r * 128 + c] = 0;
+        }
+    }
+#endif
+#endif
+}
+
 void platform_drawoverwritemonochrome(int16_t x, int16_t y, uint8_t w,
     uint8_t h, uint8_t const* bitmap)
 {

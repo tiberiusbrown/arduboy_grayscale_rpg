@@ -21,9 +21,15 @@ static bool gif_recording = false;
 static int gif_ds;
 static uint8_t gif_prev[128 * FBH];
 
+float fade_factor = 1.f;
 int gplane;
 uint8_t pixels[2][128 * 64];
 uint8_t tex_pixels[128 * 63 * 4];
+
+inline uint8_t fadef(uint8_t x)
+{
+    return uint8_t(fade_factor * x + 0.5f);
+}
 
 static void send_gif_frame(int ds = 3)
 {
@@ -160,10 +166,11 @@ int main(int argc, char** argv)
         {
             int p0 = pixels[0][i];
             int p1 = pixels[1][i];
+            int pf = p0 + p1 * 2;
 #if MUTED_PALETTE
-            uint8_t p = uint8_t((p0 * 0x40 + p1 * 0x80 + 0x10) & 0xff);
+            uint8_t p = uint8_t((fadef(pf * 0x40) + 0x10) & 0xff);
 #else
-            uint8_t p = uint8_t((p0 * 0x55 + p1 * 0xaa) & 0xff);
+            uint8_t p = uint8_t(fadef(pf * 0x55) & 0xff);
 #endif
             tex_pixels[i * 4 + 0] = p;
             tex_pixels[i * 4 + 1] = p;

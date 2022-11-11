@@ -7,8 +7,6 @@ constexpr uint8_t DEFEND_Y = 20;
 constexpr uint8_t ASLEEP_FRAMES = 16;
 constexpr uint8_t DAMAGED_FRAMES = 8;
 
-constexpr uint8_t INVALID = -1;
-
 static constexpr uint8_t PPOS[] PROGMEM = {
     16, 9, 16, 33, 0, 14, 0, 38,
 };
@@ -35,7 +33,7 @@ static void move_sprite(uint8_t i, uint8_t x, uint8_t y)
 
 static void move_sprite_to_base(uint8_t i)
 {
-    auto& d = sdata.battle; 
+    auto& d = sdata.battle;
     auto& s = d.sprites[i];
     move_sprite(i, s.bx, s.by);
 }
@@ -62,12 +60,12 @@ static void init_attack_order() {
     uint8_t n = 0;
     for(uint8_t i = 0; i < 4; ++i)
     {
-        if(party[i].id != 255)
+        if(party[i].id != INVALID)
         {
             speeds[n] = get_speed(i);
             d.attack_order[n++] = i;
         }
-        if(d.enemies[i].id != 255)
+        if(d.enemies[i].id != INVALID)
         {
             speeds[n] = get_speed(i + 4);
             d.attack_order[n++] = i + 4;
@@ -91,7 +89,7 @@ static void init_sprites()
     for(uint8_t i = 0; i < nparty; ++i)
     {
         uint8_t id = party[i].id;
-        if(id == 255) continue;
+        if(id == INVALID) continue;
         auto& s = d.sprites[i];
         s.active = true;
         s.x = pgm_read_byte(&PPOS[i * 2 + 0]);
@@ -101,7 +99,7 @@ static void init_sprites()
     for(uint8_t i = 0; i < 4; ++i)
     {
         uint8_t id = d.enemies[i].id;
-        if(id == 255) continue;
+        if(id == INVALID) continue;
         auto& s = d.sprites[i + 4];
         s.active = true;
         s.x = pgm_read_byte(&EPOS[i * 2 + 0]);
@@ -143,13 +141,13 @@ static void battle_enemy_attack(uint8_t i)
     auto& d = sdata.battle;
     auto& e = d.enemies[i];
 
-    if(d.pdef == 255)
+    if(d.pdef == INVALID)
     {
         uint8_t j[4];
         uint8_t n = 0;
         for(uint8_t i = 0; i < 4; ++i)
         {
-            if(party[i].id == 255) continue;
+            if(party[i].id == INVALID) continue;
             if(party[i].hp > 0) j[n++] = i;
         }
         d.defender_id = j[u8rand(n)];
@@ -163,7 +161,31 @@ static void battle_enemy_attack(uint8_t i)
 static void battle_next_turn()
 {
     auto& d = sdata.battle;
-    d.defender_id = 255;
+    // check for defeat
+    {
+        bool defeat = true;
+        for(auto const& p : party)
+            if(p.id != INVALID && p.hp > 0) defeat = false;
+        if(defeat)
+        {
+            d.next_phase = BPHASE_DEFEAT;
+            d.phase = BPHASE_DELAY;
+            d.frame = -32;
+            return;
+        }
+    }
+    {
+        bool victory = true;
+        for(auto const& e : d.enemies)
+            if(e.id != INVALID && e.hp > 0) victory = false;
+        if(victory)
+        {
+            d.phase = BPHASE_VICTORY;
+            return;
+        }
+    }
+
+    d.defender_id = INVALID;
     if(d.attacker_id < 4)
         party[d.attacker_id].ap += 1;
     else
@@ -180,12 +202,12 @@ static void battle_next_turn()
     if(id < 4)
     {
         if(d.pdef == id)
-            d.pdef = 255;
+            d.pdef = INVALID;
         d.phase = BPHASE_MENU;
     }
     else
     {
-        if(d.edef == id) d.edef = 255;
+        if(d.edef == id) d.edef = INVALID;
         battle_enemy_attack(id - 4);
     }
     for(uint8_t i = 0; i < 8; ++i)
@@ -254,8 +276,8 @@ static void update_battle_sprites()
             continue;
         }
         if(s.damaged > 0) --s.damaged;
-        if(s.hp > s.hpt) --s.hp;
-        if(s.hp < s.hpt) ++s.hp;
+        if(s.hp > s.hpt) s.hp -= uint8_t(s.hp - s.hpt + 3) / 4;
+        if(s.hp < s.hpt) s.hp += uint8_t(s.hpt - s.hp + 3) / 4;;
         if(s.x == s.tx && s.y == s.ty)
         {
             s.frame_dir = 0;
@@ -360,8 +382,8 @@ void update_battle()
         if(btns_pressed & BTN_RIGHT) esel |= 2;
         if(btns_pressed & BTN_B) d.phase = d.prev_phase;
         auto const& e = d.enemies[esel - 4];
-        if(e.id != 255 && e.hp > 0) d.esel = esel;
-        if((btns_pressed & BTN_A) && d.enemies[d.esel - 4].id != 255)
+        if(e.id != INVALID && e.hp > 0) d.esel = esel;
+        if((btns_pressed & BTN_A) && d.enemies[d.esel - 4].id != INVALID)
             d.defender_id = d.esel, d.frame = 0, d.phase = d.next_phase;
         break;
     }
@@ -385,7 +407,7 @@ void update_battle()
         d.frame = -20;
         d.phase = BPHASE_DELAY;
         d.next_phase = BPHASE_ATTACK3;
-        take_damage(d.defender_id, 4);
+        take_damage(d.defender_id, d.defender_id < 4 ? 20 : 5);
         break;
     case BPHASE_ATTACK3:
     {
@@ -403,7 +425,7 @@ void update_battle()
         else
             tx = 80, di = d.edef, d.edef = d.attacker_id;
         move_sprite(d.attacker_id, tx, DEFEND_Y);
-        if(di != 255)
+        if(di != INVALID)
             move_sprite_to_base(di);
         d.phase = BPHASE_SPRITES;
         d.next_phase = BPHASE_NEXT;
@@ -417,10 +439,17 @@ void update_battle()
         if(d.frame == 0)
             d.phase = d.next_phase;
         break;
+    case BPHASE_DEFEAT:
+        change_state(STATE_GAME_OVER);
+        break;
+    case BPHASE_VICTORY:
+
+        break;
     case BPHASE_OUTRO:
         // resume state
         if(!(chunks_are_running && run_chunks()))
             change_state(STATE_MAP);
+        break;
     default: break;
     }
 }
@@ -500,7 +529,9 @@ static void draw_health(uint8_t i)
 static void draw_battle_sprites()
 {
     auto const& d = sdata.battle;
-    static constexpr uint8_t PARTY_IMG[] PROGMEM = { 0, 255, 255, 255, };
+    static constexpr uint8_t PARTY_IMG[] PROGMEM = {
+        0, INVALID, INVALID, INVALID,
+    };
     draw_sprite_entry entries[8];
     uint8_t n = 0;
 
@@ -561,7 +592,7 @@ void render_battle()
     {
         auto const& s = d.sprites[d.attacker_id];
         draw_selection_outline(s.x, s.y);
-        if(d.phase == BPHASE_MENU && d.attacker_id != 255)
+        if(d.phase == BPHASE_MENU && d.attacker_id != INVALID)
             draw_health(d.attacker_id);
     }
     if(d.phase == BPHASE_ESEL)
@@ -570,10 +601,16 @@ void render_battle()
         draw_selection_arrow(s.x, s.y);
         draw_health(d.esel);
     }
-    if(d.defender_id != 255)
+    if(d.defender_id != INVALID)
     {
         auto const& s = d.sprites[d.defender_id];
         platform_fx_drawplusmask(s.x + 4, s.y - 8, BATTLE_ARROW_IMG, 0, 7, 8);
         draw_health(d.defender_id);
+    }
+    if(d.next_phase == BPHASE_DEFEAT)
+    {
+        uint8_t fade_frame = uint8_t(-d.frame);
+        if(fade_frame < 16)
+            platform_fade(fade_frame);
     }
 }

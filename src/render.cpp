@@ -48,6 +48,17 @@ static void render_tp()
     draw_player();
 }
 
+static void render_game_over()
+{
+    auto const& d = sdata.game_over;
+    if(d.fade_frame >= 8)
+    {
+        platform_fx_drawoverwrite(0, 0, GAME_OVER_IMG, 0, 128, 64);
+        if(d.fade_frame < 24)
+            platform_fade(d.fade_frame - 8);
+    }
+}
+
 void render()
 {
     using render_func = void (*)();
@@ -56,6 +67,7 @@ void render()
         render_dialog,
         render_tp,
         render_battle,
+        render_game_over,
     };
 
     (pgmptr(&FUNCS[state]))();

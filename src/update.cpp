@@ -232,6 +232,16 @@ static void update_tp()
     if(d.frame == TELEPORT_TRANSITION_FRAMES * 2) change_state(STATE_MAP);
 }
 
+static void update_game_over()
+{
+    auto& d = sdata.game_over;
+    if(d.message[0] == '\0')
+    {
+        // TODO: load message
+    }
+    if(d.fade_frame < 24) ++d.fade_frame;
+}
+
 void update()
 {
     using update_func = void (*)();
@@ -240,6 +250,7 @@ void update()
         update_dialog,
         update_tp,
         update_battle,
+        update_game_over,
     };
 
     pmoving = false;

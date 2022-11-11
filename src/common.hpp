@@ -1,6 +1,7 @@
 #pragma once
 
 #define TELEPORT_TRANSITION_FRAMES 16
+#define FADE_USING_CONTRAST 1
 
 #include <stdint.h>
 
@@ -54,6 +55,8 @@ inline uint8_t plane()
 }
 #endif
 
+constexpr uint8_t INVALID = -1;
+
 // useful when T is a pointer type, like function pointer or char const*
 template <class T> inline T pgmptr(T const* p)
 {
@@ -99,6 +102,7 @@ enum
     STATE_DIALOG, // message or dialog
     STATE_TP,     // player is teleporting (e.g., entering building or cave)
     STATE_BATTLE,
+    STATE_GAME_OVER,
 };
 extern uint8_t state;
 
@@ -159,6 +163,8 @@ enum battle_phase_t
     BPHASE_DEFEND,  // move to defense
     BPHASE_SPRITES, // wait until sprites are done
     BPHASE_DELAY,   // delay until frame == 0 (set frame to -N)
+    BPHASE_DEFEAT,
+    BPHASE_VICTORY,
     BPHASE_OUTRO,   // fancy "Victory!"
 };
 struct battle_sprite_t
@@ -206,12 +212,18 @@ struct sdata_battle
     bool sprites_done;
 };
 static_assert(sizeof(sdata_battle) < 256, "battle state data too large");
-constexpr int X = sizeof(sdata_battle);
+struct sdata_game_over
+{
+    uint8_t fade_frame;
+    uint8_t message_frame;
+    char message[128];
+};
 extern union sdata_t
 {
     sdata_dialog dialog;
     sdata_tp tp;
     sdata_battle battle;
+    sdata_game_over game_over;
 } sdata;
 void change_state(uint8_t new_state);
 
@@ -258,6 +270,7 @@ uint8_t u8rand(uint8_t m);
 
 // platform.cpp
 //     platform abstraction methods
+void platform_fade(uint8_t f);
 void platform_drawoverwrite(int16_t x, int16_t y, uint8_t const* bitmap,
     uint8_t frame);
 void platform_drawoverwritemonochrome(int16_t x, int16_t y, uint8_t w,

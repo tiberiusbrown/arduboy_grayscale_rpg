@@ -153,6 +153,7 @@ struct ABG_Flags
 namespace abg_detail
 {
     
+extern uint8_t  contrast;
 extern uint16_t timer_counter;
 extern uint8_t  update_counter;
 extern uint8_t  update_every_n;
@@ -256,6 +257,9 @@ struct ArduboyG_Common : public BASE
     }
     
     static void startGrey() { startGray(); }
+    
+    // use this method to adjust contrast when using ABGMode::L4_Contrast
+    static void setContrast(uint8_t f) { contrast = f; }
     
     static void setUpdateEveryN(uint8_t images)
     {
@@ -707,7 +711,7 @@ protected:
         if(current_phase == 1)
         {
             if(MODE == ABG_Mode::L4_Contrast)
-                send_cmds(0x81, (current_plane & 1) ? 0xf0 : 0x70);
+                send_cmds(0x81, (current_plane & 1) ? contrast : contrast / 2);
             send_cmds_prog<0xA8, 7, 0x22, 0, 7>();
         }
         else if(current_phase == 2)
@@ -735,7 +739,7 @@ protected:
         }
 #elif defined(ABG_SYNC_PARK_ROW) || defined(ABG_SYNC_SLOW_DRIVE)
         if(MODE == ABG_Mode::L4_Contrast)
-            send_cmds(0x81, (current_plane & 1) ? 0xf0 : 0x70);
+            send_cmds(0x81, (current_plane & 1) ? contrast : contrast / 2);
 #if defined(ABG_SYNC_PARK_ROW)
         paint(&b[128 * 7], true, 1, 0x7f);
         send_cmds_prog<0xA8, 63>();
@@ -927,6 +931,9 @@ namespace abg_detail
 #if !defined(ABG_FPS_DEFAULT)
 #define ABG_FPS_DEFAULT 135
 #endif
+#if !defined(ABG_CONTRAST_DEFAULT)
+#define ABG_CONTRAST_DEFAULT 255
+#endif
 
 #if defined(ABG_TIMER3)
 uint16_t timer_counter = F_CPU / 64 / ABG_FPS_DEFAULT;
@@ -940,6 +947,7 @@ uint8_t  current_plane;
 uint8_t  current_phase;
 #endif
 bool volatile needs_display;
+uint8_t contrast = ABG_CONTRAST_DEFAULT;
 
 void send_cmds_(uint8_t const* d, uint8_t n)
 {
