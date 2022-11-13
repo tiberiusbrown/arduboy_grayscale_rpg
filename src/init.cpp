@@ -8,7 +8,6 @@ void new_game()
     py = 135;
     pdir = 0;
     pmoving = false;
-    change_state(STATE_MAP);
     memset(story_flags, 0, sizeof(story_flags));
     memset(active_chunks, 0, sizeof(active_chunks));
     for(auto& ac : active_chunks)
@@ -28,6 +27,5 @@ void initialize()
 {
     nframe = 0;
     rand_seed = 0xcafe;
-
-    new_game();
+    change_state(STATE_TITLE);
 }

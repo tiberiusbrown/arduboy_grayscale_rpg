@@ -11,8 +11,8 @@ using uint24_t = uint32_t;
 
 // Initialize FX hardware using  FX::begin(FX_DATA_PAGE); in the setup() function.
 
-constexpr uint16_t FX_DATA_PAGE  = 0xfe03;
-constexpr uint24_t FX_DATA_BYTES = 130120;
+constexpr uint16_t FX_DATA_PAGE  = 0xfdfb;
+constexpr uint24_t FX_DATA_BYTES = 132212;
 
 constexpr uint24_t MAPDATA = 0x000000;
 constexpr uint24_t PORTRAIT_IMG = 0x018000;
@@ -23,9 +23,11 @@ constexpr uint24_t TILE_IMG = 0x01B700;
 constexpr uint24_t BATTLE_MENU_IMG = 0x01E700;
 constexpr uint24_t BATTLE_MENU_CHAIN_IMG = 0x01E840;
 constexpr uint24_t BATTLE_ARROW_IMG = 0x01E84C;
-constexpr uint24_t BATTLE_START_IMG = 0x01E868;
-constexpr uint24_t BATTLE_BANNER_IMG = 0x01EAA8;
-constexpr uint24_t BATTLE_ALERT_IMG = 0x01EE08;
-constexpr uint24_t GAME_OVER_IMG = 0x01F148;
-constexpr uint24_t GAME_OVER_MESSAGES = 0x01F948;
-constexpr uint24_t STRINGDATA = 0x01FC48;
+constexpr uint24_t BATTLE_ATTACKER_IMG = 0x01E870;
+constexpr uint24_t BATTLE_START_IMG = 0x01E894;
+constexpr uint24_t BATTLE_BANNER_IMG = 0x01EAD4;
+constexpr uint24_t BATTLE_ALERT_IMG = 0x01EE34;
+constexpr uint24_t TITLE_IMG = 0x01F174;
+constexpr uint24_t GAME_OVER_IMG = 0x01F974;
+constexpr uint24_t GAME_OVER_MESSAGES = 0x020174;
+constexpr uint24_t STRINGDATA = 0x020474;

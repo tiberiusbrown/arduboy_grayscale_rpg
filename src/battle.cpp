@@ -475,14 +475,14 @@ static void draw_selection_arrow(uint8_t x, uint8_t y)
     auto const& d = sdata.battle;
     uint8_t f = (d.frame >> 1) & 7;
     f = (f < 4 ? f : 7 - f);
-    platform_fx_drawplusmask(x + 4, y - 8 + f, BATTLE_ARROW_IMG, 0, 7, 8);
+    platform_fx_drawplusmask(x + 4, y - 8 + f, BATTLE_ARROW_IMG, 0, 9, 8);
 }
 
 static void draw_selection_outline(uint8_t x, uint8_t y)
 {
     //auto const& d = sdata.battle;
     //platform_fx_drawplusmask(x - 3, y - 3, BATTLE_SELECT_IMG, d.selframe, 22, 24);
-    platform_fx_drawplusmask(x + 4, y - 8, BATTLE_ARROW_IMG, 0, 7, 8);
+    platform_fx_drawplusmask(x + 4, y - 8, BATTLE_ATTACKER_IMG, 0, 9, 8);
 }
 
 static void draw_health(uint8_t i)
@@ -602,7 +602,7 @@ void render_battle()
     if(d.defender_id != INVALID)
     {
         auto const& s = d.sprites[d.defender_id];
-        platform_fx_drawplusmask(s.x + 4, s.y - 8, BATTLE_ARROW_IMG, 0, 7, 8);
+        platform_fx_drawplusmask(s.x + 4, s.y - 8, BATTLE_ARROW_IMG, 0, 9, 8);
         draw_health(d.defender_id);
     }
     if(d.next_phase == BPHASE_DEFEAT)

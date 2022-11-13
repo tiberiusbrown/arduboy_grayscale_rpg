@@ -11,7 +11,7 @@ rem set remove_timer0=
 cd ..\src
 set dir=%temp%/arduboy_grayscale_rpg_build
 if not exist "%dir%" mkdir %dir%
-arduino-cli.exe compile --clean -v --log-level info ^
+arduino-cli.exe compile -v --log-level info ^
     -b arduboy:avr:arduboy . ^
     --output-dir "%dir%" ^
     --build-property compiler.c.elf.extra_flags="-Wl,--relax" ^

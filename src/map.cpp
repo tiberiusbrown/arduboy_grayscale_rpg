@@ -51,6 +51,7 @@ static bool run_chunk()
             if(instr == CMD_TDLG) t1 = c.script[chunk_instr++];
             uint16_t stri = c.script[chunk_instr++];
             stri |= uint16_t(c.script[chunk_instr++]) << 8;
+            if(state == STATE_RESUME) break;
             if(state == STATE_TP) break; // don't execute during teleports
             if((instr == CMD_TMSG || instr == CMD_TDLG) && t0 != sel_tile)
                 break;
@@ -73,6 +74,7 @@ static bool run_chunk()
             e[1] = c.script[chunk_instr++];
             e[2] = c.script[chunk_instr++];
             e[3] = c.script[chunk_instr++];
+            if(state == STATE_RESUME) break;
             if(story_flag_get(f)) break;
             change_state(STATE_BATTLE);
             sdata.battle.remove_enemy = (instr == CMD_EBAT);
@@ -106,7 +108,7 @@ static bool run_chunk()
             tx |= uint16_t(c.script[chunk_instr++]) << 8;
             ty = c.script[chunk_instr++];
             ty |= uint16_t(c.script[chunk_instr++]) << 8;
-            // if(state != STATE_MAP) break;
+            if(state == STATE_RESUME) break;
             if(instr == CMD_TTP && t != sel_tile) break;
             if(instr == CMD_WTP && t != walk_tile) break;
             change_state(STATE_TP);

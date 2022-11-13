@@ -100,6 +100,8 @@ extern uint8_t nframe;
 
 enum
 {
+    STATE_TITLE,
+    STATE_RESUME, // fading in to gameplay
     STATE_MAP,    // moving around on the map
     STATE_DIALOG, // message or dialog
     STATE_TP,     // player is teleporting (e.g., entering building or cave)
@@ -113,6 +115,15 @@ extern uint8_t running_chunk;
 extern uint8_t chunk_instr;
 extern int8_t chunk_regs[16];
 
+struct sdata_title
+{
+    uint8_t fade_frame;
+    bool going_to_resume;
+};
+struct sdata_resume
+{
+    uint8_t fade_frame;
+};
 struct sdata_dialog
 {
     uint8_t portrait;
@@ -223,10 +234,13 @@ struct sdata_game_over
     uint8_t fade_frame;
     uint8_t msg_frame;
     uint8_t msg_lines;
+    bool going_to_resume;
     char msg[128];
 };
 extern union sdata_t
 {
+    sdata_title title;
+    sdata_resume resume;
     sdata_dialog dialog;
     sdata_tp tp;
     sdata_battle battle;

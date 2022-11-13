@@ -238,22 +238,70 @@ static void update_tp()
 static void update_game_over()
 {
     auto& d = sdata.game_over;
-    if(d.msg[0] == '\0')
+    if(d.going_to_resume)
     {
-        uint8_t n = u8rand(NUM_GAME_OVER_MESSAGES);
-        platform_fx_read_data_bytes(GAME_OVER_MESSAGES + n * 128, d.msg, 128);
-        wrap_text(d.msg, 106);
-        d.msg_lines = 1;
-        for(auto& c : d.msg)
-            if(c == '\n') ++d.msg_lines, c = '\0';
+        if(d.fade_frame < 24)
+            ++d.fade_frame;
+        else
+            change_state(STATE_RESUME);
     }
-    if(d.fade_frame < 24) ++d.fade_frame;
+    else
+    {
+        if(d.msg[0] == '\0')
+        {
+            uint8_t n = u8rand(NUM_GAME_OVER_MESSAGES);
+            platform_fx_read_data_bytes(GAME_OVER_MESSAGES + n * 128, d.msg, 128);
+            wrap_text(d.msg, 106);
+            d.msg_lines = 1;
+            for(auto& c : d.msg)
+                if(c == '\n') ++d.msg_lines, c = '\0';
+        }
+        if(d.fade_frame < 24) ++d.fade_frame;
+        else if(btns_pressed & (BTN_A | BTN_B))
+            d.fade_frame = 8, d.going_to_resume = true;
+    }
+}
+
+static void update_title()
+{
+    auto& d = sdata.title;
+    if(d.going_to_resume)
+    {
+        if(d.fade_frame < 16)
+            ++d.fade_frame;
+        else
+            change_state(STATE_RESUME);
+    }
+    else
+    {
+        if(d.fade_frame < 24)
+            ++d.fade_frame;
+        if(btns_pressed & BTN_A)
+            d.fade_frame = 0, d.going_to_resume = true;
+    }
+}
+
+static void update_resume()
+{
+    auto& d = sdata.resume;
+    if(d.fade_frame == 0)
+    {
+        new_game();
+        load_chunks();
+        run_chunks();
+    }
+    if(d.fade_frame < 24)
+        ++d.fade_frame;
+    else
+        change_state(STATE_MAP);
 }
 
 void update()
 {
     using update_func = void (*)();
     static update_func const FUNCS[] PROGMEM = {
+        update_title,
+        update_resume,
         update_map,
         update_dialog,
         update_tp,

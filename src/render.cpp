@@ -51,6 +51,7 @@ static void render_tp()
 static void render_game_over()
 {
     auto const& d = sdata.game_over;
+
     if(d.fade_frame < 8) return;
     platform_fx_drawoverwrite(0, 0, GAME_OVER_IMG, 0, 128, 64);
 
@@ -67,14 +68,51 @@ static void render_game_over()
         --n;
     }
 
-    if(d.fade_frame < 24)
+    if(d.going_to_resume)
+        platform_fade(24 - d.fade_frame);
+    else if(d.fade_frame < 24)
         platform_fade(d.fade_frame - 8);
+}
+
+static void render_title()
+{
+    auto const& d = sdata.title;
+    if(d.going_to_resume)
+    {
+        if(d.fade_frame < 16)
+        {
+            platform_fx_drawoverwrite(0, 0, TITLE_IMG, 0, 128, 64);
+            platform_fade(15 - d.fade_frame);
+        }
+        else if(d.fade_frame >= 24)
+        {
+            render_map();
+            platform_fade(d.fade_frame - 24);
+        }
+    }
+    else
+    {
+        if(d.fade_frame < 8) return;
+        platform_fx_drawoverwrite(0, 0, TITLE_IMG, 0, 128, 64);
+        if(d.fade_frame < 24)
+            platform_fade(d.fade_frame - 8);
+    }
+}
+
+static void render_resume()
+{
+    auto const& d = sdata.resume;
+    if(d.fade_frame < 8) return;
+    render_map();
+    platform_fade(d.fade_frame - 8);
 }
 
 void render()
 {
     using render_func = void (*)();
     static render_func const FUNCS[] PROGMEM = {
+        render_title,
+        render_resume,
         render_map,
         render_dialog,
         render_tp,
