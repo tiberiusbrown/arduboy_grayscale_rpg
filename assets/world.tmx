@@ -137,7 +137,7 @@
   <object id="58" x="138" y="143" width="12" height="14">
    <properties>
     <property name="script">brne end
-ebat !guard 0 0 0 -
+ebat !guard 0 0 0 1
 end:</property>
    </properties>
   </object>

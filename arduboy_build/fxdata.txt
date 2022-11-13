@@ -9,8 +9,10 @@ raw_t BATTLE_MENU_CHAIN_IMG = "battle_menu_chain_img.bin"
 raw_t BATTLE_ARROW_IMG = "battle_arrow_img.bin"
 raw_t BATTLE_START_IMG = "battle_start_img.bin"
 raw_t BATTLE_BANNER_IMG = "battle_banner_img.bin"
+raw_t BATTLE_ALERT_IMG = "battle_alert_img.bin"
 //raw_t BATTLE_SELECT_IMG = "battle_select_img.bin"
 raw_t GAME_OVER_IMG = "game_over_img.bin"
+raw_t GAME_OVER_MESSAGES = "game_over_messages.bin"
 
 // put string data last to avoid large diffs in git
 raw_t STRINGDATA = "stringdata.bin"

@@ -2,7 +2,7 @@
 
 #include "generated/fxdata.h"
 
-static void render_map()
+void render_map()
 {
     draw_tiles();
     draw_sprites();
@@ -51,12 +51,24 @@ static void render_tp()
 static void render_game_over()
 {
     auto const& d = sdata.game_over;
-    if(d.fade_frame >= 8)
+    if(d.fade_frame < 8) return;
+    platform_fx_drawoverwrite(0, 0, GAME_OVER_IMG, 0, 128, 64);
+
+    uint8_t n = d.msg_lines;
+    uint8_t y = 39 - n * 4;
+    char const* t = d.msg;
+    while(n != 0)
     {
-        platform_fx_drawoverwrite(0, 0, GAME_OVER_IMG, 0, 128, 64);
-        if(d.fade_frame < 24)
-            platform_fade(d.fade_frame - 8);
+        uint8_t w = text_width(t);
+        draw_text(64 - w / 2, y, t);
+        y += 9;
+        while(*t++ != '\0')
+            ;
+        --n;
     }
+
+    if(d.fade_frame < 24)
+        platform_fade(d.fade_frame - 8);
 }
 
 void render()

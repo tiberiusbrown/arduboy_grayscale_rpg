@@ -2,24 +2,18 @@
 
 #include <string.h>
 
-void initialize()
+void new_game()
 {
-    nframe = 0;
-    chunks_are_running = false;
-    rand_seed = 0xcafe;
-
     px = 100;
     py = 135;
     pdir = 0;
     pmoving = false;
     change_state(STATE_MAP);
-    for(auto& f : story_flags)
-        f = 0;
+    memset(story_flags, 0, sizeof(story_flags));
+    memset(active_chunks, 0, sizeof(active_chunks));
     for(auto& ac : active_chunks)
-    {
-        memset(&ac, 0, sizeof(ac));
         ac.cx = ac.cy = 255;
-    }
+    chunks_are_running = false;
 
     nparty = 2;
     party[0].id = 0;
@@ -28,4 +22,12 @@ void initialize()
     party[1].hp = 10;
     party[2].id = 255;
     party[3].id = 255;
+}
+
+void initialize()
+{
+    nframe = 0;
+    rand_seed = 0xcafe;
+
+    new_game();
 }

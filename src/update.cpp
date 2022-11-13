@@ -1,5 +1,8 @@
 #include "common.hpp"
 
+#include "generated/fxdata.h"
+#include "generated/num_game_over_messages.hpp"
+
 static int8_t const DIRX[8] PROGMEM = {
     0, -1, -1, -1, 0, 1, 1, 1,
 };
@@ -235,9 +238,14 @@ static void update_tp()
 static void update_game_over()
 {
     auto& d = sdata.game_over;
-    if(d.message[0] == '\0')
+    if(d.msg[0] == '\0')
     {
-        // TODO: load message
+        uint8_t n = u8rand(NUM_GAME_OVER_MESSAGES);
+        platform_fx_read_data_bytes(GAME_OVER_MESSAGES + n * 128, d.msg, 128);
+        wrap_text(d.msg, 106);
+        d.msg_lines = 1;
+        for(auto& c : d.msg)
+            if(c == '\n') ++d.msg_lines, c = '\0';
     }
     if(d.fade_frame < 24) ++d.fade_frame;
 }

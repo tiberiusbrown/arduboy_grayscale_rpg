@@ -98,6 +98,10 @@ Example Usage:
 #define ABG_TIMER3
 #endif
 
+#ifndef ABG_FAST_RECT_STATIC_DISPATCH
+#define ABG_FAST_RECT_STATIC_DISPATCH 1
+#endif
+
 #undef BLACK
 #undef WHITE
 constexpr uint8_t BLACK      = 0;
@@ -181,8 +185,12 @@ template<class... CMDS> void send_cmds(CMDS... cmds)
 extern uint8_t const YMASK0[8] PROGMEM;
 extern uint8_t const YMASK1[8] PROGMEM;
 
+#if ABG_FAST_RECT_STATIC_DISPATCH
 template<bool CLEAR>
 void fast_rect(int16_t x, int16_t y, uint8_t w, uint8_t h);
+#else
+void fast_rect(int16_t x, int16_t y, uint8_t w, uint8_t h, bool clear);
+#endif
 
 enum class SpriteMode : uint8_t
 {
@@ -366,8 +374,12 @@ struct ArduboyG_Common : public BASE
         if(FLAGS & ABG_Flags::OptimizeFillRect)
         {
             color = planeColor(current_plane, color);
+#if ABG_FAST_RECT_STATIC_DISPATCH
             if(color) fast_rect<false>(x, y, 1, h);
             else      fast_rect<true >(x, y, 1, h);
+#else
+            fast_rect(x, y, 1, h, color == BLACK);
+#endif
         }
         else Arduboy2Base::drawFastVLine(x, y, h, planeColor(current_plane, color));
     }
@@ -381,8 +393,12 @@ struct ArduboyG_Common : public BASE
         if(FLAGS & ABG_Flags::OptimizeFillRect)
         {
             color = planeColor<PLANE>(color);
+#if ABG_FAST_RECT_STATIC_DISPATCH
             if(color) fast_rect<false>(x, y, 1, h);
             else      fast_rect<true >(x, y, 1, h);
+#else
+            fast_rect(x, y, 1, h, color == BLACK);
+#endif
         }
         else Arduboy2Base::drawFastVLine(x, y, h, planeColor<PLANE>(color));
     }
@@ -534,8 +550,12 @@ struct ArduboyG_Common : public BASE
         if(FLAGS & ABG_Flags::OptimizeFillRect)
         {
             color = planeColor(current_plane, color);
+#if ABG_FAST_RECT_STATIC_DISPATCH
             if(color) fast_rect<false>(x, y, w, h);
             else      fast_rect<true >(x, y, w, h);
+#else
+            fast_rect(x, y, w, h, color == BLACK);
+#endif
         }
         else Arduboy2Base::fillRect(x, y, w, h, planeColor(current_plane, color));
     }
@@ -549,8 +569,12 @@ struct ArduboyG_Common : public BASE
         if(FLAGS & ABG_Flags::OptimizeFillRect)
         {
             color = planeColor<PLANE>(color);
+#if ABG_FAST_RECT_STATIC_DISPATCH
             if(color) fast_rect<false>(x, y, w, h);
             else      fast_rect<true >(x, y, w, h);
+#else
+            fast_rect(x, y, w, h, color == BLACK);
+#endif
         }
         else Arduboy2Base::fillRect(x, y, w, h, planeColor<PLANE>(color));
     }
@@ -973,8 +997,12 @@ uint8_t const YMASK1[8] PROGMEM =
     0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff
 };
 
+#if ABG_FAST_RECT_STATIC_DISPATCH
 template<bool CLEAR>
 void fast_rect(int16_t x, int16_t y, uint8_t w, uint8_t h)
+#else
+void fast_rect(int16_t x, int16_t y, uint8_t w, uint8_t h, bool CLEAR)
+#endif
 {
     if(y >=  64) return;
     if(x >= 128) return;
@@ -1043,8 +1071,10 @@ void fast_rect(int16_t x, int16_t y, uint8_t w, uint8_t h)
     }
 }
 
+#if ABG_FAST_RECT_STATIC_DISPATCH
 template void fast_rect<true >(int16_t x, int16_t y, uint8_t w, uint8_t h);
 template void fast_rect<false>(int16_t x, int16_t y, uint8_t w, uint8_t h);
+#endif
 
 template<SpriteMode SPRITE_MODE> void draw_sprite(
     int16_t x, int16_t y,

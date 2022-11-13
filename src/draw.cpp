@@ -15,7 +15,8 @@ static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     if(!(d & 0x80))
     {
         f += d * 2;
-        f += ((nframe >> 2) & 3);
+        if(state == STATE_MAP)
+            f += ((nframe >> 2) & 3);
     }
     entry->addr = SPRITES_IMG;
     entry->frame = f;

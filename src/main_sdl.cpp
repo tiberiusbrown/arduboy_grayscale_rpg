@@ -12,6 +12,7 @@
 
 #define MUTED_PALETTE 1
 #define EXCLUDE_LAST_ROW 1
+#define GIF_FULL_PALETTE 1
 
 constexpr int FBH = EXCLUDE_LAST_ROW ? 63 : 64;
 
@@ -31,18 +32,34 @@ inline uint8_t fadef(uint8_t x)
     return uint8_t(fade_factor * x + 0.5f);
 }
 
+inline uint8_t colormap(uint8_t x)
+{
+#if MUTED_PALETTE
+    return uint8_t((fadef(x * 0x40) + 0x10) & 0xff);
+#else
+    return = uint8_t(fadef(x * 0x55) & 0xff);
+#endif
+}
+
 static void send_gif_frame(int ds = 3)
 {
     if(gif_recording)
     {
         for(int i = 0; i < 128 * FBH; ++i)
-            gif->frame[i] = pixels[0][i] + pixels[1][i] * 2;
-        gif_ds += ds;
-        if(gif_ds > 0 && 0 != memcmp(gif_prev, gif->frame, sizeof(gif_prev)))
         {
-            ge_add_frame(gif, gif_ds);
-            memcpy(gif_prev, gif->frame, sizeof(gif_prev));
-            gif_ds = 0;
+            uint8_t p = pixels[0][i] + pixels[1][i] * 2;
+#if GIF_FULL_PALETTE
+            gif->frame[i] = colormap(p);
+#else
+            gif->frame[i] = p;
+#endif
+        }
+        //gif_ds += ds;
+        //if(gif_ds > 0 && 0 != memcmp(gif_prev, gif->frame, sizeof(gif_prev)))
+        {
+            ge_add_frame(gif, ds);
+            //memcpy(gif_prev, gif->frame, sizeof(gif_prev));
+            //gif_ds = 0;
         }
     }
 }
@@ -65,6 +82,16 @@ static void screen_recording_toggle()
     }
     else
     {
+#if GIF_FULL_PALETTE
+        uint8_t palette[256 * 3];
+        for(int i = 0; i < 256; ++i)
+        {
+            palette[3 * i + 0] = i;
+            palette[3 * i + 1] = i;
+            palette[3 * i + 2] = i;
+        }
+        int depth = 8;
+#else
         uint8_t palette[] = {
 #if MUTED_PALETTE
             0x10, 0x10, 0x10,
@@ -78,7 +105,9 @@ static void screen_recording_toggle()
             0xff, 0xff, 0xff,
 #endif
         };
-        gif = ge_new_gif(fname, 128, FBH, palette, 2, -1, 0);
+        int depth = 2;
+#endif
+        gif = ge_new_gif(fname, 128, FBH, palette, depth, -1, 0);
         gif_ds = 0;
         memset(gif_prev, 0, sizeof(gif_prev));
         send_gif_frame(0);
@@ -167,11 +196,7 @@ int main(int argc, char** argv)
             int p0 = pixels[0][i];
             int p1 = pixels[1][i];
             int pf = p0 + p1 * 2;
-#if MUTED_PALETTE
-            uint8_t p = uint8_t((fadef(pf * 0x40) + 0x10) & 0xff);
-#else
-            uint8_t p = uint8_t(fadef(pf * 0x55) & 0xff);
-#endif
+            uint8_t p = colormap(pf);
             tex_pixels[i * 4 + 0] = p;
             tex_pixels[i * 4 + 1] = p;
             tex_pixels[i * 4 + 2] = p;

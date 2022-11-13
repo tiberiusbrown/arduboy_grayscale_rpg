@@ -8,10 +8,10 @@ constexpr uint8_t ASLEEP_FRAMES = 16;
 constexpr uint8_t DAMAGED_FRAMES = 8;
 
 static constexpr uint8_t PPOS[] PROGMEM = {
-    16, 9, 16, 33, 0, 14, 0, 38,
+    16, 14, 16, 33, 0, 9, 0, 28,
 };
 static constexpr uint8_t EPOS[] PROGMEM = {
-    96, 9, 96, 33, 112, 14, 112, 38,
+    96, 14, 96, 33, 112, 9, 112, 28,
 };
 
 static void move_sprite(uint8_t i, uint8_t x, uint8_t y)
@@ -326,8 +326,7 @@ void update_battle()
     switch(d.phase)
     {
     case BPHASE_ALERT:
-        pdir = (pdir + 1) & 7;
-        if(d.frame == 16)
+        if(d.frame == 24)
             d.frame = 0, d.phase = BPHASE_INTRO;
         break;
     case BPHASE_INTRO:
@@ -557,6 +556,9 @@ void render_battle()
     {
         draw_tiles();
         draw_sprites();
+        uint8_t f = d.frame;
+        if(f > 7) f = 7;
+        platform_fx_drawplusmask(58, 10, BATTLE_ALERT_IMG, f, 13, 16);
         return;
     }
     if(d.phase == BPHASE_INTRO)

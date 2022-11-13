@@ -15,7 +15,7 @@ uint8_t updown_frames;
 void loop()
 {
     a.idle();
-    if(!a.nextFrame())
+    if(!a.nextFrameDEV())
         return;
     FX::disableOLED();
     if(a.needsUpdate())

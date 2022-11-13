@@ -13,6 +13,7 @@
 #define ABG_PRECHARGE_CYCLES 1
 #define ABG_DISCHARGE_CYCLES 1
 #define ABG_FPS_DEFAULT 120
+#define ABG_FAST_RECT_STATIC_DISPATCH 0
 #include "ArduboyG.h"
 extern ArduboyGBase a;
 using int24_t = __int24;
@@ -215,8 +216,9 @@ static_assert(sizeof(sdata_battle) < 256, "battle state data too large");
 struct sdata_game_over
 {
     uint8_t fade_frame;
-    uint8_t message_frame;
-    char message[128];
+    uint8_t msg_frame;
+    uint8_t msg_lines;
+    char msg[128];
 };
 extern union sdata_t
 {
@@ -321,6 +323,7 @@ bool run_chunks(); // returns true if state interrupt occurred
 void update();
 
 // render.cpp
+void render_map();
 void render();
 
 // battle.cpp
@@ -329,3 +332,4 @@ void render_battle();
 
 // init.cpp
 void initialize();
+void new_game();
