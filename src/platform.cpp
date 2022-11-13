@@ -7,7 +7,7 @@
 #include <SDL.h>
 #include <assert.h>
 #include <string.h>
-static uint8_t SAVE_BLOCK[8192];
+static uint8_t SAVE_BLOCK[4096];
 static uint64_t ticks_when_ready = 0;
 #endif
 
@@ -473,45 +473,16 @@ void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c)
 #endif
 }
 
-#if 0
-
-void platform_fx_clear_flag(uint16_t index)
-{
-    uint16_t addr = 4096 + index / 8;
-    uint8_t mask = ~(1 << (index % 8));
-#ifdef ARDUINO
-    FX::writeEnable();
-    FX::seekCommand(SFC_WRITE, (uint24_t(FX::programSavePage) << 8) + addr);
-    FX::writeByte(mask);
-    FX::disable();
-#else
-    SAVE_BLOCK[addr] &= mask;
-#endif
-}
-
-bool platform_fx_get_flag(uint16_t index)
-{
-    uint16_t addr = 4096 + index / 8;
-    uint8_t mask = 1 << (index % 8);
-#ifdef ARDUINO
-    uint8_t data;
-    FX::readSaveBytes(addr, &data, 1);
-    return (data & mask) != 0;
-#else
-    return (SAVE_BLOCK[addr] & mask) != 0;
-#endif
-}
-
-void platform_fx_erase_save_sector(uint16_t page)
+void platform_fx_erase_save_sector()
 {
 #ifdef ARDUINO
-    FX::eraseSaveBlock(page);
+    FX::eraseSaveBlock(0);
 #else
     uint64_t now = SDL_GetTicks64();
     assert(now >= ticks_when_ready);
     ticks_when_ready = now + 150;
-    for(int i = 0; i < 256; ++i)
-        SAVE_BLOCK[page * 256 + i] = 0xff;
+    for(int i = 0; i < 4096; ++i)
+        SAVE_BLOCK[i] = 0xff;
 #endif
 }
 void platform_fx_write_save_page(uint16_t page, void const* data)
@@ -551,5 +522,3 @@ bool platform_fx_busy()
     return SDL_GetTicks64() >= ticks_when_ready;
 #endif
 }
-
-#endif

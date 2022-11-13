@@ -18,6 +18,7 @@
       "title": "arduboy_grayscale_rpg",
       "filename": "arduboy_grayscale_rpg.hex",
       "flashdata": "fxdata.bin",
+      "flashsave": "fxsave.bin",
       "device": "ArduboyFX"
     }
   ]

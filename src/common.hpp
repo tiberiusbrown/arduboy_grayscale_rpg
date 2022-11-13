@@ -303,14 +303,10 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h);
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
-#if 0
-void platform_fx_clear_flag(uint16_t index);
-bool platform_fx_get_flag(uint16_t index);
 void platform_fx_erase_save_sector(uint16_t page);
 void platform_fx_write_save_page(uint16_t page, void const* data);
 void platform_fx_read_save_page(uint16_t page, void* data);
 bool platform_fx_busy();
-#endif
 
 // draw.cpp
 void draw_tile(int16_t x, int16_t y, uint8_t t);
