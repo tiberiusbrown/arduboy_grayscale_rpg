@@ -8,6 +8,7 @@
 #include "generated/story_flags.hpp"
 
 #ifdef ARDUINO
+#define ABG_TIMER4
 #define ABG_SYNC_PARK_ROW
 #define ABG_UPDATE_EVERY_N_DEFAULT 2
 #define ABG_PRECHARGE_CYCLES 1
@@ -124,11 +125,15 @@ struct sdata_tp
     uint8_t frame;
 };
 
-struct party_member_t
+struct battle_member_t
 {
     uint8_t id;
     uint8_t hp;
     uint8_t ap;
+};
+struct party_member_t
+{
+    battle_member_t battle;
 };
 extern party_member_t party[4];
 extern uint8_t nparty;
@@ -189,7 +194,7 @@ struct sdata_battle
     uint16_t flag;
     bool remove_enemy;
     uint8_t enemy_chunk;
-    party_member_t enemies[4];
+    battle_member_t enemies[4];
     uint8_t pdef, edef; // party/enemy defender (-1 for none)
 
     uint8_t esel;       // enemy select

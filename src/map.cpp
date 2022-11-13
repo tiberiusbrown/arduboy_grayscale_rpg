@@ -89,7 +89,7 @@ static bool run_chunk()
             sdata.battle.defender_id = -1;
             sdata.battle.flag = f;
             for(auto& p : party)
-                p.ap = 0;
+                p.battle.ap = 0;
             story_flag_set(f);
             return true;
         }

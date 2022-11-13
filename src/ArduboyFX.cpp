@@ -1,5 +1,5 @@
 #include "ArduboyFX.h"
-#include <wiring.c>
+//#include <wiring.c>
 
 uint16_t FX::programDataPage; // program read only data location in flash memory
 uint16_t FX::programSavePage; // program read and write data location in flash memory
@@ -81,7 +81,7 @@ bool FX::detect()
   return readPendingLastUInt16() == 0x4152;
 }
 
-
+#if 0
 void FX::noFXReboot()
   {
     if (!detect())
@@ -95,7 +95,7 @@ void FX::noFXReboot()
       Arduboy2Core::exitToBootloader();
     }
   }
-
+#endif
 
 void FX::writeCommand(uint8_t command)
 {

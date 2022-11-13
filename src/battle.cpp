@@ -7,10 +7,15 @@ constexpr uint8_t DEFEND_Y = 20;
 constexpr uint8_t ASLEEP_FRAMES = 16;
 constexpr uint8_t DAMAGED_FRAMES = 8;
 
-static constexpr uint8_t PPOS[] PROGMEM = {
+static battle_member_t& member(uint8_t id)
+{
+    auto& d = sdata.battle;
+    return id < 4 ? party[id].battle : d.enemies[id - 4];
+}
+
+static uint8_t const BATTLE_POS[] PROGMEM =
+{
     16, 14, 16, 33, 0, 9, 0, 28,
-};
-static constexpr uint8_t EPOS[] PROGMEM = {
     96, 14, 96, 33, 112, 9, 112, 28,
 };
 
@@ -38,12 +43,12 @@ static void move_sprite_to_base(uint8_t i)
     move_sprite(i, s.bx, s.by);
 }
 
-static uint8_t get_max_hp(uint8_t i)
+static uint8_t get_max_hp(uint8_t id)
 {
     auto const& d = sdata.battle;
-    if(i < 4)
-        return pgm_read_byte(&PARTY_INFO[party[i].id].hp);
-    return pgm_read_byte(&ENEMY_INFO[d.enemies[i - 4].id].hp);
+    if(id < 4)
+        return pgm_read_byte(&PARTY_INFO[party[id].battle.id].hp);
+    return pgm_read_byte(&ENEMY_INFO[d.enemies[id - 4].id].hp);
 }
 
 static uint8_t get_speed(uint8_t i)
@@ -58,17 +63,19 @@ static void init_attack_order() {
     auto& d = sdata.battle;
     uint8_t speeds[8];
     uint8_t n = 0;
-    for(uint8_t i = 0; i < 4; ++i)
+    for(uint8_t j = 0; j < 4; ++j)
     {
-        if(party[i].id != INVALID)
+        uint8_t i = j;
+        if(member(i).id != INVALID)
         {
             speeds[n] = get_speed(i);
             d.attack_order[n++] = i;
         }
-        if(d.enemies[i].id != INVALID)
+        i += 4;
+        if(member(i).id != INVALID)
         {
-            speeds[n] = get_speed(i + 4);
-            d.attack_order[n++] = i + 4;
+            speeds[n] = get_speed(i);
+            d.attack_order[n++] = i;
         }
     }
     // sort ascending by speed
@@ -86,25 +93,17 @@ static void init_attack_order() {
 static void init_sprites()
 {
     auto& d = sdata.battle;
-    for(uint8_t i = 0; i < nparty; ++i)
+
+    for(uint8_t i = 0; i < 8; ++i)
     {
-        uint8_t id = party[i].id;
+        uint8_t id = member(i).id;
         if(id == INVALID) continue;
         auto& s = d.sprites[i];
         s.active = true;
-        s.x = pgm_read_byte(&PPOS[i * 2 + 0]);
-        s.y = pgm_read_byte(&PPOS[i * 2 + 1]);
-        s.frame_base = pgm_read_byte(&PARTY_INFO[id].sprite) * 16;
-    }
-    for(uint8_t i = 0; i < 4; ++i)
-    {
-        uint8_t id = d.enemies[i].id;
-        if(id == INVALID) continue;
-        auto& s = d.sprites[i + 4];
-        s.active = true;
-        s.x = pgm_read_byte(&EPOS[i * 2 + 0]);
-        s.y = pgm_read_byte(&EPOS[i * 2 + 1]);
-        s.frame_base = pgm_read_byte(&ENEMY_INFO[id].sprite) * 16;
+        s.x = pgm_read_byte(&BATTLE_POS[i * 2 + 0]);
+        s.y = pgm_read_byte(&BATTLE_POS[i * 2 + 1]);
+        s.frame_base = pgm_read_byte(i < 4 ?
+            &PARTY_INFO[id].sprite : &ENEMY_INFO[id].sprite) * 16;
     }
     for(auto& s : d.sprites)
     {
@@ -119,7 +118,7 @@ static void take_damage(uint8_t i, int8_t dam)
     uint8_t mhp = get_max_hp(i);
     auto& d = sdata.battle;
     auto& s = d.sprites[i];
-    uint8_t& hp = (i < 4 ? party[i].hp : d.enemies[i - 4].hp);
+    uint8_t& hp = member(i).hp;
     if(dam > 0 && (i == d.pdef || i == d.edef))
         dam = (dam + 1) / 2;
     int8_t new_hp = hp - dam;
@@ -147,8 +146,8 @@ static void battle_enemy_attack(uint8_t i)
         uint8_t n = 0;
         for(uint8_t i = 0; i < 4; ++i)
         {
-            if(party[i].id == INVALID) continue;
-            if(party[i].hp > 0) j[n++] = i;
+            if(party[i].battle.id == INVALID) continue;
+            if(party[i].battle.hp > 0) j[n++] = i;
         }
         d.defender_id = j[u8rand(n)];
     }
@@ -165,7 +164,7 @@ static void battle_next_turn()
     {
         bool defeat = true;
         for(auto const& p : party)
-            if(p.id != INVALID && p.hp > 0) defeat = false;
+            if(p.battle.id != INVALID && p.battle.hp > 0) defeat = false;
         if(defeat)
         {
             d.next_phase = BPHASE_DEFEAT;
@@ -186,10 +185,7 @@ static void battle_next_turn()
     }
 
     d.defender_id = INVALID;
-    if(d.attacker_id < 4)
-        party[d.attacker_id].ap += 1;
-    else
-        d.enemies[d.attacker_id - 4].ap += 1;
+    member(d.attacker_id).ap += 1;
     uint8_t id;
     for(;;)
     {
@@ -512,7 +508,7 @@ static void draw_health(uint8_t i)
 
     if(i < 4)
     {
-        uint8_t id = party[i].id;
+        uint8_t id = party[i].battle.id;
         char const* name = pgmptr(&PARTY_INFO[id].name);
         draw_text_prog(1, 51, name);
     }

@@ -5,14 +5,17 @@ cd /d %~dp0
 call ..\assets\_update_generated.bat subcall
 if NOT %errorlevel%==0 goto error
 
+set "remove_timer0=-D__vector_23=__attribute__((naked,weak))remove_timer0 -DREMOVE_TIMER0"
+rem set remove_timer0=
+
 cd ..\src
 set dir=%temp%/arduboy_grayscale_rpg_build
 if not exist "%dir%" mkdir %dir%
-arduino-cli.exe compile -v --log-level info ^
+arduino-cli.exe compile --clean -v --log-level info ^
     -b arduboy:avr:arduboy . ^
     --output-dir "%dir%" ^
     --build-property compiler.c.elf.extra_flags="-Wl,--relax" ^
-    --build-property compiler.c.extra_flags="-mcall-prologues -DARDUBOY_NO_USB" ^
+    --build-property compiler.c.extra_flags="-mcall-prologues %remove_timer0%" ^
     --build-property compiler.cpp.extra_flags="{compiler.c.extra_flags}"
 if NOT %errorlevel%==0 goto error
 

@@ -69,10 +69,12 @@ void draw_sprites()
         uint8_t cy = uint8_t(ty >> 6);
         int16_t ox = -int16_t(tx & 0x7f);
         int16_t oy = -int16_t(ty & 0x3f);
-        n += add_sprite_entry(&entries[n], 0, ox, oy);
-        n += add_sprite_entry(&entries[n], 1, ox + 128, oy);
-        n += add_sprite_entry(&entries[n], 2, ox, oy + 64);
-        n += add_sprite_entry(&entries[n], 3, ox + 128, oy + 64);
+        for(uint8_t i = 0; i < 4; ++i)
+        {
+            uint8_t dox = (i &  1) * 128;
+            uint8_t doy = (i >> 1) * 64;
+            n += add_sprite_entry(&entries[n], i, ox + dox, oy + doy);
+        }
     }
 
     sort_and_draw_sprites(entries, n);

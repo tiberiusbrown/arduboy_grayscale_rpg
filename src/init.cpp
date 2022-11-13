@@ -16,12 +16,12 @@ void new_game()
     chunks_are_running = false;
 
     nparty = 2;
-    party[0].id = 0;
-    party[0].hp = 20;
-    party[1].id = 1;
-    party[1].hp = 10;
-    party[2].id = 255;
-    party[3].id = 255;
+    party[0].battle.id = 0;
+    party[0].battle.hp = 20;
+    party[1].battle.id = 1;
+    party[1].battle.hp = 10;
+    party[2].battle.id = 255;
+    party[3].battle.id = 255;
 }
 
 void initialize()

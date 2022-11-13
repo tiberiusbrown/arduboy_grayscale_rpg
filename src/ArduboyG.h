@@ -725,6 +725,13 @@ struct ArduboyG_Common : public BASE
     ABG_NOT_SUPPORTED static void display();
     ABG_NOT_SUPPORTED static void display(bool);
 
+    // expose internal Arduboy2Core methods
+    static void setCPUSpeed8MHz() { BASE::setCPUSpeed8MHz(); }
+    static void bootSPI        () { BASE::bootSPI        (); }
+    static void bootOLED       () { BASE::bootOLED       (); }
+    static void bootPins       () { BASE::bootPins       (); }
+    static void bootPowerSaving() { BASE::bootPowerSaving(); }
+    
 protected:
     
     static void doDisplay()
@@ -732,18 +739,19 @@ protected:
         uint8_t* b = getBuffer();
         
 #if defined(ABG_SYNC_THREE_PHASE)
-        if(current_phase == 1)
+        uint8_t phase = current_phase;
+        if(phase == 1)
         {
             if(MODE == ABG_Mode::L4_Contrast)
                 send_cmds(0x81, (current_plane & 1) ? contrast : contrast / 2);
             send_cmds_prog<0xA8, 7, 0x22, 0, 7>();
         }
-        else if(current_phase == 2)
+        else if(phase == 2)
         {
             paint(&b[128 * 7], false, 1, 0xf0);
             send_cmds_prog<0x22, 0, 7>();
         }
-        else if(current_phase == 3)
+        else if(phase == 3)
         {
             send_cmds_prog<0x22, 0, 7>();
             paint(&b[128 * 7], false, 1, 0xff);
