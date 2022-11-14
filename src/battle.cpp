@@ -607,7 +607,7 @@ void render_battle()
     }
     if(d.next_phase == BPHASE_DEFEAT)
     {
-        uint8_t fade_frame = uint8_t(-d.frame);
+        uint8_t fade_frame = uint8_t(-d.frame) * FADE_SPEED;
         if(fade_frame < 16)
             platform_fade(fade_frame);
     }

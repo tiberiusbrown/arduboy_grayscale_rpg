@@ -1,6 +1,6 @@
 Defenders take half damage from all attacks.
 Defenders gain AP each time they are damaged by an attack.
-Defenders force all targetable attacks toward themselves.
+Defenders direct all targetable attacks toward themselves.
 Each character's speed stat determines attack order during a battle.
 Legends tell of an amulet which allows attacking twice per turn...
 An ancient people, the Ardu are but myths now.

@@ -697,8 +697,15 @@ struct ArduboyG_Common : public BASE
     
     static bool nextFrame()
     {
-        if(!needs_display) return false;
+        uint8_t sreg = SREG;
+        cli();
+        if(!needs_display)
+        {
+            SREG = sreg;
+            return false;
+        }
         needs_display = false;
+        SREG = sreg;
         doDisplay();
 #if defined(ABG_SYNC_THREE_PHASE)
         return current_phase == 3;

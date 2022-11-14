@@ -488,7 +488,7 @@ void platform_fx_erase_save_sector()
 void platform_fx_write_save_page(uint16_t page, void const* data)
 {
 #ifdef ARDUINO
-    // eww cast to non const
+    // eww cast to non const (writeSavePage doesn't modify data though)
     FX::writeSavePage(page, (uint8_t*)data);
 #else
     uint64_t now = SDL_GetTicks64();

@@ -1,9 +1,10 @@
 #pragma once
 
-#define TELEPORT_TRANSITION_FRAMES 16
-#define FADE_USING_CONTRAST 1
-
 #include <stdint.h>
+
+constexpr uint8_t TELEPORT_TRANSITION_FRAMES = 16;
+constexpr uint8_t FADE_SPEED = 2;
+#define FADE_USING_CONTRAST 1
 
 #include "generated/story_flags.hpp"
 
@@ -11,7 +12,7 @@
 #define ABG_TIMER4
 #define ABG_SYNC_PARK_ROW
 #define ABG_UPDATE_EVERY_N_DEFAULT 2
-#define ABG_PRECHARGE_CYCLES 1
+#define ABG_PRECHARGE_CYCLES 2
 #define ABG_DISCHARGE_CYCLES 1
 #define ABG_FPS_DEFAULT 120
 #define ABG_FAST_RECT_STATIC_DISPATCH 0
@@ -107,6 +108,7 @@ enum
     STATE_TP,     // player is teleporting (e.g., entering building or cave)
     STATE_BATTLE,
     STATE_GAME_OVER,
+    STATE_SAVE,
 };
 extern uint8_t state;
 
@@ -142,12 +144,6 @@ struct battle_member_t
     uint8_t hp;
     uint8_t ap;
 };
-struct party_member_t
-{
-    battle_member_t battle;
-};
-extern party_member_t party[4];
-extern uint8_t nparty;
 
 struct enemy_info_t
 {
@@ -237,6 +233,10 @@ struct sdata_game_over
     bool going_to_resume;
     char msg[128];
 };
+struct sdata_save
+{
+
+};
 extern union sdata_t
 {
     sdata_title title;
@@ -245,15 +245,35 @@ extern union sdata_t
     sdata_tp tp;
     sdata_battle battle;
     sdata_game_over game_over;
+    sdata_save save;
 } sdata;
 void change_state(uint8_t new_state);
 
-extern uint8_t pdir;        // player direction
 extern bool pmoving;        // whether player is moving
-extern uint16_t px, py;     // player position (in pixels)
 extern uint16_t selx, sely; // selected tile
 
-extern uint8_t story_flags[STORY_FLAG_BYTES];
+struct party_member_t
+{
+    battle_member_t battle;
+};
+
+struct savefile_t
+{
+    uint16_t px, py;     // player position (in pixels)
+    uint8_t pdir;        // player direction
+    uint8_t nparty;
+    party_member_t party[4];
+    uint8_t story_flags[STORY_FLAG_BYTES];
+};
+extern savefile_t savefile;
+
+static auto& px = savefile.px;
+static auto& py = savefile.py;
+static auto& pdir = savefile.pdir;
+static auto& party = savefile.party;
+static auto& nparty = savefile.nparty;
+static auto& story_flags = savefile.story_flags;
+
 void story_flag_set(uint16_t index);
 void story_flag_clr(uint16_t index);
 void story_flag_tog(uint16_t index);
@@ -288,6 +308,10 @@ extern uint8_t btns_down, btns_pressed;
 extern uint16_t rand_seed;
 uint8_t u8rand();
 uint8_t u8rand(uint8_t m);
+
+// save.cpp
+void update_save();
+void render_save();
 
 // platform.cpp
 //     platform abstraction methods

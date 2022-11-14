@@ -84,9 +84,7 @@ sdata_t sdata;
 
 uint8_t nframe;
 
-uint8_t pdir;
 bool pmoving;
-uint16_t px, py;
 uint16_t selx, sely;
 
 active_chunk_t active_chunks[4];
@@ -98,7 +96,4 @@ uint8_t running_chunk;
 uint8_t chunk_instr;
 int8_t chunk_regs[16];
 
-uint8_t story_flags[STORY_FLAG_BYTES];
-
-party_member_t party[4];
-uint8_t nparty;
+savefile_t savefile;

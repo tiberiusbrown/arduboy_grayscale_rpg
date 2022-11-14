@@ -39,6 +39,7 @@ add_executable(arduboy_grayscale_rpg ${EXEFLAG}
     src/map.cpp
     src/platform.cpp
     src/render.cpp
+    src/save.cpp
     src/script_commands.hpp
     src/tile_solid.hpp
     src/update.cpp

@@ -241,7 +241,7 @@ static void update_game_over()
     if(d.going_to_resume)
     {
         if(d.fade_frame < 24)
-            ++d.fade_frame;
+            d.fade_frame += FADE_SPEED;
         else
             change_state(STATE_RESUME);
     }
@@ -256,7 +256,8 @@ static void update_game_over()
             for(auto& c : d.msg)
                 if(c == '\n') ++d.msg_lines, c = '\0';
         }
-        if(d.fade_frame < 24) ++d.fade_frame;
+        if(d.fade_frame < 24)
+            d.fade_frame += FADE_SPEED;
         else if(btns_pressed & (BTN_A | BTN_B))
             d.fade_frame = 8, d.going_to_resume = true;
     }
@@ -268,15 +269,15 @@ static void update_title()
     if(d.going_to_resume)
     {
         if(d.fade_frame < 16)
-            ++d.fade_frame;
+            d.fade_frame += FADE_SPEED;
         else
             change_state(STATE_RESUME);
     }
     else
     {
         if(d.fade_frame < 24)
-            ++d.fade_frame;
-        if(btns_pressed & BTN_A)
+            d.fade_frame += FADE_SPEED;
+        else if(btns_pressed & BTN_A)
             d.fade_frame = 0, d.going_to_resume = true;
     }
 }
@@ -291,7 +292,7 @@ static void update_resume()
         run_chunks();
     }
     if(d.fade_frame < 24)
-        ++d.fade_frame;
+        d.fade_frame += FADE_SPEED;
     else
         change_state(STATE_MAP);
 }
@@ -307,6 +308,7 @@ void update()
         update_tp,
         update_battle,
         update_game_over,
+        update_save,
     };
 
     pmoving = false;
