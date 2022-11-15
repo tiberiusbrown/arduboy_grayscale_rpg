@@ -9,13 +9,12 @@ constexpr uint8_t FADE_SPEED = 2;
 #include "generated/story_flags.hpp"
 
 #ifdef ARDUINO
-#define ABG_TIMER4
+//#define ABG_TIMER4
 #define ABG_SYNC_PARK_ROW
 #define ABG_UPDATE_EVERY_N_DEFAULT 2
 #define ABG_PRECHARGE_CYCLES 2
 #define ABG_DISCHARGE_CYCLES 1
 #define ABG_FPS_DEFAULT 132
-#define ABG_FAST_RECT_STATIC_DISPATCH 0
 #include "ArduboyG.h"
 extern ArduboyGBase a;
 using int24_t = __int24;

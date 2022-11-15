@@ -43,10 +43,12 @@ def convert(fout, sym, fname, sw, sh, num = 0, start = 0):
 BASE = '../src/generated/'
 BINBASE = '../arduboy_build/'
 
-convert(BASE + 'tile_img.hpp', 'TILE_IMG_PROG', 'tiles.png', 16, 16, 64, 0)
+#convert(BASE + 'tile_img.hpp', 'TILE_IMG_PROG', 'tiles.png', 16, 16, 64, 0)
+#convert(BINBASE + 'tile_img.bin', '', 'tiles.png', 16, 16, 192, 64)
+convert(BINBASE + 'tile_img.bin', '', 'tiles.png', 16, 16)
+
 convert(BASE + 'rounded_borders_white_img.hpp', 'ROUNDED_BORDERS_WHITE_IMG_PROG', 'rounded_borders_white.png', 3, 8)
 convert(BASE + 'rounded_borders_black_img.hpp', 'ROUNDED_BORDERS_BLACK_IMG_PROG', 'rounded_borders_black.png', 2, 8)
-convert(BINBASE + 'tile_img.bin', '', 'tiles.png', 16, 16, 192, 64)
 
 convert(BINBASE + 'portrait_img.bin', '', 'portraits.png', 32, 32)
 convert(BINBASE + 'player_img.bin', '', 'player_sprites.png', 16, 16)

@@ -99,10 +99,6 @@ Example Usage:
 #define ABG_TIMER3
 #endif
 
-#ifdef ARDUBOYFX_H
-#define ABG_FX
-#endif
-
 #undef BLACK
 #undef WHITE
 constexpr uint8_t BLACK      = 0;
@@ -357,7 +353,17 @@ struct ArduboyG_Common : public BASE
         uint8_t w,
         uint8_t color = WHITE)
     {
-        Arduboy2Base::drawFastHLine(x, y, w, planeColor(current_plane, color));
+        if(FLAGS & ABG_Flags::OptimizeFillRect)
+        {
+            color = planeColor(current_plane, color);
+#ifdef ABG_FAST_RECT_STATIC_DISPATCH
+            if(color) fast_rect<false>(x, y, w, 1);
+            else      fast_rect<true >(x, y, w, 1);
+#else
+            fast_rect(x, y, w, 1, color == BLACK);
+#endif
+        }
+        else Arduboy2Base::drawFastHLine(x, y, w, planeColor(current_plane, color));
     }
     
     template<uint8_t PLANE>
@@ -366,7 +372,17 @@ struct ArduboyG_Common : public BASE
         uint8_t w,
         uint8_t color = WHITE)
     {
-        Arduboy2Base::drawFastHLine(x, y, w, planeColor<PLANE>(color));
+        if(FLAGS & ABG_Flags::OptimizeFillRect)
+        {
+            color = planeColor<PLANE>(color);
+#ifdef ABG_FAST_RECT_STATIC_DISPATCH
+            if(color) fast_rect<false>(x, y, w, 1);
+            else      fast_rect<true >(x, y, w, 1);
+#else
+            fast_rect(x, y, w, 1, color == BLACK);
+#endif
+        }
+        else Arduboy2Base::drawFastHLine(x, y, w, planeColor<PLANE>(color));
     }
     
     static void drawFastVLine(
@@ -630,14 +646,6 @@ struct ArduboyG_Common : public BASE
                 frame += 1;
             Sprites::drawOverwrite(x, y, bitmap, frame);
         }
-    }
-    
-    void drawOverwriteFX(
-        int16_t x, int16_t y,
-        uint8_t const* bitmap,
-        uint8_t frame)
-    {
-        
     }
     
     void drawOverwriteMonochrome(
@@ -1056,6 +1064,8 @@ void fast_rect(int16_t x, int16_t y, uint8_t w, uint8_t h, bool CLEAR)
         w += int8_t(x);
         x0 = 0;
     }
+    if(x0 + w > 128)
+        w = 128 - x0;
 
     uint8_t t0 = y0 & 0xf8;
     uint8_t t1 = y1 & 0xf8;

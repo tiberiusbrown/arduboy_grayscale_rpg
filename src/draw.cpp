@@ -1,9 +1,13 @@
 #include "common.hpp"
 
+#define TILES_IN_PROG 0
+
 #include "font_adv.hpp"
 #include "generated/font_img.hpp"
 #include "generated/fxdata.h"
+#if TILES_IN_PROG > 0
 #include "generated/tile_img.hpp"
+#endif
 #include "generated/rounded_borders_white_img.hpp"
 #include "generated/rounded_borders_black_img.hpp"
 
@@ -91,10 +95,14 @@ void draw_player()
 
 void draw_tile(int16_t x, int16_t y, uint8_t t)
 {
-    if(t < 64)
+#if TILES_IN_PROG > 0
+    if(t < TILES_IN_PROG)
         platform_drawoverwrite(x, y, TILE_IMG_PROG, t);
     else
-        platform_fx_drawoverwrite(x, y, TILE_IMG, t - 64, 16, 16);
+        platform_fx_drawoverwrite(x, y, TILE_IMG, t - TILES_IN_PROG, 16, 16);
+#else
+    platform_fx_drawoverwrite(x, y, TILE_IMG, t, 16, 16);
+#endif
 }
 
 static void draw_chunk_tiles(uint8_t i, int16_t ox, int16_t oy)
