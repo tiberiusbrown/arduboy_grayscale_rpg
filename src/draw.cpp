@@ -4,6 +4,8 @@
 #include "generated/font_img.hpp"
 #include "generated/fxdata.h"
 #include "generated/tile_img.hpp"
+#include "generated/rounded_borders_white_img.hpp"
+#include "generated/rounded_borders_black_img.hpp"
 
 static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
                                       int16_t ox, int16_t oy)
@@ -203,9 +205,33 @@ void wrap_text(char* str, uint8_t w)
     }
 }
 
-void draw_frame(uint8_t x, uint8_t y, uint8_t w, uint8_t h)
+void draw_frame_white(int16_t x, int16_t y, uint8_t w, uint8_t h)
 {
     platform_fillrect(x, y, w, h, BLACK);
     platform_drawrect(x, y, w, h, WHITE);
     return;
+}
+
+void draw_rounded_frame_white(int16_t x, int16_t y, uint8_t w, uint8_t h)
+{
+    draw_frame_white(x, y, w, h);
+    platform_drawoverwrite(x        , y        , ROUNDED_BORDERS_WHITE_IMG_PROG, 0);
+    platform_drawoverwrite(x + w - 3, y        , ROUNDED_BORDERS_WHITE_IMG_PROG, 1);
+    platform_drawoverwrite(x        , y + h - 8, ROUNDED_BORDERS_WHITE_IMG_PROG, 2);
+    platform_drawoverwrite(x + w - 3, y + h - 8, ROUNDED_BORDERS_WHITE_IMG_PROG, 3);
+}
+
+void draw_frame_black(int16_t x, int16_t y, uint8_t w, uint8_t h)
+{
+    platform_fillrect(x, y, w, h, BLACK);
+    return;
+}
+
+void draw_rounded_frame_black(int16_t x, int16_t y, uint8_t w, uint8_t h)
+{
+    draw_frame_black(x, y, w, h);
+    platform_drawoverwrite(x        , y        , ROUNDED_BORDERS_BLACK_IMG_PROG, 0);
+    platform_drawoverwrite(x + w - 2, y        , ROUNDED_BORDERS_BLACK_IMG_PROG, 1);
+    platform_drawoverwrite(x        , y + h - 8, ROUNDED_BORDERS_BLACK_IMG_PROG, 2);
+    platform_drawoverwrite(x + w - 2, y + h - 8, ROUNDED_BORDERS_BLACK_IMG_PROG, 3);
 }

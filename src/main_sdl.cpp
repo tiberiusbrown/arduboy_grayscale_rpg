@@ -35,7 +35,7 @@ inline uint8_t fadef(uint8_t x)
 inline uint8_t colormap(uint8_t x)
 {
 #if MUTED_PALETTE
-    return uint8_t((fadef(x * 0x40) + 0x10) & 0xff);
+    return uint8_t((fadef(x * 0x38) + 0x10) & 0xff);
 #else
     return = uint8_t(fadef(x * 0x55) & 0xff);
 #endif

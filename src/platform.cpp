@@ -139,6 +139,7 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
         if(x + width > WIDTH) renderwidth = WIDTH - x;
         else renderwidth = width;
     }
+    uint8_t no_reseek = (width == renderwidth);
 
     // determine render height
     int16_t skiptop;     // pixel to be skipped at the top
@@ -204,12 +205,16 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
         "   sbrs    r0, %[spif]                         \n"
         "   rjmp    .-6                                 \n"
         "   out     %[spdr], r1                         \n" // SPDR = 0;
+
+        "6: ;skip_seek:                                 \n"
+
         "                                               \n"
         "   lsl     %[mode]                             \n" // 'clear' mode
                                                             // dbfExtraRow by
                                                             // shifting into
                                                             // carry
-        "   cpi     %[displayrow], %[lastrow]           \n"
+        //"   cpi     %[displayrow], %[lastrow]           \n"
+        "   cpi     %[displayrow], 7                    \n"
         "   brge    .+4                                 \n" // row >= lastrow,
                                                             // clear carry
         "   sec                                         \n" // row < lastrow set
@@ -245,18 +250,19 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
         "   in      r0, %[spdr]                         \n" // read bitmap data
         "   out     %[spdr], r1                         \n" // start next read
         "                                               \n"
-        "   sbrc    %[mode], %[reverseblack]            \n" // test reverse mode
-        "   eor     r0, %[rowmask]                      \n" // reverse bitmap
+        //"   sbrc    %[mode], %[reverseblack]            \n" // test reverse mode
+        //"   eor     r0, %[rowmask]                      \n" // reverse bitmap
                                                             // data
-        "   mov     r24, %[rowmask]                     \n" // temporary move
+        //"   mov     r24, %[rowmask]                     \n" // temporary move
                                                             // rowmask
-        "   sbrc    %[mode], %[whiteblack]              \n" // for black and
+        //"   sbrc    %[mode], %[whiteblack]              \n" // for black and
                                                             // white modes:
-        "   mov     r24, r0                             \n" // rowmask = bitmap
-        "   sbrc    %[mode], %[black]                   \n" // for black mode:
-        "   clr     r0                                  \n" // bitmap = 0
+        //"   mov     r24, r0                             \n" // rowmask = bitmap
+        //"   sbrc    %[mode], %[black]                   \n" // for black mode:
+        //"   clr     r0                                  \n" // bitmap = 0
         "   mul     r0, %[yshift]                       \n"
         "   movw    %[bitmap], r0                       \n" // bitmap *= yshift
+        "   mov     r0, %[rowmask]                      \n"
         "   bst     %[mode], %[masked]                  \n" // if bitmap has no
                                                             // mask:
         "   brtc    3f ;render_mask                     \n" // skip next part
@@ -266,13 +272,14 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
                                                             // cycles more for
                                                             // SPI data ready
         "   lpm                                         \n"
+        "   lpm                                         \n"
         "   clr     r1                                  \n" // restore zero reg
         "                                               \n"
         "   in      r0, %[spdr]                         \n" // read mask data
         "   out     %[spdr],r1                          \n" // start next read
-        "   sbrc    %[mode], %[whiteblack]              \n" //
+        //"   sbrc    %[mode], %[whiteblack]              \n" //
         "3: ;render_mask:                               \n"
-        "   mov     r0, r24                             \n" // get mask in r0
+        //"   mov     r0, r24                             \n" // get mask in r0
         "   mul     r0, %[yshift]                       \n" // mask *= yshift
         ";render_page0:                                 \n"
         "   cpi     %[displayrow], 0                    \n" // skip if
@@ -281,7 +288,7 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
         "                                               \n"
         "   ld      r24, %a[buffer]                     \n" // do top row or to
                                                             // row half
-        "   sbrs    %[mode],%[invert]                   \n" // skip 1st eor for
+        //"   sbrs    %[mode],%[invert]                   \n" // skip 1st eor for
                                                             // invert mode
         "   eor     %A[bitmap], r24                     \n"
         "   and     %A[bitmap], r0                      \n" // and with mask LSB
@@ -296,7 +303,7 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
         "                                               \n"
         "   ld      r24, %a[buffer]                     \n" // do shifted 2nd
                                                             // half
-        "   sbrs    %[mode], %[invert]                  \n" // skip 1st eor for
+        //"   sbrs    %[mode], %[invert]                  \n" // skip 1st eor for
                                                             // invert mode
         "   eor     %B[bitmap], r24                     \n"
         "   and     %B[bitmap], r1                      \n" // and with mask MSB
@@ -319,24 +326,30 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
                                                             // 8
         "   inc     %[displayrow]                       \n" // displayrow++
         "   in      r0, %[spsr]                         \n" // clear SPI status
-        "   sbi     %[fxport], %[fxbit]                 \n" // disable external
-                                                            // flash
+
         "   cp      r1, %[renderheight]                 \n" // while
                                                             // (renderheight >
                                                             // 0)
-        "   brge    .+2                                 \n"
+        "   brge    7f                                  \n"
+        
+        "   sbrc    %[no_reseek], 0                     \n" // skip to next row
+        "   rjmp    6b ;skip_seek                       \n" // if no reseek
+        "   sbi     %[fxport], %[fxbit]                 \n" // disable external
+                                                            // flash
         "   rjmp    1b ;render_row                      \n"
+        "7: sbi     %[fxport], %[fxbit]                 \n" // disable external
+                                                            // flash
         : [address] "+r"(address), [mode] "+r"(mode), [rowmask] "=&d"(rowmask),
         [bitmap] "=&r"(bitmap), [renderheight] "+d"(renderheight),
         [displayrow] "+d"(displayrow)
         : [width] "r"(width), [height] "r"(height), [yshift] "r"(yshift),
-        [renderwidth] "r"(renderwidth),
+        [renderwidth] "r"(renderwidth), [no_reseek] "r"(no_reseek),
         [buffer] "e"(Arduboy2Base::sBuffer + displayoffset),
 
         [fxport] "I"(_SFR_IO_ADDR(FX_PORT)), [fxbit] "I"(FX_BIT),
         [cmd] "I"(SFC_READ), [spdr] "I"(_SFR_IO_ADDR(SPDR)),
         [datapage] ""(&FX::programDataPage), [spsr] "I"(_SFR_IO_ADDR(SPSR)),
-        [spif] "I"(SPIF), [lastrow] "I"(HEIGHT / 8 - 1),
+        [spif] "I"(SPIF), //[lastrow] "I"(HEIGHT / 8 - 1),
         [displaywidth] ""(WIDTH), [reverseblack] "I"(dbfReverseBlack),
         [whiteblack] "I"(dbfWhiteBlack), [black] "I"(dbfBlack),
         [masked] "I"(dbfMasked), [invert] "I"(dbfInvert),

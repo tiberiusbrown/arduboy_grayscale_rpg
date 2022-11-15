@@ -74,8 +74,7 @@ Example Usage:
 
     void loop()
     {
-        if(!a.nextFrame())
-            return;
+        a.waitForNextFrame();
         if(a.needsUpdate())
             update();
         render();
@@ -86,6 +85,8 @@ Example Usage:
 #pragma once
 
 #include <Arduboy2.h>
+
+#include <avr/sleep.h>
 
 #if !defined(ABG_SYNC_THREE_PHASE) && \
     !defined(ABG_SYNC_PARK_ROW) && \
@@ -695,34 +696,43 @@ struct ArduboyG_Common : public BASE
         return false;
     }
     
+    static void waitForNextFrame()
+    {
+        do
+        {
+            cli();
+            for(;;)
+            {
+                if(needs_display)
+                    break;
+                sleep_enable();
+                sei();
+                sleep_cpu();
+                sleep_disable();
+                cli();
+            }
+            needs_display = false;
+            sei();
+            doDisplay();
+        }
+#if defined(ABG_SYNC_THREE_PHASE)
+        while(current_phase != 3);
+#elif defined(ABG_SYNC_PARK_ROW) || defined(ABG_SYNC_SLOW_DRIVE)
+        while(0);
+#endif
+    }
+    
     static bool nextFrame()
     {
-        uint8_t sreg = SREG;
-        cli();
-        if(!needs_display)
-        {
-            SREG = sreg;
-            return false;
-        }
-        needs_display = false;
-        SREG = sreg;
-        doDisplay();
-#if defined(ABG_SYNC_THREE_PHASE)
-        return current_phase == 3;
-#elif defined(ABG_SYNC_PARK_ROW) || defined(ABG_SYNC_SLOW_DRIVE)
+        waitForNextFrame();
         return true;
-#endif
     }
     static bool nextFrameDEV()
     {
-        bool r = nextFrame();
-        if(needs_display)
-            TXLED1;
-        else
-            TXLED0;
-        return r;
+        waitForNextFrame();
+        return true;
     }
-    
+        
     ABG_NOT_SUPPORTED static void flipVertical();
     ABG_NOT_SUPPORTED static void paint8Pixels(uint8_t);
     ABG_NOT_SUPPORTED static void paintScreen(uint8_t const*);

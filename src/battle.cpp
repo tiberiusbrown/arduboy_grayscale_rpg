@@ -179,7 +179,9 @@ static void battle_next_turn()
             if(e.id != INVALID && e.hp > 0) victory = false;
         if(victory)
         {
-            d.phase = BPHASE_VICTORY;
+            d.next_phase = BPHASE_OUTRO;
+            d.phase = BPHASE_DELAY;
+            d.frame = -32;
             return;
         }
     }
@@ -402,7 +404,7 @@ void update_battle()
         d.frame = -20;
         d.phase = BPHASE_DELAY;
         d.next_phase = BPHASE_ATTACK3;
-        take_damage(d.defender_id, d.defender_id < 4 ? 20 : 5);
+        take_damage(d.defender_id, d.defender_id < 4 ? 1 : 10);
         break;
     case BPHASE_ATTACK3:
     {
@@ -437,13 +439,13 @@ void update_battle()
     case BPHASE_DEFEAT:
         change_state(STATE_GAME_OVER);
         break;
-    case BPHASE_VICTORY:
-
-        break;
     case BPHASE_OUTRO:
-        // resume state
-        if(!(chunks_are_running && run_chunks()))
-            change_state(STATE_MAP);
+        if(d.frame == 33)
+        {
+            // resume state
+            if(!(chunks_are_running && run_chunks()))
+                change_state(STATE_MAP);
+        }
         break;
     default: break;
     }
@@ -548,7 +550,8 @@ static void draw_battle_sprites()
 void render_battle()
 {
     auto const& d = sdata.battle;
-    if(d.phase == BPHASE_ALERT)
+    uint8_t phase = d.phase;
+    if(phase == BPHASE_ALERT)
     {
         draw_tiles();
         draw_sprites();
@@ -557,13 +560,14 @@ void render_battle()
         platform_fx_drawplusmask(58, 10, BATTLE_ALERT_IMG, f, 13, 16);
         return;
     }
-    if(d.phase == BPHASE_INTRO)
+    if(phase == BPHASE_INTRO || phase == BPHASE_OUTRO)
     {
         int16_t x;
         if(d.frame <= 8) x = 128 - d.frame * 16;
         else if(d.frame <= 24) x = (8 - d.frame);
         else x = -16 - (d.frame - 24) * 16;
-        if(d.frame <= 8)
+        if( (phase == BPHASE_INTRO && d.frame <= 8) ||
+            (phase == BPHASE_OUTRO && d.frame > 24))
         {
             draw_tiles();
             draw_sprites();
@@ -572,28 +576,38 @@ void render_battle()
             draw_battle_background();
             draw_battle_sprites();
         }
-        platform_fx_drawoverwrite(-(x + 16), 0, BATTLE_BANNER_IMG, 0, 144, 24);
-        platform_fx_drawoverwrite(x, 24, BATTLE_START_IMG, 0, 144, 16);
-        platform_fx_drawoverwrite(-(x + 16), 40, BATTLE_BANNER_IMG, 0, 144, 24);
+        int16_t x2 = -(x + 16);
+        for(uint8_t i = 0; i < 24; i += 8)
+        {
+            for(uint8_t j = 0; j < 144; j += 16)
+            {
+                uint8_t c = (i + (j >> 1)) & 8 ? DARK_GRAY : BLACK;
+                platform_fillrect(x2 + j, i     , 16, 8, c);
+                platform_fillrect(x2 + j, i + 40, 16, 8, c);
+            }
+        }
+        uint8_t f = (phase == BPHASE_INTRO ? 0 : 1);
+        platform_fx_drawoverwrite(x, 24, BATTLE_BANNERS_IMG, f, 144, 16);
         return;
     }
     draw_battle_background();
     draw_battle_sprites();
-    if(d.menuy > -45)
+    int8_t menuy = d.menuy;
+    if(menuy > -45)
     {
-        platform_fx_drawplusmask(51, d.menuy, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
-        platform_fx_drawplusmask(74, d.menuy, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
-        platform_fx_drawoverwrite(48, d.menuy + 8, BATTLE_MENU_IMG, 0, 32, 40);
-        draw_text_prog(50, d.menuy + 9 + d.msely, PSTR("\x7f"));
+        platform_fx_drawplusmask(51, menuy, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
+        platform_fx_drawplusmask(74, menuy, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
+        platform_fx_drawoverwrite(48, menuy + 8, BATTLE_MENU_IMG, 0, 32, 40);
+        draw_text_prog(50, menuy + 9 + d.msely, PSTR("\x7f"));
     }
-    if(d.phase == BPHASE_MENU || d.phase == BPHASE_ESEL)
+    if(phase == BPHASE_MENU || phase == BPHASE_ESEL)
     {
         auto const& s = d.sprites[d.attacker_id];
         draw_selection_outline(s.x, s.y);
-        if(d.phase == BPHASE_MENU && d.attacker_id != INVALID)
+        if(phase == BPHASE_MENU && d.attacker_id != INVALID)
             draw_health(d.attacker_id);
     }
-    if(d.phase == BPHASE_ESEL)
+    if(phase == BPHASE_ESEL)
     {
         auto const& s = d.sprites[d.esel];
         draw_selection_arrow(s.x, s.y);

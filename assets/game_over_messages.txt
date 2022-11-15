@@ -4,3 +4,6 @@ Defenders direct all targetable attacks toward themselves.
 Each character's speed stat determines attack order during a battle.
 Legends tell of an amulet which allows attacking twice per turn...
 An ancient people, the Ardu are but myths now.
+Courage shall triumph in the end.
+Strength is perfected through weakness.
+Many Ardu champions of yore gave their lives for the cause.

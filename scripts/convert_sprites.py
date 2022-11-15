@@ -44,6 +44,8 @@ BASE = '../src/generated/'
 BINBASE = '../arduboy_build/'
 
 convert(BASE + 'tile_img.hpp', 'TILE_IMG_PROG', 'tiles.png', 16, 16, 64, 0)
+convert(BASE + 'rounded_borders_white_img.hpp', 'ROUNDED_BORDERS_WHITE_IMG_PROG', 'rounded_borders_white.png', 3, 8)
+convert(BASE + 'rounded_borders_black_img.hpp', 'ROUNDED_BORDERS_BLACK_IMG_PROG', 'rounded_borders_black.png', 2, 8)
 convert(BINBASE + 'tile_img.bin', '', 'tiles.png', 16, 16, 192, 64)
 
 convert(BINBASE + 'portrait_img.bin', '', 'portraits.png', 32, 32)
@@ -54,8 +56,7 @@ convert(BINBASE + 'battle_menu_chain_img.bin', '', 'battle_menu_chain.png', 3, 8
 convert(BINBASE + 'battle_menu_img.bin', '', 'battle_menu.png', 32, 40)
 convert(BINBASE + 'battle_attacker_img.bin', '', 'battle_attacker.png', 9, 8)
 convert(BINBASE + 'battle_arrow_img.bin', '', 'battle_arrow.png', 9, 8)
-convert(BINBASE + 'battle_start_img.bin', '', 'battle_start.png', 144, 16)
-convert(BINBASE + 'battle_banner_img.bin', '', 'battle_banner.png', 144, 24)
+convert(BINBASE + 'battle_banners_img.bin', '', 'battle_banners.png', 144, 16)
 convert(BINBASE + 'battle_select_img.bin', '', 'battle_select.png', 22, 24)
 convert(BINBASE + 'battle_alert_img.bin', '', 'battle_alert.png', 13, 16)
 convert(BINBASE + 'game_over_img.bin', '', 'game_over.png', 128, 64)

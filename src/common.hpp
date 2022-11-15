@@ -14,7 +14,7 @@ constexpr uint8_t FADE_SPEED = 2;
 #define ABG_UPDATE_EVERY_N_DEFAULT 2
 #define ABG_PRECHARGE_CYCLES 2
 #define ABG_DISCHARGE_CYCLES 1
-#define ABG_FPS_DEFAULT 120
+#define ABG_FPS_DEFAULT 132
 #define ABG_FAST_RECT_STATIC_DISPATCH 0
 #include "ArduboyG.h"
 extern ArduboyGBase a;
@@ -177,8 +177,7 @@ enum battle_phase_t
     BPHASE_SPRITES, // wait until sprites are done
     BPHASE_DELAY,   // delay until frame == 0 (set frame to -N)
     BPHASE_DEFEAT,
-    BPHASE_VICTORY,
-    BPHASE_OUTRO,   // fancy "Victory!"
+    BPHASE_OUTRO,
 };
 struct battle_sprite_t
 {
@@ -339,7 +338,10 @@ void draw_text_prog(uint8_t x, uint8_t y, char const* str); // str in PROGMEM
 void wrap_text(char* str, uint8_t w); // replace ' ' with '\n' to wrap to width
 uint8_t text_width(char const* str);
 uint8_t text_width_prog(char const* str);
-void draw_frame(uint8_t x, uint8_t y, uint8_t w, uint8_t h);
+void draw_frame_white(int16_t x, int16_t y, uint8_t w, uint8_t h);
+void draw_rounded_frame_white(int16_t x, int16_t y, uint8_t w, uint8_t h);
+void draw_frame_black(int16_t x, int16_t y, uint8_t w, uint8_t h);
+void draw_rounded_frame_black(int16_t x, int16_t y, uint8_t w, uint8_t h);
 void draw_tiles();
 void draw_player();
 void draw_sprites();

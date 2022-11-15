@@ -250,7 +250,8 @@ static void update_game_over()
         if(d.msg[0] == '\0')
         {
             uint8_t n = u8rand(NUM_GAME_OVER_MESSAGES);
-            platform_fx_read_data_bytes(GAME_OVER_MESSAGES + n * 128, d.msg, 128);
+            platform_fx_read_data_bytes(
+                GAME_OVER_MESSAGES + n * GAME_OVER_MESSAGE_LEN, d.msg, 128);
             wrap_text(d.msg, 106);
             d.msg_lines = 1;
             for(auto& c : d.msg)
