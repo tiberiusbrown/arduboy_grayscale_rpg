@@ -205,6 +205,23 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
         "   sbrs    r0, %[spif]                         \n"
         "   rjmp    .-6                                 \n"
         "   out     %[spdr], r1                         \n" // SPDR = 0;
+        "                                               \n"
+        "   ldi     %[rowmask], 0x02                    \n" // rowmask = 0xFF >>
+                                                            // (8 - (height &
+                                                            // 7));
+        "   sbrc    %[height], 1                        \n"
+        "   ldi     %[rowmask], 0x08                    \n"
+        "   sbrc    %[height], 2                        \n"
+        "   swap    %[rowmask]                          \n"
+        "   sbrs    %[height], 0                        \n"
+        "   lsr     %[rowmask]                          \n"
+        "   dec     %[rowmask]                          \n"
+        "   breq    .+4                                 \n"
+        "   cpi     %[renderheight], 8                  \n" // if (renderheight
+                                                            // >= 8) rowmask =
+                                                            // 0xFF;
+        "   brlt    .+2                                 \n"
+        "   ldi     %[rowmask], 0xFF                    \n"
 
         "6: ;skip_seek:                                 \n"
 
@@ -226,23 +243,6 @@ static void platform_fx_drawbitmap(int16_t x, int16_t y, uint24_t address,
                                                             // clear carry
         "   ror     %[mode]                             \n" // carry to mode
                                                             // dbfExtraRow
-        "                                               \n"
-        "   ldi     %[rowmask], 0x02                    \n" // rowmask = 0xFF >>
-                                                            // (8 - (height &
-                                                            // 7));
-        "   sbrc    %[height], 1                        \n"
-        "   ldi     %[rowmask], 0x08                    \n"
-        "   sbrc    %[height], 2                        \n"
-        "   swap    %[rowmask]                          \n"
-        "   sbrs    %[height], 0                        \n"
-        "   lsr     %[rowmask]                          \n"
-        "   dec     %[rowmask]                          \n"
-        "   breq    .+4                                 \n"
-        "   cpi     %[renderheight], 8                  \n" // if (renderheight
-                                                            // >= 8) rowmask =
-                                                            // 0xFF;
-        "   brlt    .+2                                 \n"
-        "   ldi     %[rowmask], 0xFF                    \n"
         "                                               \n"
         "   mov     r25, %[renderwidth]                 \n" // for (c <
                                                             // renderwidth)

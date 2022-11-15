@@ -99,8 +99,8 @@ Example Usage:
 #define ABG_TIMER3
 #endif
 
-#ifndef ABG_FAST_RECT_STATIC_DISPATCH
-#define ABG_FAST_RECT_STATIC_DISPATCH 1
+#ifdef ARDUBOYFX_H
+#define ABG_FX
 #endif
 
 #undef BLACK
@@ -186,7 +186,7 @@ template<class... CMDS> void send_cmds(CMDS... cmds)
 extern uint8_t const YMASK0[8] PROGMEM;
 extern uint8_t const YMASK1[8] PROGMEM;
 
-#if ABG_FAST_RECT_STATIC_DISPATCH
+#ifdef ABG_FAST_RECT_STATIC_DISPATCH
 template<bool CLEAR>
 void fast_rect(int16_t x, int16_t y, uint8_t w, uint8_t h);
 #else
@@ -198,6 +198,8 @@ enum class SpriteMode : uint8_t
     Overwrite,
     PlusMask,
     ExternalMask,
+    OverwriteFX,
+    PlusMaskFX,
 };
 
 template<SpriteMode SPRITE_MODE> void draw_sprite(
@@ -375,7 +377,7 @@ struct ArduboyG_Common : public BASE
         if(FLAGS & ABG_Flags::OptimizeFillRect)
         {
             color = planeColor(current_plane, color);
-#if ABG_FAST_RECT_STATIC_DISPATCH
+#ifdef ABG_FAST_RECT_STATIC_DISPATCH
             if(color) fast_rect<false>(x, y, 1, h);
             else      fast_rect<true >(x, y, 1, h);
 #else
@@ -394,7 +396,7 @@ struct ArduboyG_Common : public BASE
         if(FLAGS & ABG_Flags::OptimizeFillRect)
         {
             color = planeColor<PLANE>(color);
-#if ABG_FAST_RECT_STATIC_DISPATCH
+#ifdef ABG_FAST_RECT_STATIC_DISPATCH
             if(color) fast_rect<false>(x, y, 1, h);
             else      fast_rect<true >(x, y, 1, h);
 #else
@@ -551,7 +553,7 @@ struct ArduboyG_Common : public BASE
         if(FLAGS & ABG_Flags::OptimizeFillRect)
         {
             color = planeColor(current_plane, color);
-#if ABG_FAST_RECT_STATIC_DISPATCH
+#ifdef ABG_FAST_RECT_STATIC_DISPATCH
             if(color) fast_rect<false>(x, y, w, h);
             else      fast_rect<true >(x, y, w, h);
 #else
@@ -570,7 +572,7 @@ struct ArduboyG_Common : public BASE
         if(FLAGS & ABG_Flags::OptimizeFillRect)
         {
             color = planeColor<PLANE>(color);
-#if ABG_FAST_RECT_STATIC_DISPATCH
+#ifdef ABG_FAST_RECT_STATIC_DISPATCH
             if(color) fast_rect<false>(x, y, w, h);
             else      fast_rect<true >(x, y, w, h);
 #else
@@ -628,6 +630,14 @@ struct ArduboyG_Common : public BASE
                 frame += 1;
             Sprites::drawOverwrite(x, y, bitmap, frame);
         }
+    }
+    
+    void drawOverwriteFX(
+        int16_t x, int16_t y,
+        uint8_t const* bitmap,
+        uint8_t frame)
+    {
+        
     }
     
     void drawOverwriteMonochrome(
@@ -1022,7 +1032,7 @@ uint8_t const YMASK1[8] PROGMEM =
     0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff
 };
 
-#if ABG_FAST_RECT_STATIC_DISPATCH
+#ifdef ABG_FAST_RECT_STATIC_DISPATCH
 template<bool CLEAR>
 void fast_rect(int16_t x, int16_t y, uint8_t w, uint8_t h)
 #else
@@ -1096,7 +1106,7 @@ void fast_rect(int16_t x, int16_t y, uint8_t w, uint8_t h, bool CLEAR)
     }
 }
 
-#if ABG_FAST_RECT_STATIC_DISPATCH
+#ifdef ABG_FAST_RECT_STATIC_DISPATCH
 template void fast_rect<true >(int16_t x, int16_t y, uint8_t w, uint8_t h);
 template void fast_rect<false>(int16_t x, int16_t y, uint8_t w, uint8_t h);
 #endif
