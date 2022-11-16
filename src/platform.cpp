@@ -60,7 +60,13 @@ void platform_fade(uint8_t f)
     if(f > 15) f = 15;
     f *= 17;
 #ifdef ARDUINO
+#if TRIPLANE
+    FX::enableOLED();
+    abg_detail::send_cmds(0x81, f);
+    FX::disableOLED();
+#else
     a.setContrast(f);
+#endif
 #else
     fade_factor = float(f) / 255;
 #endif
@@ -113,12 +119,12 @@ void platform_drawoverwrite(int16_t x, int16_t y, uint8_t const* bitmap,
     uint8_t frame)
 {
 #ifdef ARDUINO
-    SpritesU::drawOverwrite(x, y, bitmap, frame * 2 + a.currentPlane());
+    SpritesU::drawOverwrite(x, y, bitmap, frame * PLANES + a.currentPlane());
 #else
     uint8_t w = pgm_read_byte(bitmap++);
     uint8_t h = pgm_read_byte(bitmap++);
     platform_drawoverwritemonochrome(
-        x, y, w, h, bitmap + ((frame * 2 + gplane) * (w * h / 8)));
+        x, y, w, h, bitmap + ((frame * PLANES + gplane) * (w * h / 8)));
 #endif
 }
 
@@ -126,11 +132,11 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h)
 {
 #ifdef ARDUINO
-    SpritesU::drawOverwriteFX(x, y, w, h, addr, frame * 2 + a.currentPlane());
+    SpritesU::drawOverwriteFX(x, y, w, h, addr, frame * PLANES + a.currentPlane());
 #else
     assert(SDL_GetTicks64() >= ticks_when_ready);
     uint8_t const* bitmap = &FXDATA[addr];
-    bitmap += w * h / 8 * (frame * 2 + gplane);
+    bitmap += w * h / 8 * (frame * PLANES + gplane);
     for(uint8_t r = 0; r < h; ++r)
     {
         for(uint8_t c = 0; c < w; ++c)
@@ -150,11 +156,11 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h)
 {
 #ifdef ARDUINO
-    SpritesU::drawPlusMaskFX(x, y, w, h, addr, frame * 2 + a.currentPlane());
+    SpritesU::drawPlusMaskFX(x, y, w, h, addr, frame * PLANES + a.currentPlane());
 #else
     assert(SDL_GetTicks64() >= ticks_when_ready);
     uint8_t const* bitmap = &FXDATA[addr];
-    bitmap += w * h / 4 * (frame * 2 + gplane);
+    bitmap += w * h / 4 * (frame * PLANES + gplane);
     for(uint8_t r = 0; r < h; ++r)
     {
         for(uint8_t c = 0; c < w; ++c)
@@ -176,7 +182,11 @@ void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c)
 #ifdef ARDUINO
     a.fillRect(x, y, w, h, c);
 #else
+#if TRIPLANE
+    c = (c > gplane) ? 1 : 0;
+#else
     c = (c & (gplane + 1)) ? 1 : 0;
+#endif
     for(uint8_t i = 0; i != h; ++i)
         for(uint8_t j = 0; j != w; ++j)
             if(unsigned(y + i) < 64 && unsigned(x + j) < 128)

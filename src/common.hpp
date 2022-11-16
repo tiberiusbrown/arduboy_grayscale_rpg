@@ -5,18 +5,31 @@
 constexpr uint8_t TELEPORT_TRANSITION_FRAMES = 16;
 constexpr uint8_t FADE_SPEED = 2;
 #define FADE_USING_CONTRAST 1
+#define TRIPLANE 1
 
 #include "generated/story_flags.hpp"
 
 #ifdef ARDUINO
 //#define ABG_TIMER4
 #define ABG_SYNC_PARK_ROW
+
+#if TRIPLANE
+#define ABG_UPDATE_EVERY_N_DEFAULT 11
+#define ABG_UPDATE_EVERY_N_DENOM_DEFAULT 7
+#define ABG_PRECHARGE_CYCLES 1
+#define ABG_DISCHARGE_CYCLES 2
+#define ABG_FPS_DEFAULT 156
+#include "ArduboyG.h"
+extern ArduboyGBase_Config<ABG_Mode::L4_Triplane> a;
+#else
 #define ABG_UPDATE_EVERY_N_DEFAULT 2
 #define ABG_PRECHARGE_CYCLES 2
 #define ABG_DISCHARGE_CYCLES 1
 #define ABG_FPS_DEFAULT 132
 #include "ArduboyG.h"
 extern ArduboyGBase a;
+#endif
+
 using int24_t = __int24;
 using uint24_t = __uint24;
 inline uint8_t plane()
@@ -57,6 +70,7 @@ inline uint8_t plane()
 }
 #endif
 
+constexpr uint8_t PLANES = TRIPLANE ? 3 : 2;
 constexpr uint8_t INVALID = -1;
 
 // useful when T is a pointer type, like function pointer or char const*

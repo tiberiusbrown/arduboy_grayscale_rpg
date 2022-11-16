@@ -102,10 +102,21 @@ static void SpritesU_DrawCommon(
         col_start = 0;
     }
     
-    // TODO: compiler for this is dumb, use asm
     uint8_t* buf = Arduboy2Base::sBuffer;
-    buf += page_start * 128;
-    buf += col_start;
+    asm volatile(
+        "mulsu %[page_start], %[c128]\n"
+        "add %A[buf], r0\n"
+        "adc %B[buf], r1\n"
+        "clr __zero_reg__\n"
+        "add %A[buf], %[col_start]\n"
+        "adc %B[buf], __zero_reg__\n"
+        :
+        [buf]        "+&x" (buf)
+        :
+        [page_start] "a"   (page_start),
+        [col_start]  "r"   (col_start),
+        [c128]       "a"   ((uint8_t)128)
+        );
 
     // clip against right edge
     {
@@ -679,7 +690,6 @@ static void SpritesU_DrawCommon(
             [fxport]     "I"   (_SFR_IO_ADDR(FX_PORT)),
             [fxbit]      "I"   (FX_BIT),
             [spdr]       "I"   (_SFR_IO_ADDR(SPDR)),
-            [datapage]   ""    (&FX::programDataPage),
             [spsr]       "I"   (_SFR_IO_ADDR(SPSR)),
             [spif]       "I"   (SPIF)
             );

@@ -2,8 +2,8 @@
 
 cd /d %~dp0
 
-python ..\scripts\convert_font.py
-if NOT %errorlevel%==0 goto error
+rem python ..\scripts\convert_font.py
+rem if NOT %errorlevel%==0 goto error
 python ..\scripts\convert_sprites.py
 if NOT %errorlevel%==0 goto error
 python ..\scripts\convert_map.py

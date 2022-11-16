@@ -1,6 +1,6 @@
 from PIL import Image
 
-def extract(fname, sw, sh, num = 0, start = 0):
+def extract(fname, sw, sh, triplane = False, num = 0, start = 0):
 
     im = Image.open(fname)
     
@@ -10,6 +10,7 @@ def extract(fname, sw, sh, num = 0, start = 0):
     sbytes = sw * sh // 8
     p0 = [0] * (num * sbytes)
     p1 = [0] * (num * sbytes)
+    p2 = [0] * (num * sbytes)
     masked = False
     if 'transparency' in im.info:
         masked = True
@@ -25,6 +26,7 @@ def extract(fname, sw, sh, num = 0, start = 0):
             for ic in range(sw):
                 b0 = 0
                 b1 = 0
+                b2 = 0
                 bm = 0
                 for tr in range(8):
                     rgba = im.getpixel((c + ic, r + ir * 8 + 7 - tr))
@@ -44,18 +46,26 @@ def extract(fname, sw, sh, num = 0, start = 0):
                         if x != 0:
                             bm = bm | 1
                             x = x - 1
-                    x0 = x & 1
-                    x1 = (x >> 1) & 1
+                    if triplane:
+                        x0 = 1 if x >= 1 and x <= 3 else 0
+                        x1 = 1 if x >= 2 and x <= 3 else 0
+                        x2 = 1 if x >= 3 and x <= 3 else 0
+                    else:
+                        x0 = x & 1
+                        x1 = (x >> 1) & 1
+                        x2 = 0
                     b0 = (b0 << 1) | x0
                     b1 = (b1 << 1) | x1
+                    b2 = (b2 << 1) | x2
                 p0[index] = b0
                 p1[index] = b1
+                p2[index] = b2
                 if masked:
                     pm[index] = bm
                 index = index + 1
         
     if masked:
-        return [num, p0, p1, pm]
+        return [num, p0, p1, p2, pm]
     else:
-        return [num, p0, p1]
+        return [num, p0, p1, p2]
     

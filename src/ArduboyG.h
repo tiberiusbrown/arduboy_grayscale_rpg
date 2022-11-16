@@ -158,6 +158,7 @@ extern uint8_t  contrast;
 extern uint16_t timer_counter;
 extern uint8_t  update_counter;
 extern uint8_t  update_every_n;
+extern uint8_t  update_every_n_denom;
 extern uint8_t  current_plane;
 #if defined(ABG_SYNC_THREE_PHASE)
 extern uint8_t volatile current_phase;
@@ -268,9 +269,10 @@ struct ArduboyG_Common : public BASE
     // use this method to adjust contrast when using ABGMode::L4_Contrast
     static void setContrast(uint8_t f) { contrast = f; }
     
-    static void setUpdateEveryN(uint8_t images)
+    static void setUpdateEveryN(uint8_t num, uint8_t denom = 1)
     {
-        update_every_n = images;
+        update_every_n = num;
+        update_every_n_denom = denom;
     }
     
     static void setRefreshHz(uint8_t hz)
@@ -707,7 +709,7 @@ struct ArduboyG_Common : public BASE
     {
         if(update_counter >= update_every_n)
         {
-            update_counter = 0;
+            update_counter -= update_every_n;
             ++BASE::frameCount; // to allow everyXFrames
             return true;
         }
@@ -802,7 +804,7 @@ protected:
             else
                 current_plane = !current_plane;
             if(current_plane == 0)
-                ++update_counter;
+                update_counter += update_every_n_denom;
         }
 #elif defined(ABG_SYNC_PARK_ROW) || defined(ABG_SYNC_SLOW_DRIVE)
         if(MODE == ABG_Mode::L4_Contrast)
@@ -838,7 +840,7 @@ protected:
         else
             current_plane = !current_plane;
         if(current_plane == 0)
-            ++update_counter;
+            update_counter += update_every_n_denom;
 #endif
     }
     
@@ -995,6 +997,9 @@ namespace abg_detail
 #if !defined(ABG_UPDATE_EVERY_N_DEFAULT)
 #define ABG_UPDATE_EVERY_N_DEFAULT 1
 #endif
+#if !defined(ABG_UPDATE_EVERY_N_DENOM_DEFAULT)
+#define ABG_UPDATE_EVERY_N_DENOM_DEFAULT 1
+#endif
 #if !defined(ABG_FPS_DEFAULT)
 #define ABG_FPS_DEFAULT 135
 #endif
@@ -1009,6 +1014,7 @@ uint16_t timer_counter = F_CPU / 256 / ABG_FPS_DEFAULT;
 #endif
 uint8_t  update_counter;
 uint8_t  update_every_n = ABG_UPDATE_EVERY_N_DEFAULT;
+uint8_t  update_every_n_denom = ABG_UPDATE_EVERY_N_DENOM_DEFAULT;
 uint8_t  current_plane;
 #if defined(ABG_SYNC_THREE_PHASE)
 uint8_t volatile current_phase;

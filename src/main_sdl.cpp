@@ -24,7 +24,7 @@ static uint8_t gif_prev[128 * FBH];
 
 float fade_factor = 1.f;
 int gplane;
-uint8_t pixels[2][128 * 64];
+uint8_t pixels[3][128 * 64];
 uint8_t tex_pixels[128 * 63 * 4];
 
 inline uint8_t fadef(uint8_t x)
@@ -186,6 +186,11 @@ int main(int argc, char** argv)
         gplane = 1;
         render();
 
+#if TRIPLANE
+        gplane = 2;
+        render();
+#endif
+
         if(frame == 1) send_gif_frame();
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -195,7 +200,12 @@ int main(int argc, char** argv)
         {
             int p0 = pixels[0][i];
             int p1 = pixels[1][i];
+#if TRIPLANE
+            int p2 = pixels[2][i];
+            int pf = p0 + p1 + p2;
+#else
             int pf = p0 + p1 * 2;
+#endif
             uint8_t p = colormap(pf);
             tex_pixels[i * 4 + 0] = p;
             tex_pixels[i * 4 + 1] = p;

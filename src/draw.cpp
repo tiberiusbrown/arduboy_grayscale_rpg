@@ -153,7 +153,7 @@ static void draw_text_ex(uint8_t x, uint8_t y, char const* str, bool prog)
             continue;
         }
         t -= ' ';
-        uint8_t const* bitmap = &FONT_IMG[t * 16];
+        uint8_t const* bitmap = &FONT_IMG[t * (8 * PLANES) + 2];
         uint8_t adv = pgm_read_byte(&FONT_ADV[t]);
         platform_drawoverwritemonochrome(cx, y, adv, 8, bitmap + plane() * 8);
         cx += adv;
