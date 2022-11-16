@@ -1,3 +1,12 @@
+/*
+Options
+
+    SPRITESU_IMPLEMENTATION
+    SPRITESU_OVERWRITE
+    SPRITESU_PLUSMASK
+    SPRITESU_FX
+*/
+
 #pragma once
 
 #ifndef ARDUBOYFX_H
@@ -6,19 +15,26 @@
 
 struct SpritesU
 {
+#ifdef SPRITESU_OVERWRITE
     static void drawOverwrite(
         int16_t x, int16_t y, uint8_t const* image, uint16_t frame);
     static void drawOverwrite(
         int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t const* image);
+#endif
+
+#ifdef SPRITESU_OVERWRITE
     static void drawPlusMask(
         int16_t x, int16_t y, uint8_t const* image, uint16_t frame);
     static void drawPlusMask(
         int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t const* image);
-        
+#endif
+
+#ifdef SPRITESU_FX
     static void drawOverwriteFX(
         int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame);
     static void drawPlusMaskFX(
         int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame);
+#endif
 };
 
 #ifdef SPRITESU_IMPLEMENTATION
@@ -108,7 +124,10 @@ static void SpritesU_DrawCommon(
     
     uint8_t buf_adv = 128 - cols;
     uint16_t image_adv = w;
-    if(!(mode & 2)) image_adv -= cols;
+#ifdef SPRITESU_FX
+    if(!(mode & 2))
+#endif
+        image_adv -= cols;
     if(mode & 1) image_adv *= 2;
     
     uint16_t image_data;
@@ -116,6 +135,7 @@ static void SpritesU_DrawCommon(
     uint8_t buf_data;
     uint8_t count;
     
+#ifdef SPRITESU_OVERWRITE
     if(mode == SPRITESU_MODE_OVERWRITE)
     {
         uint8_t const* image_ptr = (uint8_t const*)image;
@@ -235,7 +255,10 @@ static void SpritesU_DrawCommon(
             [page_start] "a"   (page_start)
             );
     }
-    else if(mode == SPRITESU_MODE_PLUSMASK)
+    else
+#endif
+#ifdef SPRITESU_PLUSMASK
+    if(mode == SPRITESU_MODE_PLUSMASK)
     {
         uint8_t const* image_ptr = (uint8_t const*)image;
         asm volatile(R"ASM(
@@ -375,8 +398,9 @@ static void SpritesU_DrawCommon(
             );
     }
     else
+#endif
+#ifdef SPRITESU_FX
     {
-#if 1
         uint8_t* bufn;
         uint8_t reseek = (w != cols);
         image += ((uint24_t)FX::programDataPage << 8);
@@ -659,10 +683,11 @@ static void SpritesU_DrawCommon(
             [spsr]       "I"   (_SFR_IO_ADDR(SPSR)),
             [spif]       "I"   (SPIF)
             );
-#endif
     }
+#endif
 }
 
+#ifdef SPRITESU_OVERWRITE
 void SpritesU::drawOverwrite(
     int16_t x, int16_t y, uint8_t const* image, uint16_t frame)
 {
@@ -673,13 +698,14 @@ void SpritesU::drawOverwrite(
         : [w] "=r" (w), [h] "=r" (h), [image] "+z" (image));
     SpritesU_DrawCommon(x, y, w, h, (uint24_t)image, frame, SPRITESU_MODE_OVERWRITE);
 }
-
 void SpritesU::drawOverwrite(
     int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t const* image)
 {
     SpritesU_DrawCommon(x, y, w, h, (uint24_t)image, 0, SPRITESU_MODE_OVERWRITE);
 }
+#endif
 
+#ifdef SPRITESU_PLUSMASK
 void SpritesU::drawPlusMask(
     int16_t x, int16_t y, uint8_t const* image, uint16_t frame)
 {
@@ -690,23 +716,24 @@ void SpritesU::drawPlusMask(
         : [w] "=r" (w), [h] "=r" (h), [image] "+z" (image));
     SpritesU_DrawCommon(x, y, w, h, (uint24_t)image, frame, SPRITESU_MODE_PLUSMASK);
 }
-
 void SpritesU::drawPlusMask(
     int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t const* image)
 {
     SpritesU_DrawCommon(x, y, w, h, (uint24_t)image, 0, SPRITESU_MODE_PLUSMASK);
 }
+#endif
 
+#ifdef SPRITESU_FX
 void SpritesU::drawOverwriteFX(
     int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame)
 {
     SpritesU_DrawCommon(x, y, w, h, image, frame, SPRITESU_MODE_OVERWRITEFX);
 }
-
 void SpritesU::drawPlusMaskFX(
     int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame)
 {
     SpritesU_DrawCommon(x, y, w, h, image, frame, SPRITESU_MODE_PLUSMASKFX);
 }
+#endif
 
 #endif

@@ -3,6 +3,8 @@
 #ifdef ARDUINO
 #include "ArduboyFX.h"
 #define SPRITESU_IMPLEMENTATION
+#define SPRITESU_OVERWRITE
+#define SPRITESU_FX
 #include "SpritesU.hpp"
 #else
 #include "generated/fxdata_emulated.hpp"
