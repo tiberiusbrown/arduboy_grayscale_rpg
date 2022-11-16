@@ -163,10 +163,11 @@ static void delay5us()
 
 // Commands sent to the OLED display to initialize it
 static const PROGMEM uint8_t lcdBootProgram[] = {
+    0x20, 0x00,
+    0xDB, 0x00,
     0xD5, 0xF0,
     0x8D, 0x14,
     0xAF,
-    0x20, 0x00,
 };
 
 // avoids calls to delayShort

@@ -1011,7 +1011,7 @@ uint8_t  update_counter;
 uint8_t  update_every_n = ABG_UPDATE_EVERY_N_DEFAULT;
 uint8_t  current_plane;
 #if defined(ABG_SYNC_THREE_PHASE)
-uint8_t  current_phase;
+uint8_t volatile current_phase;
 #endif
 bool volatile needs_display;
 uint8_t contrast = ABG_CONTRAST_DEFAULT;

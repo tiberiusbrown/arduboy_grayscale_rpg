@@ -364,7 +364,9 @@ void update_battle()
             }
             else
             {
-                d.phase = BPHASE_OUTRO;
+                d.next_phase = BPHASE_OUTRO;
+                d.phase = BPHASE_DELAY;
+                d.frame = -32;
             }
         }
         if(btns_pressed & BTN_DOWN && ++d.msel == 4) d.msel = 0;
