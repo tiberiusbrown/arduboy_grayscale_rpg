@@ -2,8 +2,6 @@
 
 cd /d %~dp0
 
-rem python ..\scripts\convert_font.py
-rem if NOT %errorlevel%==0 goto error
 python ..\scripts\convert_sprites.py
 if NOT %errorlevel%==0 goto error
 python ..\scripts\convert_map.py
@@ -12,6 +10,8 @@ python ..\scripts\convert_game_over_messages.py
 if NOT %errorlevel%==0 goto error
 
 cd ..\arduboy_build
+python ..\scripts\gen_fxsave.py
+if NOT %errorlevel%==0 goto error
 python fxdata-build.py fxdata.txt
 if NOT %errorlevel%==0 goto error
 move /y fxdata.h ..\src\generated\fxdata.h > nul

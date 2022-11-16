@@ -39,7 +39,7 @@ findstr /c:" b " /c:" B " /c:" d " /c:" D " _map2.txt > _map.txt
 del _map2.txt
 
 rem create arduboy file
-tar -a -cf arduboy_grayscale_rpg.zip arduboy_grayscale_rpg.hex fxdata.bin info.json LICENSE.txt banner_700x192.png banner_128x64.png
+tar -a -cf arduboy_grayscale_rpg.zip arduboy_grayscale_rpg.hex fxdata.bin fxsave.bin info.json LICENSE.txt banner_700x192.png banner_128x64.png
 if NOT %errorlevel%==0 goto error
 move /y arduboy_grayscale_rpg.zip ..\arduboy_grayscale_rpg.arduboy > nul
 if NOT %errorlevel%==0 goto error
