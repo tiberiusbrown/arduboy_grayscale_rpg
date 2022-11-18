@@ -107,6 +107,57 @@ static void render_resume()
     platform_fade(d.fade_frame - 8);
 }
 
+static void uint16_to_str(char* str, uint16_t v)
+{
+    uint8_t n;
+    for(n = 0; v >= 10000; ++n, v -= 10000);
+    str[0] = '0' + n;
+    for(n = 0; v >= 1000; ++n, v -= 1000);
+    str[1] = '0' + n;
+    for(n = 0; v >= 100; ++n, v -= 100);
+    str[2] = '0' + n;
+    for(n = 0; v >= 10; ++n, v -= 10);
+    str[3] = '0' + n;
+    str[4] = '0' + (uint8_t)v;
+    str[5] = '\0';
+}
+
+static void draw_uint16(uint8_t x, uint8_t y, uint16_t v)
+{
+    char str[6];
+    uint16_to_str(str, v);
+    draw_text(x, y, str);
+}
+
+static void draw_int16(uint8_t x, uint8_t y, int16_t v)
+{
+    char str[7];
+    if(v < 0)
+    {
+        str[0] = '-';
+        uint16_to_str(&str[1], uint16_t(-v));
+    }
+    else
+        uint16_to_str(str, uint16_t(v));
+    draw_text(x, y, str);
+}
+
+static void render_battery()
+{
+    draw_uint16(0, 0, bat.reading);
+    draw_int16(0, 12, bat.dr[0]);
+    draw_int16(0, 20, bat.dr[1]);
+    draw_int16(0, 28, bat.dr[2]);
+    draw_int16(0, 36, bat.dr[3]);
+    draw_int16(0, 48, bat.d2r);
+
+    if(bat.low_battery)
+    {
+        uint8_t f = (nframe & 0x10) ? 0 : 1;
+        platform_fx_drawplusmask(118, 0, BATTERY_IMG, f, 10, 8);
+    }
+}
+
 void render()
 {
     using render_func = void (*)();
@@ -122,4 +173,6 @@ void render()
     };
 
     (pgmptr(&FUNCS[state]))();
+
+    render_battery();
 }

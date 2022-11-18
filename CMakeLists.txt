@@ -27,6 +27,7 @@ if(MSVC)
 endif()
 add_executable(arduboy_grayscale_rpg ${EXEFLAG}
     .editorconfig
+    src/battery.cpp
     src/battle.cpp
     src/common.hpp
     src/common.cpp

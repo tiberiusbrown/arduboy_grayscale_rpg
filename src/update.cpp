@@ -166,8 +166,6 @@ static void update_map()
     if(run_chunks()) return;
 
     update_enemies();
-
-    ++nframe;
 }
 
 static void skip_dialog_animation(uint8_t third_newline)
@@ -243,26 +241,32 @@ static void update_game_over()
         if(d.fade_frame < 24)
             d.fade_frame += FADE_SPEED;
         else
-            change_state(STATE_RESUME);
+        change_state(STATE_RESUME);
     }
     else
     {
-        if(d.msg[0] == '\0')
-        {
-            uint8_t n = u8rand(NUM_GAME_OVER_MESSAGES);
-            platform_fx_read_data_bytes(
-                GAME_OVER_MESSAGES + n * GAME_OVER_MESSAGE_LEN, d.msg, 128);
-            wrap_text(d.msg, 106);
-            d.msg_lines = 1;
-            for(auto& c : d.msg)
-                if(c == '\n') ++d.msg_lines, c = '\0';
-        }
-        if(d.fade_frame < 24)
-            d.fade_frame += FADE_SPEED;
-        else if(btns_pressed & (BTN_A | BTN_B))
-            d.fade_frame = 8, d.going_to_resume = true;
+    if(d.msg[0] == '\0')
+    {
+        uint8_t n = u8rand(NUM_GAME_OVER_MESSAGES);
+        platform_fx_read_data_bytes(
+            GAME_OVER_MESSAGES + n * GAME_OVER_MESSAGE_LEN, d.msg, 128);
+        wrap_text(d.msg, 106);
+        d.msg_lines = 1;
+        for(auto& c : d.msg)
+            if(c == '\n') ++d.msg_lines, c = '\0';
+    }
+    if(d.fade_frame < 24)
+        d.fade_frame += FADE_SPEED;
+    else if(btns_pressed & (BTN_A | BTN_B))
+        d.fade_frame = 8, d.going_to_resume = true;
     }
 }
+
+#ifdef ARDUINO
+#include <EEPROM.h>
+#include <hardwareSerial.h>
+static uint16_t eeprom_addr = 16;
+#endif
 
 static void update_title()
 {
@@ -279,7 +283,13 @@ static void update_title()
         if(d.fade_frame < 24)
             d.fade_frame += FADE_SPEED;
         else if(btns_pressed & BTN_A)
+        {
+#if TEST_LIPO_DISCHARGE
+            for(uint16_t i = 16; i < 1024; ++i)
+                EEPROM.update(i, 0xff);
+#endif
             d.fade_frame = 0, d.going_to_resume = true;
+        }
     }
 }
 
@@ -314,4 +324,8 @@ void update()
 
     pmoving = false;
     (pgmptr(&FUNCS[state]))();
+
+    update_battery();
+
+    ++nframe;
 }

@@ -7,6 +7,12 @@ constexpr uint8_t FADE_SPEED = 2;
 #define FADE_USING_CONTRAST 1
 #define TRIPLANE 1
 
+#ifdef ARDUINO
+#define TEST_LIPO_DISCHARGE 0
+#else
+#define TEST_LIPO_DISCHARGE 0
+#endif
+
 #include "generated/story_flags.hpp"
 
 #ifdef ARDUINO
@@ -110,7 +116,7 @@ struct map_chunk_t
     uint8_t script[CHUNK_SCRIPT_SIZE];
 };
 
-extern uint8_t nframe;
+extern uint16_t nframe;
 
 enum
 {
@@ -317,9 +323,23 @@ extern active_chunk_t active_chunks[4];
 
 extern uint8_t btns_down, btns_pressed;
 
+#if TEST_LIPO_DISCHARGE
+extern uint16_t voltage;
+#endif
+
 extern uint16_t rand_seed;
 uint8_t u8rand();
 uint8_t u8rand(uint8_t m);
+
+// battery.cpp
+extern struct battery_info_t
+{
+    uint16_t reading; // raw reading (filtered)
+    int16_t  dr[4];   // first derivative history
+    int16_t  d2r;     // second derivative (filtered)
+    bool low_battery;
+} bat;
+void update_battery();
 
 // save.cpp
 void update_save();

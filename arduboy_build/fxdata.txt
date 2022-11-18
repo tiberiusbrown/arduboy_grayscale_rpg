@@ -14,6 +14,7 @@ raw_t BATTLE_ALERT_IMG = "battle_alert_img.bin"
 raw_t TITLE_IMG = "title_img.bin"
 raw_t GAME_OVER_IMG = "game_over_img.bin"
 raw_t GAME_OVER_MESSAGES = "game_over_messages.bin"
+raw_t BATTERY_IMG = "battery_img.bin"
 
 // put string data last to avoid large diffs in git
 raw_t STRINGDATA = "stringdata.bin"

@@ -98,6 +98,7 @@ static void custom_init()
 #endif
 }
 
+#ifndef DEBUG_BUILD
 // adapted from Arbuboy2 library
 // changes: remove flashlight logic / calls to delayShort
 int main() __attribute__ ((OS_main));
@@ -126,6 +127,7 @@ int main()
 
     for(;;) loop();
 }
+#endif
 
 uint8_t updown_frames;
 
@@ -195,15 +197,18 @@ static void custom_bootOLED()
 }
 
 void setup()
-{
-    // Select the ADC input here so a delay isn't required in generateRandomSeed()
-    ADMUX = RAND_SEED_IN_ADMUX;
-  
+{  
+    ADMUX = _BV(REFS0) | _BV(MUX4) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
+
     a.bootPins();
     a.bootSPI();
     custom_bootOLED();
     a.bootPowerSaving();
 
+#ifdef DEBUGBUILD
+    Serial.begin(9600);
+#endif
+    
     FX::begin(FX_DATA_PAGE, 0);
     FX::enableOLED();
     initialize();

@@ -318,7 +318,6 @@ void update_battle()
     d.menuy = (d.menuy + d.menuy_target) / 2;
     d.msely = (d.msely + d.msel * 10) / 2;
     ++d.frame;
-    ++nframe;
     if(++d.selframe >= 7) d.selframe = 0;
     update_battle_sprites();
     switch(d.phase)

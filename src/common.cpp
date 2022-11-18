@@ -82,7 +82,7 @@ uint16_t rand_seed;
 uint8_t state;
 sdata_t sdata;
 
-uint8_t nframe;
+uint16_t nframe;
 
 bool pmoving;
 uint16_t selx, sely;
@@ -97,3 +97,7 @@ uint8_t chunk_instr;
 int8_t chunk_regs[16];
 
 savefile_t savefile;
+
+#if TEST_LIPO_DISCHARGE
+uint16_t voltage;
+#endif
