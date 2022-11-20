@@ -97,7 +97,3 @@ uint8_t chunk_instr;
 int8_t chunk_regs[16];
 
 savefile_t savefile;
-
-#if TEST_LIPO_DISCHARGE
-uint16_t voltage;
-#endif

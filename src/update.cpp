@@ -262,10 +262,9 @@ static void update_game_over()
     }
 }
 
-#ifdef ARDUINO
-#include <EEPROM.h>
+#if RECORD_LIPO_DISCHARGE
 #include <hardwareSerial.h>
-static uint16_t eeprom_addr = 16;
+#include "ArduboyFX.h"
 #endif
 
 static void update_title()
@@ -283,13 +282,7 @@ static void update_title()
         if(d.fade_frame < 24)
             d.fade_frame += FADE_SPEED;
         else if(btns_pressed & BTN_A)
-        {
-#if TEST_LIPO_DISCHARGE
-            for(uint16_t i = 16; i < 1024; ++i)
-                EEPROM.update(i, 0xff);
-#endif
             d.fade_frame = 0, d.going_to_resume = true;
-        }
     }
 }
 
@@ -328,4 +321,27 @@ void update()
     update_battery();
 
     ++nframe;
+
+    if((nframe & 0x7ff) == 0x7ff)
+    {
+        uint8_t fade = u8rand() & 15;
+        if(fade == 0) fade = 1;
+        platform_fade(fade);
+    }
+#if RECORD_LIPO_DISCHARGE
+    if(btns_pressed & BTN_B)
+    {
+        int16_t v[10];
+        for(uint24_t i = 0; i < 7200 * 2; i += 2)
+        {
+            FX::readSaveBytes(i, (uint8_t*)v, 2);
+            for(uint8_t i = 0; i < 1; ++i)
+            {
+                Serial.print(v[i]);
+                Serial.print(' ');
+            }
+            Serial.print('\n');
+        }
+    }
+#endif
 }

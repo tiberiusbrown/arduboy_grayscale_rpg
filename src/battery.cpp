@@ -2,24 +2,91 @@
 
 battery_info_t bat;
 
+static int16_t filter256(int16_t y, int16_t x)
+{
+    // y     : current filter state
+    // x     : input
+    // return: next filter state
+    return y + ((x - y) >> 8);
+}
+
+#if RECORD_LIPO_DISCHARGE
+#include <hardwareSerial.h>
+#include "ArduboyFX.h"
+#endif
+
+static void battery_dsp(int16_t reading)
+{
+    if(bat.stage != 255) ++bat.stage;
+
+    // update reading
+    int16_t raw_r = int16_t(reading * 64);
+    int16_t old_r = bat.r;
+    if(bat.stage == 32)
+    {
+        bat.r = bat.r32 = raw_r;
+    }
+    else if(bat.stage > 32)
+    {
+        bat.r = filter256(bat.r, raw_r);
+    }
+
+    // update first derivatives
+    int16_t old_dr = bat.dr;
+    if(bat.stage == 64)
+    {
+        int16_t raw_dr = (bat.r - bat.r32) * (256 / 32);
+        bat.dr = raw_dr;
+    }
+    else if(bat.stage > 64)
+    {
+        int16_t raw_dr = (bat.r - old_r) * 256;
+        bat.dr = filter256(bat.dr, raw_dr);
+    }
+
+    // update second derivatives
+    if(bat.stage == 64)
+    {
+        bat.ddr = 0;
+    }
+    else if(bat.stage > 64)
+    {
+        int16_t raw_ddr = (bat.dr - old_dr) * 512;
+        bat.ddr = filter256(bat.ddr, raw_ddr);
+    }
+
+    // update low battery decision
+    if(bat.stage >= 64)
+    {
+        bat.low_battery = (bat.dr >= 0 && bat.ddr >= 800);
+    }
+
+    bat.raw = reading;
+
+#if RECORD_LIPO_DISCHARGE
+    static uint24_t save_addr = 0;
+    if(state == STATE_MAP && save_addr < 7200 * 2)
+    {
+        FX::writeEnable();
+        FX::seekCommand(SFC_WRITE, ((uint24_t)(FX::programSavePage) << 8) + save_addr);
+        FX::writeByte(uint8_t(reading));
+        FX::writeByte(uint8_t(reading >> 8));
+        FX::disable();
+        save_addr += 2;
+    }
+#endif
+}
+
 void update_battery()
 {
-    uint16_t reading = 0;
+    int16_t reading = 0;
+
+    uint16_t f = nframe & 0x3f;
 
 #ifdef ARDUINO
-    static uint16_t v;
-    uint16_t f = nframe & 0x03ff;
+    static int16_t v = 0;
     if(f == 0)
     {
-#if TEST_LIPO_DISCHARGE
-        voltage = v;
-        if(voltage != 0)
-        {
-            EEPROM.update(eeprom_addr + 0, uint8_t(voltage >> 0));
-            EEPROM.update(eeprom_addr + 1, uint8_t(voltage >> 8));
-            eeprom_addr += 2;
-        }
-#endif
         reading = v;
         v = 0;
     }
@@ -31,54 +98,11 @@ void update_battery()
     {
         ADCSRA |= _BV(ADSC);
         while(bit_is_set(ADCSRA, ADSC));
-        v += (ADC - 200);
+        v += (ADC - 300);
         power_adc_disable();
     }
-#if TEST_LIPO_DISCHARGE
-    if(btns_pressed & BTN_B)
-    {
-        for(uint16_t i = 16; i < 1024; i += 2)
-        {
-            uint16_t t = EEPROM.read(i + 0);
-            t |= (uint16_t(EEPROM.read(i + 1)) << 8);
-            Serial.print(t);
-            Serial.print('\n');
-        }
-    }
-#endif
 #endif
 
-    if(reading == 0) return;
-
-    // process new reading
-
-    uint16_t old_reading = bat.reading;
-
-    // update filtered reading
-    if(old_reading == 0)
-    {
-        bat.reading = reading;
-        return;
-    }
-    bat.reading = (bat.reading + reading) >> 1;
-
-    // update first derivative history
-    for(uint8_t i = 3; i > 0; --i)
-        bat.dr[i] = bat.dr[i - 1];
-    bat.dr[0] = bat.reading - old_reading;
-
-    for(uint8_t i = 1; i < 4; ++i)
-        if(bat.dr[i] == 0) return;
-
-    // update filtered second derivative
-    int16_t d2r = bat.dr[0] * 2 + bat.dr[1] - bat.dr[2] - bat.dr[3] * 2;
-    if(bat.d2r == 0)
-    {
-        bat.d2r = d2r * 8;
-        return;
-    }
-    bat.d2r = ((bat.d2r * 7) >> 3) + d2r;
-
-    // low battery decision
-    bat.low_battery = (bat.d2r >= 100 && reading >= 6500 && bat.dr[0] < 0);
+    if(reading != 0)
+        battery_dsp(reading);
 }
