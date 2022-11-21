@@ -8,6 +8,7 @@ enum
     OS_RESUMING,
     OS_OPTIONS,
     OS_QUIT,
+    OS_SAVE,
 };
 
 static uint8_t const OPTION_X[] PROGMEM =
@@ -34,7 +35,7 @@ void update_pause()
     }
     if(d.state == OS_RESUMING)
     {
-        if((d.menuy | d.optionsy | d.quity) == 0)
+        if((d.menuy | d.optionsy | d.quity | d.savey) == 0)
         {
             change_state(STATE_MAP);
             return;
@@ -44,32 +45,36 @@ void update_pause()
     {
         if(d.menuy >= 16 && d.optionsy == 0 && d.quity == 0)
         {
-            if((btns_pressed & BTN_LEFT) && d.menui-- == 0)
-                d.menui = 3;
-            if((btns_pressed & BTN_RIGHT) && d.menui++ == 3)
-                d.menui = 0;
+            uint8_t menui = d.menui;
+            if((btns_pressed & BTN_LEFT) && menui-- == 0)
+                menui = 3;
+            if((btns_pressed & BTN_RIGHT) && menui++ == 3)
+                menui = 0;
             if(btns_pressed & BTN_A)
             {
-                if(d.menui == 2) d.state = OS_OPTIONS;
-                if(d.menui == 3) d.state = OS_QUIT;
+                if(menui == 0) d.state = OS_SAVE;
+                if(menui == 2) d.state = OS_OPTIONS;
+                if(menui == 3) d.state = OS_QUIT;
             }
+            d.menui = menui;
         }
     }
     else if(d.state == OS_OPTIONS)
     {
         if(d.optionsy >= 64)
         {
+            uint8_t optionsi = d.optionsi;
             if(btns_pressed & BTN_B)
                 d.state = OS_MENU;
-            else if((btns_pressed & BTN_UP) && d.optionsi-- == 0)
-                d.optionsi = 2;
-            else if((btns_pressed & BTN_DOWN) && d.optionsi++ == 2)
-                d.optionsi = 0;
+            else if((btns_pressed & BTN_UP) && optionsi-- == 0)
+                optionsi = 2;
+            else if((btns_pressed & BTN_DOWN) && optionsi++ == 2)
+                optionsi = 0;
             else if(btns_pressed & (BTN_A | BTN_LEFT | BTN_RIGHT))
             {
-                if(d.optionsi == 0) savefile.no_music ^= 1;
-                else if(d.optionsi == 2) savefile.no_battery_alert ^= 1;
-                else if(d.optionsi == 1)
+                if(optionsi == 0) savefile.no_music ^= 1;
+                else if(optionsi == 2) savefile.no_battery_alert ^= 1;
+                else if(optionsi == 1)
                 {
                     if(btns_pressed & (BTN_A | BTN_RIGHT))
                         ++savefile.brightness;
@@ -79,6 +84,7 @@ void update_pause()
                     platform_fade(15);
                 }
             }
+            d.optionsi = optionsi;
         }
     }
     else if(d.state == OS_QUIT)
@@ -134,6 +140,21 @@ void update_pause()
             }
         }
     }
+    else if(d.state == OS_SAVE)
+    {
+        if(d.savey >= 64)
+        {
+            if(is_saving())
+            {
+                if(save_done())
+                    d.state = OS_RESUMING;
+            }
+            else
+            {
+                save_begin();
+            }
+        }
+    }
     if(d.state == OS_MENU)
         d.menuy += uint8_t(17 - d.menuy) >> 1;
     else
@@ -147,6 +168,10 @@ void update_pause()
     else
         d.quity >>= 1, d.quitp = false, d.quitfade = 0;
     d.quitf = adjust(d.quitf, d.quitft);
+    if(d.state == OS_SAVE)
+        d.savey += uint8_t(65 - d.savey) >> 1;
+    else
+        d.savey >>= 1;
     {
         uint8_t ax = pgm_read_byte(&OPTION_X[d.menui * 2 + 0]);
         uint8_t bx = pgm_read_byte(&OPTION_X[d.menui * 2 + 1]);
@@ -175,7 +200,8 @@ void render_pause()
 {
     auto const& d = sdata.pause;
     // render darkened map (exclude plane 0)
-    if(d.optionsy < 64 && (d.state == OS_RESUMING || plane() > 0))
+    if((d.optionsy | d.quity | d.savey) < 64 &&
+        (d.state == OS_RESUMING || plane() > 0))
         render_map();
     if(d.menuy > 0)
     {
@@ -205,5 +231,12 @@ void render_pause()
         }
         if(d.quitfade > 16 * FADE_SPEED)
             platform_fade(15 - d.quitfade);
+    }
+    if(d.savey > 0)
+    {
+        int16_t y = 64 - d.savey;
+        platform_fillrect(0, y, 128, 64, BLACK);
+        static char const SAVE_MSG[] PROGMEM = "Saving...";
+        draw_text_prog(49, y + 28, SAVE_MSG);
     }
 }

@@ -2,16 +2,53 @@
 
 #include <string.h>
 
-static char const IDENTIFIER[8] PROGMEM = "ROTArdu";
-
-void update_save()
+static uint8_t const IDENTIFIER[8] PROGMEM =
 {
+    '_', 'R', 'o', 't', 'A', '_',
+    uint8_t(VERSION >> 0),
+    uint8_t(VERSION >> 8),
+};
 
+enum { SS_DONE, SS_ERASE, SS_PROGRAM };
+static uint8_t save_stage = SS_DONE;
+static uint8_t save_page = 0;
+
+void save_begin()
+{
+    platform_fx_erase_save_sector();
+    save_stage = SS_ERASE;
+    save_page = 0;
 }
 
-void render_save()
+bool is_saving()
 {
+    return save_stage != SS_DONE;
+}
 
+bool save_done()
+{
+    if(save_stage == SS_DONE) return true;
+    if(platform_fx_busy()) return false;
+    if(save_stage == SS_ERASE)
+    {
+        save_stage = SS_PROGRAM;
+        save_page = 0;
+        for(uint8_t i = 0; i < 8; ++i)
+            savefile.identifier[i] = pgm_read_byte(&IDENTIFIER[i]);
+        savefile.checksum = compute_checksum();
+    }
+    constexpr uint8_t pages = (sizeof(savefile) + 255) / 256;
+    if(save_page >= pages)
+    {
+        save_stage = SS_DONE;
+        return true;
+    }
+    uint8_t const* p = (uint8_t const*)&savefile;
+    p += (256 * save_page);
+    uint16_t n = sizeof(savefile) - (256 * save_page);
+    platform_fx_write_save_page(save_page, p, n >= 256 ? 256 : n);
+    ++save_page;
+    return false;
 }
 
 void load()
@@ -19,7 +56,7 @@ void load()
     platform_fx_read_save_bytes(0, &savefile, sizeof(savefile));
     bool id = true;
     for(uint8_t i = 0; i < 8; ++i)
-        if(savefile.identifier[i] != (char)pgm_read_byte(&IDENTIFIER[i]))
+        if(savefile.identifier[i] != pgm_read_byte(&IDENTIFIER[i]))
             id = false;
     if(!id || compute_checksum() != savefile.checksum)
     {

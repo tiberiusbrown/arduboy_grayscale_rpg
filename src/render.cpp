@@ -177,7 +177,6 @@ void render()
         render_tp,
         render_battle,
         render_game_over,
-        render_save,
     };
 
     (pgmptr(&FUNCS[state]))();

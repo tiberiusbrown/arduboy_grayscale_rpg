@@ -320,7 +320,6 @@ void update()
         update_tp,
         update_battle,
         update_game_over,
-        update_save,
     };
 
     pmoving = false;

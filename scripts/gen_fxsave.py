@@ -1,2 +1,2 @@
 with open('fxsave.bin', 'wb') as f:
-    f.write(bytearray([0xff for _ in range(4096*2)]))
+    f.write(bytearray([0xff for _ in range(4096)]))

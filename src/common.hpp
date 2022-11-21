@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+constexpr uint16_t VERSION = 1;
+
 constexpr uint8_t TELEPORT_TRANSITION_FRAMES = 16;
 constexpr uint8_t FADE_SPEED = 2;
 #define FADE_USING_CONTRAST 1
@@ -129,7 +131,6 @@ enum
     STATE_TP,      // player is teleporting (e.g., entering building or cave)
     STATE_BATTLE,
     STATE_GAME_OVER,
-    STATE_SAVE,
 };
 extern uint8_t state;
 
@@ -175,6 +176,7 @@ struct sdata_pause
     uint8_t quitft;
     bool quitp;
     uint8_t quitfade;
+    uint8_t savey;
 };
 
 struct battle_member_t
@@ -299,7 +301,7 @@ struct party_member_t
 struct savefile_t
 {
     uint16_t checksum;
-    char identifier[8];
+    uint8_t identifier[8];
     uint16_t px, py;     // player position (in pixels)
     uint8_t pdir;        // player direction
     uint8_t nparty;
@@ -367,8 +369,9 @@ void update_pause();
 void render_pause();
 
 // save.cpp
-void update_save();
-void render_save();
+void save_begin();
+bool save_done();
+bool is_saving();
 void load();
 uint16_t compute_checksum();
 
@@ -386,8 +389,8 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h);
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
-void platform_fx_erase_save_sector(uint16_t page);
-void platform_fx_write_save_page(uint16_t page, void const* data);
+void platform_fx_erase_save_sector();
+void platform_fx_write_save_page(uint16_t page, void const* data, size_t num);
 void platform_fx_read_save_bytes(uint24_t addr, void* data, size_t num);
 bool platform_fx_busy();
 

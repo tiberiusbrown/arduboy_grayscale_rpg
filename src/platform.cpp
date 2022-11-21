@@ -11,7 +11,7 @@
 #include <SDL.h>
 #include <assert.h>
 #include <string.h>
-static uint8_t SAVE_BLOCKS[4096 * 2];
+static uint8_t SAVE_BLOCK[4096];
 static uint64_t ticks_when_ready = 0;
 #endif
 
@@ -110,7 +110,8 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
 #ifdef ARDUINO
     SpritesU::drawOverwriteFX(x, y, w, h, addr, frame * PLANES + a.currentPlane());
 #else
-    assert(SDL_GetTicks64() >= ticks_when_ready);
+    auto now = SDL_GetTicks64();
+    assert(now >= ticks_when_ready);
     uint8_t const* bitmap = &FXDATA[addr];
     bitmap += w * h / 8 * (frame * PLANES + gplane);
     for(uint8_t r = 0; r < h; ++r)
@@ -189,23 +190,30 @@ void platform_fx_erase_save_sector()
 #else
     uint64_t now = SDL_GetTicks64();
     assert(now >= ticks_when_ready);
-    ticks_when_ready = now + 150;
+    ticks_when_ready = now + 200;
     for(int i = 0; i < 4096; ++i)
-        SAVE_BLOCKS[i] = 0xff;
+        SAVE_BLOCK[i] = 0xff;
 #endif
 }
-void platform_fx_write_save_page(uint16_t page, void const* data)
+void platform_fx_write_save_page(uint16_t page, void const* data, size_t num)
 {
 #ifdef ARDUINO
-    // eww cast to non const (writeSavePage doesn't modify data though)
-    FX::writeSavePage(page, (uint8_t*)data);
+    FX::writeEnable();
+    FX::seekCommand(SFC_WRITE, (uint24_t)(FX::programSavePage + page) << 8);
+    uint8_t i = 0;
+    uint8_t const* buffer = (uint8_t const*)data;
+    do
+    {
+        FX::writeByte(buffer[i]);
+    } while(i++ < num);
+    FX::disable();
 #else
     uint64_t now = SDL_GetTicks64();
     assert(now >= ticks_when_ready);
     ticks_when_ready = now + 2;
     uint8_t const* u8data = (uint8_t const*)data;
-    for(int i = 0; i < 256; ++i)
-        SAVE_BLOCKS[page * 256 + i] &= u8data[i];
+    for(size_t i = 0; i < num; ++i)
+        SAVE_BLOCK[page * 256 + i] &= u8data[i];
 #endif
 }
 void platform_fx_read_save_bytes(uint24_t addr, void* data, size_t num)
@@ -215,7 +223,7 @@ void platform_fx_read_save_bytes(uint24_t addr, void* data, size_t num)
 #else
     uint8_t* u8data = (uint8_t*)data;
     for(size_t i = 0; i < num; ++i)
-        u8data[i] = SAVE_BLOCKS[addr + i];
+        u8data[i] = SAVE_BLOCK[addr + i];
 #endif
 }
 
@@ -228,6 +236,6 @@ bool platform_fx_busy()
     FX::disable();
     return busy;
 #else
-    return SDL_GetTicks64() >= ticks_when_ready;
+    return SDL_GetTicks64() < ticks_when_ready;
 #endif
 }
