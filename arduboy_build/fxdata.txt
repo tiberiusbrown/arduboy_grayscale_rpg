@@ -13,8 +13,12 @@ raw_t BATTLE_ALERT_IMG = "battle_alert_img.bin"
 //raw_t BATTLE_SELECT_IMG = "battle_select_img.bin"
 raw_t TITLE_IMG = "title_img.bin"
 raw_t GAME_OVER_IMG = "game_over_img.bin"
-raw_t GAME_OVER_MESSAGES = "game_over_messages.bin"
 raw_t BATTERY_IMG = "battery_img.bin"
+raw_t PAUSE_MENU_IMG = "pause_menu_img.bin"
+raw_t OPTIONS_IMG = "options_img.bin"
+raw_t CHECK_IMG = "check_img.bin"
+raw_t SLIDER_IMG = "slider_img.bin"
+raw_t GAME_OVER_MESSAGES = "game_over_messages.bin"
 
-// put string data last to avoid large diffs in git
+// put string data last to avoid large diffs in git when scripts are updated
 raw_t STRINGDATA = "stringdata.bin"

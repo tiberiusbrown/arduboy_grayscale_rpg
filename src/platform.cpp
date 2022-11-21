@@ -11,7 +11,7 @@
 #include <SDL.h>
 #include <assert.h>
 #include <string.h>
-static uint8_t SAVE_BLOCK[4096];
+static uint8_t SAVE_BLOCKS[4096 * 2];
 static uint64_t ticks_when_ready = 0;
 #endif
 
@@ -38,59 +38,35 @@ static uint8_t get_bitmap_bit(uint8_t const* bitmap, uint8_t w, uint8_t h,
 }
 #endif
 
-#if FADE_USING_CONTRAST
+#ifndef ARDUINO
 extern float fade_factor;
-#else
-static uint8_t const FADE[] PROGMEM =
-{
-    0x00, 0x22, 0x00, 0x00, 0x00, 0x22, 0x00, 0x44,
-    0x88, 0x22, 0x00, 0x44, 0x88, 0x22, 0x88, 0x44,
-    0x99, 0x22, 0x88, 0x44, 0x99, 0x22, 0x88, 0x55,
-    0x99, 0x66, 0x88, 0x55, 0x99, 0x66, 0x99, 0x55,
-    0x99, 0x66, 0x99, 0x77, 0xdd, 0x66, 0x99, 0x77,
-    0xdd, 0xee, 0x99, 0x77, 0xdd, 0xee, 0xdd, 0x77,
-    0xdd, 0xff, 0xdd, 0x77, 0xff, 0xff, 0xdd, 0x77,
-    0xff, 0xff, 0xdd, 0xff, 0xff, 0xff, 0xff, 0xff,
-};
 #endif
 
 void platform_fade(uint8_t f)
 {
-#if FADE_USING_CONTRAST
     if(f > 15) f = 15;
     f *= 17;
+
+    static uint8_t const VCOM_DES[] PROGMEM = { 0x10, 0x10, 0x10, 0x20 };
+#ifdef ARDUINO
+    static uint8_t const CONTRAST[] PROGMEM = { 0x20, 0x60, 0x90, 0xff };
+#else
+    static uint8_t const CONTRAST[] PROGMEM = { 0x6f, 0x9f, 0xcf, 0xff };
+#endif
+    uint8_t vcom_des = pgm_read_byte(&VCOM_DES[savefile.brightness]);
+    uint8_t brightness = pgm_read_byte(&CONTRAST[savefile.brightness]);
+    f = (f * brightness + f) >> 8;
+
 #ifdef ARDUINO
 #if TRIPLANE
     FX::enableOLED();
-    abg_detail::send_cmds(0x81, f);
+    abg_detail::send_cmds(0xDB, vcom_des, 0x81, f);
     FX::disableOLED();
 #else
     a.setContrast(f);
 #endif
 #else
     fade_factor = float(f) / 255;
-#endif
-#else
-    uint8_t const* fade = &FADE[f * 4];
-#ifdef ARDUINO
-    uint8_t* b = a.getBuffer();
-    for(uint16_t i = 0; i < 1024; i += 4)
-    {
-        b[i + 0] &= pgm_read_byte(fade + 0);
-        b[i + 1] &= pgm_read_byte(fade + 1);
-        b[i + 2] &= pgm_read_byte(fade + 2);
-        b[i + 3] &= pgm_read_byte(fade + 3);
-}
-#else
-    for(uint8_t r = 0; r < 64; ++r)
-    {
-        for(uint8_t c = 0; c < 128; ++c)
-        {
-            if(!((fade[c % 4] >> (r % 8)) & 1))
-                pixels[gplane][r * 128 + c] = 0;
-        }
-    }
-#endif
 #endif
 }
 
@@ -215,7 +191,7 @@ void platform_fx_erase_save_sector()
     assert(now >= ticks_when_ready);
     ticks_when_ready = now + 150;
     for(int i = 0; i < 4096; ++i)
-        SAVE_BLOCK[i] = 0xff;
+        SAVE_BLOCKS[i] = 0xff;
 #endif
 }
 void platform_fx_write_save_page(uint16_t page, void const* data)
@@ -229,17 +205,17 @@ void platform_fx_write_save_page(uint16_t page, void const* data)
     ticks_when_ready = now + 2;
     uint8_t const* u8data = (uint8_t const*)data;
     for(int i = 0; i < 256; ++i)
-        SAVE_BLOCK[page * 256 + i] &= u8data[i];
+        SAVE_BLOCKS[page * 256 + i] &= u8data[i];
 #endif
 }
-void platform_fx_read_save_page(uint16_t page, void* data)
+void platform_fx_read_save_bytes(uint24_t addr, void* data, size_t num)
 {
 #ifdef ARDUINO
-    FX::readSaveBytes(uint24_t(page) << 8, (uint8_t*)data, 256);
+    FX::readSaveBytes(addr, (uint8_t*)data, num);
 #else
     uint8_t* u8data = (uint8_t*)data;
-    for(int i = 0; i < 256; ++i)
-        u8data[i] = SAVE_BLOCK[page * 256 + i];
+    for(size_t i = 0; i < num; ++i)
+        u8data[i] = SAVE_BLOCKS[addr + i];
 #endif
 }
 

@@ -82,6 +82,12 @@ static void update_map()
 {
     if(chunks_are_running && run_chunks()) return;
 
+    if(btns_pressed & BTN_B)
+    {
+        change_state(STATE_PAUSE);
+        return;
+    }
+
     selx = sely = uint16_t(-1);
     if(btns_pressed & BTN_A)
     {
@@ -291,7 +297,6 @@ static void update_resume()
     auto& d = sdata.resume;
     if(d.fade_frame == 0)
     {
-        new_game();
         load_chunks();
         run_chunks();
     }
@@ -308,6 +313,7 @@ void update()
         update_title,
         update_resume,
         update_map,
+        update_pause,
         update_dialog,
         update_tp,
         update_battle,
@@ -322,14 +328,16 @@ void update()
 
     ++nframe;
 
+#if DEBUG_LIPO_DISCHARGE
     if((nframe & 0x7ff) == 0x7ff)
     {
         uint8_t fade = u8rand() & 15;
         if(fade == 0) fade = 1;
         platform_fade(fade);
     }
+#endif
 #if RECORD_LIPO_DISCHARGE
-    if(btns_pressed & BTN_B)
+    if(state == STATE_TITLE) && (btns_pressed & BTN_B))
     {
         int16_t v[10];
         for(uint24_t i = 0; i < 7200 * 2; i += 2)

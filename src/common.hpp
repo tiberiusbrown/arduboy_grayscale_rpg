@@ -122,10 +122,11 @@ extern uint16_t nframe;
 enum
 {
     STATE_TITLE,
-    STATE_RESUME, // fading in to gameplay
-    STATE_MAP,    // moving around on the map
-    STATE_DIALOG, // message or dialog
-    STATE_TP,     // player is teleporting (e.g., entering building or cave)
+    STATE_RESUME,  // fading in to gameplay
+    STATE_MAP,     // moving around on the map
+    STATE_PAUSE,   // pause menu
+    STATE_DIALOG,  // message or dialog
+    STATE_TP,      // player is teleporting (e.g., entering building or cave)
     STATE_BATTLE,
     STATE_GAME_OVER,
     STATE_SAVE,
@@ -156,6 +157,17 @@ struct sdata_tp
 {
     uint16_t tx, ty;
     uint8_t frame;
+};
+struct sdata_pause
+{
+    uint8_t state;
+    uint8_t menuy;
+    uint8_t menui;
+    uint8_t ax, bx;
+    uint8_t optionsy;
+    uint8_t optionsi;
+    uint8_t optionsiy;
+    uint8_t sliderx;
 };
 
 struct battle_member_t
@@ -265,6 +277,7 @@ extern union sdata_t
     sdata_battle battle;
     sdata_game_over game_over;
     sdata_save save;
+    sdata_pause pause;
 } sdata;
 void change_state(uint8_t new_state);
 
@@ -278,11 +291,16 @@ struct party_member_t
 
 struct savefile_t
 {
+    uint16_t checksum;
+    char identifier[8];
     uint16_t px, py;     // player position (in pixels)
     uint8_t pdir;        // player direction
     uint8_t nparty;
     party_member_t party[4];
     uint8_t story_flags[STORY_FLAG_BYTES];
+    uint8_t brightness;
+    uint8_t no_music;
+    uint8_t no_battery_alert;
 };
 extern savefile_t savefile;
 
@@ -337,9 +355,15 @@ extern struct battery_info_t
 } bat;
 void update_battery();
 
+// pause.cpp
+void update_pause();
+void render_pause();
+
 // save.cpp
 void update_save();
 void render_save();
+void load();
+uint16_t compute_checksum();
 
 // platform.cpp
 //     platform abstraction methods
@@ -357,7 +381,7 @@ void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_fx_erase_save_sector(uint16_t page);
 void platform_fx_write_save_page(uint16_t page, void const* data);
-void platform_fx_read_save_page(uint16_t page, void* data);
+void platform_fx_read_save_bytes(uint24_t addr, void* data, size_t num);
 bool platform_fx_busy();
 
 // draw.cpp

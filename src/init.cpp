@@ -27,5 +27,6 @@ void initialize()
 {
     nframe = 0;
     rand_seed = 0xcafe;
+    load();
     change_state(STATE_TITLE);
 }

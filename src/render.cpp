@@ -158,7 +158,7 @@ static void render_battery()
     draw_uint16(0, 36, bat.stage);
 #endif
 
-    if(bat.low_battery)
+    if(!savefile.no_battery_alert && bat.low_battery)
     {
         uint8_t f = (nframe & 0x10) ? 0 : 1;
         platform_fx_drawplusmask(118, 0, BATTERY_IMG, f, 10, 8);
@@ -172,6 +172,7 @@ void render()
         render_title,
         render_resume,
         render_map,
+        render_pause,
         render_dialog,
         render_tp,
         render_battle,
