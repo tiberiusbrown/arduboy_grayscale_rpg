@@ -61,26 +61,24 @@ void update_pause()
         {
             if(btns_pressed & BTN_B)
                 d.state = OS_MENU;
-            if((btns_pressed & BTN_UP) && d.optionsi-- == 0)
+            else if((btns_pressed & BTN_UP) && d.optionsi-- == 0)
                 d.optionsi = 2;
-            if((btns_pressed & BTN_DOWN) && d.optionsi++ == 2)
+            else if((btns_pressed & BTN_DOWN) && d.optionsi++ == 2)
                 d.optionsi = 0;
-            if(btns_pressed & (BTN_A | BTN_RIGHT))
+            else if(btns_pressed & (BTN_A | BTN_LEFT | BTN_RIGHT))
             {
                 if(d.optionsi == 0) savefile.no_music ^= 1;
-                if(d.optionsi == 2) savefile.no_battery_alert ^= 1;
-                if(d.optionsi == 1)
-                    savefile.brightness = (savefile.brightness + 1) & 3;
+                else if(d.optionsi == 2) savefile.no_battery_alert ^= 1;
+                else if(d.optionsi == 1)
+                {
+                    if(btns_pressed & (BTN_A | BTN_RIGHT))
+                        ++savefile.brightness;
+                    if(btns_pressed & BTN_LEFT)
+                        --savefile.brightness;
+                    savefile.brightness &= 3;
+                    platform_fade(15);
+                }
             }
-            if(btns_pressed & BTN_LEFT)
-            {
-                if(d.optionsi == 0) savefile.no_music ^= 1;
-                if(d.optionsi == 2) savefile.no_battery_alert ^= 1;
-                if(d.optionsi == 1)
-                    savefile.brightness = (savefile.brightness - 1) & 3;
-            }
-            if(d.optionsi == 1 && btns_pressed & (BTN_A | BTN_LEFT | BTN_RIGHT))
-                platform_fade(15);
         }
     }
     else if(d.state == OS_QUIT)
@@ -193,15 +191,18 @@ void render_pause()
         if(!savefile.no_battery_alert)
             platform_fx_drawoverwrite(71, y + 52, CHECK_IMG, 0, 8, 8);
         platform_fx_drawoverwrite(d.sliderx, y + 33, SLIDER_IMG, 0, 7, 8);
-        platform_drawrect(1, y + d.optionsiy, 126, 14, DARK_GRAY);
+        if(plane() == 0)
+            platform_drawrect(1, y + d.optionsiy, 126, 14, DARK_GRAY);
     }
     if(d.quity > 0)
     {
         int16_t y = 64 - d.quity;
         platform_fx_drawoverwrite(0, y, QUIT_IMG, 0, 128, 64);
-        platform_drawrect(16, y + d.quitiy, 96, 12, DARK_GRAY);
         if(plane() == 0)
+        {
+            platform_drawrect(16, y + d.quitiy, 96, 12, DARK_GRAY);
             platform_fillrect(16, y + d.quitiy, d.quitf, 12, DARK_GRAY);
+        }
         if(d.quitfade > 16 * FADE_SPEED)
             platform_fade(15 - d.quitfade);
     }

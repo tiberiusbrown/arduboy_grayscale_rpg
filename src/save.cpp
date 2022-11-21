@@ -1,5 +1,7 @@
 #include "common.hpp"
 
+#include <string.h>
+
 static char const IDENTIFIER[8] PROGMEM = "ROTArdu";
 
 void update_save()
@@ -21,6 +23,7 @@ void load()
             id = false;
     if(!id || compute_checksum() != savefile.checksum)
     {
+        memset(&savefile, 0, sizeof(savefile));
         new_game();
         savefile.brightness = 3;
     }
