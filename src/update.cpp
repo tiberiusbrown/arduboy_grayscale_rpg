@@ -285,6 +285,8 @@ static void update_title()
     }
     else
     {
+        if(d.fade_frame == 0)
+            load();
         if(d.fade_frame < 24)
             d.fade_frame += FADE_SPEED;
         else if(btns_pressed & BTN_A)

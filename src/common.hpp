@@ -168,6 +168,13 @@ struct sdata_pause
     uint8_t optionsi;
     uint8_t optionsiy;
     uint8_t sliderx;
+    uint8_t quity;
+    uint8_t quiti;
+    uint8_t quitiy;
+    uint8_t quitf;
+    uint8_t quitft;
+    bool quitp;
+    uint8_t quitfade;
 };
 
 struct battle_member_t
