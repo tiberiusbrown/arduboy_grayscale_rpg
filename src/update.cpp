@@ -78,6 +78,10 @@ static void update_enemies()
     }
 }
 
+#ifdef ARDUINO
+#include <ArduboyTonesPitches.h>
+#endif
+
 static void update_map()
 {
     if(chunks_are_running && run_chunks()) return;

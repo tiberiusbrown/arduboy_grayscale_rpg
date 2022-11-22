@@ -72,15 +72,25 @@ void update_pause()
                 optionsi = 0;
             else if(btns_pressed & (BTN_A | BTN_LEFT | BTN_RIGHT))
             {
-                if(optionsi == 0) savefile.no_music ^= 1;
-                else if(optionsi == 2) savefile.no_battery_alert ^= 1;
+                if(optionsi == 0)
+                {
+                    if(savefile.music_volume < 2 && (btns_pressed & (BTN_A | BTN_RIGHT)))
+                        ++savefile.music_volume;
+                    if(savefile.music_volume > 0 && (btns_pressed & BTN_LEFT))
+                        --savefile.music_volume;
+                    if(savefile.music_volume > 0)
+                        platform_audio_on();
+                    else
+                        platform_audio_off();
+                }
+                else if(optionsi == 2)
+                    savefile.no_battery_alert = !savefile.no_battery_alert;
                 else if(optionsi == 1)
                 {
-                    if(btns_pressed & (BTN_A | BTN_RIGHT))
+                    if(savefile.brightness < 3 && (btns_pressed & (BTN_A | BTN_RIGHT)))
                         ++savefile.brightness;
-                    if(btns_pressed & BTN_LEFT)
+                    if(savefile.brightness > 0 && (btns_pressed & BTN_LEFT))
                         --savefile.brightness;
-                    savefile.brightness &= 3;
                     platform_fade(15);
                 }
             }
@@ -122,7 +132,7 @@ void update_pause()
                 d.quitp = true;
             if(d.quitp && (btns_down & BTN_A))
             {
-                if((d.quitft += 2) >= 96)
+                if((d.quitft += 3) >= 96)
                 {
                     d.quitft = 96;
                     d.quitfade = 1;
@@ -144,10 +154,15 @@ void update_pause()
     {
         if(d.savey >= 64)
         {
-            if(is_saving())
+            if(d.save_wait > 0)
+            {
+                if(++d.save_wait == 16)
+                    d.state = OS_RESUMING;
+            }
+            else if(is_saving())
             {
                 if(save_done())
-                    d.state = OS_RESUMING;
+                    d.save_wait = 1;
             }
             else
             {
@@ -190,9 +205,14 @@ void update_pause()
         d.quitiy = adjust(d.quitiy, ty);
     }
     {
+        uint8_t tx = savefile.music_volume * 24 + 70;
+        if(d.musicx == 0) d.musicx = tx;
+        d.musicx = adjust(d.musicx, tx);
+    }
+    {
         uint8_t tx = savefile.brightness * 16 + 70;
-        if(d.sliderx == 0) d.sliderx = tx;
-        d.sliderx = adjust(d.sliderx, tx);
+        if(d.brightnessx == 0) d.brightnessx = tx;
+        d.brightnessx = adjust(d.brightnessx, tx);
     }
 }
 
@@ -212,11 +232,10 @@ void render_pause()
     {
         int16_t y = 64 - d.optionsy;
         platform_fx_drawoverwrite(0, y, OPTIONS_IMG, 0, 128, 64);
-        if(!savefile.no_music)
-            platform_fx_drawoverwrite(71, y + 20, CHECK_IMG, 0, 8, 8);
+        platform_fx_drawoverwrite(d.musicx, y + 17, SLIDER_IMG, 0, 7, 8);
+        platform_fx_drawoverwrite(d.brightnessx, y + 33, SLIDER_IMG, 0, 7, 8);
         if(!savefile.no_battery_alert)
             platform_fx_drawoverwrite(71, y + 52, CHECK_IMG, 0, 8, 8);
-        platform_fx_drawoverwrite(d.sliderx, y + 33, SLIDER_IMG, 0, 7, 8);
         if(plane() == 0)
             platform_drawrect(1, y + d.optionsiy, 126, 14, DARK_GRAY);
     }
@@ -230,13 +249,16 @@ void render_pause()
             platform_fillrect(16, y + d.quitiy, d.quitf, 12, DARK_GRAY);
         }
         if(d.quitfade > 16 * FADE_SPEED)
-            platform_fade(15 - d.quitfade);
+            platform_fade(16 * FADE_SPEED + 15 - d.quitfade);
     }
     if(d.savey > 0)
     {
         int16_t y = 64 - d.savey;
         platform_fillrect(0, y, 128, 64, BLACK);
         static char const SAVE_MSG[] PROGMEM = "Saving...";
-        draw_text_prog(49, y + 28, SAVE_MSG);
+        draw_text_prog(39, y + 28, SAVE_MSG);
+        static char const DONE_MSG[] PROGMEM = "Done!";
+        if(d.save_wait > 0)
+            draw_text_prog(71, y + 28, DONE_MSG);
     }
 }

@@ -6,6 +6,7 @@
 #define SPRITESU_OVERWRITE
 #define SPRITESU_FX
 #include "SpritesU.hpp"
+#include <ArduboyTones.h>
 #else
 #include "generated/fxdata_emulated.hpp"
 #include <SDL.h>
@@ -58,13 +59,9 @@ void platform_fade(uint8_t f)
     f = (f * brightness + f) >> 8;
 
 #ifdef ARDUINO
-#if TRIPLANE
     FX::enableOLED();
     abg_detail::send_cmds(0xDB, vcom_des, 0x81, f);
     FX::disableOLED();
-#else
-    a.setContrast(f);
-#endif
 #else
     fade_factor = float(f) / 255;
 #endif
@@ -159,11 +156,7 @@ void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c)
 #ifdef ARDUINO
     a.fillRect(x, y, w, h, c);
 #else
-#if TRIPLANE
     c = (c > gplane) ? 1 : 0;
-#else
-    c = (c & (gplane + 1)) ? 1 : 0;
-#endif
     for(uint8_t i = 0; i != h; ++i)
         for(uint8_t j = 0; j != w; ++j)
             if(unsigned(y + i) < 64 && unsigned(x + j) < 128)
@@ -239,3 +232,71 @@ bool platform_fx_busy()
     return SDL_GetTicks64() < ticks_when_ready;
 #endif
 }
+
+void platform_audio_toggle()
+{
+    if(platform_audio_enabled())
+        platform_audio_off();
+    else
+        platform_audio_on();
+}
+
+#ifdef ARDUINO
+
+void platform_audio_init()
+{
+    Arduboy2Audio::begin();
+    ArduboyTones::ArduboyTones(Arduboy2Audio::enabled);
+}
+
+void platform_audio_on()
+{
+    Arduboy2Audio::on();
+    static_assert(1 == VOLUME_ALWAYS_NORMAL, "");
+    static_assert(2 == VOLUME_ALWAYS_HIGH, "");
+    ArduboyTones::volumeMode(savefile.music_volume);
+}
+
+void platform_audio_off()
+{
+    Arduboy2Audio::off();
+}
+
+bool platform_audio_enabled()
+{
+    return Arduboy2Audio::enabled();
+}
+
+void platform_audio_play(uint16_t const* song)
+{
+    ArduboyTones::tonesInRAM(song);
+}
+
+void platform_audio_play_prog(uint16_t const* song)
+{
+    ArduboyTones::tones(song);
+}
+
+void platform_audio_stop()
+{
+    ArduboyTones::noTone();
+}
+
+bool platform_audio_playing()
+{
+    return ArduboyTones::playing();
+}
+
+#else
+
+static bool audio_enabled;
+void platform_audio_init() {}
+void platform_audio_on() { audio_enabled = true; }
+void platform_audio_off() { audio_enabled = false; }
+bool platform_audio_enabled() { return audio_enabled; }
+void platform_audio_play(uint16_t const* song) {}
+void platform_audio_play_prog(uint16_t const* song) {}
+void platform_audio_stop() {}
+bool platform_audio_playing() { return false; }
+
+#endif

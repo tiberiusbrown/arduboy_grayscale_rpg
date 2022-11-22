@@ -2,6 +2,10 @@
 
 #include <string.h>
 
+#ifdef ARDUINO
+#include <EEPROM.h>
+#endif
+
 static uint8_t const IDENTIFIER[8] PROGMEM =
 {
     '_', 'R', 'o', 't', 'A', '_',
@@ -40,6 +44,9 @@ bool save_done()
     constexpr uint8_t pages = (sizeof(savefile) + 255) / 256;
     if(save_page >= pages)
     {
+#ifdef ARDUINO
+        Arduboy2Audio::saveOnOff();
+#endif
         save_stage = SS_DONE;
         return true;
     }
@@ -58,11 +65,16 @@ void load()
     for(uint8_t i = 0; i < 8; ++i)
         if(savefile.identifier[i] != pgm_read_byte(&IDENTIFIER[i]))
             id = false;
+#ifdef ARDUINO
+    Arduboy2Audio::begin();
+#endif
     if(!id || compute_checksum() != savefile.checksum)
     {
         memset(&savefile, 0, sizeof(savefile));
         new_game();
         savefile.brightness = 3;
+        if(platform_audio_enabled())
+            savefile.music_volume = 1;
     }
 }
 

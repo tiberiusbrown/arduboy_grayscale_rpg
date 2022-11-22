@@ -6,8 +6,6 @@ constexpr uint16_t VERSION = 1;
 
 constexpr uint8_t TELEPORT_TRANSITION_FRAMES = 16;
 constexpr uint8_t FADE_SPEED = 2;
-#define FADE_USING_CONTRAST 1
-#define TRIPLANE 1
 
 #define DEBUG_LIPO_DISCHARGE 0
 #ifdef ARDUINO
@@ -19,10 +17,8 @@ constexpr uint8_t FADE_SPEED = 2;
 #include "generated/story_flags.hpp"
 
 #ifdef ARDUINO
-//#define ABG_TIMER4
+#define ABG_TIMER4
 #define ABG_SYNC_PARK_ROW
-
-#if TRIPLANE
 #define ABG_UPDATE_EVERY_N_DEFAULT 11
 #define ABG_UPDATE_EVERY_N_DENOM_DEFAULT 7
 #define ABG_PRECHARGE_CYCLES 1
@@ -30,15 +26,7 @@ constexpr uint8_t FADE_SPEED = 2;
 #define ABG_FPS_DEFAULT 156
 #include "ArduboyG.h"
 extern ArduboyGBase_Config<ABG_Mode::L4_Triplane> a;
-#else
-#define ABG_UPDATE_EVERY_N_DEFAULT 2
-#define ABG_PRECHARGE_CYCLES 2
-#define ABG_DISCHARGE_CYCLES 1
-#define ABG_FPS_DEFAULT 132
-#include "ArduboyG.h"
-extern ArduboyGBase a;
-#endif
-
+#include <ArduboyTones.h>
 using int24_t = __int24;
 using uint24_t = __uint24;
 inline uint8_t plane()
@@ -79,7 +67,7 @@ inline uint8_t plane()
 }
 #endif
 
-constexpr uint8_t PLANES = TRIPLANE ? 3 : 2;
+constexpr uint8_t PLANES = 3;
 constexpr uint8_t INVALID = -1;
 
 // useful when T is a pointer type, like function pointer or char const*
@@ -168,7 +156,8 @@ struct sdata_pause
     uint8_t optionsy;
     uint8_t optionsi;
     uint8_t optionsiy;
-    uint8_t sliderx;
+    uint8_t musicx;
+    uint8_t brightnessx;
     uint8_t quity;
     uint8_t quiti;
     uint8_t quitiy;
@@ -177,6 +166,7 @@ struct sdata_pause
     bool quitp;
     uint8_t quitfade;
     uint8_t savey;
+    uint8_t save_wait;
 };
 
 struct battle_member_t
@@ -307,9 +297,9 @@ struct savefile_t
     uint8_t nparty;
     party_member_t party[4];
     uint8_t story_flags[STORY_FLAG_BYTES];
+    uint8_t music_volume;
     uint8_t brightness;
-    uint8_t no_music;
-    uint8_t no_battery_alert;
+    bool no_battery_alert;
 };
 extern savefile_t savefile;
 
@@ -393,6 +383,15 @@ void platform_fx_erase_save_sector();
 void platform_fx_write_save_page(uint16_t page, void const* data, size_t num);
 void platform_fx_read_save_bytes(uint24_t addr, void* data, size_t num);
 bool platform_fx_busy();
+void platform_audio_init();
+void platform_audio_on();
+void platform_audio_off();
+void platform_audio_toggle();
+bool platform_audio_enabled();
+void platform_audio_play(uint16_t const* song);
+void platform_audio_play_prog(uint16_t const* song);
+void platform_audio_stop();
+bool platform_audio_playing();
 
 // draw.cpp
 void draw_tile(int16_t x, int16_t y, uint8_t t);

@@ -186,10 +186,8 @@ int main(int argc, char** argv)
         gplane = 1;
         render();
 
-#if TRIPLANE
         gplane = 2;
         render();
-#endif
 
         if(frame == 1) send_gif_frame();
 
@@ -200,12 +198,8 @@ int main(int argc, char** argv)
         {
             int p0 = pixels[0][i];
             int p1 = pixels[1][i];
-#if TRIPLANE
             int p2 = pixels[2][i];
             int pf = p0 + p1 + p2;
-#else
-            int pf = p0 + p1 * 2;
-#endif
             uint8_t p = colormap(pf);
             tex_pixels[i * 4 + 0] = p;
             tex_pixels[i * 4 + 1] = p;

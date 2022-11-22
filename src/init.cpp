@@ -27,5 +27,6 @@ void initialize()
 {
     nframe = 0;
     rand_seed = 0xcafe;
+    platform_audio_init();
     change_state(STATE_TITLE);
 }
