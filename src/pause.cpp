@@ -73,16 +73,7 @@ void update_pause()
             else if(btns_pressed & (BTN_A | BTN_LEFT | BTN_RIGHT))
             {
                 if(optionsi == 0)
-                {
-                    if(savefile.music_volume < 2 && (btns_pressed & (BTN_A | BTN_RIGHT)))
-                        ++savefile.music_volume;
-                    if(savefile.music_volume > 0 && (btns_pressed & BTN_LEFT))
-                        --savefile.music_volume;
-                    if(savefile.music_volume > 0)
-                        platform_audio_on();
-                    else
-                        platform_audio_off();
-                }
+                    platform_audio_toggle();
                 else if(optionsi == 2)
                     savefile.no_battery_alert = !savefile.no_battery_alert;
                 else if(optionsi == 1)
@@ -205,11 +196,6 @@ void update_pause()
         d.quitiy = adjust(d.quitiy, ty);
     }
     {
-        uint8_t tx = savefile.music_volume * 24 + 70;
-        if(d.musicx == 0) d.musicx = tx;
-        d.musicx = adjust(d.musicx, tx);
-    }
-    {
         uint8_t tx = savefile.brightness * 16 + 70;
         if(d.brightnessx == 0) d.brightnessx = tx;
         d.brightnessx = adjust(d.brightnessx, tx);
@@ -232,8 +218,9 @@ void render_pause()
     {
         int16_t y = 64 - d.optionsy;
         platform_fx_drawoverwrite(0, y, OPTIONS_IMG, 0, 128, 64);
-        platform_fx_drawoverwrite(d.musicx, y + 17, SLIDER_IMG, 0, 7, 8);
         platform_fx_drawoverwrite(d.brightnessx, y + 33, SLIDER_IMG, 0, 7, 8);
+        if(platform_audio_enabled())
+            platform_fx_drawoverwrite(71, y + 20, CHECK_IMG, 0, 8, 8);
         if(!savefile.no_battery_alert)
             platform_fx_drawoverwrite(71, y + 52, CHECK_IMG, 0, 8, 8);
         if(plane() == 0)

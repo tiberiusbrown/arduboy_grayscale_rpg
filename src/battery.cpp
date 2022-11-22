@@ -12,7 +12,6 @@ static int16_t filter256(int16_t y, int16_t x)
 
 #if RECORD_LIPO_DISCHARGE
 #include <hardwareSerial.h>
-#include "ArduboyFX.h"
 #endif
 
 static void battery_dsp(int16_t reading)

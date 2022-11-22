@@ -1,12 +1,10 @@
 #include "common.hpp"
 
 #ifdef ARDUINO
-#include "ArduboyFX.h"
 #define SPRITESU_IMPLEMENTATION
 #define SPRITESU_OVERWRITE
 #define SPRITESU_FX
 #include "SpritesU.hpp"
-#include <ArduboyTones.h>
 #else
 #include "generated/fxdata_emulated.hpp"
 #include <SDL.h>
@@ -241,20 +239,21 @@ void platform_audio_toggle()
         platform_audio_on();
 }
 
+void platform_audio_play_sfx(uint8_t const* sfx)
+{
+    platform_audio_play_sfx(sfx, 0);
+}
+
 #ifdef ARDUINO
 
 void platform_audio_init()
 {
-    Arduboy2Audio::begin();
-    ArduboyTones::ArduboyTones(Arduboy2Audio::enabled);
+    atm_synth_setup();
 }
 
 void platform_audio_on()
 {
     Arduboy2Audio::on();
-    static_assert(1 == VOLUME_ALWAYS_NORMAL, "");
-    static_assert(2 == VOLUME_ALWAYS_HIGH, "");
-    ArduboyTones::volumeMode(savefile.music_volume);
 }
 
 void platform_audio_off()
@@ -267,24 +266,14 @@ bool platform_audio_enabled()
     return Arduboy2Audio::enabled();
 }
 
-void platform_audio_play(uint16_t const* song)
+void platform_audio_play_song(uint8_t const* song)
 {
-    ArduboyTones::tonesInRAM(song);
+    atm_synth_start_score(song);
 }
 
-void platform_audio_play_prog(uint16_t const* song)
+void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot)
 {
-    ArduboyTones::tones(song);
-}
-
-void platform_audio_stop()
-{
-    ArduboyTones::noTone();
-}
-
-bool platform_audio_playing()
-{
-    return ArduboyTones::playing();
+    atm_synth_play_sfx_track(slot, slot, sfx);
 }
 
 #else
@@ -294,9 +283,7 @@ void platform_audio_init() {}
 void platform_audio_on() { audio_enabled = true; }
 void platform_audio_off() { audio_enabled = false; }
 bool platform_audio_enabled() { return audio_enabled; }
-void platform_audio_play(uint16_t const* song) {}
-void platform_audio_play_prog(uint16_t const* song) {}
-void platform_audio_stop() {}
-bool platform_audio_playing() { return false; }
+void platform_audio_play_song(uint8_t const* song) {}
+void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot) {}
 
 #endif

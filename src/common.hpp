@@ -17,7 +17,9 @@ constexpr uint8_t FADE_SPEED = 2;
 #include "generated/story_flags.hpp"
 
 #ifdef ARDUINO
-#define ABG_TIMER4
+#include <ArduboyFX.h>
+#include <ATMlib2.h>
+#define ABG_TIMER1
 #define ABG_SYNC_PARK_ROW
 #define ABG_UPDATE_EVERY_N_DEFAULT 11
 #define ABG_UPDATE_EVERY_N_DENOM_DEFAULT 7
@@ -26,7 +28,6 @@ constexpr uint8_t FADE_SPEED = 2;
 #define ABG_FPS_DEFAULT 156
 #include "ArduboyG.h"
 extern ArduboyGBase_Config<ABG_Mode::L4_Triplane> a;
-#include <ArduboyTones.h>
 using int24_t = __int24;
 using uint24_t = __uint24;
 inline uint8_t plane()
@@ -156,7 +157,6 @@ struct sdata_pause
     uint8_t optionsy;
     uint8_t optionsi;
     uint8_t optionsiy;
-    uint8_t musicx;
     uint8_t brightnessx;
     uint8_t quity;
     uint8_t quiti;
@@ -297,7 +297,6 @@ struct savefile_t
     uint8_t nparty;
     party_member_t party[4];
     uint8_t story_flags[STORY_FLAG_BYTES];
-    uint8_t music_volume;
     uint8_t brightness;
     bool no_battery_alert;
 };
@@ -388,10 +387,9 @@ void platform_audio_on();
 void platform_audio_off();
 void platform_audio_toggle();
 bool platform_audio_enabled();
-void platform_audio_play(uint16_t const* song);
-void platform_audio_play_prog(uint16_t const* song);
-void platform_audio_stop();
-bool platform_audio_playing();
+void platform_audio_play_song(uint8_t const* song);
+void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot);
+void platform_audio_play_sfx(uint8_t const* sfx);
 
 // draw.cpp
 void draw_tile(int16_t x, int16_t y, uint8_t t);

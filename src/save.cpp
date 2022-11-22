@@ -73,8 +73,6 @@ void load()
         memset(&savefile, 0, sizeof(savefile));
         new_game();
         savefile.brightness = 3;
-        if(platform_audio_enabled())
-            savefile.music_volume = 1;
     }
 }
 

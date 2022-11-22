@@ -79,7 +79,17 @@ static void update_enemies()
 }
 
 #ifdef ARDUINO
-#include <ArduboyTonesPitches.h>
+static uint8_t const sfx0[] PROGMEM = {
+    ATM_SCORE_FMT_MINIMAL_MONO,
+    ATM_CMD_M_SET_TEMPO(32),
+    ATM_CMD_M_SET_VOLUME(127),
+    ATM_CMD_M_SLIDE_VOL_ON(-8),
+    ATM_CMD_I_NOTE_F6,
+    ATM_CMD_M_DELAY_TICKS(5),
+    ATM_CMD_I_NOTE_G6,
+    ATM_CMD_M_DELAY_TICKS(11),
+    ATM_CMD_I_STOP,
+};
 #endif
 
 static void update_map()
@@ -99,6 +109,9 @@ static void update_map()
         int8_t dy = (int8_t)pgm_read_byte(&DIRY[pdir]) * 8;
         selx = (px + 8 + dx) >> 4;
         sely = (py + 8 + dy) >> 4;
+#ifdef ARDUINO
+        platform_audio_play_sfx(sfx0);
+#endif
     }
 
     int8_t dx = 0, dy = 0;
@@ -274,7 +287,6 @@ static void update_game_over()
 
 #if RECORD_LIPO_DISCHARGE
 #include <hardwareSerial.h>
-#include "ArduboyFX.h"
 #endif
 
 static void update_title()

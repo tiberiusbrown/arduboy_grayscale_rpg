@@ -95,7 +95,8 @@ Example Usage:
 #endif
 
 #if !defined(ABG_TIMER3) && \
-    !defined(ABG_TIMER4)
+    !defined(ABG_TIMER4) && \
+    !defined(ABG_TIMER1)
 #define ABG_TIMER3
 #endif
 
@@ -249,6 +250,13 @@ struct ArduboyG_Common : public BASE
         TCCR3B = _BV(WGM33) | _BV(WGM32) | _BV(CS31) | _BV(CS30);
         TCNT3 = 0;
         bitWrite(TIMSK3, OCIE3A, 1);
+#elif defined(ABG_TIMER1)
+        // Fast PWM mode, prescaler /64
+        OCR1A = timer_counter;
+        TCCR1A = _BV(WGM11) | _BV(WGM10);
+        TCCR1B = _BV(WGM13) | _BV(WGM12) | _BV(CS11) | _BV(CS10);
+        TCNT1 = 0;
+        bitWrite(TIMSK1, OCIE1A, 1);
 #elif defined(ABG_TIMER4)
         // Fast PWM mode, prescaler /256
         TC4H = (timer_counter >> 8);
@@ -1007,7 +1015,7 @@ namespace abg_detail
 #define ABG_CONTRAST_DEFAULT 255
 #endif
 
-#if defined(ABG_TIMER3)
+#if defined(ABG_TIMER3) || defined(ABG_TIMER1)
 uint16_t timer_counter = F_CPU / 64 / ABG_FPS_DEFAULT;
 #elif defined(ABG_TIMER4)
 uint16_t timer_counter = F_CPU / 256 / ABG_FPS_DEFAULT;
@@ -1715,6 +1723,7 @@ template void draw_sprite_dispatch<SpriteMode::ExternalMask>(
 }
 
 #if defined(ABG_TIMER3)
+
 ISR(TIMER3_COMPA_vect)
 {
     using namespace abg_detail;
@@ -1732,7 +1741,29 @@ ISR(TIMER3_COMPA_vect)
 #endif
     needs_display = true;
 }
+
+#elif defined(ABG_TIMER1)
+
+ISR(TIMER1_COMPA_vect)
+{
+    using namespace abg_detail;
+#if defined(ABG_SYNC_THREE_PHASE)
+    if(++current_phase >= 4)
+        current_phase = 1;
+    if(current_phase == 1)
+        OCR1A = (timer_counter >> 4) + 1; // phase 2 delay: 4 lines
+    else if(current_phase == 2)
+        OCR1A = timer_counter;            // phase 3 delay: 64 lines
+    else if(current_phase == 3)
+        OCR1A = (timer_counter >> 4) + 1; // phase 1 delay: 4 lines
+#elif defined(ABG_SYNC_PARK_ROW) || defined(ABG_SYNC_SLOW_DRIVE)
+    OCR1A = timer_counter;
+#endif
+    needs_display = true;
+}
+
 #elif defined(ABG_TIMER4)
+
 ISR(TIMER4_OVF_vect)
 {
     using namespace abg_detail;
@@ -1754,6 +1785,7 @@ ISR(TIMER4_OVF_vect)
 #endif
     needs_display = true;
 }
+
 #endif
 
 #endif // ABG_IMPLEMENTATION

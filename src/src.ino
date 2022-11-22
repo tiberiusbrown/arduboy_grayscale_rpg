@@ -6,7 +6,6 @@
 
 decltype(a) a;
 
-
 #ifdef REMOVE_TIMER0
 ISR(remove_timer0, __attribute__((naked))) {}
 #endif
