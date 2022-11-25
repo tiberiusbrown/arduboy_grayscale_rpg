@@ -179,6 +179,7 @@ static void battle_next_turn()
             if(e.id != INVALID && e.hp > 0) victory = false;
         if(victory)
         {
+            platform_audio_play_song(song_victory());
             d.next_phase = BPHASE_OUTRO;
             d.phase = BPHASE_DELAY;
             d.frame = -32;
@@ -578,6 +579,10 @@ void render_battle()
             draw_battle_sprites();
         }
         int16_t x2 = -(x + 16);
+#if 1
+        platform_fillrect(x2,  0, 144, 24, BLACK);
+        platform_fillrect(x2, 40, 144, 24, BLACK);
+#else
         for(uint8_t i = 0; i < 24; i += 8)
         {
             for(uint8_t j = 0; j < 144; j += 16)
@@ -587,6 +592,7 @@ void render_battle()
                 platform_fillrect(x2 + j, i + 40, 16, 8, c);
             }
         }
+#endif
         uint8_t f = (phase == BPHASE_INTRO ? 0 : 1);
         platform_fx_drawoverwrite(x, 24, BATTLE_BANNERS_IMG, f, 144, 16);
         return;

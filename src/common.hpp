@@ -18,7 +18,7 @@ constexpr uint8_t FADE_SPEED = 2;
 
 #ifdef ARDUINO
 #include <ArduboyFX.h>
-#include <ATMlib2.h>
+#include "ATMlib2/ATMlib2.h"
 #define ABG_TIMER1
 #define ABG_SYNC_PARK_ROW
 #define ABG_UPDATE_EVERY_N_DEFAULT 11
@@ -434,3 +434,12 @@ void render_battle();
 // init.cpp
 void initialize();
 void new_game();
+
+// songs
+extern "C" {
+#ifdef ARDUINO
+uint8_t const* song_victory();
+#else
+inline uint8_t const* song_victory() { return nullptr; }
+#endif
+}

@@ -4,6 +4,7 @@
 #define SPRITESU_IMPLEMENTATION
 #define SPRITESU_OVERWRITE
 #define SPRITESU_FX
+#define SPRITESU_RECT
 #include "SpritesU.hpp"
 #else
 #include "generated/fxdata_emulated.hpp"
@@ -152,9 +153,11 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c)
 {
 #ifdef ARDUINO
-    a.fillRect(x, y, w, h, c);
+    //a.fillRect(x, y, w, h, c);
+    c = (c > plane()) ? 1 : 0;
+    SpritesU::fillRect(x, y, w, h, c);
 #else
-    c = (c > gplane) ? 1 : 0;
+    c = (c > plane()) ? 1 : 0;
     for(uint8_t i = 0; i != h; ++i)
         for(uint8_t j = 0; j != w; ++j)
             if(unsigned(y + i) < 64 && unsigned(x + j) < 128)
@@ -165,7 +168,11 @@ void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c)
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c)
 {
 #ifdef ARDUINO
-    a.drawRect(x, y, w, h, c);
+    //a.drawRect(x, y, w, h, c);
+    platform_fillrect(x, y, w, 1, c);
+    platform_fillrect(x, y + h - 1, w, 1, c);
+    platform_fillrect(x, y, 1, h, c);
+    platform_fillrect(x + w - 1, y, 1, h, c);
 #else
     platform_fillrect(x, y, w, 1, c);
     platform_fillrect(x, y + h - 1, w, 1, c);

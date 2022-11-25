@@ -14,7 +14,7 @@ if not exist "%dir%" mkdir %dir%
 arduino-cli.exe compile -v --log-level info ^
     -b arduboy:avr:arduboy . ^
     --output-dir "%dir%" ^
-    --build-property compiler.c.elf.extra_flags="-Wl,--relax" ^
+    --build-property compiler.c.elf.extra_flags="-mstrict-X -Wl,--relax" ^
     --build-property compiler.c.extra_flags="-mcall-prologues %remove_timer0%" ^
     --build-property compiler.cpp.extra_flags="{compiler.c.extra_flags}"
 if NOT %errorlevel%==0 goto error

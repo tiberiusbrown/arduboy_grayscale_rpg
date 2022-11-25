@@ -864,18 +864,18 @@ protected:
             "   mov   r16, __zero_reg__         ;1        \n\t" //    tmp2 = 0;
             "   st    %a[ptr], r16              ;2        \n\t" //*(image) = tmp2
             "   subi  r16, 0                    ;1        \n\t" //[delay]
-            "   sbiw  %a[count], 0              ;2        \n\t" //[delay]
-            "   sbiw  %a[count], 0              ;2        \n\t" //[delay]
+            "   sbiw  %A[count], 0              ;2        \n\t" //[delay]
+            "   sbiw  %A[count], 0              ;2        \n\t" //[delay]
             "   and   __tmp_reg__, %[mask]      ;1        \n\t" //tmp &= mask
             "   out   %[spdr], __tmp_reg__      ;1        \n\t" //SPDR = tmp
-            "   sbiw  %a[count], 1              ;2        \n\t" //len--
+            "   sbiw  %A[count], 1              ;2        \n\t" //len--
             "   brne  1b                        ;1/2 :18  \n\t" //len > 0
             "   in    __tmp_reg__, %[spsr]                \n\t" //read SPSR to clear SPIF
-            "   sbiw  %a[count], 0                        \n\t"
-            "   sbiw  %a[count], 0                        \n\t" // delay before resetting DORD
-            "   sbiw  %a[count], 0                        \n\t" // below so it doesn't mess up
-            "   sbiw  %a[count], 0                        \n\t" // the last transfer
-            "   sbiw  %a[count], 0                        \n\t"
+            "   sbiw  %A[count], 0                        \n\t"
+            "   sbiw  %A[count], 0                        \n\t" // delay before resetting DORD
+            "   sbiw  %A[count], 0                        \n\t" // below so it doesn't mess up
+            "   sbiw  %A[count], 0                        \n\t" // the last transfer
+            "   sbiw  %A[count], 0                        \n\t"
             : [ptr]     "+&e" (image),
               [count]   "+&w" (count)
             : [spdr]    "I"   (_SFR_IO_ADDR(SPDR)),
@@ -1063,7 +1063,7 @@ void fast_rect(int16_t x, int16_t y, uint8_t w, uint8_t h, bool CLEAR)
 {
     if(y >=  64) return;
     if(x >= 128) return;
-    if(w == 0 || h == 0) return;
+    if((w & h) == 0) return;
     if(y + h <= 0) return;
     if(x + w <= 0) return;
     

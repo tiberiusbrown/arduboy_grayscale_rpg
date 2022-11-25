@@ -5,6 +5,7 @@ Options
     SPRITESU_OVERWRITE
     SPRITESU_PLUSMASK
     SPRITESU_FX
+    SPRITESU_RECT
 */
 
 #pragma once
@@ -35,6 +36,12 @@ struct SpritesU
     static void drawPlusMaskFX(
         int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame);
 #endif
+
+#ifdef SPRITESU_RECT
+    // color: zero for BLACK, 1 for WHITE
+    static void fillRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t color);
+#endif
+
 };
 
 #ifdef SPRITESU_IMPLEMENTATION
@@ -52,20 +59,20 @@ static void SpritesU_DrawCommon(
     if(y >= 64)  return;
     if(x + w <= 0) return;
     if(y + h <= 0) return;
-    
+
     uint8_t pages = h;
     asm volatile(
         "lsr %[pages]\n"
         "lsr %[pages]\n"
         "lsr %[pages]\n"
         : [pages] "+&r" (pages));
-    
+
     {
         uint8_t frame_pages = pages;
         if(mode & 1) frame_pages *= 2;
         image += uint16_t((frame_pages * w) * frame);
     }
-    
+
     uint8_t shift_coef = FX::bitShiftLeftUInt8(y);
     uint16_t shift_mask = ~(0xff * shift_coef);
 
@@ -78,7 +85,7 @@ static void SpritesU_DrawCommon(
         "asr %B[y]\n"
         "ror %A[y]\n"
         : [y] "+&r" (y));
-    
+
     // clip against top edge
     int8_t page_start = int8_t(y);
     if(page_start < -1)
@@ -89,7 +96,7 @@ static void SpritesU_DrawCommon(
         image += tp * w;
         page_start = -1;
     }
-    
+
     // clip against left edge
     uint8_t cols = w;
     uint8_t col_start = x;
@@ -101,7 +108,7 @@ static void SpritesU_DrawCommon(
         cols += x;
         col_start = 0;
     }
-    
+
     uint8_t* buf = Arduboy2Base::sBuffer;
     asm volatile(
         "mulsu %[page_start], %[c128]\n"
@@ -124,15 +131,15 @@ static void SpritesU_DrawCommon(
         if(cols > max_cols)
             cols = max_cols;
     }
-    
+
     // clip against bottom edge
-    bool bottom = false; 
+    bool bottom = false;
     if(pages > 7 - page_start)
     {
         pages = 7 - page_start;
         bottom = true;
     }
-    
+
     uint8_t buf_adv = 128 - cols;
     uint16_t image_adv = w;
 #ifdef SPRITESU_FX
@@ -140,28 +147,28 @@ static void SpritesU_DrawCommon(
 #endif
         image_adv -= cols;
     if(mode & 1) image_adv *= 2;
-    
+
     uint16_t image_data;
     uint16_t mask_data;
     uint8_t buf_data;
     uint8_t count;
-    
+
 #ifdef SPRITESU_OVERWRITE
     if(mode == SPRITESU_MODE_OVERWRITE)
     {
         uint8_t const* image_ptr = (uint8_t const*)image;
         asm volatile(R"ASM(
-        
+
                 cpi %[page_start], 0
                 brge L%=_middle
-                
+
                 ; advance buf to next page
                 subi %A[buf], lo8(-128)
                 sbci %B[buf], hi8(-128)
                 mov %[count], %[cols]
-                
+
             L%=_top_loop:
-            
+
                 ; write one page from image to buf+128
                 lpm %A[image_data], %a[image]+
                 mul %A[image_data], %[shift_coef]
@@ -171,7 +178,7 @@ static void SpritesU_DrawCommon(
                 st %a[buf]+, %[buf_data]
                 dec %[count]
                 brne L%=_top_loop
-                
+
                 ; decrement pages, reset buf back, advance image
                 clr __zero_reg__
                 dec %[pages]
@@ -179,25 +186,25 @@ static void SpritesU_DrawCommon(
                 sbc %B[buf], __zero_reg__
                 add %A[image], %A[image_adv]
                 adc %B[image], %B[image_adv]
-        
+
             L%=_middle:
-            
+
                 tst %[pages]
                 breq L%=_bottom
-            
+
                 ; need Y pointer for middle pages
                 push r28
                 push r29
                 movw r28, %[buf]
                 subi r28, lo8(-128)
                 sbci r29, hi8(-128)
-                
+
             L%=_middle_loop_outer:
-            
+
                 mov %[count], %[cols]
-                
+
             L%=_middle_loop_inner:
-            
+
                 ; write one page from image to buf/buf+128
                 lpm %A[image_data], %a[image]+
                 mul %A[image_data], %[shift_coef]
@@ -211,7 +218,7 @@ static void SpritesU_DrawCommon(
                 st Y+, %[buf_data]
                 dec %[count]
                 brne L%=_middle_loop_inner
-                
+
                 ; advance buf, buf+128, and image to the next page
                 clr __zero_reg__
                 add %A[buf], %[buf_adv]
@@ -222,18 +229,18 @@ static void SpritesU_DrawCommon(
                 adc %B[image], %B[image_adv]
                 dec %[pages]
                 brne L%=_middle_loop_outer
-                
+
                 ; done with Y pointer
                 pop r29
                 pop r28
-                
+
             L%=_bottom:
-            
+
                 tst %[bottom]
                 breq L%=_finish
-                
+
             L%=_bottom_loop:
-            
+
                 ; write one page from image to buf
                 lpm %A[image_data], %a[image]+
                 mul %A[image_data], %[shift_coef]
@@ -243,11 +250,11 @@ static void SpritesU_DrawCommon(
                 st %a[buf]+, %[buf_data]
                 dec %[cols]
                 brne L%=_bottom_loop
-            
+
             L%=_finish:
-            
+
                 clr __zero_reg__
-                
+
             )ASM"
             :
             [buf]        "+&x" (buf),
@@ -269,30 +276,30 @@ static void SpritesU_DrawCommon(
     else
 #endif
 #ifdef SPRITESU_PLUSMASK
-    if(mode == SPRITESU_MODE_PLUSMASK)
+    if(mode & 2)
     {
         uint8_t const* image_ptr = (uint8_t const*)image;
         asm volatile(R"ASM(
-        
+
                 cpi %[page_start], 0
                 brge L%=_middle
-                
+
                 ; advance buf to next page
                 subi %A[buf], lo8(-128)
                 sbci %B[buf], hi8(-128)
                 mov %[count], %[cols]
-                
+
             L%=_top_loop:
-                
+
                 ; write one page from image to buf+128
                 lpm %A[image_data], %a[image]+
                 lpm %A[mask_data], %a[image]+
-                
+
                 mul %A[image_data], %[shift_coef]
                 movw %[image_data], r0
                 mul %A[mask_data], %[shift_coef]
                 movw %[mask_data], r0
-                
+
                 ld %[buf_data], %a[buf]
                 com %B[mask_data]
                 and %[buf_data], %B[mask_data]
@@ -300,7 +307,7 @@ static void SpritesU_DrawCommon(
                 st %a[buf]+, %[buf_data]
                 dec %[count]
                 brne L%=_top_loop
-                
+
                 ; decrement pages, reset buf back, advance image and mask
                 clr __zero_reg__
                 dec %[pages]
@@ -308,33 +315,33 @@ static void SpritesU_DrawCommon(
                 sbc %B[buf], __zero_reg__
                 add %A[image], %[image_adv]
                 adc %B[image], __zero_reg__
-        
+
             L%=_middle:
-            
+
                 tst %[pages]
                 breq L%=_bottom
-            
+
                 ; need Y pointer for middle pages
                 push r28
                 push r29
                 movw r28, %[buf]
                 subi r28, lo8(-128)
                 sbci r29, hi8(-128)
-                
+
             L%=_middle_loop_outer:
-            
+
                 mov %[count], %[cols]
-                
+
             L%=_middle_loop_inner:
                 ; write one page from image to buf/buf+128
                 lpm %A[image_data], %a[image]+
                 lpm %A[mask_data], %a[image]+
-                
+
                 mul %A[image_data], %[shift_coef]
                 movw %[image_data], r0
                 mul %A[mask_data], %[shift_coef]
                 movw %[mask_data], r0
-                
+
                 ld %[buf_data], %a[buf]
                 com %A[mask_data]
                 and %[buf_data], %A[mask_data]
@@ -347,7 +354,7 @@ static void SpritesU_DrawCommon(
                 st Y+, %[buf_data]
                 dec %[count]
                 brne L%=_middle_loop_inner
-                
+
                 ; advance buf, buf+128, and image to the next page
                 clr __zero_reg__
                 add %A[buf], %[buf_adv]
@@ -358,18 +365,18 @@ static void SpritesU_DrawCommon(
                 adc %B[image], __zero_reg__
                 dec %[pages]
                 brne L%=_middle_loop_outer
-                
+
                 ; done with Y pointer
                 pop r29
                 pop r28
-                
+
             L%=_bottom:
-            
+
                 tst %[bottom]
                 breq L%=_finish
-                
+
             L%=_bottom_loop:
-            
+
                 ; write one page from image to buf
                 lpm %A[image_data], %a[image]+
                 lpm %A[mask_data], %a[image]+
@@ -377,7 +384,7 @@ static void SpritesU_DrawCommon(
                 movw %[image_data], r0
                 mul %A[mask_data], %[shift_coef]
                 movw %[mask_data], r0
-                
+
                 ld %[buf_data], %a[buf]
                 com %A[mask_data]
                 and %[buf_data], %A[mask_data]
@@ -385,11 +392,11 @@ static void SpritesU_DrawCommon(
                 st %a[buf]+, %[buf_data]
                 dec %[cols]
                 brne L%=_bottom_loop
-            
+
             L%=_finish:
-            
+
                 clr __zero_reg__
-                
+
             )ASM"
             :
             [buf]        "+&x" (buf),
@@ -416,11 +423,11 @@ static void SpritesU_DrawCommon(
         uint8_t reseek = (w != cols);
         image += ((uint24_t)FX::programDataPage << 8);
         asm volatile(R"ASM(
-                
+
                 rjmp L%=_begin
-                
+
             L%=_seek:
-            
+
                 ; seek subroutine
                 cbi %[fxport], %[fxbit]
                 nop
@@ -448,9 +455,9 @@ static void SpritesU_DrawCommon(
                 sbrs r0, %[spif]
                 rjmp .-6
                 ret
-                
+
             L%=_begin:
-            
+
                 ; initial seek
                 sub %A[image], %A[image_adv]
                 sbc %B[image], %B[image_adv]
@@ -461,20 +468,20 @@ static void SpritesU_DrawCommon(
                 tst %[pages]
                 brne L%=_middle_skip_reseek
                 rjmp L%=_bottom_dispatch
-                
+
             L%=_top:
-                
+
                 ; init buf
                 subi %A[buf], lo8(-128)
                 sbci %B[buf], hi8(-128)
                 mov %[count], %[cols]
-                
+
                 ; loop dispatch
                 sbrc %[mode], 0
                 rjmp L%=_top_loop_masked
-                
+
             L%=_top_loop:
-                
+
                 in %A[image_data], %[spdr]
                 out %[spdr], __zero_reg__
                 mul %A[image_data], %[shift_coef]
@@ -487,9 +494,9 @@ static void SpritesU_DrawCommon(
                 dec %[count]
                 brne L%=_top_loop
                 rjmp L%=_top_loop_done
-                
+
             L%=_top_loop_masked:
-                
+
                 in %A[image_data], %[spdr]
                 out %[spdr], __zero_reg__
                 mul %A[image_data], %[shift_coef]
@@ -511,9 +518,9 @@ static void SpritesU_DrawCommon(
                 lpm
                 dec %[count]
                 brne L%=_top_loop_masked
-            
+
             L%=_top_loop_done:
-                
+
                 ; decrement pages, reset buf back
                 clr __zero_reg__
                 sub %A[buf], %[cols]
@@ -521,9 +528,9 @@ static void SpritesU_DrawCommon(
                 dec %[pages]
                 brne L%=_middle
                 rjmp L%=_finish
-            
+
             L%=_middle:
-                
+
                 ; only seek again if necessary
                 tst %[reseek]
                 breq L%=_middle_skip_reseek
@@ -531,23 +538,23 @@ static void SpritesU_DrawCommon(
                 sbi %[fxport], %[fxbit]
                 lpm
                 rcall L%=_seek
-            
+
             L%=_middle_skip_reseek:
-            
+
                 movw %[bufn], %[buf]
                 subi %A[bufn], lo8(-128)
                 sbci %B[bufn], hi8(-128)
-            
+
             L%=_middle_loop_outer:
-            
+
                 mov %[count], %[cols]
-                
+
                 ; loop dispatch
                 sbrc %[mode], 0
                 rjmp L%=_middle_loop_inner_masked
-                
+
             L%=_middle_loop_inner:
-            
+
                 ; write one page from image to buf/buf+128
                 in %A[image_data], %[spdr]
                 out %[spdr], __zero_reg__
@@ -563,9 +570,9 @@ static void SpritesU_DrawCommon(
                 dec %[count]
                 brne L%=_middle_loop_inner
                 rjmp L%=_middle_loop_outer_next
-                
+
             L%=_middle_loop_inner_masked:
-            
+
                 ; write one page from image to buf/buf+128
                 in %A[image_data], %[spdr]
                 out %[spdr], __zero_reg__
@@ -590,21 +597,21 @@ static void SpritesU_DrawCommon(
                 nop
                 dec %[count]
                 brne L%=_middle_loop_inner_masked
-                
+
             L%=_middle_loop_outer_next:
-                
+
                 ; advance buf to the next page
                 clr __zero_reg__
                 add %A[buf], %[buf_adv]
                 adc %B[buf], __zero_reg__
                 dec %[pages]
                 brne L%=_middle
-                
+
             L%=_bottom:
-            
+
                 tst %[bottom]
                 breq L%=_finish
-                
+
                 ; seek if needed
                 tst %[reseek]
                 breq L%=_bottom_dispatch
@@ -612,15 +619,15 @@ static void SpritesU_DrawCommon(
                 sbi %[fxport], %[fxbit]
                 lpm
                 rcall L%=_seek
-                
+
             L%=_bottom_dispatch:
-                
+
                 ; loop dispatch
                 sbrc %[mode], 0
                 rjmp L%=_bottom_loop_masked
-                
+
             L%=_bottom_loop:
-            
+
                 ; write one page from image to buf
                 in %A[image_data], %[spdr]
                 out %[spdr], __zero_reg__
@@ -634,9 +641,9 @@ static void SpritesU_DrawCommon(
                 dec %[cols]
                 brne L%=_bottom_loop
                 rjmp L%=_finish
-                
+
             L%=_bottom_loop_masked:
-            
+
                 ; write one page from image to buf
                 in %A[image_data], %[spdr]
                 out %[spdr], __zero_reg__
@@ -662,11 +669,11 @@ static void SpritesU_DrawCommon(
                 lpm
 
             L%=_finish:
-            
+
                 clr __zero_reg__
                 sbi %[fxport], %[fxbit]
                 in r0, %[spsr]
-                
+
             )ASM"
             :
             [buf]        "+&x" (buf),
@@ -695,6 +702,7 @@ static void SpritesU_DrawCommon(
             );
     }
 #endif
+    {} // empty final else block, if needed
 }
 
 #ifdef SPRITESU_OVERWRITE
@@ -743,6 +751,147 @@ void SpritesU::drawPlusMaskFX(
     int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame)
 {
     SpritesU_DrawCommon(x, y, w, h, image, frame, SPRITESU_MODE_PLUSMASKFX);
+}
+#endif
+
+#ifdef SPRITESU_RECT
+void SpritesU::fillRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t color)
+{
+    if(w == 0 || h == 0) return;
+    if(x >= 128) return;
+    if(y >= 64)  return;
+    if(x + w <= 0) return;
+    if(y + h <= 0) return;
+
+    if(color & 1) color = 0xff;
+
+    // clip coords
+    uint8_t xc = x;
+    uint8_t yc = y;
+
+    // TODO: extreme clipping behavior
+
+    // clip
+    if(y < 0)
+        h += y, yc = 0;
+    if(x < 0)
+        w += x, xc = 0;
+    if(h >= uint8_t(64 - yc))
+        h = 64 - yc;
+    if(w >= uint8_t(128 - xc))
+        w = 128 - xc;
+    uint8_t y1 = yc + h;
+
+    uint8_t c0 = FX::bitShiftLeftMaskUInt8(yc); // 11100000
+    uint8_t m1 = FX::bitShiftLeftMaskUInt8(y1); // 11000000
+    uint8_t m0 = ~c0; // 00011111
+    uint8_t c1 = ~m1; // 00111111
+
+    uint8_t r0 = yc;
+    uint8_t r1 = y1 - 1;
+    asm volatile(
+        "lsr %[r0]\n"
+        "lsr %[r0]\n"
+        "lsr %[r0]\n"
+        "lsr %[r1]\n"
+        "lsr %[r1]\n"
+        "lsr %[r1]\n"
+        : [r0] "+&r" (r0),
+          [r1] "+&r" (r1));
+
+    uint8_t* buf = Arduboy2Base::sBuffer;
+    asm volatile(
+        "mul %[r0], %[c128]\n"
+        "add %A[buf], r0\n"
+        "adc %B[buf], r1\n"
+        "clr __zero_reg__\n"
+        "add %A[buf], %[x]\n"
+        "adc %B[buf], __zero_reg__\n"
+        :
+        [buf]  "+&e" (buf)
+        :
+        [r0]   "r"   (r0),
+        [x]    "r"   (xc),
+        [c128] "r"   ((uint8_t)128)
+        );
+
+    uint8_t rows = r1 - r0; // middle rows + 1
+    uint8_t f = 0;
+    uint8_t bot = c1;
+    if(m0  == 0) ++rows; // no top fragment
+    if(bot == 0) ++rows; // no bottom fragment
+    c0 &= color;
+    c1 &= color;
+
+    uint8_t col;
+    uint8_t buf_adv = 128 - w;
+
+    asm volatile(R"ASM(
+            tst  %[rows]
+            brne L%=_top
+            or   %[m1], %[m0]
+            and  %[c1], %[c0]
+            rjmp L%=_bottom_loop
+
+        L%=_top:
+            tst  %[m0]
+            breq L%=_middle
+            mov  %[col], %[w]
+
+        L%=_top_loop:
+            ld   __tmp_reg__, %a[buf]
+            and  __tmp_reg__, %[m0]
+            or   __tmp_reg__, %[c0]
+            st   %a[buf]+, __tmp_reg__
+            dec  %[col]
+            brne L%=_top_loop
+            add  %A[buf], %[buf_adv]
+            adc  %B[buf], __zero_reg__
+
+        L%=_middle:
+            dec  %[rows]
+            breq L%=_bottom
+
+        L%=_middle_outer_loop:
+            mov  %[col], %[w]
+            
+        L%=_middle_inner_loop:
+            st   %a[buf]+, %[color]
+            dec  %[col]
+            brne L%=_middle_inner_loop
+            add  %A[buf], %[buf_adv]
+            adc  %B[buf], __zero_reg__
+            dec  %[rows]
+            brne L%=_middle_outer_loop
+
+        L%=_bottom:
+            tst  %[bot]
+            breq L%=_finish
+
+        L%=_bottom_loop:
+            ld   __tmp_reg__, %a[buf]
+            and  __tmp_reg__, %[m1]
+            or   __tmp_reg__, %[c1]
+            st   %a[buf]+, __tmp_reg__
+            dec  %[w]
+            brne L%=_bottom_loop
+
+        L%=_finish:
+        )ASM"
+        :
+        [buf]     "+&e" (buf),
+        [w]       "+&r" (w),
+        [rows]    "+&r" (rows),
+        [col]     "=&r" (col)
+        :
+        [buf_adv] "r"   (buf_adv),
+        [color]   "r"   (color),
+        [m0]      "r"   (m0),
+        [m1]      "r"   (m1),
+        [c0]      "r"   (c0),
+        [c1]      "r"   (c1),
+        [bot]     "r"   (bot)
+        );
 }
 #endif
 
