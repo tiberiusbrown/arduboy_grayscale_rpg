@@ -361,7 +361,7 @@ void render_pause();
 void save_begin();
 bool save_done();
 bool is_saving();
-void load();
+void load(bool first);
 uint16_t compute_checksum();
 
 // platform.cpp

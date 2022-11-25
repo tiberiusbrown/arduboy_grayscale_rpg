@@ -58,21 +58,33 @@ bool save_done()
     return false;
 }
 
-void load()
+void load(bool first)
 {
+    uint8_t brightness = savefile.brightness;
+    uint8_t battery = savefile.no_battery_alert;
+
     platform_fx_read_save_bytes(0, &savefile, sizeof(savefile));
     bool id = true;
     for(uint8_t i = 0; i < 8; ++i)
         if(savefile.identifier[i] != pgm_read_byte(&IDENTIFIER[i])) 
             id = false;
-#ifdef ARDUINO
-    Arduboy2Audio::begin();
-#endif
     if(!id || compute_checksum() != savefile.checksum)
     {
         memset(&savefile, 0, sizeof(savefile));
         new_game();
         savefile.brightness = 3;
+    }
+
+    if(first)
+    {
+#ifdef ARDUINO
+        Arduboy2Audio::begin();
+#endif
+    }
+    else
+    {
+        savefile.brightness = brightness;
+        savefile.no_battery_alert = battery;
     }
 }
 

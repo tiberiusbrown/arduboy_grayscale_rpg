@@ -275,6 +275,7 @@ static void update_game_over()
 
 static void update_title()
 {
+    static bool first_loaded = false;
     auto& d = sdata.title;
     if(d.going_to_resume)
     {
@@ -286,7 +287,10 @@ static void update_title()
     else
     {
         if(d.fade_frame == 0)
-            load();
+        {
+            load(!first_loaded);
+            first_loaded = true;
+        }
         if(d.fade_frame < 24)
             d.fade_frame += FADE_SPEED;
         else if(btns_pressed & BTN_A)
