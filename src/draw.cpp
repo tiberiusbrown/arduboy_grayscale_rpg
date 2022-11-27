@@ -140,12 +140,51 @@ void draw_tiles()
     draw_chunk_tiles(3, ox + 128, oy + 64);
 }
 
+void draw_text_noclip(uint8_t x, uint8_t y, char const* str)
+{
+    char t;
+    uint8_t cx = x;
+    uint8_t plane8 = plane() * 8;
+    uint8_t const* font_img = FONT_IMG + plane() * 8 + -(' ' * (8 * PLANES)) + 2;
+    uint8_t const* font_adv = FONT_ADV - ' ';
+#ifdef ARDUINO
+    uint8_t shift_coef = FX::bitShiftLeftUInt8(y);
+    asm volatile(
+        "lsr %[y]\n"
+        "lsr %[y]\n"
+        "lsr %[y]\n"
+        : [y] "+&r" (y));
+#else
+    uint8_t shift_coef = 1 << (y & 7);
+    y >>= 3;
+#endif
+    while((t = (char)deref_inc(str)) != '\0')
+    {
+        if(t == '\n')
+        {
+            // advance 9 rows
+            if(shift_coef & 0x80)
+                y += 2, shift_coef = 1;
+            else
+                y += 1, shift_coef <<= 1;
+            cx = x;
+            continue;
+        }
+        uint8_t const* bitmap = font_img + (t * (8 * PLANES));
+        uint8_t adv = pgm_read_byte(&font_adv[t]);
+        platform_drawoverwritemonochrome_noclip(
+            cx, y, shift_coef, adv, 1, bitmap);
+        cx += adv;
+    }
+}
+
 static void draw_text_ex(int16_t x, int16_t y, char const* str, bool prog)
 {
     char t;
     int16_t cx = x;
     uint8_t plane8 = plane() * 8;
-    uint8_t const* font_img = FONT_IMG + plane() * 8 + 2;
+    uint8_t const* font_img = FONT_IMG + plane() * 8 + - (' ' * (8 * PLANES)) + 2;
+    uint8_t const* font_adv = FONT_ADV - ' ';
     while((t = (prog ? (char)pgm_read_byte_inc(str) : (char)deref_inc(str))) != '\0')
     {
         if(t == '\n')
@@ -154,9 +193,8 @@ static void draw_text_ex(int16_t x, int16_t y, char const* str, bool prog)
             cx = x;
             continue;
         }
-        t -= ' ';
         uint8_t const* bitmap = font_img + (t * (8 * PLANES));
-        uint8_t adv = pgm_read_byte(&FONT_ADV[t]);
+        uint8_t adv = pgm_read_byte(&font_adv[t]);
         platform_drawoverwritemonochrome(cx, y, adv, 8, bitmap);
         cx += adv;
     }

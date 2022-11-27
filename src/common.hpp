@@ -419,6 +419,9 @@ void platform_drawoverwrite(int16_t x, int16_t y, uint8_t const* bitmap,
     uint8_t frame);
 void platform_drawoverwritemonochrome(int16_t x, int16_t y, uint8_t w,
     uint8_t h, uint8_t const* bitmap);
+void platform_drawoverwritemonochrome_noclip(
+    uint8_t x, uint8_t page_start, uint8_t shift_coef,
+    uint8_t w, uint8_t pages, uint8_t const* bitmap);
 void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num);
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h);
@@ -443,6 +446,7 @@ void platform_audio_play_sfx(uint8_t const* sfx);
 void draw_tile(int16_t x, int16_t y, uint8_t t);
 void draw_text(int16_t x, int16_t y, char const* str);      // str in RAM
 void draw_text_prog(int16_t x, int16_t y, char const* str); // str in PROGMEM
+void draw_text_noclip(uint8_t x, uint8_t y, char const* str); // str in RAM
 void wrap_text(char* str, uint8_t w); // replace ' ' with '\n' to wrap to width
 uint8_t text_width(char const* str);
 uint8_t text_width_prog(char const* str);

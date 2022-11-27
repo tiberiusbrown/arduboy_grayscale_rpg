@@ -67,6 +67,7 @@ static void SpritesU_DrawCommon(
         "lsr %[pages]\n"
         : [pages] "+&r" (pages));
 
+    if(frame != 0)
     {
         uint8_t frame_pages = pages;
         if(mode & 1) frame_pages *= 2;
@@ -86,8 +87,12 @@ static void SpritesU_DrawCommon(
         "ror %A[y]\n"
         : [y] "+&r" (y));
 
-    // clip against top edge
     int8_t page_start = int8_t(y);
+    uint8_t cols = w;
+    uint8_t col_start = x;
+    bool bottom = false;
+    
+    // clip against top edge
     if(page_start < -1)
     {
         uint8_t tp = (-1 - page_start);
@@ -98,8 +103,6 @@ static void SpritesU_DrawCommon(
     }
 
     // clip against left edge
-    uint8_t cols = w;
-    uint8_t col_start = x;
     if(x < 0)
     {
         int16_t t = x;
@@ -117,8 +120,7 @@ static void SpritesU_DrawCommon(
     }
 
     // clip against bottom edge
-    bool bottom = false;
-    if(pages > 7 - page_start)
+    if(pages > uint8_t(7 - page_start))
     {
         pages = 7 - page_start;
         bottom = true;
@@ -271,6 +273,8 @@ static void SpritesU_DrawCommon(
             [shift_coef] "l"   (shift_coef),
             [bottom]     "a"   (bottom),
             [page_start] "a"   (page_start)
+            :
+            "memory"
             );
     }
     else
@@ -413,6 +417,8 @@ static void SpritesU_DrawCommon(
             [shift_coef] "l"   (shift_coef),
             [bottom]     "a"   (bottom),
             [page_start] "a"   (page_start)
+            :
+            "memory"
             );
     }
     else
@@ -699,6 +705,8 @@ static void SpritesU_DrawCommon(
             [spdr]       "I"   (_SFR_IO_ADDR(SPDR)),
             [spsr]       "I"   (_SFR_IO_ADDR(SPSR)),
             [spif]       "I"   (SPIF)
+            :
+            "memory"
             );
     }
 #endif

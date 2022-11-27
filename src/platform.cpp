@@ -87,6 +87,134 @@ void platform_drawoverwritemonochrome(int16_t x, int16_t y, uint8_t w,
 #endif
 }
 
+void platform_drawoverwritemonochrome_noclip(
+    uint8_t x, uint8_t page_start, uint8_t shift_coef,
+    uint8_t w, uint8_t pages, uint8_t const* bitmap)
+{
+#ifdef ARDUINO
+    uint16_t shift_mask = ~(0xff * shift_coef);
+    bool bottom = false;
+    if(pages > uint8_t(7 - page_start))
+    {
+        pages = 7 - page_start;
+        bottom = true;
+    }
+    uint8_t buf_adv = 128 - w;
+    uint16_t image_data;
+    uint8_t buf_data;
+    uint8_t count;
+
+    uint8_t* buf = Arduboy2Base::sBuffer;
+    asm volatile(
+        "mulsu %[page_start], %[c128]\n"
+        "add %A[buf], r0\n"
+        "adc %B[buf], r1\n"
+        "clr __zero_reg__\n"
+        "add %A[buf], %[x]\n"
+        "adc %B[buf], __zero_reg__\n"
+        :
+        [buf] "+&x" (buf)
+        :
+        [page_start] "a"   (page_start),
+        [x]          "r"   (x),
+        [c128]       "a"   ((uint8_t)128)
+        );
+
+    asm volatile(R"ASM(
+
+                tst %[pages]
+                breq L%=_bottom
+
+                ; need Y pointer for middle pages
+                push r28
+                push r29
+                movw r28, %[buf]
+                subi r28, lo8(-128)
+                sbci r29, hi8(-128)
+
+            L%=_middle_loop_outer:
+
+                mov %[count], %[cols]
+
+            L%=_middle_loop_inner:
+
+                ; write one page from image to buf/buf+128
+                lpm %A[image_data], %a[image]+
+                mul %A[image_data], %[shift_coef]
+                ld %[buf_data], %a[buf]
+                and %[buf_data], %A[shift_mask]
+                or %[buf_data], r0
+                st %a[buf]+, %[buf_data]
+                ld %[buf_data], Y
+                and %[buf_data], %B[shift_mask]
+                or %[buf_data], r1
+                st Y+, %[buf_data]
+                dec %[count]
+                brne L%=_middle_loop_inner
+
+                ; advance buf, buf+128, and image to the next page
+                clr __zero_reg__
+                add %A[buf], %[buf_adv]
+                adc %B[buf], __zero_reg__
+                add r28, %[buf_adv]
+                adc r29, __zero_reg__
+                add %A[image], %A[image_adv]
+                adc %B[image], __zero_reg__
+                dec %[pages]
+                brne L%=_middle_loop_outer
+
+                ; done with Y pointer
+                pop r29
+                pop r28
+
+            L%=_bottom:
+
+                tst %[bottom]
+                breq L%=_finish
+
+            L%=_bottom_loop:
+
+                ; write one page from image to buf
+                lpm %A[image_data], %a[image]+
+                mul %A[image_data], %[shift_coef]
+                ld %[buf_data], %a[buf]
+                and %[buf_data], %A[shift_mask]
+                or %[buf_data], r0
+                st %a[buf]+, %[buf_data]
+                dec %[cols]
+                brne L%=_bottom_loop
+
+            L%=_finish:
+
+                clr __zero_reg__
+
+            )ASM"
+        :
+        [buf]        "+&x" (buf),
+        [image]      "+&z" (bitmap),
+        [pages]      "+&a" (pages),
+        [count]      "=&l" (count),
+        [buf_data]   "=&a" (buf_data),
+        [image_data] "=&a" (image_data)
+        :
+        [cols]       "l"   (w),
+        [buf_adv]    "l"   (buf_adv),
+        [image_adv]  "l"   (uint8_t(128 - w)),
+        [shift_mask] "l"   (shift_mask),
+        [shift_coef] "l"   (shift_coef),
+        [bottom]     "a"   (bottom)
+        :
+        "memory"
+        );
+#else
+    uint8_t oy = 0;
+    while(shift_coef > 1)
+        ++oy, shift_coef >>= 1;
+    platform_drawoverwritemonochrome(
+        x, page_start * 8 + oy, w, pages * 8, bitmap);
+#endif
+}
+
 void platform_drawoverwrite(int16_t x, int16_t y, uint8_t const* bitmap,
     uint8_t frame)
 {

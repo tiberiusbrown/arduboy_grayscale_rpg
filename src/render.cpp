@@ -25,7 +25,7 @@ static void render_dialog()
     platform_fillrect(0, 35, 128, 28, BLACK);
     char c = d.message[d.char_progress];
     d.message[d.char_progress] = '\0';
-    draw_text(0, 37, d.message);
+    draw_text_noclip(0, 37, d.message);
     d.message[d.char_progress] = c;
 }
 
