@@ -18,7 +18,7 @@ static void render_dialog()
     auto& d = sdata.dialog;
     if(d.portrait != 255)
     {
-        platform_fillrect(0, 2, 33, 33, BLACK);
+        platform_drawrect(0, 2, 33, 33, BLACK);
         platform_fx_drawoverwrite(0, 3, PORTRAIT_IMG, d.portrait, 32, 32);
     }
 

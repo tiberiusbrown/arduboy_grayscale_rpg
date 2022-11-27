@@ -11,7 +11,7 @@
 #include "common.hpp"
 
 #define MUTED_PALETTE 1
-#define EXCLUDE_LAST_ROW 1
+#define EXCLUDE_LAST_ROW 0
 #define GIF_FULL_PALETTE 1
 
 constexpr int FBH = EXCLUDE_LAST_ROW ? 63 : 64;
@@ -25,7 +25,7 @@ static uint8_t gif_prev[128 * FBH];
 float fade_factor = 1.f;
 int gplane;
 uint8_t pixels[3][128 * 64];
-uint8_t tex_pixels[128 * 63 * 4];
+uint8_t tex_pixels[128 * FBH * 4];
 
 inline uint8_t fadef(uint8_t x)
 {

@@ -2,28 +2,10 @@
 
 #include "generated/fxdata.h"
 
-enum
-{
-    OS_MENU,
-    OS_RESUMING,
-    OS_OPTIONS,
-    OS_QUIT,
-    OS_SAVE,
-};
-
 static uint8_t const OPTION_X[] PROGMEM =
 {
     5, 25, 32, 54, 61, 96, 103, 121,
 };
-
-static uint8_t adjust(uint8_t x, uint8_t tx)
-{
-    if(x < tx)
-        x += (uint8_t(tx - x + 1) >> 1);
-    else
-        x -= (uint8_t(x - tx + 1) >> 1);
-    return x;
-}
 
 void update_pause()
 {
@@ -35,7 +17,7 @@ void update_pause()
     }
     if(d.state == OS_RESUMING)
     {
-        if((d.menuy | d.optionsy | d.quity | d.savey) == 0)
+        if((d.menuy | d.optionsy | d.quity | d.savey | d.partyy) == 0)
         {
             change_state(STATE_MAP);
             return;
@@ -43,7 +25,7 @@ void update_pause()
     }
     else if(d.state == OS_MENU)
     {
-        if(d.menuy >= 16 && d.optionsy == 0 && d.quity == 0)
+        if(d.menuy >= 16 && (d.optionsy | d.quity | d.savey | d.partyy) == 0)
         {
             uint8_t menui = d.menui;
             if((btns_pressed & BTN_LEFT) && menui-- == 0)
@@ -53,6 +35,7 @@ void update_pause()
             if(btns_pressed & BTN_A)
             {
                 if(menui == 0) d.state = OS_SAVE;
+                if(menui == 1) d.state = OS_PARTY;
                 if(menui == 2) d.state = OS_OPTIONS;
                 if(menui == 3) d.state = OS_QUIT;
             }
@@ -161,6 +144,10 @@ void update_pause()
             }
         }
     }
+    else if(d.state == OS_PARTY)
+    {
+        update_pause_party();
+    }
     if(d.state == OS_MENU)
         d.menuy += uint8_t(17 - d.menuy) >> 1;
     else
@@ -178,6 +165,10 @@ void update_pause()
         d.savey += uint8_t(65 - d.savey) >> 1;
     else
         d.savey >>= 1;
+    if(d.state == OS_PARTY)
+        d.partyy += uint8_t(65 - d.partyy) >> 1;
+    else
+        d.partyy >>= 1;
     {
         uint8_t ax = pgm_read_byte(&OPTION_X[d.menui * 2 + 0]);
         uint8_t bx = pgm_read_byte(&OPTION_X[d.menui * 2 + 1]);
@@ -206,7 +197,7 @@ void render_pause()
 {
     auto const& d = sdata.pause;
     // render darkened map (exclude plane 0)
-    if((d.optionsy | d.quity | d.savey) < 64 &&
+    if((d.optionsy | d.quity | d.savey | d.partyy) < 64 &&
         (d.state == OS_RESUMING || plane() > 0))
         render_map();
     if(d.menuy > 0)
@@ -247,5 +238,9 @@ void render_pause()
         static char const DONE_MSG[] PROGMEM = "Done!";
         if(d.save_wait > 0)
             draw_text_prog(71, y + 28, DONE_MSG);
+    }
+    if(d.partyy > 0)
+    {
+        render_pause_party();
     }
 }

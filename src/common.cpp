@@ -18,10 +18,10 @@ static char const PN_BOY[] PROGMEM = "Dismas";
 
 party_info_t const PARTY_INFO[4] PROGMEM =
 {
-    { 0, 10, 20, PN_HERO },
-    { 3, 10, 10, PN_GIRL },
-    { 0, 10, 10, PN_GIRL2 },
-    { 0, 10, 10, PN_BOY },
+    { 0, 0, 10, 20, PN_HERO },
+    { 3, 2, 10, 10, PN_GIRL },
+    { 0, 0, 10, 10, PN_GIRL2 },
+    { 0, 0, 10, 10, PN_BOY },
 };
 
 static uint8_t simple_mod(uint8_t n, uint8_t d)
@@ -75,6 +75,15 @@ bool story_flag_get(uint16_t index)
     uint8_t i = index >> 3;
     uint8_t m = 1 << (index & 7);
     return (story_flags[i] & m) != 0;
+}
+
+uint8_t adjust(uint8_t x, uint8_t tx)
+{
+    if(x < tx)
+        x += (uint8_t(tx - x + 1) >> 1);
+    else
+        x -= (uint8_t(x - tx + 1) >> 1);
+    return x;
 }
 
 uint16_t rand_seed;

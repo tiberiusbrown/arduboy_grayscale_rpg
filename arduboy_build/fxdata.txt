@@ -19,6 +19,8 @@ raw_t QUIT_IMG = "quit_img.bin"
 raw_t OPTIONS_IMG = "options_img.bin"
 raw_t CHECK_IMG = "check_img.bin"
 raw_t SLIDER_IMG = "slider_img.bin"
+raw_t ARROWS_IMG = "arrows_img.bin"
+raw_t PARTY_MEMBERS_IMG = "party_members_img.bin"
 raw_t GAME_OVER_MESSAGES = "game_over_messages.bin"
 
 // put string data last to avoid large diffs in git when scripts are updated

@@ -35,6 +35,20 @@ inline uint8_t plane()
     return a.currentPlane();
 }
 #define MY_ASSERT(cond__) (void)0
+template<class T>
+inline uint8_t pgm_read_byte_inc(T const*& p)
+{
+    uint8_t r;
+    asm volatile("lpm %[r], %a[p]+\n" : [p] "+&z" (p), [r] "=&r" (r));
+    return r;
+}
+template<class T>
+inline uint8_t deref_inc(T const*& p)
+{
+    uint8_t r;
+    asm volatile("ld %[r], %a[p]+\n" : [p] "+&e" (p), [r] "=&r" (r));
+    return r;
+}
 #else
 #include <assert.h>
 #define MY_ASSERT(cond__) assert(cond__)
@@ -45,7 +59,21 @@ inline char const* PSTR(char const* str)
 }
 inline uint8_t pgm_read_byte(void const* p)
 {
-    return *(uint8_t*)p;
+    return *(uint8_t const*)p;
+}
+template<class T>
+inline uint8_t pgm_read_byte_inc(T const*& p)
+{
+    uint8_t r = *(uint8_t const*)p;
+    p = (T const*)((uint8_t const*)p + 1);
+    return r;
+}
+template<class T>
+inline uint8_t deref_inc(T const*& p)
+{
+    uint8_t r = *(uint8_t const*)p;
+    p = (T const*)((uint8_t const*)p + 1);
+    return r;
 }
 inline uint16_t pgm_read_word(void const* p)
 {
@@ -167,6 +195,10 @@ struct sdata_pause
     uint8_t quitfade;
     uint8_t savey;
     uint8_t save_wait;
+    uint8_t partyy;
+    uint8_t partyi;
+    uint8_t partyx;
+    uint8_t partyxt;
 };
 
 struct battle_member_t
@@ -188,6 +220,7 @@ extern enemy_info_t const ENEMY_INFO[] PROGMEM;
 struct party_info_t
 {
     uint8_t sprite;
+    uint8_t portrait;
     uint8_t speed;
     uint8_t hp;
     char const* name;
@@ -344,6 +377,8 @@ extern uint16_t rand_seed;
 uint8_t u8rand();
 uint8_t u8rand(uint8_t m);
 
+uint8_t adjust(uint8_t x, uint8_t tx);
+
 // battery.cpp
 extern struct battery_info_t
 {
@@ -354,8 +389,21 @@ extern struct battery_info_t
 void update_battery();
 
 // pause.cpp
+enum
+{
+    OS_MENU,
+    OS_RESUMING,
+    OS_OPTIONS,
+    OS_QUIT,
+    OS_SAVE,
+    OS_PARTY,
+};
 void update_pause();
 void render_pause();
+
+// pause_party.cpp
+void update_pause_party();
+void render_pause_party();
 
 // save.cpp
 void save_begin();
@@ -393,8 +441,8 @@ void platform_audio_play_sfx(uint8_t const* sfx);
 
 // draw.cpp
 void draw_tile(int16_t x, int16_t y, uint8_t t);
-void draw_text(uint8_t x, uint8_t y, char const* str);      // str in RAM
-void draw_text_prog(uint8_t x, uint8_t y, char const* str); // str in PROGMEM
+void draw_text(int16_t x, int16_t y, char const* str);      // str in RAM
+void draw_text_prog(int16_t x, int16_t y, char const* str); // str in PROGMEM
 void wrap_text(char* str, uint8_t w); // replace ' ' with '\n' to wrap to width
 uint8_t text_width(char const* str);
 uint8_t text_width_prog(char const* str);

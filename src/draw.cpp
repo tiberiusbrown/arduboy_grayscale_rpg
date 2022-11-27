@@ -140,11 +140,13 @@ void draw_tiles()
     draw_chunk_tiles(3, ox + 128, oy + 64);
 }
 
-static void draw_text_ex(uint8_t x, uint8_t y, char const* str, bool prog)
+static void draw_text_ex(int16_t x, int16_t y, char const* str, bool prog)
 {
     char t;
-    uint8_t cx = x;
-    while((t = (prog ? (char)pgm_read_byte(str++) : *str++)) != '\0')
+    int16_t cx = x;
+    uint8_t plane8 = plane() * 8;
+    uint8_t const* font_img = FONT_IMG + plane() * 8 + 2;
+    while((t = (prog ? (char)pgm_read_byte_inc(str) : (char)deref_inc(str))) != '\0')
     {
         if(t == '\n')
         {
@@ -153,19 +155,19 @@ static void draw_text_ex(uint8_t x, uint8_t y, char const* str, bool prog)
             continue;
         }
         t -= ' ';
-        uint8_t const* bitmap = &FONT_IMG[t * (8 * PLANES) + 2];
+        uint8_t const* bitmap = font_img + (t * (8 * PLANES));
         uint8_t adv = pgm_read_byte(&FONT_ADV[t]);
-        platform_drawoverwritemonochrome(cx, y, adv, 8, bitmap + plane() * 8);
+        platform_drawoverwritemonochrome(cx, y, adv, 8, bitmap);
         cx += adv;
     }
 }
 
-void draw_text(uint8_t x, uint8_t y, char const* str)
+void draw_text(int16_t x, int16_t y, char const* str)
 {
     draw_text_ex(x, y, str, false);
 }
 
-void draw_text_prog(uint8_t x, uint8_t y, char const* str)
+void draw_text_prog(int16_t x, int16_t y, char const* str)
 {
     draw_text_ex(x, y, str, true);
 }
@@ -217,7 +219,6 @@ void draw_frame_white(int16_t x, int16_t y, uint8_t w, uint8_t h)
 {
     platform_fillrect(x, y, w, h, BLACK);
     platform_drawrect(x, y, w, h, WHITE);
-    return;
 }
 
 void draw_rounded_frame_white(int16_t x, int16_t y, uint8_t w, uint8_t h)
@@ -232,7 +233,6 @@ void draw_rounded_frame_white(int16_t x, int16_t y, uint8_t w, uint8_t h)
 void draw_frame_black(int16_t x, int16_t y, uint8_t w, uint8_t h)
 {
     platform_fillrect(x, y, w, h, BLACK);
-    return;
 }
 
 void draw_rounded_frame_black(int16_t x, int16_t y, uint8_t w, uint8_t h)

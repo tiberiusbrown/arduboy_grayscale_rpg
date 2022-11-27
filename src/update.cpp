@@ -95,7 +95,6 @@ static void update_map()
         int8_t dy = (int8_t)pgm_read_byte(&DIRY[pdir]) * 8;
         selx = (px + 8 + dx) >> 4;
         sely = (py + 8 + dy) >> 4;
-        platform_audio_play_song(song_victory());
     }
 
     int8_t dx = 0, dy = 0;
@@ -210,14 +209,18 @@ static void update_dialog()
             }
             d.char_progress = 0;
         }
-        else if(d.message[d.char_progress] == '\0') {
-            if(!(chunks_are_running && run_chunks())) change_state(STATE_MAP);
+        else if(d.message[d.char_progress] == '\0')
+        {
+            if(!(chunks_are_running && run_chunks()))
+                change_state(STATE_MAP);
         }
-        else {
+        else
+        {
             // skip_dialog_animation(third_newline);
         }
     }
-    else {
+    else
+    {
         for(uint8_t i = 0; i < 2; ++i)
             if(d.message[d.char_progress] != '\0') ++d.char_progress;
         if(d.char_progress > third_newline) d.char_progress = third_newline;

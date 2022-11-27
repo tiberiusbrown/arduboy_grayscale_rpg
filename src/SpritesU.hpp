@@ -109,6 +109,21 @@ static void SpritesU_DrawCommon(
         col_start = 0;
     }
 
+    // clip against right edge
+    {
+        uint8_t max_cols = 128 - col_start;
+        if(cols > max_cols)
+            cols = max_cols;
+    }
+
+    // clip against bottom edge
+    bool bottom = false;
+    if(pages > 7 - page_start)
+    {
+        pages = 7 - page_start;
+        bottom = true;
+    }
+
     uint8_t* buf = Arduboy2Base::sBuffer;
     asm volatile(
         "mulsu %[page_start], %[c128]\n"
@@ -124,21 +139,6 @@ static void SpritesU_DrawCommon(
         [col_start]  "r"   (col_start),
         [c128]       "a"   ((uint8_t)128)
         );
-
-    // clip against right edge
-    {
-        uint8_t max_cols = 128 - col_start;
-        if(cols > max_cols)
-            cols = max_cols;
-    }
-
-    // clip against bottom edge
-    bool bottom = false;
-    if(pages > 7 - page_start)
-    {
-        pages = 7 - page_start;
-        bottom = true;
-    }
 
     uint8_t buf_adv = 128 - cols;
     uint16_t image_adv = w;

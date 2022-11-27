@@ -39,6 +39,7 @@ add_executable(arduboy_grayscale_rpg ${EXEFLAG}
     src/main_sdl.cpp
     src/map.cpp
     src/pause.cpp
+    src/pause_party.cpp
     src/platform.cpp
     src/render.cpp
     src/save.cpp
