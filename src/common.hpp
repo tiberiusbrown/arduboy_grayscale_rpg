@@ -170,6 +170,7 @@ struct sdata_dialog
     uint8_t portrait;
     uint8_t char_progress;
     bool question;
+    bool questiondraw;
     uint8_t question_msg;
     uint8_t questioni;
     uint8_t questioniy;

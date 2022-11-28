@@ -17,7 +17,7 @@ static void render_dialog()
     char c;
     bool portrait = (d.portrait != 255);
 
-    if(!d.question)
+    if(!d.questiondraw)
     {
         render_map();
         platform_fillrect(0, 36, 128, 28, BLACK);

@@ -234,7 +234,12 @@ static void update_dialog()
     if(d.question)
     {
         d.questioniy = adjust(d.questioniy, d.questioni * 11);
-        if(message_done)
+        if(!d.questiondraw)
+        {
+            if(btns_pressed & BTN_A)
+                d.questiondraw = true;
+        }
+        else if(message_done)
         {
             d.questiondone = true;
             if(btns_down & BTN_A)
