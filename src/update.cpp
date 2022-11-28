@@ -10,6 +10,12 @@ static int8_t const DIRY[8] PROGMEM = {
     1, 1, 0, -1, -1, -1, 0, 1,
 };
 
+void back_to_map()
+{
+    if(!(chunks_are_running && run_chunks()))
+        change_state(STATE_MAP);
+}
+
 bool enemy_contacts_player(active_chunk_t const& c)
 {
     auto const& e = c.enemy;
@@ -182,6 +188,32 @@ static void skip_dialog_animation(uint8_t third_newline)
     d.char_progress = i;
 }
 
+static void advance_dialog_animation()
+{
+    auto& d = sdata.dialog;
+    for(uint8_t i = 0; i < 2; ++i)
+    {
+        char c = d.message[d.char_progress];
+        if(c != '\0') ++d.char_progress;
+        if(c == '|')
+        {
+            // replace pipe char
+            d.message[d.char_progress - 1] = '\0';
+            // skip following newline
+            MY_ASSERT(d.message[d.char_progress] == '\n');
+            d.question_msg = ++d.char_progress;
+            d.question = true;
+            // count number of questions
+            uint8_t n = 0, j = d.question_msg;
+            for(uint8_t j = d.question_msg; (c = d.message[j]) != '\0'; ++j)
+                if(c == '\n') ++n;
+            d.numquestions = n;
+            MY_ASSERT(n + 1 <= 3);
+            return;
+        }
+    }
+}
+
 static void update_dialog()
 {
     auto& d = sdata.dialog;
@@ -197,6 +229,48 @@ static void update_dialog()
             }
         }
     }
+    char current_char = d.message[d.char_progress];
+    bool message_done = (current_char == '\0');
+    if(d.question)
+    {
+        d.questioniy = adjust(d.questioniy, d.questioni * 11);
+        if(message_done)
+        {
+            d.questiondone = true;
+            if(btns_down & BTN_A)
+            {
+                if(d.questionfill >= 32)
+                {
+                    chunk_regs[0] = 0;
+                    chunk_regs[1] = 0;
+                    chunk_regs[2] = 0;
+                    chunk_regs[d.questioni + 1] = 1;
+                    back_to_map();
+                }
+                else
+                    ++d.questionfill;
+            }
+            else
+            {
+                d.questionfill = 0;
+                if(btns_pressed & BTN_UP)
+                {
+                    if(d.questioni > 0)
+                        --d.questioni;
+                }
+                else if(btns_pressed & BTN_DOWN)
+                {
+                    if(d.questioni < d.numquestions)
+                        ++d.questioni;
+                }
+            }
+        }
+        else
+        {
+            advance_dialog_animation();
+        }
+        return;
+    }
     if(btns_down & BTN_B) skip_dialog_animation(third_newline);
     if(btns_pressed & BTN_A)
     {
@@ -209,20 +283,15 @@ static void update_dialog()
             }
             d.char_progress = 0;
         }
-        else if(d.message[d.char_progress] == '\0')
+        else if(message_done)
         {
-            if(!(chunks_are_running && run_chunks()))
-                change_state(STATE_MAP);
-        }
-        else
-        {
-            // skip_dialog_animation(third_newline);
+            if(!d.question)
+                back_to_map();
         }
     }
     else
     {
-        for(uint8_t i = 0; i < 2; ++i)
-            if(d.message[d.char_progress] != '\0') ++d.char_progress;
+        advance_dialog_animation();
         if(d.char_progress > third_newline) d.char_progress = third_newline;
     }
 }

@@ -13,17 +13,41 @@ void render_map()
 
 static void render_dialog()
 {
-    render_map();
-
     auto& d = sdata.dialog;
-    if(d.portrait != 255)
+    char c;
+    bool portrait = (d.portrait != 255);
+
+    if(!d.question)
     {
-        platform_drawrect(0, 2, 33, 33, BLACK);
-        platform_fx_drawoverwrite(0, 3, PORTRAIT_IMG, d.portrait, 32, 32);
+        render_map();
+        platform_fillrect(0, 36, 128, 28, BLACK);
+        if(portrait)
+            platform_fillrect(0, 0, 35, 35, BLACK);
+    }
+    else
+    {
+        uint8_t x = portrait ? 39 : 2;
+        c = d.message[d.char_progress];
+        d.message[d.char_progress] = '\0';
+        draw_text_noclip(x, 2, &d.message[d.question_msg], true);
+        d.message[d.char_progress] = c;
+        if(d.questiondone && plane() == 0)
+        {
+            uint8_t w = 128 - x;
+            uint8_t f = (d.questionfill * w + 16) >> 5;
+            platform_drawrect(x - 2, d.questioniy, w + 2, 12, DARK_GRAY);
+            platform_fillrect(x - 1, d.questioniy + 1, f, 10, DARK_GRAY);
+        }
+    }
+    platform_fillrect(0, 35, 128, 1, LIGHT_GRAY);
+
+    if(portrait)
+    {
+        platform_fx_drawoverwrite(2, 2, PORTRAIT_IMG, d.portrait, 32, 32);
+        platform_drawrect(0, 0, 36, 36, LIGHT_GRAY);
     }
 
-    platform_fillrect(0, 35, 128, 28, BLACK);
-    char c = d.message[d.char_progress];
+    c = d.message[d.char_progress];
     d.message[d.char_progress] = '\0';
     draw_text_noclip(0, 37, d.message);
     d.message[d.char_progress] = c;

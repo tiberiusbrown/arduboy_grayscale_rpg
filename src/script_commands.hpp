@@ -119,6 +119,22 @@ Other Assembly Syntax
     !flag_name        unique flag identifier (auto-assigns to index)
     {string message}  unique string identifier (auto-assigns to index)
 
+Asking questions:
+
+    The syntax for {string messages} allows for embedding questions and
+    responses using the pipe '|' character. A newline character should follow
+    the pipe character and each following response. For example:
+
+        msg {Would you like to pick up the item?|
+        Yes
+        No}
+
+    Only up to three responses are allowed. After the player selects a
+    response, the registers r1, r2, and r3 will be set to zero, except for
+    the index of the response chosen, which will be set to one. For example,
+    in the above prompt, if the player selected "No" then the registers would
+    be set as: r1 = 0, r2 = 1, r3 = 0.
+
 */
 
 #pragma once
@@ -128,8 +144,8 @@ enum script_command_t
     CMD_END,
 
     CMD_MSG,
-    CMD_DLG,
     CMD_TMSG,
+    CMD_DLG,
     CMD_TDLG,
     CMD_BAT,
     CMD_EBAT,

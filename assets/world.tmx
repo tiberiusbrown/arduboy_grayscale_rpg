@@ -143,7 +143,10 @@ end:</property>
   </object>
   <object id="59" x="200" y="119.5">
    <properties>
-    <property name="script" value="$tdlg 4 {This is MY house! Don't go in, whatever you do. I don't want any more trespassers, do you read?}"/>
+    <property name="script">$tmsg {Should you read this sign?|
+Yes, of course!
+No, I don't think so.
+Well, maybe later...}</property>
    </properties>
    <point/>
   </object>

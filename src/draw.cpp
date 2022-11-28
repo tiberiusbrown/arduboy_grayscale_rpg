@@ -140,7 +140,7 @@ void draw_tiles()
     draw_chunk_tiles(3, ox + 128, oy + 64);
 }
 
-void draw_text_noclip(uint8_t x, uint8_t y, char const* str)
+void draw_text_noclip(uint8_t x, uint8_t y, char const* str, bool big_lines)
 {
     char t;
     uint8_t cx = x;
@@ -162,11 +162,22 @@ void draw_text_noclip(uint8_t x, uint8_t y, char const* str)
     {
         if(t == '\n')
         {
-            // advance 9 rows
-            if(shift_coef & 0x80)
-                y += 2, shift_coef = 1;
+            if(big_lines)
+            {
+                // advance 11 rows
+                if(shift_coef >= 0x20)
+                    y += 2, shift_coef >>= 5;
+                else
+                    y += 1, shift_coef <<= 3;
+            }
             else
-                y += 1, shift_coef <<= 1;
+            {
+                // advance 9 rows
+                if(shift_coef & 0x80)
+                    y += 2, shift_coef = 1;
+                else
+                    y += 1, shift_coef <<= 1;
+            }
             cx = x;
             continue;
         }
@@ -210,11 +221,33 @@ void draw_text_prog(int16_t x, int16_t y, char const* str)
     draw_text_ex(x, y, str, true);
 }
 
+void draw_dec(int16_t x, int16_t y, uint8_t val)
+{
+    char b[7];
+    char* t = b;
+    
+    uint8_t val_orig = val;
+    if(val >= 200)
+        *t++ = '2', val -= 200;
+    if(val >= 100)
+        *t++ = '1', val -= 100;
+    if(val_orig >= 100 || val >= 10)
+    {
+        char n = '0';
+        while(val >= 10)
+            ++n, val -= 10;
+        *t++ = n;
+    }
+    *t++ = '0' + val;
+    *t++ = '\0';
+    draw_text(x, y, b);
+}
+
 static uint8_t text_width_ex(char const* str, bool prog)
 {
     uint8_t w = 0;
-    char t;
-    while((t = (prog ? (char)pgm_read_byte(str++) : *str++)) != '\0')
+    uint8_t t;
+    while((t = (prog ? pgm_read_byte_inc(str) : deref_inc(str))) != '\0')
         w += pgm_read_byte(&FONT_ADV[t - ' ']);
     return w;
 }

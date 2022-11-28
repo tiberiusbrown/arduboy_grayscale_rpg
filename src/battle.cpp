@@ -47,7 +47,7 @@ static uint8_t get_max_hp(uint8_t id)
 {
     auto const& d = sdata.battle;
     if(id < 4)
-        return pgm_read_byte(&PARTY_INFO[party[id].battle.id].hp);
+        return party_mhp(id);
     return pgm_read_byte(&ENEMY_INFO[d.enemies[id - 4].id].hp);
 }
 
@@ -276,7 +276,7 @@ static void update_battle_sprites()
         }
         if(s.damaged > 0) --s.damaged;
         if(s.hp > s.hpt) s.hp -= uint8_t(s.hp - s.hpt + 3) / 4;
-        if(s.hp < s.hpt) s.hp += uint8_t(s.hpt - s.hp + 3) / 4;;
+        if(s.hp < s.hpt) s.hp += uint8_t(s.hpt - s.hp + 3) / 4;
         if(s.x == s.tx && s.y == s.ty)
         {
             s.frame_dir = 0;
@@ -443,11 +443,7 @@ void update_battle()
         break;
     case BPHASE_OUTRO:
         if(d.frame == 33)
-        {
-            // resume state
-            if(!(chunks_are_running && run_chunks()))
-                change_state(STATE_MAP);
-        }
+            back_to_map();
         break;
     default: break;
     }

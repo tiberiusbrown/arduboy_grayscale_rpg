@@ -4,7 +4,7 @@ import sys
 strings = []
 flags = {}
 
-MAX_STRING_LENGTH = 253
+MAX_STRING_LENGTH = 240
 
 from enum import IntEnum, auto
 
@@ -20,8 +20,8 @@ class CMD(AutoNumber):
     END  = ()
 
     MSG  = ()
-    DLG  = ()
     TMSG = ()
+    DLG  = ()
     TDLG = ()
     BAT  = ()
     EBAT = ()

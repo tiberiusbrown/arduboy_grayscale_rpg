@@ -46,7 +46,7 @@ template<class T>
 inline uint8_t deref_inc(T const*& p)
 {
     uint8_t r;
-    asm volatile("ld %[r], %a[p]+\n" : [p] "+&e" (p), [r] "=&r" (r));
+    asm volatile("ld %[r], %a[p]+\n" : [p] "+&e" (p), [r] "=&r" (r) :: "memory");
     return r;
 }
 #else
@@ -169,7 +169,14 @@ struct sdata_dialog
 {
     uint8_t portrait;
     uint8_t char_progress;
-    char message[254];
+    bool question;
+    uint8_t question_msg;
+    uint8_t questioni;
+    uint8_t questioniy;
+    uint8_t numquestions;
+    bool questiondone;
+    uint8_t questionfill;
+    char message[241];
 };
 struct sdata_tp
 {
@@ -222,10 +229,16 @@ struct party_info_t
     uint8_t sprite;
     uint8_t portrait;
     uint8_t speed;
-    uint8_t hp;
+    uint8_t max_hp;
+    uint8_t base_att;
+    uint8_t base_def;
     char const* name;
 };
 extern party_info_t const PARTY_INFO[4] PROGMEM;
+
+uint8_t party_att(uint8_t i);
+uint8_t party_def(uint8_t i);
+uint8_t party_mhp(uint8_t i);
 
 enum battle_phase_t
 {
@@ -287,7 +300,6 @@ struct sdata_battle
     battle_sprite_t sprites[8];
     bool sprites_done;
 };
-static_assert(sizeof(sdata_battle) < 256, "battle state data too large");
 struct sdata_game_over
 {
     uint8_t fade_frame;
@@ -311,6 +323,7 @@ extern union sdata_t
     sdata_save save;
     sdata_pause pause;
 } sdata;
+static_assert(sizeof(sdata) <= 256, "state data too large");
 void change_state(uint8_t new_state);
 
 extern bool pmoving;        // whether player is moving
@@ -419,6 +432,8 @@ void platform_drawoverwrite(int16_t x, int16_t y, uint8_t const* bitmap,
     uint8_t frame);
 void platform_drawoverwritemonochrome(int16_t x, int16_t y, uint8_t w,
     uint8_t h, uint8_t const* bitmap);
+// this method assumes the image never clips outside the display
+// and can be much faster because of that assumption
 void platform_drawoverwritemonochrome_noclip(
     uint8_t x, uint8_t page_start, uint8_t shift_coef,
     uint8_t w, uint8_t pages, uint8_t const* bitmap);
@@ -446,7 +461,10 @@ void platform_audio_play_sfx(uint8_t const* sfx);
 void draw_tile(int16_t x, int16_t y, uint8_t t);
 void draw_text(int16_t x, int16_t y, char const* str);      // str in RAM
 void draw_text_prog(int16_t x, int16_t y, char const* str); // str in PROGMEM
-void draw_text_noclip(uint8_t x, uint8_t y, char const* str); // str in RAM
+// this method assumes the text never clips outside the display
+// and is much faster because of that assumption (str in RAM)
+void draw_text_noclip(uint8_t x, uint8_t y, char const* str, bool big_lines = false);
+void draw_dec(int16_t x, int16_t y, uint8_t val);
 void wrap_text(char* str, uint8_t w); // replace ' ' with '\n' to wrap to width
 uint8_t text_width(char const* str);
 uint8_t text_width_prog(char const* str);
@@ -473,6 +491,7 @@ void load_chunks();
 bool run_chunks(); // returns true if state interrupt occurred
 
 // update.cpp
+void back_to_map();
 void update();
 
 // render.cpp

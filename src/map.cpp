@@ -53,7 +53,8 @@ static bool run_chunk()
             stri |= uint16_t(c.script[chunk_instr++]) << 8;
             if(state == STATE_RESUME) break;
             if(state == STATE_TP) break; // don't execute during teleports
-            if((instr == CMD_TMSG || instr == CMD_TDLG) && t0 != sel_tile)
+            static_assert(!((CMD_TMSG | CMD_TDLG) & 1), "");
+            if(!(instr & 1) && t0 != sel_tile)
                 break;
             change_state(STATE_DIALOG);
             sdata.dialog.portrait = 255;
