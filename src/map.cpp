@@ -24,13 +24,13 @@ static bool run_chunk()
     {
         uint16_t tx = ac.cx * 8;
         uint16_t ty = ac.cy * 4;
-        uint16_t dx, dy; // TODO: could these be uint8_t
-        dx = uint16_t(((px + 8) >> 4) - tx);
-        dy = uint16_t(((py + 8) >> 4) - ty);
-        if(dx < 8 && dy < 4) walk_tile = dy * 8 + dx;
-        dx = uint16_t(selx - tx);
-        dy = uint16_t(sely - ty);
-        if(dx < 8 && dy < 4) sel_tile = dy * 8 + dx;
+        uint8_t dx, dy;
+        dx = uint8_t(((px + 8) >> 4) - tx);
+        dy = uint8_t(((py + 8) >> 4) - ty);
+        if((dx | dy) < 8) walk_tile = dy * 8 + dx;
+        dx = uint8_t(selx - tx);
+        dy = uint8_t(sely - ty);
+        if((dx | dy) < 8) sel_tile = dy * 8 + dx;
     }
     while(chunk_instr < CHUNK_SCRIPT_SIZE)
     {
@@ -123,7 +123,7 @@ static bool run_chunk()
             uint8_t t = c.script[chunk_instr++];
             uint8_t dst = t & 0xf;
             uint8_t src = t >> 4;
-            chunk_regs[dst] += chunk_regs[src];
+            savefile.chunk_regs[dst] += savefile.chunk_regs[src];
             break;
         }
         case CMD_ADDI:
@@ -132,7 +132,7 @@ static bool run_chunk()
             int8_t imm = (int8_t)c.script[chunk_instr++];
             uint8_t dst = t & 0xf;
             uint8_t src = t >> 4;
-            chunk_regs[dst] = chunk_regs[src] + imm;
+            savefile.chunk_regs[dst] = savefile.chunk_regs[src] + imm;
             break;
         }
         case CMD_SUB:
@@ -140,7 +140,7 @@ static bool run_chunk()
             uint8_t t = c.script[chunk_instr++];
             uint8_t dst = t & 0xf;
             uint8_t src = t >> 4;
-            chunk_regs[dst] -= chunk_regs[src];
+            savefile.chunk_regs[dst] -= savefile.chunk_regs[src];
             break;
         }
 
@@ -215,14 +215,14 @@ static bool run_chunk()
         {
             uint8_t t = c.script[chunk_instr++];
             int8_t i = (int8_t)c.script[chunk_instr++];
-            if(chunk_regs[t] == 0) chunk_instr += i;
+            if(savefile.chunk_regs[t] == 0) chunk_instr += i;
             break;
         }
         case CMD_BRN:
         {
             uint8_t t = c.script[chunk_instr++];
             int8_t i = (int8_t)c.script[chunk_instr++];
-            if(chunk_regs[t] < 0) chunk_instr += i;
+            if(savefile.chunk_regs[t] < 0) chunk_instr += i;
             break;
         }
         case CMD_BRFS:
@@ -270,16 +270,12 @@ bool run_chunks()
         running_chunk = 0;
         chunk_instr = 0;
         chunks_are_running = true;
-        for(auto& r : chunk_regs)
-            r = 0;
     }
     while(running_chunk < 4)
     {
         if(run_chunk()) return true;
         ++running_chunk;
         chunk_instr = 0;
-        for(auto& r : chunk_regs)
-            r = 0;
     }
     chunks_are_running = false;
     return false;

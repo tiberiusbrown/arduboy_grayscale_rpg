@@ -247,10 +247,10 @@ static void update_dialog()
             {
                 if(d.questionfill >= 32)
                 {
-                    chunk_regs[0] = 0;
-                    chunk_regs[1] = 0;
-                    chunk_regs[2] = 0;
-                    chunk_regs[d.questioni + 1] = 1;
+                    savefile.chunk_regs[0] = 0;
+                    savefile.chunk_regs[1] = 0;
+                    savefile.chunk_regs[2] = 0;
+                    savefile.chunk_regs[d.questioni + 1] = 1;
                     back_to_map();
                 }
                 else

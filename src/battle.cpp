@@ -319,7 +319,7 @@ void update_battle()
     d.menuy = (d.menuy + d.menuy_target) / 2;
     d.msely = (d.msely + d.msel * 10) / 2;
     ++d.frame;
-    if(++d.selframe >= 7) d.selframe = 0;
+    //if(++d.selframe >= 7) d.selframe = 0;
     update_battle_sprites();
     switch(d.phase)
     {
@@ -489,35 +489,34 @@ static void draw_health(uint8_t i)
 {
     auto const& d = sdata.battle;
     auto const& s = d.sprites[i];
-    uint8_t hp = s.hp, hpt = s.hpt;
-    uint8_t x = (i < 4 ? 0 : 124 - HP_BAR_WIDTH);
+    uint8_t x = (i < 4 ? 1 : 125 - HP_BAR_WIDTH);
     constexpr uint8_t y = 58;
     constexpr uint8_t w = HP_BAR_WIDTH + 2;
     constexpr uint8_t h = 4;
-    platform_drawrect(x + 1, y + 1, w, h, DARK_GRAY);
-    if(hpt < hp)
-    {
-        platform_fillrect(x + 2, y + 2, hpt, h - 2, WHITE);
-        platform_fillrect(x + 2 + hpt, y + 2, hp - hpt, h - 2, LIGHT_GRAY);
-    }
-    else
-    {
-        platform_fillrect(x + 2, y + 2, hp, h - 2, WHITE);
-        platform_fillrect(x + 2 + hp, y + 2, hpt - hp, h - 2, LIGHT_GRAY);
-    }
+    platform_drawrect(x, y + 1, w, h, DARK_GRAY);
 
-    if(i < 4)
+    uint8_t hp = s.hp, hpt = s.hpt;
+    if(hpt < hp) tswap(hpt, hp);
+    platform_fillrect(x + 1, y + 2, hp, h - 2, WHITE);
+    platform_fillrect(x + 1 + hp, y + 2, hpt - hp, h - 2, LIGHT_GRAY);
+
     {
-        uint8_t id = party[i].battle.id;
-        char const* name = pgmptr(&PARTY_INFO[id].name);
-        draw_text_prog(1, 51, name);
-    }
-    else
-    {
-        uint8_t id = d.enemies[i - 4].id;
-        char const* name = pgmptr(&ENEMY_INFO[id].name);
-        uint8_t w = text_width_prog(name);
-        draw_text_prog(127 - w, 51, name);
+        uint8_t id = member(i).id;
+        const char* const* zname;
+        uint8_t tx;
+        if(i < 4)
+        {
+            zname = &PARTY_INFO[id].name;
+            tx = 1;
+        }
+        else
+        {
+            zname = &ENEMY_INFO[id].name;
+            tx = 127 - w;
+        }
+        const char* name = pgmptr(
+            i < 4 ? &PARTY_INFO[id].name : &ENEMY_INFO[id].name);
+        draw_text_prog(tx, 51, name);
     }
 }
 

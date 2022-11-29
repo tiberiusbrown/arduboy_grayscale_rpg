@@ -156,7 +156,6 @@ extern uint8_t state;
 extern bool chunks_are_running;
 extern uint8_t running_chunk;
 extern uint8_t chunk_instr;
-extern int8_t chunk_regs[16];
 
 struct sdata_title
 {
@@ -279,7 +278,7 @@ struct battle_sprite_t
 struct sdata_battle
 {
     uint8_t frame;
-    uint8_t selframe;
+    //uint8_t selframe;
     uint16_t flag;
     bool remove_enemy;
     uint8_t enemy_chunk;
@@ -351,6 +350,7 @@ struct savefile_t
     uint8_t story_flags[STORY_FLAG_BYTES];
     uint8_t brightness;
     bool no_battery_alert;
+    int8_t chunk_regs[16];
 };
 extern savefile_t savefile;
 

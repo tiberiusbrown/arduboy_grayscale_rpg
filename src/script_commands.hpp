@@ -138,6 +138,27 @@ Asking questions:
     in the above prompt, if the player selected "No" then the registers would
     be set as: r1 = 0, r2 = 1, r3 = 0.
 
+Registers:
+
+    Register   Use
+    ==========================================================================
+    r0         Always zero
+    r1         Nonzero if the first response to a question was selected
+    r2         Nonzero if the second response to a question was selected
+    r3         Nonzero if the third response to a question was selected
+    r4
+    r5
+    r6
+    r7
+    r8
+    r9
+    r10
+    r11
+    r12
+    r13
+    r14
+    r15
+
 */
 
 #pragma once

@@ -108,11 +108,6 @@ static void render_title()
             platform_fx_drawoverwrite(0, 0, TITLE_IMG, 0);
             platform_fade(15 - d.fade_frame);
         }
-        else if(d.fade_frame >= 24)
-        {
-            render_map();
-            platform_fade(d.fade_frame - 24);
-        }
     }
     else
     {

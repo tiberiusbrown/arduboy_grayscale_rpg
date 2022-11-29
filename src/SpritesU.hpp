@@ -883,10 +883,16 @@ void SpritesU::fillRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t colo
 
         L%=_middle_outer_loop:
             mov  %[col], %[w]
+            sbrs %[col], 0
+            rjmp L%=_middle_inner_loop
+            inc  %[col]
+            rjmp L%=_middle_inner_loop_odd
             
         L%=_middle_inner_loop:
             st   %a[buf]+, %[color]
-            dec  %[col]
+        L%=_middle_inner_loop_odd:
+            st   %a[buf]+, %[color]
+            subi %[col], 2
             brne L%=_middle_inner_loop
             add  %A[buf], %[buf_adv]
             adc  %B[buf], __zero_reg__

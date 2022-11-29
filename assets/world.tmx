@@ -143,7 +143,8 @@ end:</property>
   </object>
   <object id="59" x="200" y="119.5">
    <properties>
-    <property name="script">$tmsg {Should you read this sign?|
+    <property name="script">$brnt end
+msg {Should you read this sign?|
 Yes, of course!
 No, I don't think so.
 Well, maybe later...}
