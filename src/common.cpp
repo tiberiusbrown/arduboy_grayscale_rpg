@@ -18,10 +18,10 @@ static char const PN_BOY[] PROGMEM = "Dismas";
 
 party_info_t const PARTY_INFO[4] PROGMEM =
 {
-    { 0, 0, 10, 20, 4, 4, PN_HERO },
-    { 3, 2, 10, 10, 3, 3, PN_GIRL },
-    { 0, 0, 10, 10, 4, 4, PN_GIRL2 },
-    { 0, 0, 10, 10, 4, 4, PN_BOY },
+    { 0, 0, 10, 20, 4, 4, 10, PN_HERO },
+    { 3, 2, 10, 10, 3, 3, 10, PN_GIRL },
+    { 0, 0, 10, 10, 4, 4, 10, PN_GIRL2 },
+    { 0, 0, 10, 10, 4, 4, 10, PN_BOY },
 };
 
 uint8_t party_att(uint8_t i)
@@ -41,7 +41,14 @@ uint8_t party_def(uint8_t i)
 uint8_t party_mhp(uint8_t i)
 {
     uint8_t id = party[i].battle.id;
-    uint8_t r = pgm_read_byte(&PARTY_INFO[id].max_hp);
+    uint8_t r = pgm_read_byte(&PARTY_INFO[id].base_mhp);
+    return r;
+}
+
+uint8_t party_spd(uint8_t i)
+{
+    uint8_t id = party[i].battle.id;
+    uint8_t r = pgm_read_byte(&PARTY_INFO[id].base_spd);
     return r;
 }
 

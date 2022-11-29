@@ -1,5 +1,5 @@
 #include <avr/pgmspace.h>
-#include <atm_synth.h>
+#include "src/ATMlib2/atm_synth.h"
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof (a) / sizeof ((a)[0]))

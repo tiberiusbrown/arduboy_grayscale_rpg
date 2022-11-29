@@ -4,9 +4,6 @@
 
 void render_map()
 {
-    static bool blah = false;
-    if(bat.low_battery) blah = true;
-    if(blah) return;
     draw_tiles();
     draw_sprites();
 }
@@ -43,7 +40,7 @@ static void render_dialog()
 
     if(portrait)
     {
-        platform_fx_drawoverwrite(2, 2, PORTRAIT_IMG, d.portrait, 32, 32);
+        platform_fx_drawoverwrite(2, 2, PORTRAIT_IMG, d.portrait);
         platform_drawrect(0, 0, 36, 36, LIGHT_GRAY);
     }
 
@@ -80,7 +77,7 @@ static void render_game_over()
     auto const& d = sdata.game_over;
 
     if(d.fade_frame < 8) return;
-    platform_fx_drawoverwrite(0, 0, GAME_OVER_IMG, 0, 128, 64);
+    platform_fx_drawoverwrite(0, 0, GAME_OVER_IMG, 0);
 
     uint8_t n = d.msg_lines;
     uint8_t y = 39 - n * 4;
@@ -108,7 +105,7 @@ static void render_title()
     {
         if(d.fade_frame < 16)
         {
-            platform_fx_drawoverwrite(0, 0, TITLE_IMG, 0, 128, 64);
+            platform_fx_drawoverwrite(0, 0, TITLE_IMG, 0);
             platform_fade(15 - d.fade_frame);
         }
         else if(d.fade_frame >= 24)
@@ -120,7 +117,7 @@ static void render_title()
     else
     {
         if(d.fade_frame < 8) return;
-        platform_fx_drawoverwrite(0, 0, TITLE_IMG, 0, 128, 64);
+        platform_fx_drawoverwrite(0, 0, TITLE_IMG, 0);
         if(d.fade_frame < 24)
             platform_fade(d.fade_frame - 8);
     }

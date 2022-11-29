@@ -32,7 +32,11 @@ struct SpritesU
 
 #ifdef SPRITESU_FX
     static void drawOverwriteFX(
+        int16_t x, int16_t y, uint24_t image, uint16_t frame);
+    static void drawOverwriteFX(
         int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame);
+    static void drawPlusMaskFX(
+        int16_t x, int16_t y, uint24_t image, uint16_t frame);
     static void drawPlusMaskFX(
         int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame);
 #endif
@@ -51,6 +55,7 @@ constexpr uint8_t SPRITESU_MODE_PLUSMASK    = 1;
 constexpr uint8_t SPRITESU_MODE_OVERWRITEFX = 2;
 constexpr uint8_t SPRITESU_MODE_PLUSMASKFX  = 3;
 
+__attribute__((noinline))
 static void SpritesU_DrawCommon(
     int16_t x, int16_t y, uint8_t w, uint8_t h,
     uint24_t image, uint16_t frame, uint8_t mode)
@@ -195,8 +200,8 @@ static void SpritesU_DrawCommon(
                 breq L%=_bottom
 
                 ; need Y pointer for middle pages
-                push r28
-                push r29
+                ;push r28
+                ;push r29
                 movw r28, %[buf]
                 subi r28, lo8(-128)
                 sbci r29, hi8(-128)
@@ -233,8 +238,8 @@ static void SpritesU_DrawCommon(
                 brne L%=_middle_loop_outer
 
                 ; done with Y pointer
-                pop r29
-                pop r28
+                ;pop r29
+                ;pop r28
 
             L%=_bottom:
 
@@ -261,20 +266,20 @@ static void SpritesU_DrawCommon(
             :
             [buf]        "+&x" (buf),
             [image]      "+&z" (image_ptr),
-            [pages]      "+&a" (pages),
-            [count]      "=&l" (count),
-            [buf_data]   "=&a" (buf_data),
-            [image_data] "=&a" (image_data)
+            [pages]      "+&r" (pages),
+            [count]      "=&r" (count),
+            [buf_data]   "=&r" (buf_data),
+            [image_data] "=&r" (image_data)
             :
-            [cols]       "l"   (cols),
-            [buf_adv]    "l"   (buf_adv),
-            [image_adv]  "l"   (image_adv),
-            [shift_mask] "l"   (shift_mask),
-            [shift_coef] "l"   (shift_coef),
-            [bottom]     "a"   (bottom),
-            [page_start] "a"   (page_start)
+            [cols]       "r"   (cols),
+            [buf_adv]    "r"   (buf_adv),
+            [image_adv]  "r"   (image_adv),
+            [shift_mask] "r"   (shift_mask),
+            [shift_coef] "r"   (shift_coef),
+            [bottom]     "r"   (bottom),
+            [page_start] "r"   (page_start)
             :
-            "memory"
+            "r28", "r29", "memory"
             );
     }
     else
@@ -326,8 +331,8 @@ static void SpritesU_DrawCommon(
                 breq L%=_bottom
 
                 ; need Y pointer for middle pages
-                push r28
-                push r29
+                ;push r28
+                ;push r29
                 movw r28, %[buf]
                 subi r28, lo8(-128)
                 sbci r29, hi8(-128)
@@ -371,8 +376,8 @@ static void SpritesU_DrawCommon(
                 brne L%=_middle_loop_outer
 
                 ; done with Y pointer
-                pop r29
-                pop r28
+                ;pop r29
+                ;pop r28
 
             L%=_bottom:
 
@@ -405,20 +410,20 @@ static void SpritesU_DrawCommon(
             :
             [buf]        "+&x" (buf),
             [image]      "+&z" (image_ptr),
-            [pages]      "+&l" (pages),
-            [count]      "=&l" (count),
-            [buf_data]   "=&l" (buf_data),
-            [image_data] "=&l" (image_data),
-            [mask_data]  "=&l" (mask_data)
+            [pages]      "+&r" (pages),
+            [count]      "=&r" (count),
+            [buf_data]   "=&r" (buf_data),
+            [image_data] "=&r" (image_data),
+            [mask_data]  "=&r" (mask_data)
             :
-            [cols]       "l"   (cols),
-            [buf_adv]    "l"   (buf_adv),
-            [image_adv]  "l"   (image_adv),
-            [shift_coef] "l"   (shift_coef),
-            [bottom]     "a"   (bottom),
-            [page_start] "a"   (page_start)
+            [cols]       "r"   (cols),
+            [buf_adv]    "r"   (buf_adv),
+            [image_adv]  "r"   (image_adv),
+            [shift_coef] "r"   (shift_coef),
+            [bottom]     "r"   (bottom),
+            [page_start] "r"   (page_start)
             :
-            "memory"
+            "r28", "r29", "memory"
             );
     }
     else
@@ -751,14 +756,30 @@ void SpritesU::drawPlusMask(
 
 #ifdef SPRITESU_FX
 void SpritesU::drawOverwriteFX(
+    int16_t x, int16_t y, uint24_t image, uint16_t frame)
+{
+    FX::seekData(image);
+    uint8_t w = FX::readPendingUInt8();
+    uint8_t h = FX::readEnd();
+    SpritesU_DrawCommon(x, y, w, h, image + 2, frame, SPRITESU_MODE_OVERWRITEFX);
+}
+void SpritesU::drawOverwriteFX(
     int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame)
 {
-    SpritesU_DrawCommon(x, y, w, h, image, frame, SPRITESU_MODE_OVERWRITEFX);
+    SpritesU_DrawCommon(x, y, w, h, image + 2, frame, SPRITESU_MODE_OVERWRITEFX);
+}
+void SpritesU::drawPlusMaskFX(
+    int16_t x, int16_t y, uint24_t image, uint16_t frame)
+{
+    FX::seekData(image);
+    uint8_t w = FX::readPendingUInt8();
+    uint8_t h = FX::readEnd();
+    SpritesU_DrawCommon(x, y, w, h, image + 2, frame, SPRITESU_MODE_PLUSMASKFX);
 }
 void SpritesU::drawPlusMaskFX(
     int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame)
 {
-    SpritesU_DrawCommon(x, y, w, h, image, frame, SPRITESU_MODE_PLUSMASKFX);
+    SpritesU_DrawCommon(x, y, w, h, image + 2, frame, SPRITESU_MODE_PLUSMASKFX);
 }
 #endif
 

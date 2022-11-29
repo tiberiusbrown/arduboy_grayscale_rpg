@@ -91,8 +91,8 @@ static bool run_chunk()
             sdata.battle.pdef = sdata.battle.edef = -1;
             sdata.battle.defender_id = -1;
             sdata.battle.flag = f;
-            for(auto& p : party)
-                p.battle.ap = 0;
+            //for(auto& p : party)
+            //    p.battle.ap = 0;
             story_flag_set(f);
             return true;
         }
@@ -202,19 +202,26 @@ static bool run_chunk()
             c.tiles_flat[t] = i;
             break;
         }
+        case CMD_PA:
+        {
+            uint8_t id = c.script[chunk_instr++];
+            party[nparty].battle.id = id;
+            party[nparty].battle.hp = party_mhp(nparty);
+            party[nparty].battle.ap = 0;
+        }
 
         case CMD_JMP: chunk_instr += c.script[chunk_instr]; break;
         case CMD_BRZ:
         {
             uint8_t t = c.script[chunk_instr++];
-            uint8_t i = c.script[chunk_instr++];
+            int8_t i = (int8_t)c.script[chunk_instr++];
             if(chunk_regs[t] == 0) chunk_instr += i;
             break;
         }
         case CMD_BRN:
         {
             uint8_t t = c.script[chunk_instr++];
-            uint8_t i = c.script[chunk_instr++];
+            int8_t i = (int8_t)c.script[chunk_instr++];
             if(chunk_regs[t] < 0) chunk_instr += i;
             break;
         }
@@ -223,7 +230,7 @@ static bool run_chunk()
         {
             uint16_t f = c.script[chunk_instr++];
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
-            uint8_t t = c.script[chunk_instr++];
+            int8_t t = (int8_t)c.script[chunk_instr++];
             bool fs = story_flag_get(f);
             if(instr == CMD_BRFC) fs = !fs;
             if(fs) chunk_instr += t;
@@ -232,22 +239,21 @@ static bool run_chunk()
         case CMD_BRNT:
         {
             uint8_t t = c.script[chunk_instr++];
-            uint8_t i = c.script[chunk_instr++];
+            int8_t i = (int8_t)c.script[chunk_instr++];
             if(t != sel_tile) chunk_instr += i;
             break;
         }
         case CMD_BRNW:
         {
             uint8_t t = c.script[chunk_instr++];
-            uint8_t i = c.script[chunk_instr++];
+            int8_t i = (int8_t)c.script[chunk_instr++];
             if(t != walk_tile) chunk_instr += i;
             break;
         }
         case CMD_BRNE:
         {
-            uint8_t i = c.script[chunk_instr++];
+            int8_t i = (int8_t)c.script[chunk_instr++];
             if(!enemy_contacts_player(ac)) chunk_instr += i;
-            // else __debugbreak();
             break;
         }
 

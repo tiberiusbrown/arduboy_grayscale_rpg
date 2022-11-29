@@ -109,15 +109,18 @@ static void draw_chunk_tiles(uint8_t i, int16_t ox, int16_t oy)
 {
     auto const& ac = active_chunks[i];
     uint8_t const* tiles = ac.chunk.tiles_flat;
+    uint8_t maxy = 64;
+    if(state == STATE_PAUSE) maxy -= sdata.pause.ally;
+    else if(state == STATE_DIALOG) maxy = 35;
     for(uint8_t r = 0, n = 0; r < 64; r += 16)
     {
         int16_t y = oy + r;
-        if(y <= -16 || y >= 64)
+        if(y <= -16)
         {
             n += 8;
             continue;
         }
-        if(state == STATE_DIALOG && y >= 35) break;
+        if(y >= maxy) break;
         for(uint8_t c = 0; c < 128; c += 16, ++n)
         {
             int16_t x = ox + c;

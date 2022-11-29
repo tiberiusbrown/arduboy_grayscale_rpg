@@ -39,6 +39,7 @@ class CMD(AutoNumber):
     EP   = ()
     EPF  = ()
     ST   = ()
+    PA   = ()
 
     JMP  = ()
     BRZ  = ()
@@ -210,6 +211,10 @@ def assemble(s, eps):
         elif s[i] == 'st':
             b.append(CMD.ST); i += 1
             b.append(int(s[i])); i += 1
+            b.append(int(s[i])); i += 1
+            
+        elif s[i] == 'pa':
+            b.append(CMD.PA); i += 1
             b.append(int(s[i])); i += 1
             
         elif s[i] == 'jmp':

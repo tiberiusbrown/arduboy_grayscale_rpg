@@ -33,6 +33,7 @@ def convert(fout, sym, fname, sw, sh, num = 0, start = 0):
             f.write('};\n')
     if fout[-4:] == '.bin':
         with open(fout, 'wb') as f:
+            f.write(bytearray([sw, sh]))
             for i in range(ps[0]):
                 if len(ps) > 4:
                     for j in range(sbytes):

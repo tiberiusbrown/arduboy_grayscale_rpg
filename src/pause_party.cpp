@@ -8,11 +8,11 @@ void update_pause_party()
 
     if(d.partyy < 64) return;
 
-    if(btns_pressed & BTN_B)
-        d.state = OS_MENU;
-    else if(d.partyx == d.partyxt)
+    if(d.partyx == d.partyxt)
     {
-        if(d.partyi > 0 && (btns_pressed & BTN_LEFT))
+        if(btns_pressed & BTN_B)
+            d.state = OS_MENU;
+        else if(d.partyi > 0 && (btns_pressed & BTN_LEFT))
         {
             --d.partyi;
             d.partyx = 0;
@@ -39,7 +39,7 @@ static void render_pause_party_offset(int16_t x, int16_t y, uint8_t i)
     uint8_t sprite = pgm_read_byte(&pi->sprite);
     uint8_t portrait = pgm_read_byte(&pi->portrait);
     platform_drawrect(x + 9, y + 19, 36, 36, LIGHT_GRAY);
-    platform_fx_drawoverwrite(x + 11, y + 21, PORTRAIT_IMG, portrait, 32, 32);
+    platform_fx_drawoverwrite(x + 11, y + 21, PORTRAIT_IMG, portrait);
     draw_text_prog(x + 47, y + 19, name);
     {
         // health bar
@@ -57,9 +57,9 @@ static void render_pause_party_offset(int16_t x, int16_t y, uint8_t i)
     if(i == d.partyi)
     {
         if(i > 0)
-            platform_fx_drawoverwrite(x + 0, y + 36, ARROWS_IMG, 0, 8, 8);
+            platform_fx_drawoverwrite(x + 0, y + 36, ARROWS_IMG, 0);
         if(i < nparty - 1)
-            platform_fx_drawoverwrite(x + 120, y + 36, ARROWS_IMG, 1, 8, 8);
+            platform_fx_drawoverwrite(x + 120, y + 36, ARROWS_IMG, 1);
     }
 }
 
@@ -67,7 +67,7 @@ void render_pause_party()
 {
     auto const& d = sdata.pause;
     int16_t y = 64 - d.partyy;
-    platform_fx_drawoverwrite(0, y, PARTY_MEMBERS_IMG, 0, 128, 16);
+    platform_fx_drawoverwrite(0, y, PARTY_MEMBERS_IMG, 0);
     platform_fillrect(0, y + 16, 128, 48, BLACK);
     if(d.partyx < d.partyxt)
     {

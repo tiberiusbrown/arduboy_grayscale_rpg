@@ -106,7 +106,7 @@ void platform_drawoverwritemonochrome_noclip(
 
     uint8_t* buf = Arduboy2Base::sBuffer;
     asm volatile(
-        "mulsu %[page_start], %[c128]\n"
+        "mul %[page_start], %[c128]\n"
         "add %A[buf], r0\n"
         "adc %B[buf], r1\n"
         "clr __zero_reg__\n"
@@ -115,9 +115,9 @@ void platform_drawoverwritemonochrome_noclip(
         :
         [buf] "+&x" (buf)
         :
-        [page_start] "a"   (page_start),
+        [page_start] "r"   (page_start),
         [x]          "r"   (x),
-        [c128]       "a"   ((uint8_t)128)
+        [c128]       "r"   ((uint8_t)128)
         );
 
     asm volatile(R"ASM(
@@ -126,8 +126,8 @@ void platform_drawoverwritemonochrome_noclip(
                 breq L%=_bottom
 
                 ; need Y pointer for middle pages
-                push r28
-                push r29
+                ;push r28
+                ;push r29
                 movw r28, %[buf]
                 subi r28, lo8(-128)
                 sbci r29, hi8(-128)
@@ -152,20 +152,19 @@ void platform_drawoverwritemonochrome_noclip(
                 dec %[count]
                 brne L%=_middle_loop_inner
 
-                ; advance buf, buf+128, and image to the next page
+                ; advance buf, buf+128 to the next page
+                ; image doesn't need to advance because no clip
                 clr __zero_reg__
                 add %A[buf], %[buf_adv]
                 adc %B[buf], __zero_reg__
                 add r28, %[buf_adv]
                 adc r29, __zero_reg__
-                add %A[image], %A[image_adv]
-                adc %B[image], __zero_reg__
                 dec %[pages]
                 brne L%=_middle_loop_outer
 
                 ; done with Y pointer
-                pop r29
-                pop r28
+                ;pop r29
+                ;pop r28
 
             L%=_bottom:
 
@@ -192,19 +191,18 @@ void platform_drawoverwritemonochrome_noclip(
         :
         [buf]        "+&x" (buf),
         [image]      "+&z" (bitmap),
-        [pages]      "+&a" (pages),
-        [count]      "=&l" (count),
-        [buf_data]   "=&a" (buf_data),
-        [image_data] "=&a" (image_data)
+        [pages]      "+&r" (pages),
+        [count]      "=&r" (count),
+        [buf_data]   "=&r" (buf_data),
+        [image_data] "=&r" (image_data)
         :
-        [cols]       "l"   (w),
-        [buf_adv]    "l"   (buf_adv),
-        [image_adv]  "l"   (uint8_t(128 - w)),
-        [shift_mask] "l"   (shift_mask),
-        [shift_coef] "l"   (shift_coef),
-        [bottom]     "a"   (bottom)
+        [cols]       "r"   (w),
+        [buf_adv]    "r"   (buf_adv),
+        [shift_mask] "r"   (shift_mask),
+        [shift_coef] "r"   (shift_coef),
+        [bottom]     "r"   (bottom)
         :
-        "memory"
+        "r28", "r29", "memory"
         );
 #else
     uint8_t oy = 0;
@@ -240,7 +238,7 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
 #else
     auto now = SDL_GetTicks64();
     assert(now >= ticks_when_ready);
-    uint8_t const* bitmap = &FXDATA[addr];
+    uint8_t const* bitmap = &FXDATA[addr + 2];
     bitmap += w * h / 8 * (frame * PLANES + gplane);
     for(uint8_t r = 0; r < h; ++r)
     {
@@ -257,6 +255,18 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
 #endif
 }
 
+void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
+    uint16_t frame)
+{
+#ifdef ARDUINO
+    SpritesU::drawOverwriteFX(x, y, addr, frame * PLANES + a.currentPlane());
+#else
+    uint8_t w = FXDATA[addr + 0];
+    uint8_t h = FXDATA[addr + 1];
+    platform_fx_drawoverwrite(x, y, addr, frame, w, h);
+#endif
+}
+
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h)
 {
@@ -264,7 +274,7 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     SpritesU::drawPlusMaskFX(x, y, w, h, addr, frame * PLANES + a.currentPlane());
 #else
     assert(SDL_GetTicks64() >= ticks_when_ready);
-    uint8_t const* bitmap = &FXDATA[addr];
+    uint8_t const* bitmap = &FXDATA[addr + 2];
     bitmap += w * h / 4 * (frame * PLANES + gplane);
     for(uint8_t r = 0; r < h; ++r)
     {
@@ -279,6 +289,18 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
             if(m) pixels[gplane][tpy * 128 + tpx] = p;
         }
     }
+#endif
+}
+
+void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
+    uint16_t frame)
+{
+#ifdef ARDUINO
+    SpritesU::drawPlusMaskFX(x, y, addr, frame * PLANES + a.currentPlane());
+#else
+    uint8_t w = FXDATA[addr + 0];
+    uint8_t h = FXDATA[addr + 1];
+    platform_fx_drawplusmask(x, y, addr, frame, w, h);
 #endif
 }
 

@@ -17,7 +17,7 @@ void update_pause()
     }
     if(d.state == OS_RESUMING)
     {
-        if((d.menuy | d.optionsy | d.quity | d.savey | d.partyy) == 0)
+        if((d.ally | d.menuy) == 0)
         {
             change_state(STATE_MAP);
             return;
@@ -25,7 +25,7 @@ void update_pause()
     }
     else if(d.state == OS_MENU)
     {
-        if(d.menuy >= 16 && (d.optionsy | d.quity | d.savey | d.partyy) == 0)
+        if(d.menuy >= 16 && d.ally == 0)
         {
             uint8_t menui = d.menui;
             if((btns_pressed & BTN_LEFT) && menui-- == 0)
@@ -191,6 +191,7 @@ void update_pause()
         if(d.brightnessx == 0) d.brightnessx = tx;
         d.brightnessx = adjust(d.brightnessx, tx);
     }
+    d.ally = d.optionsy | d.quity | d.savey | d.partyy;
 }
 
 void render_pause()
@@ -202,25 +203,25 @@ void render_pause()
         render_map();
     if(d.menuy > 0)
     {
-        platform_fx_drawoverwrite(0, d.menuy - 16, PAUSE_MENU_IMG, 0, 128, 16);
+        platform_fx_drawoverwrite(0, d.menuy - 16, PAUSE_MENU_IMG, 0);
         platform_fillrect(d.ax, d.menuy - 5, (d.bx - d.ax + 1), 2, WHITE);
     }
     if(d.optionsy > 0)
     {
         int16_t y = 64 - d.optionsy;
-        platform_fx_drawoverwrite(0, y, OPTIONS_IMG, 0, 128, 64);
-        platform_fx_drawoverwrite(d.brightnessx, y + 33, SLIDER_IMG, 0, 7, 8);
+        platform_fx_drawoverwrite(0, y, OPTIONS_IMG, 0);
+        platform_fx_drawoverwrite(d.brightnessx, y + 33, SLIDER_IMG, 0);
         if(platform_audio_enabled())
-            platform_fx_drawoverwrite(71, y + 20, CHECK_IMG, 0, 8, 8);
+            platform_fx_drawoverwrite(71, y + 20, CHECK_IMG, 0);
         if(!savefile.no_battery_alert)
-            platform_fx_drawoverwrite(71, y + 52, CHECK_IMG, 0, 8, 8);
+            platform_fx_drawoverwrite(71, y + 52, CHECK_IMG, 0);
         if(plane() == 0)
             platform_drawrect(1, y + d.optionsiy, 126, 14, DARK_GRAY);
     }
     if(d.quity > 0)
     {
         int16_t y = 64 - d.quity;
-        platform_fx_drawoverwrite(0, y, QUIT_IMG, 0, 128, 64);
+        platform_fx_drawoverwrite(0, y, QUIT_IMG, 0);
         if(plane() == 0)
         {
             platform_drawrect(16, y + d.quitiy, 96, 12, DARK_GRAY);

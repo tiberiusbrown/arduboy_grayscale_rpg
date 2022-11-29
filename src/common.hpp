@@ -18,7 +18,7 @@ constexpr uint8_t FADE_SPEED = 2;
 
 #ifdef ARDUINO
 #include <ArduboyFX.h>
-#include "ATMlib2/ATMlib2.h"
+#include "src/ATMlib2/ATMlib2.h"
 #define ABG_TIMER1
 #define ABG_SYNC_PARK_ROW
 #define ABG_UPDATE_EVERY_N_DEFAULT 11
@@ -49,6 +49,7 @@ inline uint8_t deref_inc(T const*& p)
     asm volatile("ld %[r], %a[p]+\n" : [p] "+&e" (p), [r] "=&r" (r) :: "memory");
     return r;
 }
+#define FORCE_NOINLINE __attribute__((noinline))
 #else
 #include <assert.h>
 #define MY_ASSERT(cond__) assert(cond__)
@@ -94,6 +95,7 @@ inline uint8_t plane()
 {
     return (uint8_t)gplane;
 }
+#define FORCE_NOINLINE
 #endif
 
 constexpr uint8_t PLANES = 3;
@@ -207,6 +209,7 @@ struct sdata_pause
     uint8_t partyi;
     uint8_t partyx;
     uint8_t partyxt;
+    uint8_t ally;
 };
 
 struct battle_member_t
@@ -230,9 +233,10 @@ struct party_info_t
     uint8_t sprite;
     uint8_t portrait;
     uint8_t speed;
-    uint8_t max_hp;
+    uint8_t base_mhp;
     uint8_t base_att;
     uint8_t base_def;
+    uint8_t base_spd;
     char const* name;
 };
 extern party_info_t const PARTY_INFO[4] PROGMEM;
@@ -240,6 +244,7 @@ extern party_info_t const PARTY_INFO[4] PROGMEM;
 uint8_t party_att(uint8_t i);
 uint8_t party_def(uint8_t i);
 uint8_t party_mhp(uint8_t i);
+uint8_t party_spd(uint8_t i);
 
 enum battle_phase_t
 {
@@ -441,8 +446,12 @@ void platform_drawoverwritemonochrome_noclip(
 void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num);
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h);
+void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
+    uint16_t frame);
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h);
+void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
+    uint16_t frame);
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_fx_erase_save_sector();

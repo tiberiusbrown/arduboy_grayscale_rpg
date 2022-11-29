@@ -74,6 +74,9 @@ Game Manipulation
     st <tile> <tile_img>
         Overwrite image at <tile> with <tile_img>
 
+    pa <id>
+        Add party member <id> to party
+
 Control Instructions
 
     end
@@ -163,6 +166,7 @@ enum script_command_t
     CMD_EP,
     CMD_EPF,
     CMD_ST,
+    CMD_PA,
 
     CMD_JMP,
     CMD_BRZ,

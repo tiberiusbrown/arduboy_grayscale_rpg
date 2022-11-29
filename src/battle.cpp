@@ -55,7 +55,7 @@ static uint8_t get_speed(uint8_t i)
 {
     auto const& d = sdata.battle;
     if(i < 4)
-        return 10;
+        return party_spd(i);
     return pgm_read_byte(&ENEMY_INFO[d.enemies[i - 4].id].speed);
 }
 
@@ -590,7 +590,7 @@ void render_battle()
         }
 #endif
         uint8_t f = (phase == BPHASE_INTRO ? 0 : 1);
-        platform_fx_drawoverwrite(x, 24, BATTLE_BANNERS_IMG, f, 144, 16);
+        platform_fx_drawoverwrite(x, 24, BATTLE_BANNERS_IMG, f);
         return;
     }
     draw_battle_background();
@@ -600,7 +600,7 @@ void render_battle()
     {
         platform_fx_drawplusmask(51, menuy, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
         platform_fx_drawplusmask(74, menuy, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
-        platform_fx_drawoverwrite(48, menuy + 8, BATTLE_MENU_IMG, 0, 32, 40);
+        platform_fx_drawoverwrite(48, menuy + 8, BATTLE_MENU_IMG, 0);
         draw_text_prog(50, menuy + 9 + d.msely, PSTR("\x7f"));
     }
     if(phase == BPHASE_MENU || phase == BPHASE_ESEL)

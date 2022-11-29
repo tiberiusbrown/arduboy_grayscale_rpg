@@ -146,7 +146,10 @@ end:</property>
     <property name="script">$tmsg {Should you read this sign?|
 Yes, of course!
 No, I don't think so.
-Well, maybe later...}</property>
+Well, maybe later...}
+brz r1 end
+msg {Great! I'm glad you chose to read this sign.}
+end:</property>
    </properties>
    <point/>
   </object>

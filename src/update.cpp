@@ -184,7 +184,7 @@ static void skip_dialog_animation(uint8_t third_newline)
 {
     auto& d = sdata.dialog;
     uint8_t i;
-    for(i = 0; d.message[i] != '\0' && i != third_newline; ++i) {}
+    for(i = 0; d.message[i] != '\0' && d.message[i] != '|' && i != third_newline; ++i) {}
     d.char_progress = i;
 }
 
@@ -197,6 +197,7 @@ static void advance_dialog_animation()
         if(c != '\0') ++d.char_progress;
         if(c == '|')
         {
+            MY_ASSERT(!d.question);
             // replace pipe char
             d.message[d.char_progress - 1] = '\0';
             // skip following newline
@@ -272,6 +273,8 @@ static void update_dialog()
         }
         else
         {
+            if(btns_down & BTN_B)
+                skip_dialog_animation(255);
             advance_dialog_animation();
         }
         return;
