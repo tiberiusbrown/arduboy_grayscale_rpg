@@ -6,7 +6,7 @@
 #include "script_commands.hpp"
 #include "tile_solid.hpp"
 
-static void reset_enemy(enemy_t& e)
+static void reset_enemy(sprite_t& e)
 {
     e.path_index = 0;
     e.x = (e.path[0] & 7) * 16;
@@ -19,6 +19,7 @@ static void reset_enemy(enemy_t& e)
 static bool run_chunk()
 {
     auto& ac = active_chunks[running_chunk];
+    auto& sprite = chunk_sprites[running_chunk];
     auto& c = ac.chunk;
     uint8_t walk_tile = 255;
     uint8_t sel_tile = 255;
@@ -35,8 +36,8 @@ static bool run_chunk()
         if((dx | dy) < 8)
         {
             sel_tile = dy * 8 + dx;
-            uint8_t ex = ac.sprite.x;
-            uint8_t ey = ac.sprite.y;
+            uint8_t ex = sprite.x;
+            uint8_t ey = sprite.y;
             dx = uint8_t((selx & 127) - ex);
             dy = uint8_t((sely &  63) - ey);
             if((dx | dy) < 16)
@@ -189,21 +190,21 @@ static bool run_chunk()
             uint8_t n = c.script[chunk_instr++];
             if(instr == CMD_EPF && story_flag_get(f))
             {
-                ac.sprite.active = false;
+                sprite.active = false;
                 chunk_instr += n;
                 break;
             }
             bool reset = false;
-            if(ac.sprite.type != id) reset = true;
-            ac.sprite.type = id;
+            if(sprite.type != id) reset = true;
+            sprite.type = id;
             for(uint8_t j = 0; j < n; ++j)
             {
-                if(ac.sprite.path[j] != c.script[chunk_instr]) reset = true;
-                ac.sprite.path[j] = c.script[chunk_instr++];
+                if(sprite.path[j] != c.script[chunk_instr]) reset = true;
+                sprite.path[j] = c.script[chunk_instr++];
             }
-            ac.sprite.path_num = n;
-            ac.sprite.active = (n > 0);
-            if(reset) reset_enemy(ac.sprite);
+            sprite.path_num = n;
+            sprite.active = (n > 0);
+            if(reset) reset_enemy(sprite);
             break;
         }
         case CMD_ST:
@@ -264,7 +265,7 @@ static bool run_chunk()
         case CMD_BRNE:
         {
             int8_t i = (int8_t)c.script[chunk_instr++];
-            if(!sprite_contacts_player(ac)) chunk_instr += i;
+            if(!sprite_contacts_player(ac, sprite)) chunk_instr += i;
             break;
         }
         case CMD_BRNS:
@@ -320,10 +321,18 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
             chunk->tiles_flat[i] = 30;
         for(uint8_t i = 0; i < CHUNK_SCRIPT_SIZE; ++i)
             chunk->script[i] = 0;
-        active_chunk.sprite.active = false;
+        chunk_sprites[index].active = false;
         return;
     }
     platform_fx_read_data_bytes(addr, chunk, sizeof(map_chunk_t));
+}
+
+static void shift_chunk(uint8_t dst, uint8_t src)
+{
+    memcpy(&active_chunks[dst], &active_chunks[src],
+           sizeof(active_chunk_t));
+    memcpy(&chunk_sprites[dst], &chunk_sprites[src],
+           sizeof(sprite_t));
 }
 
 void load_chunks()
@@ -340,17 +349,13 @@ void load_chunks()
         if(cy == uint8_t(pcy + 1))
         {
             // shift up
-            memcpy(&active_chunks[0], &active_chunks[2],
-                   sizeof(active_chunk_t));
-            memcpy(&active_chunks[1], &active_chunks[3],
-                   sizeof(active_chunk_t));
+            shift_chunk(0, 2);
+            shift_chunk(1, 3);
         }
         else if(cy == uint8_t(pcy - 1)) {
             // shift down
-            memcpy(&active_chunks[2], &active_chunks[0],
-                   sizeof(active_chunk_t));
-            memcpy(&active_chunks[3], &active_chunks[1],
-                   sizeof(active_chunk_t));
+            shift_chunk(2, 0);
+            shift_chunk(3, 1);
         }
     }
     if(cy == pcy)
@@ -358,17 +363,13 @@ void load_chunks()
         if(cx == uint8_t(pcx + 1))
         {
             // shift left
-            memcpy(&active_chunks[0], &active_chunks[1],
-                   sizeof(active_chunk_t));
-            memcpy(&active_chunks[2], &active_chunks[3],
-                   sizeof(active_chunk_t));
+            shift_chunk(0, 1);
+            shift_chunk(2, 3);
         }
         else if(cx == uint8_t(pcx - 1)) {
             // shift right
-            memcpy(&active_chunks[1], &active_chunks[0],
-                   sizeof(active_chunk_t));
-            memcpy(&active_chunks[3], &active_chunks[2],
-                   sizeof(active_chunk_t));
+            shift_chunk(1, 0);
+            shift_chunk(3, 2);
         }
     }
 
@@ -400,10 +401,11 @@ bool check_solid(uint16_t tx, uint16_t ty)
     if(tx & 0x08) q <<= 1;
     if((t & q) != 0) return true;
     // check sprite
-    if(c.sprite.active)
+    auto const& e = chunk_sprites[ci];
+    if(e.active)
     {
-        uint8_t ex = c.sprite.x;
-        uint8_t ey = c.sprite.y;
+        uint8_t ex = e.x;
+        uint8_t ey = e.y;
         if((uint8_t(ctx - ex) | uint8_t(cty - ey)) < 16)
             return true;
     }

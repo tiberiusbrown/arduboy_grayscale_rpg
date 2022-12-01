@@ -339,34 +339,7 @@ struct party_member_t
     battle_member_t battle;
 };
 
-struct savefile_t
-{
-    uint16_t checksum;
-    uint8_t identifier[8];
-    uint16_t px, py;     // player position (in pixels)
-    uint8_t pdir;        // player direction
-    uint8_t nparty;
-    party_member_t party[4];
-    uint8_t story_flags[STORY_FLAG_BYTES];
-    uint8_t brightness;
-    bool no_battery_alert;
-    int8_t chunk_regs[16];
-};
-extern savefile_t savefile;
-
-static auto& px = savefile.px;
-static auto& py = savefile.py;
-static auto& pdir = savefile.pdir;
-static auto& party = savefile.party;
-static auto& nparty = savefile.nparty;
-static auto& story_flags = savefile.story_flags;
-
-void story_flag_set(uint16_t index);
-void story_flag_clr(uint16_t index);
-void story_flag_tog(uint16_t index);
-bool story_flag_get(uint16_t index);
-
-struct enemy_t
+struct sprite_t
 {
     uint8_t x, y, dir;
     uint8_t type;
@@ -385,11 +358,41 @@ struct active_chunk_t
 {
     map_chunk_t chunk;
     uint8_t cx, cy;
-    enemy_t sprite;
 };
 // 0 1
 // 2 3
 extern active_chunk_t active_chunks[4];
+
+struct savefile_t
+{
+    uint16_t checksum;
+    uint8_t identifier[8];
+    uint16_t px, py;     // player position (in pixels)
+    uint8_t pdir;        // player direction
+    uint8_t nparty;
+    party_member_t party[4];
+    uint8_t story_flags[STORY_FLAG_BYTES];
+    uint8_t brightness;
+    bool no_battery_alert;
+    int8_t chunk_regs[16];
+    sprite_t chunk_sprites[4];
+};
+extern savefile_t savefile;
+
+static auto& px = savefile.px;
+static auto& py = savefile.py;
+static auto& pdir = savefile.pdir;
+static auto& party = savefile.party;
+static auto& nparty = savefile.nparty;
+static auto& story_flags = savefile.story_flags;
+static auto& chunk_sprites = savefile.chunk_sprites;
+
+constexpr auto SIZEOF_SAVEFILE = sizeof(savefile);
+
+void story_flag_set(uint16_t index);
+void story_flag_clr(uint16_t index);
+void story_flag_tog(uint16_t index);
+bool story_flag_get(uint16_t index);
 
 extern uint8_t btns_down, btns_pressed;
 
@@ -496,7 +499,7 @@ void sort_sprites(draw_sprite_entry* entries, uint8_t n);
 void sort_and_draw_sprites(draw_sprite_entry* entries, uint8_t n);
 
 // map.cpp
-bool sprite_contacts_player(active_chunk_t const& c);
+bool sprite_contacts_player(active_chunk_t const& c, sprite_t const& e);
 bool check_solid(uint16_t tx, uint16_t ty); // tx,ty in pixels
 void load_chunks();
 bool run_chunks(); // returns true if state interrupt occurred

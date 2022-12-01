@@ -16,9 +16,8 @@ void back_to_map()
         change_state(STATE_MAP);
 }
 
-bool sprite_contacts_player(active_chunk_t const& c)
+bool sprite_contacts_player(active_chunk_t const& c, sprite_t const& e)
 {
-    auto const& e = c.sprite;
     if(!e.active) return false;
     uint16_t ex = c.cx * 128 + e.x;
     uint16_t ey = c.cy * 64 + e.y;
@@ -39,9 +38,8 @@ static inline bool rect_intersect(
     return true;
 }
 
-static inline void update_sprite(active_chunk_t& c)
+static inline void update_sprite(active_chunk_t& c, sprite_t& e)
 {
-    auto& e = c.sprite;
     if(!e.active) return;
     if(nframe & 1) return;
 
@@ -112,8 +110,8 @@ static inline void update_sprite(active_chunk_t& c)
 
 static void update_sprites()
 {
-    for(auto& c : active_chunks)
-        update_sprite(c);
+    for(uint8_t i = 0; i < 4; ++i)
+        update_sprite(active_chunks[i], chunk_sprites[i]);
 }
 
 static void update_map()

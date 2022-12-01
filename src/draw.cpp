@@ -14,7 +14,7 @@
 static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
                                       int16_t ox, int16_t oy)
 {
-    auto const& e = active_chunks[ci].sprite;
+    auto const& e = chunk_sprites[ci];
     if(!e.active) return 0;
     uint8_t f = e.type * 16;
     uint8_t d = e.dir;

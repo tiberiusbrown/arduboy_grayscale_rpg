@@ -13,8 +13,8 @@ static uint8_t const IDENTIFIER[8] PROGMEM =
     uint8_t(VERSION >> 8),
 };
 
-enum { SS_DONE, SS_ERASE, SS_PROGRAM };
-static uint8_t save_stage = SS_DONE;
+enum { SS_IDLE, SS_ERASE, SS_PROGRAM, SS_DONE };
+static uint8_t save_stage = SS_IDLE;
 static uint8_t save_page = 0;
 
 void save_begin()
@@ -26,13 +26,17 @@ void save_begin()
 
 bool is_saving()
 {
-    return save_stage != SS_DONE;
+    return save_stage != SS_IDLE;
 }
 
 bool save_done()
 {
-    if(save_stage == SS_DONE) return true;
     if(platform_fx_busy()) return false;
+    if(save_stage == SS_DONE)
+    {
+        save_stage = SS_IDLE;
+        return true;
+    }
     if(save_stage == SS_ERASE)
     {
         save_stage = SS_PROGRAM;
@@ -40,6 +44,7 @@ bool save_done()
         for(uint8_t i = 0; i < 8; ++i)
             savefile.identifier[i] = pgm_read_byte(&IDENTIFIER[i]);
         savefile.checksum = compute_checksum();
+        return false;
     }
     constexpr uint8_t pages = (sizeof(savefile) + 255) / 256;
     if(save_page >= pages)
@@ -48,12 +53,13 @@ bool save_done()
         Arduboy2Audio::saveOnOff();
 #endif
         save_stage = SS_DONE;
-        return true;
+        return false; // wait for next frame
     }
     uint8_t const* p = (uint8_t const*)&savefile;
     p += (256 * save_page);
     uint16_t n = sizeof(savefile) - (256 * save_page);
-    platform_fx_write_save_page(save_page, p, n >= 256 ? 256 : n);
+    if(n >= 256) n = 256;
+    platform_fx_write_save_page(save_page, p, n);
     ++save_page;
     return false;
 }

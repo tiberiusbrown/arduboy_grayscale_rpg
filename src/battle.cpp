@@ -331,7 +331,7 @@ void update_battle()
         d.menuy = d.menuy_target = -48;
         if(d.frame == 8 && d.remove_enemy)
         {
-            active_chunks[d.enemy_chunk].sprite.active = false;
+            chunk_sprites[d.enemy_chunk].active = false;
             init_sprites();
         }
         if(d.frame == 33)
