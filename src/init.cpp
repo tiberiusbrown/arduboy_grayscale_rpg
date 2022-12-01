@@ -14,12 +14,13 @@ void new_game()
         ac.cx = ac.cy = 255;
     chunks_are_running = false;
 
-    nparty = 2;
+    nparty = 3;
     party[0].battle.id = 0;
     party[0].battle.hp = 20;
     party[1].battle.id = 1;
     party[1].battle.hp = 10;
-    party[2].battle.id = 255;
+    party[2].battle.id = 2;
+    party[2].battle.hp = 10;
     party[3].battle.id = 255;
 }
 

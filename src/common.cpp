@@ -14,14 +14,14 @@ enemy_info_t const ENEMY_INFO[] PROGMEM =
 static char const PN_HERO[] PROGMEM = "Matthias";
 static char const PN_GIRL[] PROGMEM = "Catherine";
 static char const PN_GIRL2[] PROGMEM = "Lucy";
-static char const PN_BOY[] PROGMEM = "Dismas";
+static char const PN_MAN[] PROGMEM = "Dismas";
 
 party_info_t const PARTY_INFO[4] PROGMEM =
 {
     { 0, 0, 10, 20, 4, 4, 10, PN_HERO },
     { 3, 2, 10, 10, 3, 3, 10, PN_GIRL },
-    { 0, 0, 10, 10, 4, 4, 10, PN_GIRL2 },
-    { 0, 0, 10, 10, 4, 4, 10, PN_BOY },
+    { 4, 1, 10, 10, 4, 4, 10, PN_GIRL2 },
+    { 0, 3, 10, 10, 4, 4, 10, PN_MAN },
 };
 
 uint8_t party_att(uint8_t i)

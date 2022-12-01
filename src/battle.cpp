@@ -452,10 +452,9 @@ void update_battle()
 static void draw_battle_background()
 {
     static constexpr uint8_t TS[] PROGMEM = { 10, 11, 26, 27 };
-    uint8_t t = 0x23;
-    for(uint8_t r = 0; r < 4; ++r)
-        for(uint8_t c = 0; c < 8; ++c, t ^= (t >> 3) ^ (t << 1))
-            draw_tile(c * 16, r * 16, pgm_read_byte(&TS[t & 3]));
+    for(uint8_t r = 0, n = 0, t = 0x23; r < 4; ++r)
+        for(uint8_t c = 0; c < 8; ++c, ++n, t ^= (t >> 3) ^ (t << 1))
+            draw_tile(c * 16, r * 16, pgm_read_byte(&TS[t & 3]), n);
     auto const& d = sdata.battle;
     for(uint8_t i = 0; i < 4; ++i)
     {
@@ -535,8 +534,8 @@ static void draw_battle_sprites()
         if((nframe & 1) && (s.asleep > 0 || s.damaged > 0))
             continue;
         auto& e = entries[n++];
-        e.x = s.x;
-        e.y = s.y;
+        e.x = (uint8_t)s.x;
+        e.y = (uint8_t)s.y;
         e.addr = SPRITES_IMG;
         e.frame = s.frame_base + s.frame_dir;
     }

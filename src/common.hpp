@@ -266,7 +266,7 @@ struct battle_sprite_t
     bool active;
     uint8_t asleep;
     uint8_t damaged;
-    uint8_t x, y;   // current pos
+    int8_t x, y;   // current pos
     uint8_t tx, ty; // target pos
     uint8_t bx, by; // base pos
     uint8_t move_speed;
@@ -468,7 +468,7 @@ void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot);
 void platform_audio_play_sfx(uint8_t const* sfx);
 
 // draw.cpp
-void draw_tile(int16_t x, int16_t y, uint8_t t);
+void draw_tile(int16_t x, int16_t y, uint8_t t, uint8_t n);
 void draw_text(int16_t x, int16_t y, char const* str);      // str in RAM
 void draw_text_prog(int16_t x, int16_t y, char const* str); // str in PROGMEM
 // this method assumes the text never clips outside the display

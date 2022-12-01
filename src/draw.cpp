@@ -93,7 +93,7 @@ void draw_player()
     platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, PLAYER_IMG, f, 16, 16);
 }
 
-void draw_tile(int16_t x, int16_t y, uint8_t t)
+void draw_tile(int16_t x, int16_t y, uint8_t t, uint8_t n)
 {
 #if TILES_IN_PROG > 0
     if(t < TILES_IN_PROG)
@@ -101,7 +101,41 @@ void draw_tile(int16_t x, int16_t y, uint8_t t)
     else
         platform_fx_drawoverwrite(x, y, TILE_IMG, t - TILES_IN_PROG, 16, 16);
 #else
-    platform_fx_drawoverwrite(x, y, TILE_IMG, t, 16, 16);
+    uint16_t f = t;
+    uint8_t nf = (uint8_t)nframe;
+#if 0
+#ifdef ARDUINO
+    asm volatile(R"ASM(
+        mov  r0, %[n]
+        lsr  r0
+        lsr  r0
+        eor  %[n], r0
+        mul  %[n], %[k]
+        mov  %[n], r0
+        lsr  r0
+        eor  %[n], r0
+        clr  r1
+        lsr  %[nf]
+        lsr  %[nf]
+        add  %[n], %[nf]
+        andi %[n], 63
+        cpi  %[n], 4
+        brge .+2
+        add  %B[f], %[n]
+        )ASM"
+        : [n] "+&r" (n), [f] "+&r" (f), [nf] "+&r" (nf)
+        : [k] "r" (uint8_t(223))
+        );
+#else
+    n ^= (n >> 2);
+    n *= 223;
+    n ^= (n >> 1);
+    n += (nf >> 2);
+    n &= 63;
+    if(n < 4) f += (uint16_t(n) << 8);
+#endif
+#endif
+    platform_fx_drawoverwrite(x, y, TILE_IMG, f, 16, 16);
 #endif
 }
 
@@ -124,7 +158,7 @@ static void draw_chunk_tiles(uint8_t i, int16_t ox, int16_t oy)
         for(uint8_t c = 0; c < 128; c += 16, ++n)
         {
             int16_t x = ox + c;
-            draw_tile(x, y, tiles[n]);
+            draw_tile(x, y, tiles[n], n);
         }
     }
 }

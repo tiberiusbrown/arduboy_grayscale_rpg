@@ -76,7 +76,11 @@ static void SpritesU_DrawCommon(
     {
         uint8_t frame_pages = pages;
         if(mode & 1) frame_pages *= 2;
+#if 1
         image += uint16_t((frame_pages * w) * frame);
+#else
+        image += uint24_t(uint24_t(frame_pages * w) * frame);
+#endif
     }
 
     uint8_t shift_coef = FX::bitShiftLeftUInt8(y);
