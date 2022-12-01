@@ -8,6 +8,7 @@
 
 static void reset_enemy(enemy_t& e)
 {
+    e.path_index = 0;
     e.x = (e.path[0] & 7) * 16;
     e.y = ((e.path[0] >> 3) & 3) * 16;
     e.frames_rem = 1;
@@ -21,6 +22,7 @@ static bool run_chunk()
     auto& c = ac.chunk;
     uint8_t walk_tile = 255;
     uint8_t sel_tile = 255;
+    bool sel_sprite = false;
     {
         uint16_t tx = ac.cx * 8;
         uint16_t ty = ac.cy * 4;
@@ -28,9 +30,18 @@ static bool run_chunk()
         dx = uint8_t(((px + 8) >> 4) - tx);
         dy = uint8_t(((py + 8) >> 4) - ty);
         if((dx | dy) < 8) walk_tile = dy * 8 + dx;
-        dx = uint8_t(selx - tx);
-        dy = uint8_t(sely - ty);
-        if((dx | dy) < 8) sel_tile = dy * 8 + dx;
+        dx = uint8_t((selx >> 4) - tx);
+        dy = uint8_t((sely >> 4) - ty);
+        if((dx | dy) < 8)
+        {
+            sel_tile = dy * 8 + dx;
+            uint8_t ex = ac.sprite.x;
+            uint8_t ey = ac.sprite.y;
+            dx = uint8_t((selx & 127) - ex);
+            dy = uint8_t((sely &  63) - ey);
+            if((dx | dy) < 16)
+                sel_sprite = true;
+        }
     }
     while(chunk_instr < CHUNK_SCRIPT_SIZE)
     {
@@ -178,21 +189,21 @@ static bool run_chunk()
             uint8_t n = c.script[chunk_instr++];
             if(instr == CMD_EPF && story_flag_get(f))
             {
-                ac.enemy.active = false;
+                ac.sprite.active = false;
                 chunk_instr += n;
                 break;
             }
             bool reset = false;
-            if(ac.enemy.type != id) reset = true;
-            ac.enemy.type = id;
+            if(ac.sprite.type != id) reset = true;
+            ac.sprite.type = id;
             for(uint8_t j = 0; j < n; ++j)
             {
-                if(ac.enemy.path[j] != c.script[chunk_instr]) reset = true;
-                ac.enemy.path[j] = c.script[chunk_instr++];
+                if(ac.sprite.path[j] != c.script[chunk_instr]) reset = true;
+                ac.sprite.path[j] = c.script[chunk_instr++];
             }
-            ac.enemy.path_num = n;
-            ac.enemy.active = (n > 0);
-            if(reset) reset_enemy(ac.enemy);
+            ac.sprite.path_num = n;
+            ac.sprite.active = (n > 0);
+            if(reset) reset_enemy(ac.sprite);
             break;
         }
         case CMD_ST:
@@ -253,7 +264,13 @@ static bool run_chunk()
         case CMD_BRNE:
         {
             int8_t i = (int8_t)c.script[chunk_instr++];
-            if(!enemy_contacts_player(ac)) chunk_instr += i;
+            if(!sprite_contacts_player(ac)) chunk_instr += i;
+            break;
+        }
+        case CMD_BRNS:
+        {
+            int8_t i = (int8_t)c.script[chunk_instr++];
+            if(!sel_sprite) chunk_instr += i;
             break;
         }
 
@@ -303,7 +320,7 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
             chunk->tiles_flat[i] = 30;
         for(uint8_t i = 0; i < CHUNK_SCRIPT_SIZE; ++i)
             chunk->script[i] = 0;
-        active_chunk.enemy.active = false;
+        active_chunk.sprite.active = false;
         return;
     }
     platform_fx_read_data_bytes(addr, chunk, sizeof(map_chunk_t));
@@ -363,18 +380,31 @@ void load_chunks()
 
 bool tile_is_solid(uint16_t tx, uint16_t ty)
 {
+    // check tile
     uint8_t cx = uint8_t(tx >> 7);
     uint8_t cy = uint8_t(ty >> 6);
     cx -= active_chunks[0].cx;
     cy -= active_chunks[0].cy;
     if(cx > 1 || cy > 1) return true;
-    uint8_t x = uint8_t(tx & 0x7f) >> 4;
-    uint8_t y = uint8_t(ty & 0x3f) >> 4;
+    uint8_t ctx = uint8_t(tx & 0x7f);
+    uint8_t cty = uint8_t(ty & 0x3f);
+    uint8_t x = ctx >> 4;
+    uint8_t y = cty >> 4;
     uint8_t ci = cy * 2 + cx;
-    uint8_t t = active_chunks[ci].chunk.tiles[y][x];
+    auto const& c = active_chunks[ci];
+    uint8_t t = c.chunk.tiles[y][x];
     t = pgm_read_byte(&TILE_SOLID[t]);
     x = 1;
     if(ty & 0x08) x <<= 2;
     if(tx & 0x08) x <<= 1;
-    return (t & x) != 0;
+    if((t & x) != 0) return true;
+    // check sprite
+    if(c.sprite.active)
+    {
+        uint8_t ex = c.sprite.x;
+        uint8_t ey = c.sprite.y;
+        if(uint8_t(ctx - ex) < 16 && uint8_t(cty - ey) < 16)
+            return true;
+    }
+    return false;
 }

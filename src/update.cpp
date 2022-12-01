@@ -16,9 +16,9 @@ void back_to_map()
         change_state(STATE_MAP);
 }
 
-bool enemy_contacts_player(active_chunk_t const& c)
+bool sprite_contacts_player(active_chunk_t const& c)
 {
-    auto const& e = c.enemy;
+    auto const& e = c.sprite;
     if(!e.active) return false;
     uint16_t ex = c.cx * 128 + e.x;
     uint16_t ey = c.cy * 64 + e.y;
@@ -28,15 +28,49 @@ bool enemy_contacts_player(active_chunk_t const& c)
     return dx <= 24 && dy <= 24;
 }
 
-static inline void update_enemy(enemy_t& e)
+static inline bool rect_intersect(
+    uint16_t x0, uint16_t y0, uint8_t w0, uint8_t h0,
+    uint16_t x1, uint16_t y1, uint8_t w1, uint8_t h1)
 {
+    if(x0 + w0 <= x1) return false;
+    if(y0 + h0 <= y1) return false;
+    if(x1 + w1 <= x0) return false;
+    if(y1 + h1 <= y0) return false;
+    return true;
+}
+
+static inline void update_sprite(active_chunk_t& c)
+{
+    auto& e = c.sprite;
     if(!e.active) return;
     if(nframe & 1) return;
 
+    // no path or just waiting on a single tile
+    if(e.path_num <= 1)
+        return;
+
+    uint8_t prevx = e.x, prevy = e.y;
+
+    e.walking = true;
     if(e.dir < 8)
     {
         e.x += (int8_t)pgm_read_byte(&DIRX[e.dir]);
         e.y += (int8_t)pgm_read_byte(&DIRY[e.dir]);
+    }
+
+    // check collision with player
+    {
+        uint16_t ex = c.cx * 128 + e.x;
+        uint16_t ey = c.cy *  64 + e.y;
+        if(rect_intersect(
+            ex, ey, 16, 16,
+            px + 5, py + 5, 6, 6))
+        {
+            e.x = prevx;
+            e.y = prevy;
+            e.walking = false;
+            return;
+        }
     }
 
     if(--e.frames_rem == 0)
@@ -76,12 +110,10 @@ static inline void update_enemy(enemy_t& e)
     }
 }
 
-static void update_enemies()
+static void update_sprites()
 {
     for(auto& c : active_chunks)
-    {
-        update_enemy(c.enemy);
-    }
+        update_sprite(c);
 }
 
 static void update_map()
@@ -94,13 +126,15 @@ static void update_map()
         return;
     }
 
+    update_sprites();
+
     selx = sely = uint16_t(-1);
     if(btns_pressed & BTN_A)
     {
         int8_t dx = (int8_t)pgm_read_byte(&DIRX[pdir]) * 8;
         int8_t dy = (int8_t)pgm_read_byte(&DIRY[pdir]) * 8;
-        selx = (px + 8 + dx) >> 4;
-        sely = (py + 8 + dy) >> 4;
+        selx = (px + 8 + dx);
+        sely = (py + 8 + dy);
     }
 
     int8_t dx = 0, dy = 0;
@@ -175,9 +209,7 @@ static void update_map()
     }
 
     load_chunks();
-    if(run_chunks()) return;
-
-    update_enemies();
+    run_chunks();
 }
 
 static void skip_dialog_animation(uint8_t third_newline)

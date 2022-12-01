@@ -104,7 +104,10 @@ Control Instructions
         If player is NOT walking on <tile>, jmp label
 
     brne label
-        If player is NOT walking into chunk enemy, jmp label
+        If player is NOT walking into chunk sprite, jmp label
+
+    brns label
+        If player is NOT selecting <sprite>, jmp label
 
 Other Assembly Syntax
 
@@ -197,4 +200,5 @@ enum script_command_t
     CMD_BRNT,
     CMD_BRNW,
     CMD_BRNE,
+    CMD_BRNS,
 };

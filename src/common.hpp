@@ -378,13 +378,14 @@ struct enemy_t
     uint8_t path_index; // index of current destination
     uint8_t frames_rem;
     bool active;
+    bool walking;
 };
 
 struct active_chunk_t
 {
     map_chunk_t chunk;
     uint8_t cx, cy;
-    enemy_t enemy;
+    enemy_t sprite;
 };
 // 0 1
 // 2 3
@@ -495,7 +496,7 @@ void sort_sprites(draw_sprite_entry* entries, uint8_t n);
 void sort_and_draw_sprites(draw_sprite_entry* entries, uint8_t n);
 
 // map.cpp
-bool enemy_contacts_player(active_chunk_t const& c);
+bool sprite_contacts_player(active_chunk_t const& c);
 bool tile_is_solid(uint16_t tx, uint16_t ty); // tx,ty in pixels
 void load_chunks();
 bool run_chunks(); // returns true if state interrupt occurred

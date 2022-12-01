@@ -49,6 +49,7 @@ class CMD(AutoNumber):
     BRNT = ()
     BRNW = ()
     BRNE = ()
+    BRNS = ()
 
 # TODO: merge duplicate strings
 def addstring(b, s):
@@ -253,6 +254,10 @@ def assemble(s, eps):
             
         elif s[i] == 'brne':
             b.append(CMD.BRNE); i += 1
+            b.append(s[i]); i += 1
+            
+        elif s[i] == 'brns':
+            b.append(CMD.BRNS); i += 1
             b.append(s[i]); i += 1
             
         elif s[i][-1] == ':':

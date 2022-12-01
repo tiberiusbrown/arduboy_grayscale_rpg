@@ -14,11 +14,11 @@
 static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
                                       int16_t ox, int16_t oy)
 {
-    auto const& e = active_chunks[ci].enemy;
+    auto const& e = active_chunks[ci].sprite;
     if(!e.active) return 0;
     uint8_t f = e.type * 16;
     uint8_t d = e.dir;
-    if(!(d & 0x80))
+    if(e.walking && !(d & 0x80))
     {
         f += d * 2;
         if(state == STATE_MAP)
@@ -27,7 +27,7 @@ static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     entry->addr = SPRITES_IMG;
     entry->frame = f;
     entry->x = ox + e.x;
-    entry->y = oy + e.y - 4;
+    entry->y = oy + e.y - 2;
     return 1;
 }
 
