@@ -64,7 +64,7 @@ static inline void update_sprite(active_chunk_t& c)
         uint16_t ey = c.cy *  64 + e.y;
         if(rect_intersect(
             ex, ey, 16, 16,
-            px + 5, py + 5, 6, 6))
+            px + 4, py + 4, 8, 8))
         {
             e.x = prevx;
             e.y = prevy;
@@ -169,39 +169,57 @@ static void update_map()
 
         uint8_t m = 0;
         int8_t nx = 0, ny = 0;
-        if(tile_is_solid(px + 5, py + 5)) ++nx, ++ny, m |= 1;
-        if(tile_is_solid(px + 11, py + 5)) --nx, ++ny, m |= 2;
-        if(tile_is_solid(px + 5, py + 11)) ++nx, --ny, m |= 4;
-        if(tile_is_solid(px + 11, py + 11)) --nx, --ny, m |= 8;
 
+        // main collision corrections
+        if(check_solid(px + 4, py + 4)) ++nx, ++ny, m |= 1;
+        if(check_solid(px + 11, py + 4)) --nx, ++ny, m |= 2;
+        if(check_solid(px + 4, py + 11)) ++nx, --ny, m |= 4;
+        if(check_solid(px + 11, py + 11)) --nx, --ny, m |= 8;
+
+        // diagonal corrections: if the player is running diagonally
+        //                       into an extruding corner
+        if(m == 1 && pdir == 3)
+        {
+            if(check_solid(px + 5, py + 6)) ny = 0;
+            else nx = 0;
+        }
+        if(m == 2 && pdir == 5)
+        {
+            if(check_solid(px + 11, py + 6)) ny = 0;
+            else nx = 0;
+        }
+        if(m == 4 && pdir == 1)
+        {
+            if(check_solid(px + 5, py + 10)) ny = 0;
+            else nx = 0;
+        }
+        if(m == 8 && pdir == 7)
+        {
+            if(check_solid(px + 11, py + 10)) ny = 0;
+            else nx = 0;
+        }
+
+        // corrections for passing diagonally through a tight gap
+        if(m == 9)
+        {
+            nx = -dx, ny = -dy;
+            if(uint8_t(pdir - 0) < 3) nx = -1, ny = +1;
+            if(uint8_t(pdir - 4) < 3) nx = +1, ny = -1;
+        }
+        if(m == 6)
+        {
+            nx = -dx, ny = -dy;
+            if(uint8_t(pdir - 2) < 3) nx = -1, ny = -1;
+            if(uint8_t(pdir - 1) > 4) nx = +1, ny = +1;
+        }
+
+        // limit total movement to one pixel
         if(nx > 1) nx = 1;
         if(nx < -1) nx = -1;
         if(ny > 1) ny = 1;
         if(ny < -1) ny = -1;
         if(nx == dx) nx = 0;
         if(ny == dy) ny = 0;
-
-        // diagonal corrections: if the player is running into a corner
-        if(m == 1 && pdir == 3)
-        {
-            if(tile_is_solid(px + 5, py + 6)) ny = 0;
-            else nx = 0;
-        }
-        if(m == 2 && pdir == 5)
-        {
-            if(tile_is_solid(px + 11, py + 6)) ny = 0;
-            else nx = 0;
-        }
-        if(m == 4 && pdir == 1)
-        {
-            if(tile_is_solid(px + 5, py + 10)) ny = 0;
-            else nx = 0;
-        }
-        if(m == 8 && pdir == 7)
-        {
-            if(tile_is_solid(px + 11, py + 10)) ny = 0;
-            else nx = 0;
-        }
 
         // collision correction
         px += nx;

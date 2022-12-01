@@ -497,7 +497,7 @@ void sort_and_draw_sprites(draw_sprite_entry* entries, uint8_t n);
 
 // map.cpp
 bool sprite_contacts_player(active_chunk_t const& c);
-bool tile_is_solid(uint16_t tx, uint16_t ty); // tx,ty in pixels
+bool check_solid(uint16_t tx, uint16_t ty); // tx,ty in pixels
 void load_chunks();
 bool run_chunks(); // returns true if state interrupt occurred
 

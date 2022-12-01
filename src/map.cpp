@@ -378,7 +378,7 @@ void load_chunks()
     load_chunk(3, cx + 1, cy + 1);
 }
 
-bool tile_is_solid(uint16_t tx, uint16_t ty)
+bool check_solid(uint16_t tx, uint16_t ty)
 {
     // check tile
     uint8_t cx = uint8_t(tx >> 7);
@@ -386,24 +386,25 @@ bool tile_is_solid(uint16_t tx, uint16_t ty)
     cx -= active_chunks[0].cx;
     cy -= active_chunks[0].cy;
     if(cx > 1 || cy > 1) return true;
-    uint8_t ctx = uint8_t(tx & 0x7f);
-    uint8_t cty = uint8_t(ty & 0x3f);
+    uint8_t ctx = uint8_t(tx) & 127;
+    uint8_t cty = uint8_t(ty) & 63;
     uint8_t x = ctx >> 4;
     uint8_t y = cty >> 4;
     uint8_t ci = cy * 2 + cx;
     auto const& c = active_chunks[ci];
     uint8_t t = c.chunk.tiles[y][x];
     t = pgm_read_byte(&TILE_SOLID[t]);
-    x = 1;
-    if(ty & 0x08) x <<= 2;
-    if(tx & 0x08) x <<= 1;
-    if((t & x) != 0) return true;
+    // identify quarter tiles
+    uint8_t q = 1;
+    if(ty & 0x08) q <<= 2;
+    if(tx & 0x08) q <<= 1;
+    if((t & q) != 0) return true;
     // check sprite
     if(c.sprite.active)
     {
         uint8_t ex = c.sprite.x;
         uint8_t ey = c.sprite.y;
-        if(uint8_t(ctx - ex) < 16 && uint8_t(cty - ey) < 16)
+        if((uint8_t(ctx - ex) | uint8_t(cty - ey)) < 16)
             return true;
     }
     return false;
