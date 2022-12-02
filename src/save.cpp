@@ -46,6 +46,8 @@ bool save_done()
         savefile.checksum = compute_checksum();
         return false;
     }
+    // TODO: figure out why this is breaking when save file is
+    //       more than one page...
     constexpr uint8_t pages = (sizeof(savefile) + 255) / 256;
     if(save_page >= pages)
     {

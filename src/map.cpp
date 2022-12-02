@@ -308,6 +308,7 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
     if(active_chunk.cx != cx || active_chunk.cy != cy)
     {
         memset(&active_chunk, 0, sizeof(active_chunk));
+        memset(&chunk_sprites[index], 0, sizeof(sprite_t));
         active_chunk.cx = cx;
         active_chunk.cy = cy;
     }
