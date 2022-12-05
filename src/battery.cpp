@@ -80,7 +80,9 @@ void update_battery()
 {
     int16_t reading = 0;
 
-    uint16_t f = nframe & 0x3f;
+    static uint8_t bf = 0;
+
+    uint8_t f = bf & 0x7f;
 
 #ifdef ARDUINO
     static int16_t v = 0;
@@ -89,11 +91,11 @@ void update_battery()
         reading = v;
         v = 0;
     }
-    if((f & 0x000f) == 0x0000)
+    if((f & 0x1f) == 0x00)
     {
         power_adc_enable();
     }
-    if((f & 0x000f) == 0x0001)
+    if((f & 0x1f) == 0x01)
     {
         ADCSRA |= _BV(ADSC);
         while(bit_is_set(ADCSRA, ADSC));
@@ -104,4 +106,6 @@ void update_battery()
 
     if(reading != 0)
         battery_dsp(reading);
+
+    ++bf;
 }

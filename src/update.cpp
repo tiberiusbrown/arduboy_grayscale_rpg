@@ -376,7 +376,7 @@ static void update_game_over()
         if(d.fade_frame < 24)
             d.fade_frame += FADE_SPEED;
         else
-        change_state(STATE_RESUME);
+        change_state(STATE_TITLE);
     }
     else
     {
@@ -456,8 +456,6 @@ void update()
 
     pmoving = false;
     (pgmptr(&FUNCS[state]))();
-
-    update_battery();
 
     ++nframe;
 

@@ -11,17 +11,32 @@ enemy_info_t const ENEMY_INFO[] PROGMEM =
     { 2, 10, 10, EN_DARK_WIZARD },
 };
 
-static char const PN_HERO[] PROGMEM = "Matthias";
-static char const PN_GIRL[] PROGMEM = "Catherine";
-static char const PN_GIRL2[] PROGMEM = "Lucy";
-static char const PN_MAN[] PROGMEM = "Dismas";
+static char const PN_MATTHIAS[] PROGMEM = "Matthias";
+static char const PN_CATHERINE[] PROGMEM = "Catherine";
+static char const PN_LUCY[] PROGMEM = "Lucy";
+static char const PN_DISMAS[] PROGMEM = "Dismas";
 
 party_info_t const PARTY_INFO[4] PROGMEM =
 {
-    { 0, 0, 10, 20, 4, 4, 10, PN_HERO },
-    { 3, 2, 10, 10, 3, 3, 10, PN_GIRL },
-    { 4, 1, 10, 10, 4, 4, 10, PN_GIRL2 },
-    { 0, 3, 10, 10, 4, 4, 10, PN_MAN },
+    { 0, 0, 10, 20, 4, 4, 10, PN_MATTHIAS },
+    { 3, 2, 10, 10, 3, 3, 10, PN_CATHERINE },
+    { 4, 1, 10, 10, 4, 4, 10, PN_LUCY },
+    { 0, 3, 10, 10, 4, 4, 10, PN_DISMAS },
+};
+
+static char const IN_CLOTH_TUNIC[] PROGMEM = "Cloth Tunic";
+static char const IN_BRASS_KNUCKLES[] PROGMEM = "Brass Knuckles";
+static char const IN_NINJA_SHOES[] PROGMEM = "Ninja Shoes";
+static char const IN_BRAWLERS_RING[] PROGMEM = "Brawler's Ring";
+static char const IN_AMULET_OF_ZHARTUL[] PROGMEM = "Amulet of Zhar-Tul";
+
+item_info_t const ITEM_INFO[] PROGMEM =
+{
+    { 0, 1, 0, 0, IT_SHIRT , IN_CLOTH_TUNIC },
+    { 1, 0, 0, 0, IT_WEAPON, IN_BRASS_KNUCKLES },
+    { 0, 1, 0, 1, IT_SHOES , IN_NINJA_SHOES },
+    { 0, 0, 0, 1, IT_OTHER , IN_BRAWLERS_RING },
+    { 0, 0, 0, 0, IT_OTHER , IN_AMULET_OF_ZHARTUL },
 };
 
 uint8_t party_att(uint8_t i)

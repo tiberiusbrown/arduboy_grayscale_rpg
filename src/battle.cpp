@@ -66,7 +66,7 @@ static void init_attack_order() {
     for(uint8_t j = 0; j < 4; ++j)
     {
         uint8_t i = j;
-        if(member(i).id != INVALID)
+        if(i < nparty && member(i).id != INVALID)
         {
             speeds[n] = get_speed(i);
             d.attack_order[n++] = i;
@@ -135,6 +135,12 @@ static void take_damage(uint8_t i, int8_t dam)
         s.damaged = DAMAGED_FRAMES;
 }
 
+void draw_ap(int16_t x, int16_t y, uint8_t ap)
+{
+    for(uint8_t i = 0, t = 0; i < MAX_AP; ++i, t += 5)
+        platform_fx_drawoverwrite(x + t, y, AP_IMG, ap > i ? 0 : 1);
+}
+
 static void battle_enemy_attack(uint8_t i)
 {
     auto& d = sdata.battle;
@@ -161,17 +167,12 @@ static void battle_next_turn()
 {
     auto& d = sdata.battle;
     // check for defeat
+    if(party[0].battle.hp == 0)
     {
-        bool defeat = true;
-        for(auto const& p : party)
-            if(p.battle.id != INVALID && p.battle.hp > 0) defeat = false;
-        if(defeat)
-        {
-            d.next_phase = BPHASE_DEFEAT;
-            d.phase = BPHASE_DELAY;
-            d.frame = -32;
-            return;
-        }
+        d.next_phase = BPHASE_DEFEAT;
+        d.phase = BPHASE_DELAY;
+        d.frame = -32;
+        return;
     }
     {
         bool victory = true;
@@ -188,7 +189,8 @@ static void battle_next_turn()
     }
 
     d.defender_id = INVALID;
-    member(d.attacker_id).ap += 1;
+    if(d.attacker_id != INVALID)
+        member(d.attacker_id).ap += 1;
     uint8_t id;
     for(;;)
     {
@@ -325,7 +327,10 @@ void update_battle()
     {
     case BPHASE_ALERT:
         if(d.frame == 24)
-            d.frame = 0, d.phase = BPHASE_INTRO;
+        {
+            d.frame = 0;
+            d.phase = BPHASE_INTRO;
+        }
         break;
     case BPHASE_INTRO:
         d.menuy = d.menuy_target = -48;
@@ -340,6 +345,7 @@ void update_battle()
             d.esel = 4;
             d.frame = 0;
             d.attacker_index = d.num_attackers;
+            d.attacker_id = INVALID;
             d.phase = BPHASE_NEXT;
         }
         break;
@@ -406,7 +412,7 @@ void update_battle()
         d.frame = -20;
         d.phase = BPHASE_DELAY;
         d.next_phase = BPHASE_ATTACK3;
-        take_damage(d.defender_id, d.defender_id < 4 ? 1 : 10);
+        take_damage(d.defender_id, d.defender_id < 4 ? 10 : 1);
         break;
     case BPHASE_ATTACK3:
     {
@@ -460,7 +466,8 @@ static void draw_battle_background()
     {
         auto const& s = d.sprites[i];
         if(s.asleep < ASLEEP_FRAMES) continue;
-        platform_fx_drawplusmask(s.bx, s.by, ASLEEP_IMG, i, 16, 16);
+        if(plane() > 1)
+            platform_fx_drawplusmask(s.bx, s.by, SPRITES_IMG, s.frame_base, 16, 16);
     }
     platform_fillrect(33, DEFEND_Y + 7, 14, 12, WHITE);
     platform_drawrect(35, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
@@ -488,7 +495,7 @@ static void draw_health(uint8_t i)
 {
     auto const& d = sdata.battle;
     auto const& s = d.sprites[i];
-    uint8_t x = (i < 4 ? 1 : 125 - HP_BAR_WIDTH);
+    uint8_t x = (i < 4 ? 0 : 126 - HP_BAR_WIDTH);
     constexpr uint8_t y = 58;
     constexpr uint8_t w = HP_BAR_WIDTH + 2;
     constexpr uint8_t h = 4;
@@ -501,22 +508,22 @@ static void draw_health(uint8_t i)
 
     {
         uint8_t id = member(i).id;
-        const char* const* zname;
+        const char* name;
         uint8_t tx;
         if(i < 4)
         {
-            zname = &PARTY_INFO[id].name;
-            tx = 1;
+            name = pgmptr(&PARTY_INFO[id].name);
+            tx = 0;
         }
         else
         {
-            zname = &ENEMY_INFO[id].name;
-            tx = 127 - w;
+            name = pgmptr(&ENEMY_INFO[id].name);
+            tx = 128 - text_width_prog(name);
         }
-        const char* name = pgmptr(
-            i < 4 ? &PARTY_INFO[id].name : &ENEMY_INFO[id].name);
         draw_text_prog(tx, 51, name);
     }
+    if(i < 4)
+        draw_ap(x + w + 1, y + 1, member(i).ap);
 }
 
 static void draw_battle_sprites()

@@ -281,6 +281,19 @@ static bool run_chunk()
     return false;
 }
 
+static void clamp_regs()
+{
+    savefile.chunk_regs[0] = 0;
+    for(uint8_t i = 0; i < NUM_ITEM_TYPES; ++i)
+    {
+        int8_t* xp = &savefile.chunk_regs[8 + i];
+        int8_t x = *xp;
+        if(x < 0) x = 0;
+        if(x > 99) x = 99;
+        *xp = x;
+    }
+}
+
 bool run_chunks()
 {
     if(!chunks_are_running)
@@ -291,11 +304,16 @@ bool run_chunks()
     }
     while(running_chunk < 4)
     {
-        if(run_chunk()) return true;
+        if(run_chunk())
+        {
+            clamp_regs();
+            return true;
+        }
         ++running_chunk;
         chunk_instr = 0;
     }
     chunks_are_running = false;
+    clamp_regs();
     return false;
 }
 

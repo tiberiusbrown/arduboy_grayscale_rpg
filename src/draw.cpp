@@ -177,51 +177,62 @@ void draw_tiles()
     draw_chunk_tiles(3, ox + 128, oy + 64);
 }
 
-void draw_text_noclip(uint8_t x, uint8_t y, char const* str, bool big_lines)
+void draw_text_noclip(int16_t x, int16_t y, char const* str, uint8_t f)
 {
     char t;
-    uint8_t cx = x;
+    uint8_t cx = (uint8_t)x;
     uint8_t plane8 = plane() * 8;
     uint8_t const* font_img = FONT_IMG + plane() * 8 + -(' ' * (8 * PLANES)) + 2;
     uint8_t const* font_adv = FONT_ADV - ' ';
+    uint8_t page = (uint8_t)y;
 #ifdef ARDUINO
     uint8_t shift_coef = FX::bitShiftLeftUInt8(y);
     asm volatile(
-        "lsr %[y]\n"
-        "lsr %[y]\n"
-        "lsr %[y]\n"
-        : [y] "+&r" (y));
+        "lsr %[page]\n"
+        "lsr %[page]\n"
+        "lsr %[page]\n"
+        : [page] "+&r" (page));
 #else
-    uint8_t shift_coef = 1 << (y & 7);
-    y >>= 3;
+    uint8_t shift_coef = 1 << (page & 7);
+    page >>= 3;
 #endif
-    while((t = (char)deref_inc(str)) != '\0')
+    if(page >= 8) return;
+    for(;;)
     {
+        if(f & NOCLIPFLAG_PROG)
+            t = (char)pgm_read_byte_inc(str);
+        else
+            t = (char)deref_inc(str);
+        if(t == '\0') return;
         if(t == '\n')
         {
-            if(big_lines)
+            if(f & NOCLIPFLAG_BIGLINES)
             {
                 // advance 11 rows
                 if(shift_coef >= 0x20)
-                    y += 2, shift_coef >>= 5;
+                    page += 2, shift_coef >>= 5;
                 else
-                    y += 1, shift_coef <<= 3;
+                    page += 1, shift_coef <<= 3;
             }
             else
             {
                 // advance 9 rows
                 if(shift_coef & 0x80)
-                    y += 2, shift_coef = 1;
+                    page += 2, shift_coef = 1;
                 else
-                    y += 1, shift_coef <<= 1;
+                    page += 1, shift_coef <<= 1;
             }
-            cx = x;
+            if(page >= 8) return;
+            cx = (uint8_t)x;
             continue;
         }
         uint8_t const* bitmap = font_img + (t * (8 * PLANES));
         uint8_t adv = pgm_read_byte(&font_adv[t]);
-        platform_drawoverwritemonochrome_noclip(
-            cx, y, shift_coef, adv, 1, bitmap);
+        if(cx < uint8_t(128 - adv))
+        {
+            platform_drawoverwritemonochrome_noclip(
+                cx, page, shift_coef, adv, 1, bitmap);
+        }
         cx += adv;
     }
 }
@@ -233,8 +244,13 @@ static void draw_text_ex(int16_t x, int16_t y, char const* str, bool prog)
     uint8_t plane8 = plane() * 8;
     uint8_t const* font_img = FONT_IMG + plane() * 8 + - (' ' * (8 * PLANES)) + 2;
     uint8_t const* font_adv = FONT_ADV - ' ';
-    while((t = (prog ? (char)pgm_read_byte_inc(str) : (char)deref_inc(str))) != '\0')
+    for(;;)
     {
+        if(prog)
+            t = (char)pgm_read_byte_inc(str);
+        else
+            t = (char)deref_inc(str);
+        if(t == '\0') return;
         if(t == '\n')
         {
             y += 9;
@@ -258,11 +274,10 @@ void draw_text_prog(int16_t x, int16_t y, char const* str)
     draw_text_ex(x, y, str, true);
 }
 
-void draw_dec(int16_t x, int16_t y, uint8_t val)
+uint8_t dec_to_str(char* dst, uint8_t val)
 {
-    char b[7];
-    char* t = b;
-    
+    char* t = dst;
+
     uint8_t val_orig = val;
     if(val >= 200)
         *t++ = '2', val -= 200;
@@ -277,7 +292,15 @@ void draw_dec(int16_t x, int16_t y, uint8_t val)
     }
     *t++ = '0' + val;
     *t++ = '\0';
-    draw_text(x, y, b);
+
+    return (uint8_t)(uintptr_t)(t - dst - 1);
+}
+
+void draw_dec(int16_t x, int16_t y, uint8_t val)
+{
+    char b[7];
+    (void)dec_to_str(b, val);
+    draw_text_noclip(x, y, b);
 }
 
 static uint8_t text_width_ex(char const* str, bool prog)

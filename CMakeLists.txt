@@ -36,6 +36,7 @@ add_executable(arduboy_grayscale_rpg ${EXEFLAG}
     src/gifenc.h
     src/gifenc.c
     src/init.cpp
+    src/items.cpp
     src/main_sdl.cpp
     src/map.cpp
     src/pause.cpp

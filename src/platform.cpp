@@ -208,8 +208,8 @@ void platform_drawoverwritemonochrome_noclip(
     uint8_t oy = 0;
     while(shift_coef > 1)
         ++oy, shift_coef >>= 1;
-    assert(page_start <= 7);
-    assert(x + w <= 128);
+    MY_ASSERT(page_start <= 7);
+    MY_ASSERT(x + w <= 128);
     if(page_start > 7 || x + w > 128)
         return;
     platform_drawoverwritemonochrome(

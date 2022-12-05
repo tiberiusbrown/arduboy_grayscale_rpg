@@ -234,11 +234,9 @@ void render_pause()
     {
         int16_t y = 64 - d.savey;
         platform_fillrect(0, y, 128, 64, BLACK);
-        static char const SAVE_MSG[] PROGMEM = "Saving...";
-        draw_text_prog(39, y + 28, SAVE_MSG);
-        static char const DONE_MSG[] PROGMEM = "Done!";
+        draw_text_noclip(39, y + 28, PSTR("Saving..."), NOCLIPFLAG_PROG);
         if(d.save_wait > 0)
-            draw_text_prog(71, y + 28, DONE_MSG);
+            draw_text_noclip(71, y + 28, PSTR("Done!"), NOCLIPFLAG_PROG);
     }
     if(d.partyy > 0)
     {

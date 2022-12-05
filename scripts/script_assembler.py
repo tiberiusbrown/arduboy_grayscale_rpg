@@ -4,6 +4,17 @@ import sys
 strings = []
 flags = {}
 
+item_flags = [
+    'cloth_tunic',
+    'brass_knuckles',
+    'brawlers_ring',
+    'ninja_shoes',
+    'amulet_of_zhartul',
+    'LAST_ITEM'
+    ]
+for i in item_flags:
+    flags['!' + i] = len(flags)
+
 MAX_STRING_LENGTH = 240
 
 from enum import IntEnum, auto

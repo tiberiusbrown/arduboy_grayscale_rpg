@@ -7,6 +7,8 @@ constexpr uint16_t VERSION = 1;
 constexpr uint8_t TELEPORT_TRANSITION_FRAMES = 16;
 constexpr uint8_t FADE_SPEED = 2;
 
+constexpr uint8_t MAX_AP = 6;
+
 #define DEBUG_LIPO_DISCHARGE 0
 #ifdef ARDUINO
 #define RECORD_LIPO_DISCHARGE 0
@@ -185,6 +187,23 @@ struct sdata_tp
     uint16_t tx, ty;
     uint8_t frame;
 };
+
+enum {
+    IT_OTHER, IT_HAT, IT_SHIRT, IT_PANTS, IT_SHOES, IT_WEAPON, IT_SHIELD,
+};
+struct item_info_t
+{
+    // modifiers
+    int8_t att, def, spd, mhp;
+    uint8_t type;
+    char const* name;
+};
+extern item_info_t const ITEM_INFO[] PROGMEM;
+
+struct sdata_items
+{
+    uint8_t i;
+};
 struct sdata_pause
 {
     uint8_t state;
@@ -209,6 +228,8 @@ struct sdata_pause
     uint8_t partyx;
     uint8_t partyxt;
     uint8_t ally;
+    sdata_items items;
+    uint8_t itemsy;
 };
 
 struct battle_member_t
@@ -313,10 +334,6 @@ struct sdata_game_over
     bool going_to_resume;
     char msg[128];
 };
-struct sdata_save
-{
-
-};
 extern union sdata_t
 {
     sdata_title title;
@@ -325,7 +342,6 @@ extern union sdata_t
     sdata_tp tp;
     sdata_battle battle;
     sdata_game_over game_over;
-    sdata_save save;
     sdata_pause pause;
 } sdata;
 static_assert(sizeof(sdata) <= 256, "state data too large");
@@ -333,11 +349,6 @@ void change_state(uint8_t new_state);
 
 extern bool pmoving;        // whether player is moving
 extern uint16_t selx, sely; // selected tile
-
-struct party_member_t
-{
-    battle_member_t battle;
-};
 
 struct sprite_t
 {
@@ -363,6 +374,24 @@ struct active_chunk_t
 // 2 3
 extern active_chunk_t active_chunks[4];
 
+enum
+{
+    ITEM_HP_POT,
+    ITEM_AP_POT,
+    NUM_ITEM_TYPES,
+};
+
+static constexpr uint8_t ITEM_BYTES = (SFLAG_LAST_ITEM + 7) / 8;
+
+struct party_member_t
+{
+    battle_member_t battle;
+    // shirt, pants, shoes, weapon, shield (indices)
+    uint8_t worn_items[5];
+    // other equipped items (bitset)
+    uint8_t other_items[ITEM_BYTES];
+};
+
 struct savefile_t
 {
     uint16_t checksum;
@@ -374,7 +403,7 @@ struct savefile_t
     uint8_t story_flags[STORY_FLAG_BYTES];
     uint8_t brightness;
     bool no_battery_alert;
-    int8_t chunk_regs[16];
+    int8_t chunk_regs[8+NUM_ITEM_TYPES];
     sprite_t chunk_sprites[4];
 };
 extern savefile_t savefile;
@@ -477,8 +506,11 @@ void draw_text(int16_t x, int16_t y, char const* str);      // str in RAM
 void draw_text_prog(int16_t x, int16_t y, char const* str); // str in PROGMEM
 // this method assumes the text never clips outside the display
 // and is much faster because of that assumption (str in RAM)
-void draw_text_noclip(uint8_t x, uint8_t y, char const* str, bool big_lines = false);
+constexpr uint8_t NOCLIPFLAG_BIGLINES = 1;
+constexpr uint8_t NOCLIPFLAG_PROG = 2;
+void draw_text_noclip(int16_t x, int16_t y, char const* str, uint8_t f = 0);
 void draw_dec(int16_t x, int16_t y, uint8_t val);
+uint8_t dec_to_str(char* dst, uint8_t val);
 void wrap_text(char* str, uint8_t w); // replace ' ' with '\n' to wrap to width
 uint8_t text_width(char const* str);
 uint8_t text_width_prog(char const* str);
@@ -513,8 +545,13 @@ void render_map();
 void render();
 
 // battle.cpp
+void draw_ap(int16_t x, int16_t y, uint8_t ap);
 void update_battle();
 void render_battle();
+
+// items.cpp
+void update_items();
+void render_items(int16_t y, sdata_items& d);
 
 // init.cpp
 void initialize();

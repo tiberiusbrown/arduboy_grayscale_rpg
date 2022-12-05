@@ -26,7 +26,7 @@ static void render_dialog()
         uint8_t x = portrait ? 39 : 2;
         c = d.message[d.char_progress];
         d.message[d.char_progress] = '\0';
-        draw_text_noclip(x, 2, &d.message[d.question_msg], true);
+        draw_text_noclip(x, 2, &d.message[d.question_msg], NOCLIPFLAG_BIGLINES);
         d.message[d.char_progress] = c;
         if(d.questiondone && plane() == 0)
         {
@@ -85,7 +85,7 @@ static void render_game_over()
     while(n != 0)
     {
         uint8_t w = text_width(t);
-        draw_text(64 - w / 2, y, t);
+        draw_text_noclip(64 - w / 2, y, t);
         y += 9;
         while(*t++ != '\0')
             ;
@@ -196,6 +196,8 @@ void render()
     };
 
     (pgmptr(&FUNCS[state]))();
+
+    update_battery();
 
     render_battery();
 }

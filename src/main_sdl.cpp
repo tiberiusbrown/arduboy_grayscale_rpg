@@ -10,7 +10,7 @@
 
 #include "common.hpp"
 
-#define MUTED_PALETTE 1
+#define MUTED_PALETTE 0
 #define EXCLUDE_LAST_ROW 0
 #define GIF_FULL_PALETTE 1
 
@@ -47,7 +47,7 @@ static void send_gif_frame(int ds = 3)
     {
         for(int i = 0; i < 128 * FBH; ++i)
         {
-            uint8_t p = pixels[0][i] + pixels[1][i] * 2;
+            uint8_t p = pixels[0][i] + pixels[1][i] + pixels[2][i];
 #if GIF_FULL_PALETTE
             gif->frame[i] = colormap(p);
 #else

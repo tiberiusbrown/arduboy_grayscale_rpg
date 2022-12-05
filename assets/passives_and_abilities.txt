@@ -1,0 +1,9 @@
+While Matthias still stands, his friends cannot be killed in battle.
+After attacking, Catherine heals a random ally for half the damage.
+Lucy's attacks deal double damage to back-row enemies.
+While defending, Dismas has a 50% chance to strike back.
+Cloth Tunic         |  +1 defense.
+Brass Knuckles      |  +1 attack.
+Ninja Shoes         |  +1 speed, +1 defense.
+Brawler's Ring      |  +10 max health.
+Amulet of Zhar-Tul  |  The wearer may attack twice per turn.
