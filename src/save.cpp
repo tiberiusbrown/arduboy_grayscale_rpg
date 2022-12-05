@@ -41,13 +41,12 @@ bool save_done()
     {
         save_stage = SS_PROGRAM;
         save_page = 0;
+        uint8_t const* p = &IDENTIFIER[0];
         for(uint8_t i = 0; i < 8; ++i)
-            savefile.identifier[i] = pgm_read_byte(&IDENTIFIER[i]);
+            savefile.identifier[i] = pgm_read_byte_inc(p);
         savefile.checksum = compute_checksum();
         return false;
     }
-    // TODO: figure out why this is breaking when save file is
-    //       more than one page...
     constexpr uint8_t pages = (sizeof(savefile) + 255) / 256;
     if(save_page >= pages)
     {
@@ -59,7 +58,7 @@ bool save_done()
     }
     uint8_t const* p = (uint8_t const*)&savefile;
     p += (256 * save_page);
-    uint16_t n = sizeof(savefile) - (256 * save_page);
+    size_t n = sizeof(savefile) - (256 * save_page);
     if(n >= 256) n = 256;
     platform_fx_write_save_page(save_page, p, n);
     ++save_page;
@@ -101,9 +100,9 @@ uint16_t compute_checksum()
     // CRC16
     uint8_t x;
     uint16_t crc = 0xffff;
-    for(uint16_t i = 2; i < sizeof(savefile); ++i)
+    for(size_t i = 2; i < sizeof(savefile); ++i)
     {
-        x = (crc >> 8) ^ ((uint8_t*)&savefile)[i];
+        x = (crc >> 8) ^ ((uint8_t const*)&savefile)[i];
         x ^= x >> 4;
         crc = (crc << 8) ^
             (uint16_t(x) << 12) ^

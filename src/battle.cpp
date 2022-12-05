@@ -462,6 +462,7 @@ static void draw_battle_background()
         for(uint8_t c = 0; c < 8; ++c, ++n, t ^= (t >> 3) ^ (t << 1))
             draw_tile(c * 16, r * 16, pgm_read_byte(&TS[t & 3]), n);
     auto const& d = sdata.battle;
+    // sleeping sprites
     for(uint8_t i = 0; i < 4; ++i)
     {
         auto const& s = d.sprites[i];

@@ -24,19 +24,13 @@ party_info_t const PARTY_INFO[4] PROGMEM =
     { 0, 3, 10, 10, 4, 4, 10, PN_DISMAS },
 };
 
-static char const IN_CLOTH_TUNIC[] PROGMEM = "Cloth Tunic";
-static char const IN_BRASS_KNUCKLES[] PROGMEM = "Brass Knuckles";
-static char const IN_NINJA_SHOES[] PROGMEM = "Ninja Shoes";
-static char const IN_BRAWLERS_RING[] PROGMEM = "Brawler's Ring";
-static char const IN_AMULET_OF_ZHARTUL[] PROGMEM = "Amulet of Zhar-Tul";
-
 item_info_t const ITEM_INFO[] PROGMEM =
 {
-    { 0, 1, 0, 0, IT_SHIRT , IN_CLOTH_TUNIC },
-    { 1, 0, 0, 0, IT_WEAPON, IN_BRASS_KNUCKLES },
-    { 0, 1, 0, 1, IT_SHOES , IN_NINJA_SHOES },
-    { 0, 0, 0, 1, IT_OTHER , IN_BRAWLERS_RING },
-    { 0, 0, 0, 0, IT_OTHER , IN_AMULET_OF_ZHARTUL },
+    { 0, 1, 0, 0, IT_SHIRT  },
+    { 1, 0, 0, 0, IT_WEAPON },
+    { 0, 1, 0, 1, IT_SHOES  },
+    { 0, 0, 0, 1, IT_OTHER  },
+    { 0, 0, 0, 0, IT_OTHER  },
 };
 
 uint8_t party_att(uint8_t i)

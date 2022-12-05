@@ -196,7 +196,6 @@ struct item_info_t
     // modifiers
     int8_t att, def, spd, mhp;
     uint8_t type;
-    char const* name;
 };
 extern item_info_t const ITEM_INFO[] PROGMEM;
 

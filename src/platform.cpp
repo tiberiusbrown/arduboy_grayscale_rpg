@@ -352,12 +352,12 @@ void platform_fx_write_save_page(uint16_t page, void const* data, size_t num)
 #ifdef ARDUINO
     FX::writeEnable();
     FX::seekCommand(SFC_WRITE, (uint24_t)(FX::programSavePage + page) << 8);
-    uint8_t i = 0;
+    size_t i = 0;
     uint8_t const* buffer = (uint8_t const*)data;
     do
     {
         FX::writeByte(buffer[i]);
-    } while(i++ < num);
+    } while(++i < num);
     FX::disable();
 #else
     uint64_t now = SDL_GetTicks64();
