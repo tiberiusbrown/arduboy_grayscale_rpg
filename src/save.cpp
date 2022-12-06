@@ -73,7 +73,7 @@ void load(bool first)
     platform_fx_read_save_bytes(0, &savefile, sizeof(savefile));
     bool id = true;
     for(uint8_t i = 0; i < 8; ++i)
-        if(savefile.identifier[i] != pgm_read_byte(&IDENTIFIER[i])) 
+        if(savefile.identifier[i] != pgm_read_byte(&IDENTIFIER[i]))
             id = false;
     if(!id || compute_checksum() != savefile.checksum)
     {

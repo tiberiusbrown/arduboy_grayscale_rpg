@@ -1,19 +1,18 @@
 import re
 import sys
+import csv
 
 strings = []
 flags = {}
 
-item_flags = [
-    'cloth_tunic',
-    'brass_knuckles',
-    'brawlers_ring',
-    'ninja_shoes',
-    'amulet_of_zhartul',
-    'LAST_ITEM'
-    ]
-for i in item_flags:
-    flags['!' + i] = len(flags)
+with open('items.csv', newline='') as f:
+    reader = csv.reader(f, delimiter=',', quotechar='"')
+    items = [row[5] for row in reader]
+    items = items[1:]
+for i in range(len(items)):
+    items[i] = re.sub('[^a-zA-Z]+', '_', items[i].split('|')[0].strip())
+for i in items:
+    flags['!ITEM_' + i] = len(flags)
 
 MAX_STRING_LENGTH = 240
 
@@ -105,6 +104,9 @@ def flag(s):
         print('Expected flag, got "%s"' % s)
         sys.exit(1)
     if s not in flags:
+        if s.startswith('ITEM_'):
+            print('Undefined item flag: "%s"' % s)
+            sys.exit(1)
         n = len(flags)
         flags[s] = n
     return flags[s]

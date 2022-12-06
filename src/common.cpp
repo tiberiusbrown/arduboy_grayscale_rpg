@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+#include "generated/item_info_prog.hpp"
+
 static char const EN_DARK_GUARD[] PROGMEM = "Dark Guard";
 static char const EN_DARK_WIZARD[] PROGMEM = "Dark Wizard";
 
@@ -22,15 +24,6 @@ party_info_t const PARTY_INFO[4] PROGMEM =
     { 3, 2, 10, 10, 3, 3, 10, PN_CATHERINE },
     { 4, 1, 10, 10, 4, 4, 10, PN_LUCY },
     { 0, 3, 10, 10, 4, 4, 10, PN_DISMAS },
-};
-
-item_info_t const ITEM_INFO[] PROGMEM =
-{
-    { 0, 1, 0, 0, IT_SHIRT  },
-    { 1, 0, 0, 0, IT_WEAPON },
-    { 0, 1, 0, 1, IT_SHOES  },
-    { 0, 0, 0, 1, IT_OTHER  },
-    { 0, 0, 0, 0, IT_OTHER  },
 };
 
 uint8_t party_att(uint8_t i)

@@ -17,6 +17,7 @@ constexpr uint8_t MAX_AP = 6;
 #endif
 
 #include "generated/story_flags.hpp"
+#include "generated/num_items.hpp"
 
 #ifdef ARDUINO
 #include <ArduboyFX.h>
@@ -199,9 +200,15 @@ struct item_info_t
 };
 extern item_info_t const ITEM_INFO[] PROGMEM;
 
+constexpr size_t ITEM_BYTES = (NUM_ITEMS + 7) / 8;
+static_assert(ITEM_BYTES <= 256, "revisit item_id");
+using item_t = uint8_t;
+
 struct sdata_items
 {
-    uint8_t i;
+    uint8_t user_id; // who is using an item?
+    item_t i; // item selected
+    char str[ITEM_TOTAL_LEN];
 };
 struct sdata_pause
 {
@@ -209,10 +216,12 @@ struct sdata_pause
     uint8_t menuy;
     uint8_t menui;
     uint8_t ax, bx;
+
     uint8_t optionsy;
     uint8_t optionsi;
     uint8_t optionsiy;
     uint8_t brightnessx;
+
     uint8_t quity;
     uint8_t quiti;
     uint8_t quitiy;
@@ -220,15 +229,19 @@ struct sdata_pause
     uint8_t quitft;
     bool quitp;
     uint8_t quitfade;
+
     uint8_t savey;
     uint8_t save_wait;
+
     uint8_t partyy;
     uint8_t partyi;
     uint8_t partyx;
     uint8_t partyxt;
+
     uint8_t ally;
+
     sdata_items items;
-    uint8_t itemsy;
+    bool showing_items;
 };
 
 struct battle_member_t
@@ -324,6 +337,8 @@ struct sdata_battle
 
     battle_sprite_t sprites[8];
     bool sprites_done;
+
+    sdata_items items;
 };
 struct sdata_game_over
 {
@@ -380,13 +395,11 @@ enum
     NUM_ITEM_TYPES,
 };
 
-static constexpr uint8_t ITEM_BYTES = (SFLAG_LAST_ITEM + 7) / 8;
-
 struct party_member_t
 {
     battle_member_t battle;
     // shirt, pants, shoes, weapon, shield (indices)
-    uint8_t worn_items[5];
+    item_t worn_items[5];
     // other equipped items (bitset)
     uint8_t other_items[ITEM_BYTES];
 };
@@ -549,8 +562,10 @@ void update_battle();
 void render_battle();
 
 // items.cpp
-void update_items();
-void render_items(int16_t y, sdata_items& d);
+void update_items(sdata_items& d);
+void render_items(int16_t y, sdata_items const& d);
+void unequip_item(uint8_t user, item_t i);
+void equip_item(uint8_t user, item_t i);
 
 // init.cpp
 void initialize();

@@ -8,7 +8,13 @@ void update_pause_party()
 
     if(d.partyy < 64) return;
 
-    if(d.partyx == d.partyxt)
+    if(d.showing_items)
+    {
+        update_items(d.items);
+        if(btns_pressed & BTN_B)
+            d.showing_items = false;
+    }
+    else if(d.partyx == d.partyxt)
     {
         if(btns_pressed & BTN_B)
             d.state = OS_MENU;
@@ -26,11 +32,14 @@ void update_pause_party()
         }
         else if(btns_pressed & BTN_A)
         {
-
+            d.showing_items = true;
+            d.items.user_id = d.partyi;
         }
     }
     else
+    {
         d.partyx = adjust(d.partyx, d.partyxt);
+    }
 }
 
 static void render_pause_party_offset(int16_t x, int16_t y, uint8_t i)
@@ -86,6 +95,13 @@ static void render_pause_party_offset(int16_t x, int16_t y, uint8_t i)
 void render_pause_party()
 {
     auto const& d = sdata.pause;
+
+    if(d.showing_items)
+    {
+        render_items(0, d.items);
+        return;
+    }
+
     int16_t y = 64 - d.partyy;
     //platform_fx_drawoverwrite(0, y, PARTY_MEMBERS_IMG, 0);
     platform_fillrect(0, y, 128, 64, BLACK);

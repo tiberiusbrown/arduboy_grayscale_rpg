@@ -1,5 +1,0 @@
-Cloth Tunic         |  +1 defense.
-Brass Knuckles      |  +1 attack.
-Ninja Shoes         |  +1 speed, +1 defense.
-Brawler's Ring      |  +10 max health.
-Amulet of Zhar-Tul  |  The wearer may attack twice per turn.

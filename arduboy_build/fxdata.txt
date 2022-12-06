@@ -28,3 +28,4 @@ raw_t GAME_OVER_MESSAGES = "game_over_messages.bin"
 
 // put string data last to avoid large diffs in git when scripts are updated
 raw_t STRINGDATA = "stringdata.bin"
+raw_t ITEM_STRINGS = "item_strings.bin"

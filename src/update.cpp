@@ -174,8 +174,7 @@ static void update_map()
         if(check_solid(px + 4, py + 11)) ++nx, --ny, m |= 4;
         if(check_solid(px + 11, py + 11)) --nx, --ny, m |= 8;
 
-        // diagonal corrections: if the player is running diagonally
-        //                       into an extruding corner
+        // corrections for running diagonally into an extruding corner
         if(m == 1 && pdir == 3)
         {
             if(check_solid(px + 5, py + 6)) ny = 0;
@@ -197,7 +196,7 @@ static void update_map()
             else nx = 0;
         }
 
-        // corrections for passing diagonally through a tight gap
+        // corrections for running diagonally through a tight gap
         if(m == 9)
         {
             nx = -dx, ny = -dy;
