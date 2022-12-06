@@ -31,7 +31,7 @@ static void render_dialog()
         if(d.questiondone && plane() == 0)
         {
             uint8_t w = 128 - x;
-            uint8_t f = (d.questionfill * w + 16) >> 5;
+            uint8_t f = (d.questionfillw * w + 128) >> 8;
             platform_drawrect(x - 2, d.questioniy, w + 2, 12, DARK_GRAY);
             platform_fillrect(x - 1, d.questioniy + 1, f, 10, DARK_GRAY);
         }

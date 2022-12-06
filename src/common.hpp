@@ -180,7 +180,9 @@ struct sdata_dialog
     uint8_t questioniy;
     uint8_t numquestions;
     bool questiondone;
+    bool questionpause;
     uint8_t questionfill;
+    uint8_t questionfillw;
     char message[241];
 };
 struct sdata_tp

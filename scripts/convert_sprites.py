@@ -1,8 +1,13 @@
 from extract_sprite_planes import extract
+import os
 
 triplane = True
 
 def convert(fout, sym, fname, sw, sh, num = 0, start = 0):
+    imgtime = os.path.getmtime(fname)
+    outtime = os.path.getmtime(fout)
+    if outtime > imgtime:
+        return
     ps = extract(fname, sw, sh, triplane, num, start)
     sbytes = sw * sh // 8
     if fout[-4:] == '.hpp':
