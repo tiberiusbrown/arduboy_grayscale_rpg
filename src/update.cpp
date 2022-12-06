@@ -114,6 +114,16 @@ static void update_sprites()
         update_sprite(active_chunks[i], chunk_sprites[i]);
 }
 
+static uint8_t solid_mask()
+{
+    uint8_t m = 0;
+    if(check_solid(px +  4, py +  4)) m |= 1;
+    if(check_solid(px + 11, py +  4)) m |= 2;
+    if(check_solid(px +  4, py + 11)) m |= 4;
+    if(check_solid(px + 11, py + 11)) m |= 8;
+    return m;
+}
+
 static void update_map()
 {
     if(chunks_are_running && run_chunks()) return;
@@ -161,18 +171,21 @@ static void update_map()
             else pdir = 7;
         }
 
+        int16_t prevx = px;
+        int16_t prevy = py;
+
         // movement
         px += dx;
         py += dy;
 
-        uint8_t m = 0;
+        uint8_t m = solid_mask();
         int8_t nx = 0, ny = 0;
 
         // main collision corrections
-        if(check_solid(px + 4, py + 4)) ++nx, ++ny, m |= 1;
-        if(check_solid(px + 11, py + 4)) --nx, ++ny, m |= 2;
-        if(check_solid(px + 4, py + 11)) ++nx, --ny, m |= 4;
-        if(check_solid(px + 11, py + 11)) --nx, --ny, m |= 8;
+        if(m & 1) ++nx, ++ny;
+        if(m & 2) --nx, ++ny;
+        if(m & 4) ++nx, --ny;
+        if(m & 8) --nx, --ny;
 
         // corrections for running diagonally into an extruding corner
         if(m == 1 && pdir == 3)
@@ -221,6 +234,12 @@ static void update_map()
         // collision correction
         px += nx;
         py += ny;
+
+#if 1
+        m = solid_mask();
+        if(m != 0 && m != 9 && m != 6)
+            px = prevx, py = prevy;
+#endif
     }
 
     load_chunks();

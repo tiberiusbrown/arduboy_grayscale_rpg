@@ -29,29 +29,51 @@ party_info_t const PARTY_INFO[4] PROGMEM =
 uint8_t party_att(uint8_t i)
 {
     uint8_t id = party[i].battle.id;
-    uint8_t r = pgm_read_byte(&PARTY_INFO[id].base_att);
-    return r;
+    int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_att);
+    r += items_att(i);
+    if(r < 1) r = 1;
+    if(r > 99) r = 99;
+    return (uint8_t)r;
 }
 
 uint8_t party_def(uint8_t i)
 {
     uint8_t id = party[i].battle.id;
-    uint8_t r = pgm_read_byte(&PARTY_INFO[id].base_def);
+    int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_def);
+    r += items_def(i);
+    if(r < 1) r = 1;
+    if(r > 99) r = 99;
     return r;
 }
 
 uint8_t party_mhp(uint8_t i)
 {
     uint8_t id = party[i].battle.id;
-    uint8_t r = pgm_read_byte(&PARTY_INFO[id].base_mhp);
+    int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_mhp);
+    r += items_mhp(i);
+    if(r < 1) r = 1;
+    if(r > 99) r = 99;
     return r;
 }
 
 uint8_t party_spd(uint8_t i)
 {
     uint8_t id = party[i].battle.id;
-    uint8_t r = pgm_read_byte(&PARTY_INFO[id].base_spd);
+    int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_spd);
+    r += items_spd(i);
+    if(r < 1) r = 1;
+    if(r > 99) r = 99;
     return r;
+}
+
+void party_clip_hp()
+{
+    for(uint8_t i = 0; i < nparty; ++i)
+    {
+        uint8_t mhp = party_mhp(i);
+        if(party[i].battle.hp > mhp)
+            party[i].battle.hp = mhp;
+    }
 }
 
 static uint8_t simple_mod(uint8_t n, uint8_t d)

@@ -4,10 +4,11 @@ import os
 triplane = True
 
 def convert(fout, sym, fname, sw, sh, num = 0, start = 0):
-    imgtime = os.path.getmtime(fname)
-    outtime = os.path.getmtime(fout)
-    if outtime > imgtime:
-        return
+    if os.path.exists(fout):
+        imgtime = os.path.getmtime(fname)
+        outtime = os.path.getmtime(fout)
+        if outtime > imgtime:
+            return
     ps = extract(fname, sw, sh, triplane, num, start)
     sbytes = sw * sh // 8
     if fout[-4:] == '.hpp':
@@ -94,3 +95,4 @@ convert(BINBASE + 'arrows_img.bin', '', 'arrows.png', 8, 8)
 convert(BINBASE + 'a_items_img.bin', '', 'a_items.png', 30, 8)
 convert(BINBASE + 'ap_img.bin', '', 'ap.png', 4, 8)
 convert(BINBASE + 'innates_img.bin', '', 'innates.png', 128, 24)
+convert(BINBASE + 'item_cats_img.bin', '', 'item_cats.png', 62, 16)

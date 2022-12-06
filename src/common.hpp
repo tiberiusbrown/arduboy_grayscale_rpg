@@ -53,6 +53,7 @@ inline uint8_t deref_inc(T const*& p)
     return r;
 }
 #define FORCE_NOINLINE __attribute__((noinline))
+inline uint8_t bitmask(uint8_t x) { return FX::bitShiftLeftUInt8(x); }
 #else
 #include <assert.h>
 #define MY_ASSERT(cond__) assert(cond__)
@@ -99,6 +100,7 @@ inline uint8_t plane()
     return (uint8_t)gplane;
 }
 #define FORCE_NOINLINE
+inline uint8_t bitmask(uint8_t x) { return 1 << (x & 7); }
 #endif
 
 constexpr uint8_t PLANES = 3;
@@ -192,7 +194,7 @@ struct sdata_tp
 };
 
 enum {
-    IT_OTHER, IT_HAT, IT_SHIRT, IT_PANTS, IT_SHOES, IT_WEAPON, IT_SHIELD,
+    IT_CONSUMABLE, IT_HAT, IT_ARMOR, IT_SHOES, IT_WEAPON, IT_SHIELD, IT_OTHER,
 };
 struct item_info_t
 {
@@ -203,14 +205,18 @@ struct item_info_t
 extern item_info_t const ITEM_INFO[] PROGMEM;
 
 constexpr size_t ITEM_BYTES = (NUM_ITEMS + 7) / 8;
-static_assert(ITEM_BYTES <= 256, "revisit item_id");
+static_assert(NUM_ITEMS <= 255, "revisit item_id");
 using item_t = uint8_t;
+constexpr item_t INVALID_ITEM = NUM_ITEMS;
 
 struct sdata_items
 {
-    uint8_t user_id; // who is using an item?
-    item_t i;        // item selected
-    bool equipped;   // whether we are viewing equipped or all
+    uint8_t user_index;  // who is using an item?
+    uint8_t n;           // offset selected
+    uint8_t off;         // list offset
+    uint8_t cat;         // current category
+    uint8_t cat_nums[7]; // number of items in each category
+    bool equipped;       // whether we are viewing equipped or all
     char str[ITEM_TOTAL_LEN];
 };
 struct sdata_pause
@@ -280,6 +286,7 @@ uint8_t party_att(uint8_t i);
 uint8_t party_def(uint8_t i);
 uint8_t party_mhp(uint8_t i);
 uint8_t party_spd(uint8_t i);
+void party_clip_hp();
 
 enum battle_phase_t
 {
@@ -361,7 +368,8 @@ extern union sdata_t
     sdata_game_over game_over;
     sdata_pause pause;
 } sdata;
-static_assert(sizeof(sdata) <= 256, "state data too large");
+constexpr auto SIZEOF_SDATA = sizeof(sdata);
+//static_assert(SIZEOF_SDATA <= 256, "state data too large");
 void change_state(uint8_t new_state);
 
 extern bool pmoving;        // whether player is moving
@@ -401,10 +409,8 @@ enum
 struct party_member_t
 {
     battle_member_t battle;
-    // shirt, pants, shoes, weapon, shield (indices)
-    item_t worn_items[5];
-    // other equipped items (bitset)
-    uint8_t other_items[ITEM_BYTES];
+    // equipped items (bitset)
+    uint8_t equipped_items[ITEM_BYTES];
 };
 
 struct savefile_t
@@ -565,10 +571,16 @@ void update_battle();
 void render_battle();
 
 // items.cpp
+int8_t items_att(uint8_t user);
+int8_t items_def(uint8_t user);
+int8_t items_spd(uint8_t user);
+int8_t items_mhp(uint8_t user);
+void update_items_numcat(sdata_items& d);
 void update_items(sdata_items& d);
-void render_items(int16_t y, sdata_items const& d);
+void render_items(int16_t y, sdata_items& d);
 void unequip_item(uint8_t user, item_t i);
 void equip_item(uint8_t user, item_t i);
+void toggle_item(uint8_t user, item_t i);
 
 // init.cpp
 void initialize();

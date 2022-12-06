@@ -32,8 +32,9 @@ void update_pause_party()
         }
         else if(btns_pressed & BTN_A)
         {
+            update_items_numcat(d.items);
             d.showing_items = true;
-            d.items.user_id = d.partyi;
+            d.items.user_index = d.partyi;
         }
     }
     else
@@ -94,7 +95,7 @@ static void render_pause_party_offset(int16_t x, int16_t y, uint8_t i)
 
 void render_pause_party()
 {
-    auto const& d = sdata.pause;
+    auto& d = sdata.pause;
 
     if(d.showing_items)
     {
