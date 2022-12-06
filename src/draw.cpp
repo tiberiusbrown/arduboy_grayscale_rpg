@@ -2,7 +2,7 @@
 
 #define TILES_IN_PROG 0
 
-#include "font_adv.hpp"
+#include "generated/font_adv.hpp"
 #include "generated/font_img.hpp"
 #include "generated/fxdata.h"
 #if TILES_IN_PROG > 0
@@ -334,8 +334,7 @@ void wrap_text(char* str, uint8_t w)
             x = 0;
             continue;
         }
-        t -= ' ';
-        x += pgm_read_byte(&FONT_ADV[t]);
+        x += pgm_read_byte(&FONT_ADV[t - ' ']);
         if(x > w)
         {
             --i;

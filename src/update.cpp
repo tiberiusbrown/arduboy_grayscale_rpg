@@ -379,20 +379,24 @@ static void update_game_over()
     }
     else
     {
-    if(d.msg[0] == '\0')
-    {
-        uint8_t n = u8rand(NUM_GAME_OVER_MESSAGES);
-        platform_fx_read_data_bytes(
-            GAME_OVER_MESSAGES + n * GAME_OVER_MESSAGE_LEN, d.msg, 128);
-        wrap_text(d.msg, 106);
-        d.msg_lines = 1;
-        for(auto& c : d.msg)
-            if(c == '\n') ++d.msg_lines, c = '\0';
-    }
-    if(d.fade_frame < 24)
-        d.fade_frame += FADE_SPEED;
-    else if(btns_pressed & (BTN_A | BTN_B))
-        d.fade_frame = 8, d.going_to_resume = true;
+        if(d.msg[0] == '\0')
+        {
+            uint8_t n = u8rand(NUM_GAME_OVER_MESSAGES);
+            platform_fx_read_data_bytes(
+                GAME_OVER_MESSAGES + n * GAME_OVER_MESSAGE_LEN, d.msg,
+                GAME_OVER_MESSAGE_LEN);
+            //wrap_text(d.msg, 106);
+            d.msg_lines = 1;
+            for(auto& c : d.msg)
+            {
+                if(c == '\0') break;
+                if(c == '\n') ++d.msg_lines, c = '\0';
+            }
+        }
+        if(d.fade_frame < 24)
+            d.fade_frame += FADE_SPEED;
+        else if(btns_pressed & (BTN_A | BTN_B))
+            d.fade_frame = 8, d.going_to_resume = true;
     }
 }
 
@@ -439,6 +443,26 @@ static void update_resume()
         change_state(STATE_MAP);
 }
 
+void process_repeat(uint8_t i, uint8_t btn)
+{
+    constexpr uint8_t REP_INIT = 16;
+    constexpr uint8_t REP_DELAY = 8;
+    static uint8_t reps[4];
+    uint8_t* r = &reps[i];
+    if(!(btns_down & btn))
+    {
+        *r = 0;
+        return;
+    }
+    uint8_t c = *r;
+    uint8_t d = (c & 0x80) ? REP_DELAY + 0x80 : REP_INIT;
+    if(c >= d)
+        c = 0x80, btns_pressed |= btn;
+    else
+        ++c;
+    *r = c;
+}
+
 void update()
 {
     using update_func = void (*)();
@@ -452,6 +476,12 @@ void update()
         update_battle,
         update_game_over,
     };
+
+    // arrow button repeat logic
+    process_repeat(0, BTN_UP   );
+    process_repeat(1, BTN_DOWN );
+    process_repeat(2, BTN_LEFT );
+    process_repeat(3, BTN_RIGHT);
 
     pmoving = false;
     (pgmptr(&FUNCS[state]))();

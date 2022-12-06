@@ -74,7 +74,7 @@ static bool run_chunk()
             if(instr == CMD_TDLG) sdata.dialog.portrait = t1;
             platform_fx_read_data_bytes(STRINGDATA + stri, sdata.dialog.message,
                                         sizeof(sdata.dialog.message));
-            wrap_text(sdata.dialog.message, 128);
+            //wrap_text(sdata.dialog.message, 128);
             return true;
         }
         case CMD_BAT:

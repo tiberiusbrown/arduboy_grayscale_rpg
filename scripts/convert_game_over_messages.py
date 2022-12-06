@@ -1,4 +1,5 @@
 import sys
+from font import check_wrap
 
 with open('game_over_messages.txt', 'r') as f:
     msgs = f.readlines()
@@ -20,6 +21,7 @@ with open('../arduboy_build/game_over_messages.bin', 'wb') as f:
         if num >= 256:
             break
         num += 1
+        msg = '\n'.join(check_wrap(msg, 106, 3))
         bytes = bytearray([0 for x in range(N)])
         for i in range(len(msg)):
             bytes[i] = ord(msg[i])

@@ -207,7 +207,8 @@ using item_t = uint8_t;
 struct sdata_items
 {
     uint8_t user_id; // who is using an item?
-    item_t i; // item selected
+    item_t i;        // item selected
+    bool equipped;   // whether we are viewing equipped or all
     char str[ITEM_TOTAL_LEN];
 };
 struct sdata_pause

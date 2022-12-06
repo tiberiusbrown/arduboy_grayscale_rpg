@@ -1,6 +1,7 @@
 import re
 import sys
 import csv
+from font import wrap
 
 strings = []
 flags = {}
@@ -63,13 +64,15 @@ class CMD(AutoNumber):
 
 # TODO: merge duplicate strings
 def addstring(b, s):
+    s = s[1:-1]
     if len(s) > MAX_STRING_LENGTH:
         print('String too long: %s' % s)
         print('Length: %d' % len(s))
         print('Max:    %d' % MAX_STRING_LENGTH)
         sys.exit(1)
     x = len(strings)
-    for c in s[1:-1]:
+    s = '\n'.join(wrap(s, 128))
+    for c in s:
         strings.append(ord(c))
     strings.append(0)
     b.append((x >> 0) % 256)

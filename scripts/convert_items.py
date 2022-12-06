@@ -1,5 +1,6 @@
 import sys
 import csv
+from font import check_wrap
 
 def num(x):
     return 0 if x == '' else int(x)
@@ -29,6 +30,8 @@ with open('../arduboy_build/item_strings.bin', 'wb') as f:
     for t in rows:
         name = t[5]
         msg = t[6]
+        check_wrap(name, 100, 1)
+        msg = '\n'.join(check_wrap(msg, 128, 2))
         bytes = bytearray([0 for x in range(N)])
         for i in range(len(name)):
             bytes[i] = ord(name[i])

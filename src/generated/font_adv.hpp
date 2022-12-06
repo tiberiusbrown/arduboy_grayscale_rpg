@@ -1,6 +1,6 @@
 #pragma once
 
-static constexpr uint8_t FONT_ADV[96] PROGMEM =
+constexpr uint8_t FONT_ADV[96] PROGMEM =
 {
     3, 3, 3, 5, 5, 7, 5, 2, 3, 3, 4, 4, 3, 3, 2, 3,
     5, 4, 5, 5, 5, 5, 5, 5, 5, 5, 2, 3, 5, 5, 5, 5,

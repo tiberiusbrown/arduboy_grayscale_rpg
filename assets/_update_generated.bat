@@ -10,6 +10,8 @@ python ..\scripts\convert_game_over_messages.py
 if NOT %errorlevel%==0 goto error
 python ..\scripts\convert_items.py
 if NOT %errorlevel%==0 goto error
+python ..\scripts\font.py
+if NOT %errorlevel%==0 goto error
 
 cd ..\arduboy_build
 python ..\scripts\gen_fxsave.py
