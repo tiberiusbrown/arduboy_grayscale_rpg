@@ -32,7 +32,6 @@ add_executable(arduboy_grayscale_rpg ${EXEFLAG}
     src/common.hpp
     src/common.cpp
     src/draw.cpp
-    src/font_adv.hpp
     src/gifenc.h
     src/gifenc.c
     src/init.cpp

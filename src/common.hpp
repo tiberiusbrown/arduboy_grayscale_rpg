@@ -52,6 +52,7 @@ inline uint8_t deref_inc(T const*& p)
     asm volatile("ld %[r], %a[p]+\n" : [p] "+&e" (p), [r] "=&r" (r) :: "memory");
     return r;
 }
+#define FORCE_INLINE __attribute__((always_inline))
 #define FORCE_NOINLINE __attribute__((noinline))
 inline uint8_t bitmask(uint8_t x) { return FX::bitShiftLeftUInt8(x); }
 #else
@@ -99,6 +100,7 @@ inline uint8_t plane()
 {
     return (uint8_t)gplane;
 }
+#define FORCE_INLINE
 #define FORCE_NOINLINE
 inline uint8_t bitmask(uint8_t x) { return 1 << (x & 7); }
 #endif
@@ -216,6 +218,7 @@ struct sdata_items
     uint8_t off;         // list offset
     uint8_t cat;         // current category
     uint8_t cat_nums[7]; // number of items in each category
+    item_t  item_count;  // total number of items
     bool equipped;       // whether we are viewing equipped or all
     char str[ITEM_TOTAL_LEN];
 };
@@ -257,7 +260,6 @@ struct battle_member_t
 {
     uint8_t id;
     uint8_t hp;
-    uint8_t ap;
 };
 
 struct enemy_info_t
@@ -566,7 +568,6 @@ void render_map();
 void render();
 
 // battle.cpp
-void draw_ap(int16_t x, int16_t y, uint8_t ap);
 void update_battle();
 void render_battle();
 
@@ -578,8 +579,8 @@ int8_t items_mhp(uint8_t user);
 void update_items_numcat(sdata_items& d);
 void update_items(sdata_items& d);
 void render_items(int16_t y, sdata_items& d);
-void unequip_item(uint8_t user, item_t i);
-void equip_item(uint8_t user, item_t i);
+void unequip_item_basic(uint8_t user, item_t i);
+void equip_item_basic(uint8_t user, item_t i);
 void toggle_item(uint8_t user, item_t i);
 
 // init.cpp

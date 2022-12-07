@@ -219,7 +219,6 @@ static bool run_chunk()
             uint8_t id = c.script[chunk_instr++];
             party[nparty].battle.id = id;
             party[nparty].battle.hp = party_mhp(nparty);
-            party[nparty].battle.ap = 0;
         }
 
         case CMD_JMP: chunk_instr += c.script[chunk_instr]; break;

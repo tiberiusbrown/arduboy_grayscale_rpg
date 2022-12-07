@@ -135,12 +135,6 @@ static void take_damage(uint8_t i, int8_t dam)
         s.damaged = DAMAGED_FRAMES;
 }
 
-void draw_ap(int16_t x, int16_t y, uint8_t ap)
-{
-    for(uint8_t i = 0, t = 0; i < MAX_AP; ++i, t += 5)
-        platform_fx_drawoverwrite(x + t, y, AP_IMG, ap > i ? 0 : 1);
-}
-
 static void battle_enemy_attack(uint8_t i)
 {
     auto& d = sdata.battle;
@@ -189,8 +183,6 @@ static void battle_next_turn()
     }
 
     d.defender_id = INVALID;
-    if(d.attacker_id != INVALID)
-        member(d.attacker_id).ap += 1;
     uint8_t id;
     for(;;)
     {
@@ -319,7 +311,7 @@ void update_battle()
 {
     auto& d = sdata.battle;
     d.menuy = (d.menuy + d.menuy_target) / 2;
-    d.msely = (d.msely + d.msel * 10) / 2;
+    d.msely = (d.msely + d.msel * 8) / 2;
     ++d.frame;
     //if(++d.selframe >= 7) d.selframe = 0;
     update_battle_sprites();
@@ -333,7 +325,7 @@ void update_battle()
         }
         break;
     case BPHASE_INTRO:
-        d.menuy = d.menuy_target = -48;
+        d.menuy = d.menuy_target = -32;
         if(d.frame == 8 && d.remove_enemy)
         {
             chunk_sprites[d.enemy_chunk].active = false;
@@ -356,7 +348,7 @@ void update_battle()
         d.menuy_target = 0;
         if(btns_pressed & BTN_A)
         {
-            d.menuy_target = -51;
+            d.menuy_target = -33;
             if(d.msel == 0)
             {
                 d.frame = 0;
@@ -375,8 +367,8 @@ void update_battle()
                 d.frame = -32;
             }
         }
-        if(btns_pressed & BTN_DOWN && ++d.msel == 4) d.msel = 0;
-        if(btns_pressed & BTN_UP && d.msel-- == 0) d.msel = 3;
+        if(btns_pressed & BTN_DOWN && ++d.msel == 3) d.msel = 0;
+        if(btns_pressed & BTN_UP && d.msel-- == 0) d.msel = 2;
         break;
     case BPHASE_ESEL:
     {
@@ -521,10 +513,8 @@ static void draw_health(uint8_t i)
             name = pgmptr(&ENEMY_INFO[id].name);
             tx = 128 - text_width_prog(name);
         }
-        draw_text_prog(tx, 51, name);
+        draw_text_noclip(tx, 51, name, NOCLIPFLAG_PROG);
     }
-    if(i < 4)
-        draw_ap(x + w + 1, y + 1, member(i).ap);
 }
 
 static void draw_battle_sprites()
@@ -607,7 +597,7 @@ void render_battle()
         platform_fx_drawplusmask(51, menuy, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
         platform_fx_drawplusmask(74, menuy, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
         platform_fx_drawoverwrite(48, menuy + 8, BATTLE_MENU_IMG, 0);
-        draw_text_prog(50, menuy + 9 + d.msely, PSTR("\x7f"));
+        draw_text_noclip(50, menuy + 9 + d.msely, PSTR("\x7f"), NOCLIPFLAG_PROG);
     }
     if(phase == BPHASE_MENU || phase == BPHASE_ESEL)
     {

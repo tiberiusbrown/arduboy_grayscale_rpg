@@ -75,7 +75,6 @@ static void render_pause_party_offset(int16_t x, int16_t y, uint8_t i)
         (void)dec_to_str(t, party_mhp(i));
         draw_text_noclip(uint8_t(x + 76), uint8_t(y), buf);
     }
-    draw_ap(x + 99, y + 8, b.ap);
     {
         // health bar
         constexpr uint8_t W = 58;

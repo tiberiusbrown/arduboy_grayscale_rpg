@@ -1,5 +1,6 @@
 Att,Def,Spd,MHP,Type,Name,Description
 ,1,,,armor,Cloth Tunic,"Worn and scruffy, but warm enough. +1 defense."
+,2,,,armor,Leather Tunic,Rough yet tough. +2 defense.
 1,,,,weapon,Brass Knuckles,Is that tarnish or old blood? +1 attack.
 ,1,1,,shoes,Ninja Shoes,"+1 speed, +1 defense."
 ,,,10,other,Brawler’s Ring,+10 max health.

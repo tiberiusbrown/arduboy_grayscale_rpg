@@ -20,6 +20,9 @@ void new_game()
         party[i].battle.id = i;
         party[i].battle.hp = party_mhp(i);
     }
+
+    story_flag_set(SFLAG_ITEM_Cloth_Tunic);
+    story_flag_set(SFLAG_ITEM_Leather_Tunic);
 }
 
 void initialize()
