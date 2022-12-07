@@ -115,6 +115,20 @@ static void init_sprites()
     }
 }
 
+static uint8_t calc_damage()
+{
+    auto const& d = sdata.battle;
+    uint8_t dam = 1;
+    
+    // test if attacker is Lucy (double damage to back row)
+    uint8_t i = d.attacker_id;
+    if(i < 4 && party[i].battle.id == 2 && d.defender_id >= 6)
+        dam *= 2;
+
+    if(dam > 99) dam = 99;
+    return dam;
+}
+
 static void take_damage(uint8_t i, int8_t dam)
 {
     uint8_t mhp = get_max_hp(i);
@@ -406,7 +420,7 @@ void update_battle()
         d.frame = -20;
         d.phase = BPHASE_DELAY;
         d.next_phase = BPHASE_ATTACK3;
-        take_damage(d.defender_id, d.defender_id < 4 ? 10 : 1);
+        take_damage(d.defender_id, (int8_t)calc_damage());
         break;
     case BPHASE_ATTACK3:
     {
@@ -605,8 +619,8 @@ void render_battle()
     {
         auto const& s = d.sprites[d.attacker_id];
         draw_selection_outline(s.x, s.y);
-        if(phase == BPHASE_MENU && d.attacker_id != INVALID)
-            draw_health(d.attacker_id);
+        //if(phase == BPHASE_MENU && d.attacker_id != INVALID)
+        //    draw_health(d.attacker_id);
     }
     if(phase == BPHASE_ESEL)
     {
@@ -614,6 +628,8 @@ void render_battle()
         draw_selection_arrow(s.x, s.y);
         draw_health(d.esel);
     }
+    if(d.attacker_id != INVALID)
+        draw_health(d.attacker_id);
     if(d.defender_id != INVALID)
     {
         auto const& s = d.sprites[d.defender_id];
