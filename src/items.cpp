@@ -53,6 +53,13 @@ uint8_t item_cat(item_t i)
     return pgm_read_byte(&ITEM_INFO[i].type);
 }
 
+bool user_is_wearing(uint8_t user, item_t i)
+{
+    uint8_t index = i >> 3;
+    uint8_t mask = bitmask(i);
+    return (party[user].equipped_items[index] & mask) != 0;
+}
+
 void unequip_item_basic(uint8_t user, item_t i)
 {
     uint8_t index = i >> 3;

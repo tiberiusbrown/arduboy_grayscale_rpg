@@ -61,7 +61,7 @@ static uint8_t get_speed(uint8_t i)
 
 static void init_attack_order() {
     auto& d = sdata.battle;
-    uint8_t speeds[8];
+    uint8_t speeds[9]; // +1 slot for amulet of Zhar-Tul double turn
     uint8_t n = 0;
     for(uint8_t j = 0; j < 4; ++j)
     {
@@ -70,6 +70,8 @@ static void init_attack_order() {
         {
             speeds[n] = get_speed(i);
             d.attack_order[n++] = i;
+            if(user_is_wearing(i, SFLAG_ITEM_Amulet_of_Zhar_Tul))
+                d.attack_order[n++] = i;
         }
         i += 4;
         if(member(i).id != INVALID)

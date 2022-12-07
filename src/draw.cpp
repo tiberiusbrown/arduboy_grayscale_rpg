@@ -228,7 +228,7 @@ void draw_text_noclip(int16_t x, int16_t y, char const* str, uint8_t f)
         }
         uint8_t const* bitmap = font_img + (t * (8 * PLANES));
         uint8_t adv = pgm_read_byte(&font_adv[t]);
-        if(cx < uint8_t(128 - adv))
+        if(cx <= uint8_t(128 - adv))
         {
             platform_drawoverwritemonochrome_noclip(
                 cx, page, shift_coef, adv, 1, bitmap);

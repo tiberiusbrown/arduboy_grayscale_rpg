@@ -572,6 +572,7 @@ void update_battle();
 void render_battle();
 
 // items.cpp
+bool user_is_wearing(uint8_t user, item_t i);
 int8_t items_att(uint8_t user);
 int8_t items_def(uint8_t user);
 int8_t items_spd(uint8_t user);
