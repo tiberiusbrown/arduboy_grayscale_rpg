@@ -4,6 +4,7 @@
 
 void new_game()
 {
+    memset(&savefile, 0, sizeof(savefile));
     px = 100;
     py = 135;
     pdir = 0;
@@ -23,6 +24,7 @@ void new_game()
 
     story_flag_set(SFLAG_ITEM_Cloth_Tunic);
     story_flag_set(SFLAG_ITEM_Leather_Tunic);
+    story_flag_set(SFLAG_ITEM_Strange_Ring);
 }
 
 void initialize()

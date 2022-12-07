@@ -9,8 +9,8 @@ static char const EN_DARK_WIZARD[] PROGMEM = "Dark Wizard";
 
 enemy_info_t const ENEMY_INFO[] PROGMEM =
 {
-    { 1, 10, 10, EN_DARK_GUARD },
-    { 2, 10, 10, EN_DARK_WIZARD },
+    { 1, 4, 0, 10, 10, EN_DARK_GUARD },
+    { 2, 4, 0, 10, 10, EN_DARK_WIZARD },
 };
 
 static char const PN_MATTHIAS[] PROGMEM = "Matthias";
@@ -20,10 +20,10 @@ static char const PN_DISMAS[] PROGMEM = "Dismas";
 
 party_info_t const PARTY_INFO[4] PROGMEM =
 {
-    { 0, 0, 10, 20, 4, 4, 10, PN_MATTHIAS },
-    { 3, 2, 10, 10, 3, 3, 10, PN_CATHERINE },
-    { 4, 1, 10, 10, 4, 4, 10, PN_LUCY },
-    { 0, 3, 10, 10, 4, 4, 10, PN_DISMAS },
+    { 0, 0, 10, 20, 4, 0, 10, PN_MATTHIAS },
+    { 3, 2, 10, 10, 3, 0, 10, PN_CATHERINE },
+    { 4, 1, 10, 10, 4, 0, 10, PN_LUCY },
+    { 0, 3, 10, 10, 4, 0, 10, PN_DISMAS },
 };
 
 uint8_t party_att(uint8_t i)
@@ -41,7 +41,7 @@ uint8_t party_def(uint8_t i)
     uint8_t id = party[i].battle.id;
     int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_def);
     r += items_def(i);
-    if(r < 1) r = 1;
+    if(r < 0) r = 0;
     if(r > 99) r = 99;
     return r;
 }
@@ -61,7 +61,7 @@ uint8_t party_spd(uint8_t i)
     uint8_t id = party[i].battle.id;
     int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_spd);
     r += items_spd(i);
-    if(r < 1) r = 1;
+    if(r < 0) r = 0;
     if(r > 99) r = 99;
     return r;
 }

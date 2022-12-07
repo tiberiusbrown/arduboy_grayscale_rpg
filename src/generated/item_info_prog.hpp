@@ -9,4 +9,5 @@ item_info_t const ITEM_INFO[] PROGMEM =
     { 0, 0, 0, 10, IT_OTHER },
     { 0, 0, 0, 0, IT_OTHER },
     { 0, 0, 5, 0, IT_OTHER },
+    { 0, 0, 0, 0, IT_OTHER },
 };

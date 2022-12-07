@@ -5,4 +5,5 @@ Att,Def,Spd,MHP,Type,Name,Description
 ,1,1,,shoes,Ninja Shoes,"+1 speed, +1 defense."
 ,,,10,other,Brawler’s Ring,+10 max health.
 ,,,,other,Amulet of Zhar-Tul,The wearer may attack twice per turn.
-,,5,,other,Tempus Ring,It hums and vibrates unnaturally.
+,,5,,other,Tempus Ring,It hums and vibrates unnaturally. +5 speed.
+,,,,other,Strange Ring,What does it do?

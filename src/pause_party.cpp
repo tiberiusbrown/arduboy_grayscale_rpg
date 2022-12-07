@@ -73,11 +73,11 @@ static void render_pause_party_offset(int16_t x, int16_t y, uint8_t i)
         t += dec_to_str(t, b.hp);
         *t++ = '/';
         (void)dec_to_str(t, party_mhp(i));
-        draw_text_noclip(uint8_t(x + 76), uint8_t(y), buf);
+        draw_text_noclip(uint8_t(x + 90), uint8_t(y), buf);
     }
     {
         // health bar
-        constexpr uint8_t W = 58;
+        constexpr uint8_t W = 75;
         constexpr uint8_t H = 2;
         platform_drawrect(x + 38, y + 8, W + 2, H + 2, DARK_GRAY);
         uint8_t mhp = party_mhp(i);

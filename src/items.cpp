@@ -85,7 +85,7 @@ void toggle_item(uint8_t user, item_t i)
     if(equip)
     {
         uint8_t cat = item_cat(i);
-        if(uint8_t(cat - 1) < 6)
+        if(uint8_t(cat - 1) < 5)
         {
             // remove other items of the same category
             ROTA_FOREACH_USER_ITEM(user, j, {
@@ -101,9 +101,12 @@ void toggle_item(uint8_t user, item_t i)
 void update_items_numcat(sdata_items& d)
 {
     for(auto& n : d.cat_nums) n = 0;
+    d.cat_nums[IT_CONSUMABLE] = 1;
+    d.item_count = 0;
 
     ROTA_FOREACH_ITEM(i, {
         ++d.cat_nums[item_cat(i)];
+        ++d.item_count;
     });
 }
 
@@ -120,26 +123,33 @@ static item_t selected_item(sdata_items const& d)
 
 void update_items(sdata_items& d)
 {
-    uint8_t any_items = 0;
-    for(auto c : d.cat_nums)
-        any_items |= c;
-    if(any_items == 0) return;
-    if(btns_pressed & BTN_LEFT)
+    if(d.item_count != 0)
     {
-        d.off = d.n = 0;
-        if(d.cat-- == 0) d.cat = 6;
-    }
-    if(btns_pressed & BTN_RIGHT)
-    {
-        d.off = d.n = 0;
-        if(d.cat++ == 6) d.cat = 0;
+        if(btns_pressed & BTN_LEFT)
+        {
+            do
+            {
+                d.off = d.n = 0;
+                if(d.cat-- == 0) d.cat = 6;
+            } while(d.cat_nums[d.cat] == 0);
+        }
+        if(btns_pressed & BTN_RIGHT)
+        {
+            do
+            {
+                d.off = d.n = 0;
+                if(d.cat++ == 6) d.cat = 0;
+            } while(d.cat_nums[d.cat] == 0);
+        }
     }
     if((btns_pressed & BTN_UP) && d.n > 0)
         --d.n;
     if((btns_pressed & BTN_DOWN) && uint8_t(d.n + 1) < d.cat_nums[d.cat])
         ++d.n;
-    if(d.off > d.n    ) d.off = d.n;
-    if(d.off < d.n - 2) d.off = d.n - 2;
+    if(d.off > d.n)
+        d.off = d.n;
+    if(d.off < d.n - 2)
+        d.off = d.n - 2;
     if(btns_pressed & BTN_A)
     {
         item_t selitem = selected_item(d);
@@ -152,12 +162,14 @@ static inline void render_item_row(
     int16_t x, int16_t y, uint8_t cat, sdata_items& d,
     item_t i, uint8_t& n)
 {
-    uint8_t row = n - d.off;
-    if(row >= 3) return;
     if(item_cat(i) != cat) return;
+    uint8_t row = n - d.off;
+    uint8_t pn = n;
+    ++n;
+    if(row >= 3) return;
     size_t num;
     int16_t rowy = y + row * 10 + 13;
-    if(d.n == n)
+    if(d.n == pn)
     {
         num = ITEM_TOTAL_LEN;
         platform_drawrect(x, rowy, 128, 10, DARK_GRAY);
@@ -184,9 +196,8 @@ static inline void render_item_row(
             draw_text_noclip(x + 127 - w, rowy + 1, name, NOCLIPFLAG_PROG);
         }
     }
-    if(d.n == n)
+    if(d.n == pn)
         draw_text_noclip(x, y + 46, &d.str[ITEM_NAME_LEN]);
-    ++n;
 }
 
 static void render_items_page(
@@ -202,17 +213,12 @@ static void render_items_page(
 
 void render_items(int16_t y, sdata_items& d)
 {
-    uint8_t any_items = 0;
-    for(auto c : d.cat_nums)
-        any_items |= c;
-    if(any_items == 0)
-    {
-        platform_fx_drawoverwrite(0, 0, NO_ITEMS_IMG, 0);
-        return;
-    }
     render_items_page(0, y, d.cat, d);
-    platform_fx_drawoverwrite(0, y + 1, ARROWS_IMG, 0);
-    platform_fx_drawoverwrite(120, y + 1, ARROWS_IMG, 1);
+    if(d.item_count != 0)
+    {
+        platform_fx_drawoverwrite(0, y + 1, ARROWS_IMG, 0);
+        platform_fx_drawoverwrite(120, y + 1, ARROWS_IMG, 1);
+    }
     platform_fillrect(0, 11, 128, 1, WHITE);
     platform_fillrect(0, 44, 128, 1, WHITE);
 }

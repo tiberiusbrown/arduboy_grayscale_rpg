@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <string.h>
 
 constexpr uint16_t VERSION = 1;
 
@@ -103,6 +104,10 @@ inline uint8_t plane()
 #define FORCE_INLINE
 #define FORCE_NOINLINE
 inline uint8_t bitmask(uint8_t x) { return 1 << (x & 7); }
+inline void* memcpy_P(void* dst, void const* src, size_t num)
+{
+    return memcpy(dst, src, num);
+}
 #endif
 
 constexpr uint8_t PLANES = 3;
@@ -265,8 +270,10 @@ struct battle_member_t
 struct enemy_info_t
 {
     uint8_t sprite;
-    uint8_t speed;
-    uint8_t hp;
+    uint8_t att;
+    uint8_t def;
+    uint8_t spd;
+    uint8_t mhp;
     char const* name;
 };
 extern enemy_info_t const ENEMY_INFO[] PROGMEM;
@@ -341,7 +348,7 @@ struct sdata_battle
     battle_phase_t prev_phase;
     battle_phase_t next_phase;
 
-    uint8_t attack_order[8];
+    uint8_t attack_order[9];
     uint8_t num_attackers;
     uint8_t attacker_index;
     uint8_t attacker_id;

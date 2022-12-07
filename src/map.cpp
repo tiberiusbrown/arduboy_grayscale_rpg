@@ -97,7 +97,7 @@ static bool run_chunk()
                 auto& enemy = sdata.battle.enemies[i];
                 uint8_t id = e[i];
                 enemy.id = id;
-                enemy.hp = pgm_read_byte(&ENEMY_INFO[id].hp);
+                enemy.hp = pgm_read_byte(&ENEMY_INFO[id].mhp);
             }
             sdata.battle.phase = BPHASE_ALERT;
             sdata.battle.pdef = sdata.battle.edef = -1;
@@ -161,6 +161,25 @@ static bool run_chunk()
             uint16_t f = c.script[chunk_instr++];
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
             story_flag_set(f);
+            if(f < NUM_ITEMS)
+            {
+                // special message
+                change_state(STATE_DIALOG);
+                sdata.dialog.portrait = 255;
+                static char const YOU_FOUND[] PROGMEM = "Item: ";
+                memcpy_P(sdata.dialog.message, YOU_FOUND, sizeof(YOU_FOUND));
+                platform_fx_read_data_bytes(
+                    ITEM_STRINGS + ITEM_TOTAL_LEN * f,
+                    &sdata.dialog.message[sizeof(YOU_FOUND) - 1],
+                    ITEM_TOTAL_LEN);
+                for(uint8_t i = 0; i < ITEM_NAME_LEN - 1; ++i)
+                {
+                    char& c = sdata.dialog.message[sizeof(YOU_FOUND) - 1 + i];
+                    if(c == '\0') c = ' ';
+                }
+                sdata.dialog.message[sizeof(YOU_FOUND) - 1 + ITEM_NAME_LEN - 1] = '\n';
+                return true;
+            }
             break;
         }
         case CMD_FC:

@@ -173,7 +173,6 @@ end:</property>
     <property name="script">$brnt end
 brfs !ITEM_Tempus_Ring end
 fs !ITEM_Tempus_Ring
-msg {In the chest you find a sweet ring!}
 end:</property>
    </properties>
    <point/>
@@ -183,7 +182,6 @@ end:</property>
     <property name="script">$brnt end
 brfs !ITEM_Ninja_Shoes end
 fs !ITEM_Ninja_Shoes
-msg {In the chest you find ninja shoes!}
 end:</property>
    </properties>
    <point/>
@@ -193,7 +191,6 @@ end:</property>
     <property name="script">$brnt end
 brfs !ITEM_Brawler_s_Ring end
 fs !ITEM_Brawler_s_Ring
-msg {In the chest you find a brawler's ring!}
 end:</property>
    </properties>
    <point/>
@@ -203,7 +200,6 @@ end:</property>
     <property name="script">$brnt end
 brfs !ITEM_Amulet_of_Zhar_Tul end
 fs !ITEM_Amulet_of_Zhar_Tul
-msg {In the chest you find a cool amulet!}
 end:</property>
    </properties>
    <point/>
