@@ -14,3 +14,4 @@ constexpr uint16_t SFLAG_ITEM_Defender_s_Breastplate = 8;
 constexpr uint16_t SFLAG_guard = 9;
 constexpr uint16_t SFLAG_Lucy = 10;
 constexpr uint16_t SFLAG_Catherine = 11;
+constexpr uint16_t SFLAG_Dismas = 12;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="128" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="72">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="128" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="74">
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer id="1" name="Tiles" width="256" height="128">
   <data encoding="csv">
@@ -157,23 +157,23 @@ end:</property>
   <object id="65" x="89.3333" y="234" width="12" height="14">
    <properties>
     <property name="script">brns end
-dlg 1 {Hi there!}
+dlg 2 {Hi there!}
 end:</property>
    </properties>
   </object>
   <object id="66" x="202" y="231.667" width="12" height="14">
    <properties>
     <property name="script">brns end
-dlg 2 {Hey! Can I join you?|
+dlg 1 {Hey! Can I join you?|
 Sure!
 Not right now...}
 brz r1 no
-dlg 2 {Yay! How exciting!}
+dlg 1 {Yay! How exciting!}
 fs !Catherine
 pa 1
 jmp end
 no:
-dlg 2 {Some other time, then. Come back when you're ready for me to join you!}
+dlg 1 {Some other time, then. Come back when you're ready for me to join you!}
 end:</property>
    </properties>
   </object>
@@ -214,14 +214,17 @@ end:</property>
   </object>
  </objectgroup>
  <objectgroup color="#ff0000" id="3" name="Paths">
-  <object id="53" name="!guard" class="1" x="133.773" y="136.545">
+  <object id="53" name="!guard" class="4" x="133.773" y="136.545">
    <polyline points="0,0 17.8182,1.45455"/>
   </object>
-  <object id="63" name="!Lucy" class="4" x="114.667" y="228.667">
+  <object id="63" name="!Lucy" class="2" x="114.667" y="228.667">
    <polyline points="0,0 6.33333,5"/>
   </object>
-  <object id="64" name="!Catherine" class="3" x="136" y="199">
+  <object id="64" name="!Catherine" class="1" x="136" y="199">
    <polyline points="0,0 48,0.666667 49.6667,48.3333 -1,48.6667"/>
+  </object>
+  <object id="73" name="!Dismas" class="3" x="39" y="137">
+   <polyline points="0,0 1.33333,16.3333 34.3333,16.3333 31.3333,-1.66667"/>
   </object>
  </objectgroup>
 </map>

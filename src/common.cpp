@@ -21,9 +21,9 @@ static char const PN_DISMAS[] PROGMEM = "Dismas";
 party_info_t const PARTY_INFO[4] PROGMEM =
 {
     { 0, 0, 10, 20, 4, 0, 10, PN_MATTHIAS },
-    { 3, 2, 10, 10, 3, 0, 10, PN_CATHERINE },
-    { 4, 1, 10, 10, 4, 0, 10, PN_LUCY },
-    { 0, 3, 10, 10, 4, 0, 10, PN_DISMAS },
+    { 1, 1, 10, 10, 3, 0, 10, PN_CATHERINE },
+    { 2, 2, 10, 10, 4, 0, 10, PN_LUCY },
+    { 3, 3, 10, 10, 4, 0, 10, PN_DISMAS },
 };
 
 uint8_t party_att(uint8_t i)
