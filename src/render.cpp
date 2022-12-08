@@ -18,8 +18,6 @@ static void render_dialog()
     {
         render_map();
         platform_fillrect(0, 36, 128, 28, BLACK);
-        if(portrait)
-            platform_fillrect(0, 0, 35, 35, BLACK);
     }
     else
     {
@@ -40,8 +38,13 @@ static void render_dialog()
 
     if(portrait)
     {
-        platform_fx_drawoverwrite(2, 2, PORTRAIT_IMG, d.portrait);
-        platform_drawrect(0, 0, 36, 36, LIGHT_GRAY);
+        uint8_t p = d.portrait;
+        uint8_t x = 0;
+        if(p >= 0x80)
+            p -= 0x80, x = 48;
+        platform_fx_drawoverwrite(x + 2, 2, PORTRAIT_IMG, p);
+        platform_drawrect(x + 0, 0, 36, 36, LIGHT_GRAY);
+        platform_drawrect(x + 1, 1, 34, 34, BLACK);
     }
     else if(d.portrait == 254)
     {

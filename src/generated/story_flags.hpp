@@ -11,5 +11,5 @@ constexpr uint16_t SFLAG_ITEM_Amulet_of_Zhar_Tul = 5;
 constexpr uint16_t SFLAG_ITEM_Tempus_Ring = 6;
 constexpr uint16_t SFLAG_ITEM_Strange_Ring = 7;
 constexpr uint16_t SFLAG_guard = 8;
-constexpr uint16_t SFLAG_girl2 = 9;
-constexpr uint16_t SFLAG_girl = 10;
+constexpr uint16_t SFLAG_Lucy = 9;
+constexpr uint16_t SFLAG_Catherine = 10;

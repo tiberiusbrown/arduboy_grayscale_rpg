@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="128" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="71">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="128" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="72">
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer id="1" name="Tiles" width="256" height="128">
   <data encoding="csv">
@@ -164,7 +164,16 @@ end:</property>
   <object id="66" x="202" y="231.667" width="12" height="14">
    <properties>
     <property name="script">brns end
-dlg 2 {Please get out of my way.}
+dlg 2 {Hey! Can I join you?|
+Sure!
+Not right now...}
+brz r1 no
+dlg 2 {Yay! How exciting!}
+fs !Catherine
+pa 1
+jmp end
+no:
+dlg 2 {Some other time, then. Come back when you're ready for me to join you!}
 end:</property>
    </properties>
   </object>
@@ -204,14 +213,14 @@ end:</property>
    <point/>
   </object>
  </objectgroup>
- <objectgroup color="#ff0000" id="3" name="Paths" visible="0">
+ <objectgroup color="#ff0000" id="3" name="Paths">
   <object id="53" name="!guard" class="1" x="133.773" y="136.545">
    <polyline points="0,0 17.8182,1.45455"/>
   </object>
-  <object id="63" name="!girl2" class="4" x="114.667" y="228.667">
+  <object id="63" name="!Lucy" class="4" x="114.667" y="228.667">
    <polyline points="0,0 6.33333,5"/>
   </object>
-  <object id="64" name="!girl" class="3" x="136" y="199">
+  <object id="64" name="!Catherine" class="3" x="136" y="199">
    <polyline points="0,0 48,0.666667 49.6667,48.3333 -1,48.6667"/>
   </object>
  </objectgroup>

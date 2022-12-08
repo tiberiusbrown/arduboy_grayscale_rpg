@@ -235,14 +235,27 @@ static bool run_chunk()
             break;
         }
         case CMD_PA:
-            if(nparty < 4)
+            if(nparty >= 4)
+                break;
             {
                 uint8_t id = c.script[chunk_instr++];
+                for(uint8_t u = 0; u < nparty; ++u)
+                    if(party[u].battle.id == id)
+                        break;
                 party[nparty].battle.id = id;
                 party[nparty].battle.hp = party_mhp(nparty);
                 ++nparty;
+                change_state(STATE_DIALOG);
+                sdata.dialog.portrait = 0x80 + pgm_read_byte(&PARTY_INFO[id].portrait);
+                char* m = sdata.dialog.message;
+                char const* n = pgmptr(&PARTY_INFO[id].name);
+                char c;
+                do *m++ = c = (char)pgm_read_byte_inc(n);
+                while(c != '\0');
+                static char const JOINED[] PROGMEM = " has joined the party!";
+                memcpy_P(m - 1, JOINED, sizeof(JOINED));
+                return true;
             }
-            break;
 
         case CMD_JMP:
         {

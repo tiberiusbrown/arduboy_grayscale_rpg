@@ -328,7 +328,6 @@ enum battle_phase_t
 struct battle_sprite_t
 {
     bool active;
-    uint8_t asleep;
     uint8_t damaged;
     int8_t x, y;   // current pos
     uint8_t tx, ty; // target pos

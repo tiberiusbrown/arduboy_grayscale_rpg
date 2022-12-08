@@ -170,9 +170,7 @@ static void take_damage(uint8_t i, int8_t dam)
     if(f == 0 && new_hp > 0)
         f = 1;
     s.hpt = f;
-    if(new_hp == 0)
-        s.asleep = 1;
-    else if(dam > 0)
+    if(dam > 0)
         s.damaged = DAMAGED_FRAMES;
 }
 
@@ -230,7 +228,7 @@ static void battle_next_turn()
         if(++d.attacker_index >= d.num_attackers)
             d.attacker_index = 0;
         id = d.attacker_id = d.attack_order[d.attacker_index];
-        if(d.sprites[id].asleep == 0)
+        if(member(id).hp > 0)
             break;
     }
     if(id < 4)
@@ -300,7 +298,8 @@ static void update_battle_sprites()
     {
         auto& s = d.sprites[i];
         if(!s.active) continue;
-        if(s.asleep > 0 && ++s.asleep >= ASLEEP_FRAMES)
+        if(s.damaged > 0) --s.damaged;
+        else if(member(i).hp == 0)
         {
             if(d.pdef == i) d.pdef = INVALID;
             if(d.edef == i) d.edef = INVALID;
@@ -309,7 +308,6 @@ static void update_battle_sprites()
             if(i >= 4) remove_enemy(i--);
             continue;
         }
-        if(s.damaged > 0) --s.damaged;
         if(s.hp > s.hpt) s.hp -= uint8_t(s.hp - s.hpt + 3) / 4;
         if(s.hp < s.hpt) s.hp += uint8_t(s.hpt - s.hp + 3) / 4;
         if(s.x == s.tx && s.y == s.ty)
@@ -526,7 +524,7 @@ static void draw_battle_background()
     for(uint8_t i = 0; i < 4; ++i)
     {
         auto const& s = d.sprites[i];
-        if(s.asleep < ASLEEP_FRAMES) continue;
+        if(s.damaged > 0 || member(i).hp > 0) continue;
         if(plane() > 1)
             platform_fx_drawplusmask(s.bx, s.by, SPRITES_IMG, s.frame_base, 16, 16);
     }
@@ -534,7 +532,6 @@ static void draw_battle_background()
     platform_drawrect(DEFEND_X1 + 3, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
     platform_fillrect(DEFEND_X2 + 1, DEFEND_Y + 7, 14, 12, WHITE);
     platform_drawrect(DEFEND_X2 + 3, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
-    //platform_fillrect(0, 50, 128, 14, BLACK);
 }
 
 static void draw_selection_arrow(uint8_t x, uint8_t y)
@@ -583,7 +580,7 @@ static void draw_battle_sprites()
     for(auto const& s : d.sprites)
     {
         if(!s.active) continue;
-        if((nframe & 1) && (s.asleep > 0 || s.damaged > 0))
+        if((nframe & 1) && s.damaged > 0)
             continue;
         auto& e = entries[n++];
         e.x = (uint8_t)s.x;

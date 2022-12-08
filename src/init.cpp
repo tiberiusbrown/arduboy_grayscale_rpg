@@ -15,18 +15,13 @@ void new_game()
         ac.cx = ac.cy = 255;
     chunks_are_running = false;
 
-    nparty = 4;
-    for(uint8_t i = 0; i < nparty; ++i)
-    {
-        party[i].battle.id = i;
-        party[i].battle.hp = party_mhp(i);
-        for(auto& it : party[i].equipped_items)
-            it = INVALID_ITEM;
-    }
+    nparty = 1;
+    //party[0].battle.id = 0;
+    party[0].battle.hp = party_mhp(0);
 
-    story_flag_set(SFLAG_ITEM_Cloth_Tunic);
-    story_flag_set(SFLAG_ITEM_Leather_Tunic);
-    story_flag_set(SFLAG_ITEM_Strange_Ring);
+    for(uint8_t n = 0; n < 4; ++n)
+        for(auto& i : party[n].equipped_items)
+            i = INVALID_ITEM;
 }
 
 void initialize()
