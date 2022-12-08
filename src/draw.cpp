@@ -298,7 +298,7 @@ uint8_t dec_to_str(char* dst, uint8_t val)
 
 void draw_dec(int16_t x, int16_t y, uint8_t val)
 {
-    char b[7];
+    char b[4];
     (void)dec_to_str(b, val);
     draw_text_noclip(x, y, b);
 }

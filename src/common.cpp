@@ -129,13 +129,14 @@ bool story_flag_get(uint16_t index)
     return (story_flags[i] & m) != 0;
 }
 
-uint8_t adjust(uint8_t x, uint8_t tx)
+void adjust(uint8_t& rx, uint8_t tx)
 {
+    uint8_t x = rx;
     if(x < tx)
         x += (uint8_t(tx - x + 1) >> 1);
     else
         x -= (uint8_t(x - tx + 1) >> 1);
-    return x;
+    rx = x;
 }
 
 uint16_t rand_seed;

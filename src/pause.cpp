@@ -160,7 +160,7 @@ void update_pause()
         d.quity += uint8_t(65 - d.quity) >> 1;
     else
         d.quity >>= 1, d.quitp = false, d.quitfade = 0;
-    d.quitf = adjust(d.quitf, d.quitft);
+    adjust(d.quitf, d.quitft);
     if(d.state == OS_SAVE)
         d.savey += uint8_t(65 - d.savey) >> 1;
     else
@@ -173,23 +173,23 @@ void update_pause()
         uint8_t ax = pgm_read_byte(&OPTION_X[d.menui * 2 + 0]);
         uint8_t bx = pgm_read_byte(&OPTION_X[d.menui * 2 + 1]);
         if(d.ax == 0) d.ax = ax, d.bx = bx;
-        d.ax = adjust(d.ax, ax);
-        d.bx = adjust(d.bx, bx);
+        adjust(d.ax, ax);
+        adjust(d.bx, bx);
     }
     {
         uint8_t ty = d.optionsi * 16 + 17;
         if(d.optionsiy == 0) d.optionsiy = ty;
-        d.optionsiy = adjust(d.optionsiy, ty);
+        adjust(d.optionsiy, ty);
     }
     {
         uint8_t ty = d.quiti * 13 + 25;
         if(d.quitiy == 0) d.quitiy = ty;
-        d.quitiy = adjust(d.quitiy, ty);
+        adjust(d.quitiy, ty);
     }
     {
         uint8_t tx = savefile.brightness * 16 + 70;
         if(d.brightnessx == 0) d.brightnessx = tx;
-        d.brightnessx = adjust(d.brightnessx, tx);
+        adjust(d.brightnessx, tx);
     }
     d.ally = d.optionsy | d.quity | d.savey | d.partyy;
 }

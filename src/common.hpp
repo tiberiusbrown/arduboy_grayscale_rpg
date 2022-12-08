@@ -230,6 +230,8 @@ struct sdata_items
     uint8_t user_index;  // who is using an item?
     uint8_t n;           // offset selected
     uint8_t off;         // list offset
+    uint8_t x, xt;       // page offset / target
+    uint8_t pcat;        // previous category
     uint8_t cat;         // current category
     uint8_t cat_nums[IT_NUM_CATS]; // number of items in each category
     item_t  item_count;  // total number of items
@@ -267,7 +269,8 @@ struct sdata_pause
     uint8_t ally;
 
     sdata_items items;
-    bool showing_items;
+    uint8_t itemsy;
+    uint8_t itemsyt;
 };
 
 struct battle_member_t
@@ -467,7 +470,7 @@ extern uint16_t rand_seed;
 uint8_t u8rand();
 uint8_t u8rand(uint8_t m);
 
-uint8_t adjust(uint8_t x, uint8_t tx);
+void adjust(uint8_t& x, uint8_t tx);
 
 // battery.cpp
 extern struct battery_info_t

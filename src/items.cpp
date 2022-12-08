@@ -102,8 +102,15 @@ static item_t selected_item(sdata_items const& d)
 
 void update_items(sdata_items& d)
 {
+    if(d.x != d.xt)
+    {
+        adjust(d.x, d.xt);
+        return;
+    }
+
     if(d.item_count != 0)
     {
+        d.pcat = d.cat;
         if(btns_pressed & BTN_LEFT)
         {
             do
@@ -111,6 +118,8 @@ void update_items(sdata_items& d)
                 d.off = d.n = 0;
                 if(d.cat-- == 0) d.cat = IT_NUM_CATS - 1;
             } while(d.cat_nums[d.cat] == 0);
+            d.x = 0;
+            d.xt = 128;
         }
         if(btns_pressed & BTN_RIGHT)
         {
@@ -119,6 +128,8 @@ void update_items(sdata_items& d)
                 d.off = d.n = 0;
                 if(d.cat++ == IT_NUM_CATS - 1) d.cat = 0;
             } while(d.cat_nums[d.cat] == 0);
+            d.x = 128;
+            d.xt = 0;
         }
     }
     if((btns_pressed & BTN_UP) && d.n > 0)
@@ -170,7 +181,7 @@ static inline void render_item_row(
         }
     }
     if(d.n == pn)
-        draw_text_noclip(x, y + 46, &d.str[ITEM_NAME_LEN]);
+        draw_text_noclip(x + 2, y + 46, &d.str[ITEM_NAME_LEN]);
 }
 
 static void render_items_page(
@@ -186,12 +197,29 @@ static void render_items_page(
 
 void render_items(int16_t y, sdata_items& d)
 {
-    render_items_page(0, y, d.cat, d);
+    if(d.x < d.xt)
+    {
+        render_items_page(d.x - 128, y, d.cat, d);
+        render_items_page(d.x, y, d.pcat, d);
+    }
+    else if(d.x > d.xt)
+    {
+        render_items_page(d.x, y, d.cat, d);
+        render_items_page(d.x - 128, y, d.pcat, d);
+    }
+    else
+    {
+        render_items_page(0, y, d.cat, d);
+    }
+
     if(d.item_count != 0)
     {
+        platform_fillrect(0, 0, 8, 10, BLACK);
+        platform_fillrect(120, 0, 8, 10, BLACK);
         platform_fx_drawoverwrite(0, y + 1, ARROWS_IMG, 0);
         platform_fx_drawoverwrite(120, y + 1, ARROWS_IMG, 1);
     }
-    platform_fillrect(0, 11, 128, 1, WHITE);
-    platform_fillrect(0, 44, 128, 1, WHITE);
+
+    platform_fillrect(0, y + 11, 128, 1, WHITE);
+    platform_fillrect(0, y + 44, 128, 1, WHITE);
 }

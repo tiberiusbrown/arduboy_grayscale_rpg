@@ -300,7 +300,7 @@ static void update_dialog()
     bool message_done = (current_char == '\0');
     if(d.question)
     {
-        d.questioniy = adjust(d.questioniy, d.questioni * 11);
+        adjust(d.questioniy, d.questioni * 11);
         if(!d.questiondraw)
         {
             if(btns_pressed & BTN_A)
@@ -342,7 +342,7 @@ static void update_dialog()
                 }
             }
             uint8_t t = (d.questionfill >= 15 ? 255 : d.questionfill * 17);
-            d.questionfillw = adjust(d.questionfillw, t);
+            adjust(d.questionfillw, t);
         }
         else
         {
