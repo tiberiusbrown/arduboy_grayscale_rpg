@@ -198,7 +198,6 @@ end:</property>
   <object id="70" x="120.667" y="104.667">
    <properties>
     <property name="script">$brnt end
-brfs !ITEM_Amulet_of_Zhar_Tul end
 fs !ITEM_Amulet_of_Zhar_Tul
 end:</property>
    </properties>

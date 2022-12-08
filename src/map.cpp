@@ -160,12 +160,13 @@ static bool run_chunk()
         {
             uint16_t f = c.script[chunk_instr++];
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
+            bool already_have = story_flag_get(f);
             story_flag_set(f);
-            if(f < NUM_ITEMS)
+            if(!already_have && f < NUM_ITEMS)
             {
                 // special message
                 change_state(STATE_DIALOG);
-                sdata.dialog.portrait = 255;
+                sdata.dialog.portrait = 254;
                 static char const YOU_FOUND[] PROGMEM = "Item: ";
                 memcpy_P(sdata.dialog.message, YOU_FOUND, sizeof(YOU_FOUND));
                 platform_fx_read_data_bytes(

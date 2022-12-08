@@ -12,7 +12,7 @@ static void render_dialog()
 {
     auto& d = sdata.dialog;
     char c;
-    bool portrait = (d.portrait != 255);
+    bool portrait = (d.portrait < 254);
 
     if(!d.questiondraw)
     {
@@ -42,6 +42,10 @@ static void render_dialog()
     {
         platform_fx_drawoverwrite(2, 2, PORTRAIT_IMG, d.portrait);
         platform_drawrect(0, 0, 36, 36, LIGHT_GRAY);
+    }
+    else if(d.portrait == 254)
+    {
+        platform_fx_drawoverwrite(33, 16, GOT_ITEM_IMG, 0);
     }
 
     c = d.message[d.char_progress];

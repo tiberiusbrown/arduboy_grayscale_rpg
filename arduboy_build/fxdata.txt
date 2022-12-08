@@ -26,6 +26,7 @@ raw_t AP_IMG = "ap_img.bin"
 raw_t INNATES_IMG = "innates_img.bin"
 raw_t ITEM_CATS_IMG = "item_cats_img.bin"
 raw_t NO_ITEMS_IMG = "no_items_img.bin"
+raw_t GOT_ITEM_IMG = "got_item_img.bin"
 
 // put string data last to avoid large diffs in git when scripts are updated
 raw_t GAME_OVER_MESSAGES = "game_over_messages.bin"
