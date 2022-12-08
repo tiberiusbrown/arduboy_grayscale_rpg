@@ -137,20 +137,21 @@ static void init_sprites()
     }
 }
 
-static uint8_t calc_damage(uint8_t attacker, uint8_t defender)
+static uint8_t calc_attack_damage(uint8_t attacker, uint8_t defender)
 {
     auto const& d = sdata.battle;
     uint8_t att = get_att(attacker);
     uint8_t def = get_def(defender);
 
-    uint8_t dam = att;
+    int16_t dam = (att * att + (uint8_t(att + def) >> 1)) / (att + def);
     
     // test if attacker is Lucy (double damage to back row)
     if(attacker < 4 && party[attacker].battle.id == 2 && defender >= 6)
         dam *= 2;
 
+    if(dam <= 0) dam = 1;
     if(dam > 99) dam = 99;
-    return dam;
+    return (uint8_t)dam;
 }
 
 static void take_damage(uint8_t i, int8_t dam)
@@ -445,7 +446,7 @@ void update_battle()
         d.frame = -20;
         d.phase = BPHASE_DELAY;
         d.next_phase = BPHASE_ATTACK3;
-        uint8_t dam = calc_damage(d.attacker_id, d.defender_id);
+        uint8_t dam = calc_attack_damage(d.attacker_id, d.defender_id);
         take_damage(d.defender_id, (int8_t)dam);
 
         // Dismas innate: 50% chance to strike back when defending
@@ -454,7 +455,7 @@ void update_battle()
             (u8rand() & 1))
         {
             take_damage(d.attacker_id,
-                (int8_t)calc_damage(d.defender_id, d.attacker_id));
+                (int8_t)calc_attack_damage(d.defender_id, d.attacker_id));
         }
 
         // Catherine innate: after attacking, heal a wounded ally for 50% damage
