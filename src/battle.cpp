@@ -179,21 +179,47 @@ static void battle_enemy_attack(uint8_t i)
     auto& d = sdata.battle;
     auto& e = d.enemies[i];
 
-    if(d.pdef == INVALID)
+    uint8_t num_enemies = 0;
+    for(uint8_t n = 0; n < 4; ++n)
+        if(d.enemies[n].hp > 0)
+            ++num_enemies;
+
+    if(num_enemies >= 2 &&
+        d.edef == INVALID &&
+        u8rand() < pgm_read_byte(&ENEMY_INFO[e.id].defend))
     {
-        uint8_t j[4];
-        uint8_t n = 0;
-        for(uint8_t i = 0; i < 4; ++i)
-        {
-            if(party[i].battle.id == INVALID) continue;
-            if(party[i].battle.hp > 0) j[n++] = i;
-        }
-        d.defender_id = j[u8rand(n)];
+        d.phase = BPHASE_DEFEND;
+        return;
     }
-    else
-        d.defender_id = d.pdef;
 
     d.phase = BPHASE_ATTACK1;
+
+    if(d.pdef != INVALID)
+    {
+        d.defender_id = d.pdef;
+        return;
+    }
+
+    if(u8rand() < pgm_read_byte(&ENEMY_INFO[e.id].target_weakest))
+    {
+        // lowest HP target
+        uint8_t hp = 255;
+        d.defender_id = 0;
+        for(uint8_t u = 1; u < 4; ++u)
+        {
+            uint8_t ihp = party[u].battle.hp;
+            if(ihp <= 0) continue;
+            if(ihp < hp) hp = ihp, d.defender_id = i;
+        }
+        return;
+    }
+
+    // random target
+    uint8_t j[4];
+    uint8_t n = 0;
+    for(uint8_t u = 0; u < 4; ++u)
+        if(party[u].battle.hp > 0) j[n++] = u;
+    d.defender_id = j[u8rand(n)];
 }
 
 static void battle_next_turn()
@@ -233,7 +259,7 @@ static void battle_next_turn()
     }
     if(id < 4)
     {
-        if(d.pdef == id)
+        if(d.pdef == id && !user_is_wearing(id, SFLAG_ITEM_Defender_s_Breastplate))
             d.pdef = INVALID;
         d.phase = BPHASE_MENU;
     }
@@ -387,23 +413,29 @@ void update_battle()
         d.menuy_target = 0;
         if(btns_pressed & BTN_A)
         {
-            d.menuy_target = -33;
             if(d.msel == 0)
             {
                 d.frame = 0;
                 d.prev_phase = BPHASE_MENU;
                 d.next_phase = BPHASE_ATTACK1;
+                if(d.edef != INVALID) d.esel = d.edef;
                 d.phase = BPHASE_ESEL;
             }
             else if(d.msel == 1)
             {
-                d.phase = BPHASE_DEFEND;
+                if(d.pdef != d.attacker_id)
+                    d.phase = BPHASE_DEFEND;
             }
             else
             {
                 d.next_phase = BPHASE_OUTRO;
                 d.phase = BPHASE_DELAY;
                 d.frame = -32;
+            }
+            if(d.phase != BPHASE_MENU)
+            {
+                d.menuy_target = -33;
+                d.msel = 0;
             }
         }
         if(btns_pressed & BTN_DOWN && ++d.msel == 3) d.msel = 0;
@@ -417,6 +449,7 @@ void update_battle()
         if(btns_pressed & BTN_LEFT) esel &= ~2;
         if(btns_pressed & BTN_RIGHT) esel |= 2;
         if(btns_pressed & BTN_B) d.phase = d.prev_phase;
+        if(d.edef != INVALID) esel = d.edef;
         auto const& e = d.enemies[esel - 4];
         if(e.id != INVALID && e.hp > 0) d.esel = esel;
         if((btns_pressed & BTN_A) && d.enemies[d.esel - 4].id != INVALID)
@@ -474,7 +507,10 @@ void update_battle()
     } 
     case BPHASE_ATTACK3:
     {
-        move_sprite_to_base(d.attacker_id);
+        if(d.attacker_id == d.pdef)
+            move_sprite(d.attacker_id, DEFEND_X1, DEFEND_Y);
+        else
+            move_sprite_to_base(d.attacker_id);
         d.phase = BPHASE_SPRITES;
         d.next_phase = BPHASE_NEXT;
         break;
@@ -488,7 +524,7 @@ void update_battle()
         else
             tx = DEFEND_X2, di = d.edef, d.edef = d.attacker_id;
         move_sprite(d.attacker_id, tx, DEFEND_Y);
-        if(di != INVALID)
+        if(di != INVALID && di != d.attacker_id)
             move_sprite_to_base(di);
         d.phase = BPHASE_SPRITES;
         d.next_phase = BPHASE_NEXT;
@@ -521,7 +557,7 @@ static void draw_battle_background()
             draw_tile(c * 16, r * 16, pgm_read_byte(&TS[t & 3]), n);
     auto const& d = sdata.battle;
     // sleeping sprites
-    for(uint8_t i = 0; i < 4; ++i)
+    for(uint8_t i = 0; i < nparty; ++i)
     {
         auto const& s = d.sprites[i];
         if(s.damaged > 0 || member(i).hp > 0) continue;

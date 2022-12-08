@@ -286,6 +286,8 @@ struct enemy_info_t
     uint8_t def;
     uint8_t spd;
     uint8_t mhp;
+    uint8_t defend;         // chance to defend
+    uint8_t target_weakest; // chance to target lowest hp party member
     char const* name;
 };
 extern enemy_info_t const ENEMY_INFO[] PROGMEM;

@@ -9,8 +9,8 @@ static char const EN_DARK_WIZARD[] PROGMEM = "Dark Wizard";
 
 enemy_info_t const ENEMY_INFO[] PROGMEM =
 {
-    { 1, 4, 0, 10, 10, EN_DARK_GUARD },
-    { 2, 4, 0, 10, 10, EN_DARK_WIZARD },
+    { 1, 4, 0, 10, 10,  64, 128, EN_DARK_GUARD },
+    { 2, 4, 0, 10, 10,   0, 255, EN_DARK_WIZARD },
 };
 
 static char const PN_MATTHIAS[] PROGMEM = "Matthias";

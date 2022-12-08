@@ -7,3 +7,4 @@ Att,Def,Spd,MHP,Type,Name,Description
 ,,,,amulet,Amulet of Zhar-Tul,The wearer may attack twice per turn.
 ,,5,,ring,Tempus Ring,It hums and vibrates unnaturally. +5 speed.
 ,,,,ring,Strange Ring,What does it do?
+,4,,,armor,Defender’s Breastplate,+4 defense. The wearer does not stop defending at start of turn.

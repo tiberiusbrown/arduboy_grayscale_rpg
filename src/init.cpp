@@ -22,6 +22,8 @@ void new_game()
     for(uint8_t n = 0; n < 4; ++n)
         for(auto& i : party[n].equipped_items)
             i = INVALID_ITEM;
+
+    story_flag_set(SFLAG_ITEM_Defender_s_Breastplate);
 }
 
 void initialize()

@@ -100,8 +100,8 @@ static bool run_chunk()
                 enemy.hp = pgm_read_byte(&ENEMY_INFO[id].mhp);
             }
             sdata.battle.phase = BPHASE_ALERT;
-            sdata.battle.pdef = sdata.battle.edef = -1;
-            sdata.battle.defender_id = -1;
+            sdata.battle.pdef = sdata.battle.edef = INVALID;
+            sdata.battle.defender_id = INVALID;
             sdata.battle.flag = f;
             //for(auto& p : party)
             //    p.battle.ap = 0;
