@@ -25,17 +25,15 @@ void foreach_next_helper(
     } while(0)
 #define ROTA_FOREACH_ITEM(i__, body__) \
     ROTA_FOREACH_ITEM_EX_(i__, body__, story_flags)
-#define ROTA_FOREACH_USER_ITEM(user__, i__, body__) \
-    ROTA_FOREACH_ITEM_EX_(i__, body__, party[user].equipped_items)
 
 static int8_t items_stat(uint8_t user, uint8_t offset)
 {
     int8_t const* ptr = (int8_t const*)ITEM_INFO + offset;
     int16_t total = 0;
 
-    ROTA_FOREACH_USER_ITEM(user, i, {
-        total += (int8_t)pgm_read_byte(ptr + sizeof(item_info_t) * i);
-    });
+    for(auto i : party[user].equipped_items)
+        if(i != INVALID_ITEM)
+            total += (int8_t)pgm_read_byte(ptr + sizeof(item_info_t) * i);
 
     if(total < -99) total = -99;
     if(total > +99) total = +99;
@@ -55,45 +53,26 @@ uint8_t item_cat(item_t i)
 
 bool user_is_wearing(uint8_t user, item_t i)
 {
-    uint8_t index = i >> 3;
-    uint8_t mask = bitmask(i);
-    return (party[user].equipped_items[index] & mask) != 0;
-}
-
-void unequip_item_basic(uint8_t user, item_t i)
-{
-    uint8_t index = i >> 3;
-    uint8_t mask = bitmask(i);
-    party[user].equipped_items[index] &= ~mask;
-}
-
-void equip_item_basic(uint8_t user, item_t i)
-{
-    uint8_t index = i >> 3;
-    uint8_t mask = bitmask(i);
-    party[user].equipped_items[index] |= mask;
+    uint8_t cat = item_cat(i);
+    return party[user].equipped_items[cat] == i;
 }
 
 void toggle_item(uint8_t user, item_t i)
 {
-    uint8_t index = i >> 3;
-    uint8_t mask = bitmask(i);
-    uint8_t& byte = party[user].equipped_items[index];
-    bool equip = (byte & mask) == 0;
-    for(uint8_t u = 0; u < 4; ++u)
-        party[u].equipped_items[index] &= ~mask;
-    if(equip)
+    uint8_t cat = item_cat(i);
+    item_t& eq = party[user].equipped_items[cat];
+    bool equipped = (eq == i);
+    if(equipped)
+        eq = INVALID_ITEM;
+    else
     {
-        uint8_t cat = item_cat(i);
-        if(uint8_t(cat - 1) < 5)
+        for(uint8_t u = 0; u < 4; ++u)
         {
-            // remove other items of the same category
-            ROTA_FOREACH_USER_ITEM(user, j, {
-                if(item_cat(j) == cat)
-                    unequip_item_basic(user, j);
-            });
+            auto& ueq = party[u].equipped_items[cat];
+            if(ueq == i)
+                ueq = INVALID_ITEM;
         }
-        byte |= mask;
+        eq = i;
     }
     party_clip_hp();
 }
@@ -130,7 +109,7 @@ void update_items(sdata_items& d)
             do
             {
                 d.off = d.n = 0;
-                if(d.cat-- == 0) d.cat = 6;
+                if(d.cat-- == 0) d.cat = IT_NUM_CATS - 1;
             } while(d.cat_nums[d.cat] == 0);
         }
         if(btns_pressed & BTN_RIGHT)
@@ -138,7 +117,7 @@ void update_items(sdata_items& d)
             do
             {
                 d.off = d.n = 0;
-                if(d.cat++ == 6) d.cat = 0;
+                if(d.cat++ == IT_NUM_CATS - 1) d.cat = 0;
             } while(d.cat_nums[d.cat] == 0);
         }
     }
@@ -179,18 +158,12 @@ static inline void render_item_row(
     platform_fx_read_data_bytes(
         ITEM_STRINGS + ITEM_TOTAL_LEN * i, d.str, num);
     draw_text_noclip(x + 2, rowy + 1, d.str);
-    // find if a user who has equipped the item
     if(cat != IT_CONSUMABLE)
     {
-        uint8_t user = INVALID;
-        for(uint8_t u = 0; u < nparty; ++u)
+        // find if there is a user who has the item equipped
+        for(uint8_t user = 0; user < nparty; ++user)
         {
-            uint8_t byte = party[u].equipped_items[i >> 3];
-            uint8_t mask = bitmask((uint8_t)i);
-            if(byte & mask) user = u;
-        }
-        if(user != INVALID)
-        {
+            if(!user_is_wearing(user, i)) continue;
             char const* name = pgmptr(&PARTY_INFO[party[user].battle.id].name);
             uint8_t w = text_width_prog(name);
             draw_text_noclip(x + 127 - w, rowy + 1, name, NOCLIPFLAG_PROG);

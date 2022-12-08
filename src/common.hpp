@@ -201,7 +201,16 @@ struct sdata_tp
 };
 
 enum {
-    IT_CONSUMABLE, IT_HAT, IT_ARMOR, IT_SHOES, IT_WEAPON, IT_SHIELD, IT_OTHER,
+    IT_WEAPON,
+    IT_SHIELD,
+    IT_ARMOR,
+    IT_HAT,
+    IT_SHOES,
+    IT_RING,
+    IT_AMULET,
+    
+    IT_CONSUMABLE,
+    IT_NUM_CATS
 };
 struct item_info_t
 {
@@ -222,7 +231,7 @@ struct sdata_items
     uint8_t n;           // offset selected
     uint8_t off;         // list offset
     uint8_t cat;         // current category
-    uint8_t cat_nums[7]; // number of items in each category
+    uint8_t cat_nums[IT_NUM_CATS]; // number of items in each category
     item_t  item_count;  // total number of items
     bool equipped;       // whether we are viewing equipped or all
     char str[ITEM_TOTAL_LEN];
@@ -418,8 +427,7 @@ enum
 struct party_member_t
 {
     battle_member_t battle;
-    // equipped items (bitset)
-    uint8_t equipped_items[ITEM_BYTES];
+    item_t equipped_items[IT_NUM_CATS - 1];
 };
 
 struct savefile_t
@@ -587,8 +595,6 @@ int8_t items_mhp(uint8_t user);
 void update_items_numcat(sdata_items& d);
 void update_items(sdata_items& d);
 void render_items(int16_t y, sdata_items& d);
-void unequip_item_basic(uint8_t user, item_t i);
-void equip_item_basic(uint8_t user, item_t i);
 void toggle_item(uint8_t user, item_t i);
 
 // init.cpp

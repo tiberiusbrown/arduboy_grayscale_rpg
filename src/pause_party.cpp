@@ -33,6 +33,7 @@ void update_pause_party()
         else if(btns_pressed & BTN_A)
         {
             update_items_numcat(d.items);
+            d.items.cat = IT_CONSUMABLE;
             d.showing_items = true;
             d.items.user_index = d.partyi;
         }

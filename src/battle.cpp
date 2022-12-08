@@ -439,21 +439,40 @@ void update_battle()
         break;
     }
     case BPHASE_ATTACK2:
+    {
         // TODO: attack/damage animation
         // just delay for now
         d.frame = -20;
         d.phase = BPHASE_DELAY;
         d.next_phase = BPHASE_ATTACK3;
-        take_damage(d.defender_id, (int8_t)calc_damage(d.attacker_id, d.defender_id));
+        uint8_t dam = calc_damage(d.attacker_id, d.defender_id);
+        take_damage(d.defender_id, (int8_t)dam);
+
+        // Dismas innate: 50% chance to strike back when defending
         if(d.pdef == d.defender_id &&
             party[d.defender_id].battle.id == 3 &&
             (u8rand() & 1))
         {
-            // Dismas innate: 50% chance to strike back when defending
             take_damage(d.attacker_id,
                 (int8_t)calc_damage(d.defender_id, d.attacker_id));
         }
+
+        // Catherine innate: after attacking, heal a wounded ally for 50% damage
+        if(party[d.attacker_id].battle.id == 1)
+        {
+            uint8_t ally = 0;
+            uint8_t hp = 0;
+            for(uint8_t i = 1; i < nparty; ++i)
+            {
+                uint8_t uhp = party_mhp(i) - party[i].battle.hp;
+                if(uhp > hp)
+                    ally = i, hp = uhp;
+            }
+            take_damage(ally, -int8_t((dam + 1) >> 1));
+        }
+
         break;
+    } 
     case BPHASE_ATTACK3:
     {
         move_sprite_to_base(d.attacker_id);
