@@ -100,6 +100,7 @@ for obj in tm.layers[2]:
     epaths[chunk][obj.name] = [len(tiles)] + tiles
 
 # assemble all script objects
+script_assembler.init()
 for obj in tm.layers[1]:
     x = int(obj.x)
     y = int(obj.y)

@@ -465,7 +465,7 @@ bool check_solid(uint16_t tx, uint16_t ty)
     {
         uint8_t ex = e.x;
         uint8_t ey = e.y;
-        if((uint8_t(ctx - ex) | uint8_t(cty - ey)) < 16)
+        if(uint8_t(ctx - ex) < 16 && uint8_t(cty - ey - 5) < 11)
             return true;
     }
     return false;

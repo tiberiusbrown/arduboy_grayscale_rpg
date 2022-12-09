@@ -137,7 +137,7 @@
   <object id="58" x="138" y="143" width="12" height="14">
    <properties>
     <property name="script">brne end
-ebat !guard 0 0 0 1
+ebat !guard E_Dark_Guard E_Dark_Guard E_Dark_Wizard E_Dark_Wizard
 end:</property>
    </properties>
   </object>
@@ -157,23 +157,23 @@ end:</property>
   <object id="65" x="89.3333" y="234" width="12" height="14">
    <properties>
     <property name="script">brns end
-dlg 2 {Hi there!}
+dlg P_Lucy {Hi there!}
 end:</property>
    </properties>
   </object>
   <object id="66" x="202" y="231.667" width="12" height="14">
    <properties>
     <property name="script">brns end
-dlg 1 {Hey! Can I join you?|
+dlg P_Catherine {Hey! Can I join you?|
 Sure!
 Not right now...}
 brz r1 no
-dlg 1 {Yay! How exciting!}
+dlg P_Catherine {Yay! How exciting!}
 fs !Catherine
 pa 1
 jmp end
 no:
-dlg 1 {Some other time, then. Come back when you're ready for me to join you!}
+dlg P_Catherine {Some other time, then. Come back when you're ready for me to join you!}
 end:</property>
    </properties>
   </object>

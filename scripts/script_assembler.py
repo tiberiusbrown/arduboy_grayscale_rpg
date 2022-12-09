@@ -3,6 +3,27 @@ import sys
 import csv
 from font import wrap
 
+portraits = {}
+sprites = {}
+enemies = {}
+
+def id_helper(x):
+    return re.sub('[^a-zA-Z]+', '_', x)
+
+def init():
+    with open('portraits.csv', newline='') as f:
+        reader = csv.reader(f, delimiter=',', quotechar='"')
+        for row in reader:
+            portraits['P_' + id_helper(row[1])] = int(row[0])
+    with open('sprites.csv', newline='') as f:
+        reader = csv.reader(f, delimiter=',', quotechar='"')
+        for row in reader:
+            sprites['S_' + id_helper(row[1])] = int(row[0])
+    with open('enemies.csv', newline='') as f:
+        reader = csv.reader(f, delimiter=',', quotechar='"')
+        for row in reader:
+            enemies['E_' + id_helper(row[1])] = int(row[0])
+
 strings = []
 flags = {}
 
@@ -123,6 +144,27 @@ def addpath(b, s, eps):
         sys.exit(1)
     b += eps[s]
 
+def addsprite(b, s):
+    if s not in sprites:
+        print('Sprite not found: "%s"' % s)
+        print('Sprites: ', sprites)
+        sys.exit(1)
+    b.append(sprites[s])
+
+def addportrait(b, s):
+    if s not in portraits:
+        print('Portrait not found: "%s"' % s)
+        print('Portraits: ', portraits)
+        sys.exit(1)
+    b.append(portraits[s])
+
+def addenemy(b, s):
+    if s not in enemies:
+        print('Enemy not found: "%s"' % s)
+        print('Enemies: ', enemies)
+        sys.exit(1)
+    b.append(enemies[s])
+
 def etype(s):
     if s == '-': return 255
     return int(s)
@@ -147,30 +189,40 @@ def assemble(s, eps):
             
         elif s[i] == 'dlg':
             b.append(CMD.DLG); i += 1
-            b.append(int(s[i])); i += 1
+            addportrait(b, s[i]); i += 1
+            #b.append(int(s[i])); i += 1
             addstring(b, s[i]); i += 1
             
         elif s[i] == 'tdlg':
             b.append(CMD.TDLG); i += 1
             b.append(int(s[i])); i += 1
-            b.append(int(s[i])); i += 1
+            addportrait(b, s[i]); i += 1
+            #b.append(int(s[i])); i += 1
             addstring(b, s[i]); i += 1
             
         elif s[i] == 'bat':
             b.append(CMD.BAT); i += 1
             addflag(b, s[i]); i += 1
-            b.append(etype(s[i])); i += 1
-            b.append(etype(s[i])); i += 1
-            b.append(etype(s[i])); i += 1
-            b.append(etype(s[i])); i += 1
+            addenemy(b, s[i]); i += 1
+            addenemy(b, s[i]); i += 1
+            addenemy(b, s[i]); i += 1
+            addenemy(b, s[i]); i += 1
+            #b.append(etype(s[i])); i += 1
+            #b.append(etype(s[i])); i += 1
+            #b.append(etype(s[i])); i += 1
+            #b.append(etype(s[i])); i += 1
             
         elif s[i] == 'ebat':
             b.append(CMD.EBAT); i += 1
             addflag(b, s[i]); i += 1
-            b.append(etype(s[i])); i += 1
-            b.append(etype(s[i])); i += 1
-            b.append(etype(s[i])); i += 1
-            b.append(etype(s[i])); i += 1
+            addenemy(b, s[i]); i += 1
+            addenemy(b, s[i]); i += 1
+            addenemy(b, s[i]); i += 1
+            addenemy(b, s[i]); i += 1
+            #b.append(etype(s[i])); i += 1
+            #b.append(etype(s[i])); i += 1
+            #b.append(etype(s[i])); i += 1
+            #b.append(etype(s[i])); i += 1
             
         elif s[i] == 'tp':
             b.append(CMD.TP); i += 1
@@ -216,13 +268,15 @@ def assemble(s, eps):
             
         elif s[i] == 'ep':
             b.append(CMD.EP); i += 1
-            b.append(int(s[i])); i += 1
+            addsprite(b, s[i]); i += 1
+            #b.append(int(s[i])); i += 1
             addpath(b, s[i], eps); i += 1
             
         elif s[i] == 'epf':
             b.append(CMD.EPF); i += 1
             addflag(b, s[i]); i += 1
-            b.append(int(s[i])); i += 1
+            addsprite(b, s[i]); i += 1
+            #b.append(int(s[i])); i += 1
             addpath(b, s[i], eps); i += 1
             
         elif s[i] == 'st':

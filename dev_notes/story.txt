@@ -1,0 +1,13 @@
+Start with Matthias in a clearing with no exit. There is a strange figure. Talk to him.
+    Figure: Very soon will your path become known, Matthias..
+Talk to him again:
+    Figure: The time for the Return of the Ardu has come.
+The strange figure is gone now. An exit in the clearing is now open. Go through it.
+A warror is patrolling. Walk into him.
+    Warrior: What? The Ardu boy! And yet to achieve full potential. Die now!
+Teleport to the Matthias's home in his bed.
+    Mother: Matthias! I heard you cry out. Was it another of those dreams?
+    Matthias: I... I think so. But this one was different, mother. The figure... he spoke to me. Something about my path and... he said something about the "Ardu".
+    Mother: The... Ardu?
+    Mother: Are you sure?
+    Mother: I mean... it was just a dream, dear son. Come along, the morning's getting on. I need you to go to market and get some fish for tonight from Old Charlie. A walk in the fresh air will ease your mind.
