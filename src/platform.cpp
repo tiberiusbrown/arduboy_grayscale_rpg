@@ -429,17 +429,31 @@ bool platform_audio_enabled()
 
 void platform_audio_play_song(uint8_t const* song)
 {
-    atm_synth_start_score(song);
+    if(savefile.sound & 2)
+        atm_synth_start_score(song);
 }
 
 void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot)
 {
-    atm_synth_play_sfx_track(slot, slot, sfx);
+    if(savefile.sound & 1)
+        atm_synth_play_sfx_track(slot, slot, sfx);
+}
+
+void platform_audio_update()
+{
+    atm_synth_set_score_paused((savefile.sound & 2) == 0);
+    if((savefile.sound != 0) != platform_audio_enabled())
+        platform_audio_toggle();
 }
 
 #else
 
 static bool audio_enabled;
+void platform_audio_update()
+{
+    if((savefile.sound != 0) != platform_audio_enabled())
+        platform_audio_toggle();
+}
 void platform_audio_init() {}
 void platform_audio_on() { audio_enabled = true; }
 void platform_audio_off() { audio_enabled = false; }

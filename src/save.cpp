@@ -67,6 +67,7 @@ bool save_done()
 
 void load(bool first)
 {
+    uint8_t sound = savefile.sound;
     uint8_t brightness = savefile.brightness;
     uint8_t battery = savefile.no_battery_alert;
 
@@ -79,6 +80,7 @@ void load(bool first)
     {
         memset(&savefile, 0, sizeof(savefile));
         new_game();
+        savefile.sound = 3;
         savefile.brightness = 3;
     }
 
@@ -86,10 +88,13 @@ void load(bool first)
     {
 #ifdef ARDUINO
         Arduboy2Audio::begin();
+        if(!Arduboy2Audio::enabled())
+            savefile.sound = 0;
 #endif
     }
     else
     {
+        savefile.sound = sound;
         savefile.brightness = brightness;
         savefile.no_battery_alert = battery;
     }

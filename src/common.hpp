@@ -248,6 +248,8 @@ struct sdata_pause
     uint8_t optionsy;
     uint8_t optionsi;
     uint8_t optionsiy;
+    uint8_t soundx;
+    uint8_t soundxt;
     uint8_t brightnessx;
 
     uint8_t quity;
@@ -443,6 +445,7 @@ struct savefile_t
     uint8_t nparty;
     party_member_t party[4];
     uint8_t story_flags[STORY_FLAG_BYTES];
+    uint8_t sound;
     uint8_t brightness;
     bool no_battery_alert;
     int8_t chunk_regs[8+ NUM_CONSUMABLE_ITEM_TYPES];
@@ -537,6 +540,7 @@ void platform_audio_init();
 void platform_audio_on();
 void platform_audio_off();
 void platform_audio_toggle();
+void platform_audio_update(); // update on/off from savefile.sound
 bool platform_audio_enabled();
 void platform_audio_play_song(uint8_t const* song);
 void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot);
