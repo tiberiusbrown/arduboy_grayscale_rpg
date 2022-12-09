@@ -21,6 +21,14 @@ static uint8_t const BATTLE_POS[] PROGMEM =
     94, 20, 94, 45, 111, 12, 111, 34,
 };
 
+static uint8_t calc_hp_bar_width(uint8_t hp, uint8_t mhp)
+{
+    uint8_t f = ((uint8_t(hp) * HP_BAR_WIDTH + mhp / 2) / mhp);
+    if(f == 0 && hp > 0)
+        f = 1;
+    return f;
+}
+
 static void move_sprite(uint8_t i, uint8_t x, uint8_t y)
 {
     auto& d = sdata.battle;
@@ -124,16 +132,11 @@ static void init_sprites()
         if(id == INVALID) continue;
         auto& s = d.sprites[i];
         s.active = true;
-        s.x = pgm_read_byte(&BATTLE_POS[i * 2 + 0]);
-        s.y = pgm_read_byte(&BATTLE_POS[i * 2 + 1]);
+        s.hp = s.hpt = calc_hp_bar_width(member(i).hp, get_mhp(i));
+        s.bx = s.tx = s.x = pgm_read_byte(&BATTLE_POS[i * 2 + 0]);
+        s.by = s.ty = s.y = pgm_read_byte(&BATTLE_POS[i * 2 + 1]);
         s.frame_base = pgm_read_byte(i < 4 ?
             &PARTY_INFO[id].sprite : &ENEMY_INFO[id].sprite) * 16;
-    }
-    for(auto& s : d.sprites)
-    {
-        s.bx = s.tx = s.x;
-        s.by = s.ty = s.y;
-        s.hp = s.hpt = HP_BAR_WIDTH;
     }
 }
 
@@ -166,10 +169,7 @@ static void take_damage(uint8_t i, int8_t dam)
     if(new_hp < 0) new_hp = 0;
     if(new_hp > mhp) new_hp = mhp;
     hp = new_hp;
-    uint8_t f = ((uint8_t(new_hp) * HP_BAR_WIDTH + mhp / 2) / mhp);
-    if(f == 0 && new_hp > 0)
-        f = 1;
-    s.hpt = f;
+    s.hpt = calc_hp_bar_width(hp, mhp);
     if(dam > 0)
         s.damaged = DAMAGED_FRAMES;
 }

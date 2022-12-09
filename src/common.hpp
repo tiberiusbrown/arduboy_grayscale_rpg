@@ -248,8 +248,6 @@ struct sdata_pause
     uint8_t optionsy;
     uint8_t optionsi;
     uint8_t optionsiy;
-    uint8_t soundx;
-    uint8_t soundxt;
     uint8_t brightnessx;
 
     uint8_t quity;

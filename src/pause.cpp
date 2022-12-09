@@ -51,29 +51,21 @@ void update_pause()
                 d.state = OS_MENU;
             else if((btns_pressed & BTN_UP) && optionsi-- == 0)
                 optionsi = 2;
-            else if((btns_pressed & BTN_DOWN) && optionsi++ == 2)
+            else if((btns_pressed & BTN_DOWN) && optionsi++ == 3)
                 optionsi = 0;
             else if(btns_pressed & (BTN_A | BTN_LEFT | BTN_RIGHT))
             {
                 if(optionsi == 0)
                 {
-                    if(savefile.sound < 3 && (btns_pressed & (BTN_A | BTN_RIGHT)))
-                    {
-                        ++savefile.sound;
-                        d.soundx = 27;
-                        d.soundxt = 0;
-                    }
-                    if(savefile.sound > 0 && (btns_pressed & BTN_LEFT))
-                    {
-                        --savefile.sound;
-                        d.soundx = 0;
-                        d.soundxt = 27;
-                    }
+                    savefile.sound ^= 2;
+                    platform_audio_update();
+                }
+                else if(optionsi == 1)
+                {
+                    savefile.sound ^= 1;
                     platform_audio_update();
                 }
                 else if(optionsi == 2)
-                    savefile.no_battery_alert = !savefile.no_battery_alert;
-                else if(optionsi == 1)
                 {
                     if(savefile.brightness < 3 && (btns_pressed & (BTN_A | BTN_RIGHT)))
                         ++savefile.brightness;
@@ -81,6 +73,8 @@ void update_pause()
                         --savefile.brightness;
                     platform_fade(15);
                 }
+                else if(optionsi == 3)
+                    savefile.no_battery_alert = !savefile.no_battery_alert;
             }
             d.optionsi = optionsi;
         }
@@ -191,7 +185,7 @@ void update_pause()
         adjust(d.bx, bx);
     }
     {
-        uint8_t ty = d.optionsi * 16 + 17;
+        uint8_t ty = d.optionsi * 11 + 18;
         if(d.optionsiy == 0) d.optionsiy = ty;
         adjust(d.optionsiy, ty);
     }
@@ -205,7 +199,6 @@ void update_pause()
         if(d.brightnessx == 0) d.brightnessx = tx;
         adjust(d.brightnessx, tx);
     }
-    adjust(d.soundx, d.soundxt);
     d.ally = d.optionsy | d.quity | d.savey | d.partyy;
 }
 
@@ -225,40 +218,16 @@ void render_pause()
     {
         int16_t y = 64 - d.optionsy;
         platform_fx_drawoverwrite(0, y, OPTIONS_IMG, 0);
-        platform_fillrect(64, y + 16, 64, 16, BLACK);
-        platform_fx_drawoverwrite(0, y + 32, OPTIONS_BOTTOM_IMG, 0);
-        platform_fx_drawoverwrite(d.brightnessx, y + 33, SLIDER_IMG, 0);
+        platform_fx_drawoverwrite(d.brightnessx, y + 40, SLIDER_IMG, 0);
 
-        uint8_t sound = savefile.sound;
-        if(d.soundx < d.soundxt)
-        {
-            platform_fx_drawoverwrite(84 - 27 + d.soundx, y + 20, OPTIONS_SOUND_OPTS_IMG, sound);
-            platform_fx_drawoverwrite(84 + d.soundx, y + 20, OPTIONS_SOUND_OPTS_IMG, sound + 1);
-        }
-        else if(d.soundx > d.soundxt)
-        {
-            platform_fx_drawoverwrite(84 + d.soundx, y + 20, OPTIONS_SOUND_OPTS_IMG, sound);
-            platform_fx_drawoverwrite(84 - 27 + d.soundx, y + 20, OPTIONS_SOUND_OPTS_IMG, sound - 1);
-        }
-        else
-        {
-            platform_fx_drawoverwrite(84, y + 20, OPTIONS_SOUND_OPTS_IMG, sound);
-        }
-        platform_fx_drawoverwrite(0, y + 16, OPTIONS_SOUND_IMG, 0);
-        platform_fillrect(124, y + 16, 4, 16, BLACK);
-        //if(platform_audio_enabled())
-        //    platform_fx_drawoverwrite(71, y + 20, CHECK_IMG, 0);
-        if(d.optionsi == 0)
-        {
-            if(savefile.sound > 0)
-                platform_fx_drawoverwrite(70, y + 20, ARROWS_IMG, 0);
-            if(savefile.sound < 3)
-                platform_fx_drawoverwrite(116, y + 20, ARROWS_IMG, 1);
-        }
+        if(savefile.sound & 2)
+            platform_fx_drawoverwrite(71, y + 20, CHECK_IMG, 0);
+        if(savefile.sound & 1)
+            platform_fx_drawoverwrite(71, y + 31, CHECK_IMG, 0);
         if(!savefile.no_battery_alert)
-            platform_fx_drawoverwrite(71, y + 52, CHECK_IMG, 0);
+            platform_fx_drawoverwrite(71, y + 53, CHECK_IMG, 0);
         if(plane() == 0)
-            platform_drawrect(1, y + d.optionsiy, 126, 14, DARK_GRAY);
+            platform_drawrect(1, y + d.optionsiy, 126, 12, DARK_GRAY);
     }
     if(d.quity > 0)
     {
