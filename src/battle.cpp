@@ -209,7 +209,7 @@ static void battle_enemy_attack(uint8_t i)
         {
             uint8_t ihp = party[u].battle.hp;
             if(ihp <= 0) continue;
-            if(ihp < hp) hp = ihp, d.defender_id = i;
+            if(ihp < hp) hp = ihp, d.defender_id = u;
         }
         return;
     }

@@ -9,8 +9,8 @@ static char const EN_DARK_WIZARD[] PROGMEM = "Dark Wizard";
 
 enemy_info_t const ENEMY_INFO[] PROGMEM =
 {
-    { 1, 4, 0, 10, 10,  64, 128, EN_DARK_GUARD },
-    { 2, 4, 0, 10, 10,   0, 255, EN_DARK_WIZARD },
+    { 4, 4, 0, 4, 10,  64, 128, EN_DARK_GUARD },
+    { 5, 4, 0, 4,  6,   0, 255, EN_DARK_WIZARD },
 };
 
 static char const PN_MATTHIAS[] PROGMEM = "Matthias";
@@ -20,10 +20,10 @@ static char const PN_DISMAS[] PROGMEM = "Dismas";
 
 party_info_t const PARTY_INFO[4] PROGMEM =
 {
-    { 0, 0, 10, 20, 4, 0, 10, PN_MATTHIAS },
-    { 1, 1, 10, 10, 3, 0, 10, PN_CATHERINE },
-    { 2, 2, 10, 10, 4, 0, 10, PN_LUCY },
-    { 3, 3, 10, 10, 4, 0, 10, PN_DISMAS },
+    { 0, 0, 4, 10, 4, 0, 10, PN_MATTHIAS },
+    { 1, 1, 4, 10, 4, 0, 10, PN_CATHERINE },
+    { 2, 2, 4, 10, 4, 0, 10, PN_LUCY },
+    { 3, 3, 4, 10, 4, 0, 10, PN_DISMAS },
 };
 
 uint8_t party_att(uint8_t i)

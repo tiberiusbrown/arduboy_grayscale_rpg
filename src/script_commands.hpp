@@ -153,8 +153,7 @@ Registers:
     r5
     r6
     r7
-    r8         Number of HP potions (clamped from 0-99)
-    r9         Number of AP potions (clamped from 0-99)
+    r8+        Number of consumable items
 
 */
 

@@ -12,7 +12,7 @@
 struct atm_libstate atmlib_state;
 
 #define ATMLIB_TICKRATE_MAX (255)
-#define ATMLIB_TICKRATE_DEFAULT (25)
+#define ATMLIB_TICKRATE_DEFAULT (20)
 #define MAX_VOLUME (127)
 #define LAST_NOTE (63)
 const uint16_t noteTable[64] PROGMEM = {

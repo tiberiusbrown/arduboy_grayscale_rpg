@@ -4,7 +4,11 @@
 
 void new_game()
 {
+    uint8_t brightness = savefile.brightness;
+    bool no_battery_alert = savefile.no_battery_alert;
     memset(&savefile, 0, sizeof(savefile));
+    savefile.brightness = brightness;
+    savefile.no_battery_alert = no_battery_alert;
     px = 100;
     py = 135;
     pdir = 0;
@@ -15,13 +19,16 @@ void new_game()
         ac.cx = ac.cy = 255;
     chunks_are_running = false;
 
-    nparty = 1;
-    //party[0].battle.id = 0;
-    party[0].battle.hp = party_mhp(0);
-
     for(uint8_t n = 0; n < 4; ++n)
+    {
+        party[n].battle.id = INVALID;
         for(auto& i : party[n].equipped_items)
             i = INVALID_ITEM;
+    }
+
+    nparty = 1;
+    party[0].battle.id = 0;
+    party[0].battle.hp = party_mhp(0);
 
     story_flag_set(SFLAG_ITEM_Defender_s_Breastplate);
 }

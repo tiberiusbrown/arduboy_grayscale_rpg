@@ -324,7 +324,7 @@ static bool run_chunk()
 static void clamp_regs()
 {
     savefile.chunk_regs[0] = 0;
-    for(uint8_t i = 0; i < NUM_ITEM_TYPES; ++i)
+    for(uint8_t i = 0; i < NUM_CONSUMABLE_ITEM_TYPES; ++i)
     {
         int8_t* xp = &savefile.chunk_regs[8 + i];
         int8_t x = *xp;
@@ -465,7 +465,7 @@ bool check_solid(uint16_t tx, uint16_t ty)
     {
         uint8_t ex = e.x;
         uint8_t ey = e.y;
-        if(uint8_t(ctx - ex) < 16 && uint8_t(cty - ey - 5) < 11)
+        if(uint8_t(ctx - ex - 2) < 12 && uint8_t(cty - ey - 4) < 12)
             return true;
     }
     return false;

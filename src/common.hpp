@@ -235,7 +235,7 @@ struct sdata_items
     uint8_t cat;         // current category
     uint8_t cat_nums[IT_NUM_CATS]; // number of items in each category
     item_t  item_count;  // total number of items
-    bool equipped;       // whether we are viewing equipped or all
+    bool battle;         // whether we are in battle
     char str[ITEM_TOTAL_LEN];
 };
 struct sdata_pause
@@ -423,9 +423,9 @@ extern active_chunk_t active_chunks[4];
 
 enum
 {
-    ITEM_HP_POT,
-    ITEM_AP_POT,
-    NUM_ITEM_TYPES,
+    CIT_HEALTH_SALVE,
+    CIT_HEALTH_ELIXIR,
+    NUM_CONSUMABLE_ITEM_TYPES,
 };
 
 struct party_member_t
@@ -445,7 +445,7 @@ struct savefile_t
     uint8_t story_flags[STORY_FLAG_BYTES];
     uint8_t brightness;
     bool no_battery_alert;
-    int8_t chunk_regs[8+NUM_ITEM_TYPES];
+    int8_t chunk_regs[8+ NUM_CONSUMABLE_ITEM_TYPES];
     sprite_t chunk_sprites[4];
 };
 extern savefile_t savefile;
@@ -609,7 +609,11 @@ void new_game();
 extern "C" {
 #ifdef ARDUINO
 uint8_t const* song_victory();
+uint8_t const* song_main2();
+uint8_t const* song_main3();
 #else
 inline uint8_t const* song_victory() { return nullptr; }
+inline uint8_t const* song_main2() { return nullptr; }
+inline uint8_t const* song_main3() { return nullptr; }
 #endif
 }

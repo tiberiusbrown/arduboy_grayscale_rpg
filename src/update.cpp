@@ -16,17 +16,6 @@ void back_to_map()
         change_state(STATE_MAP);
 }
 
-bool sprite_contacts_player(active_chunk_t const& c, sprite_t const& e)
-{
-    if(!e.active) return false;
-    uint16_t ex = c.cx * 128 + e.x;
-    uint16_t ey = c.cy * 64 + e.y;
-    // TODO: make these uint8_t
-    uint16_t dx = px - ex + 12;
-    uint16_t dy = py - ey + 12;
-    return dx <= 24 && dy <= 24;
-}
-
 static inline bool rect_intersect(
     uint16_t x0, uint16_t y0, uint8_t w0, uint8_t h0,
     uint16_t x1, uint16_t y1, uint8_t w1, uint8_t h1)
@@ -38,6 +27,18 @@ static inline bool rect_intersect(
     return true;
 }
 
+bool sprite_contacts_player(active_chunk_t const& c, sprite_t const& e)
+{
+    if(!e.active) return false;
+    uint16_t ex = c.cx * 128 + e.x;
+    uint16_t ey = c.cy * 64 + e.y;
+    // sprite rect is x + 2, y + 4, 12, 12
+    // player rect is x + 4, y + 4, 8, 8
+    return rect_intersect(
+        ex - 2, ey, 20, 20,
+        px + 4, py + 4, 8, 8);
+}
+
 static inline void update_sprite(active_chunk_t& c, sprite_t& e)
 {
     if(!e.active) return;
@@ -47,28 +48,18 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
     if(e.path_num <= 1)
         return;
 
-    uint8_t prevx = e.x, prevy = e.y;
-
+    // check collision with player
     e.walking = true;
+    if(sprite_contacts_player(c, e))
+    {
+        e.walking = false;
+        return;
+    }
+
     if(e.dir < 8)
     {
         e.x += (int8_t)pgm_read_byte(&DIRX[e.dir]);
         e.y += (int8_t)pgm_read_byte(&DIRY[e.dir]);
-    }
-
-    // check collision with player
-    {
-        uint16_t ex = c.cx * 128 + e.x;
-        uint16_t ey = c.cy *  64 + e.y;
-        if(rect_intersect(
-            ex, ey, 16, 16,
-            px + 4, py + 4, 8, 8))
-        {
-            e.x = prevx;
-            e.y = prevy;
-            e.walking = false;
-            return;
-        }
     }
 
     if(--e.frames_rem == 0)
@@ -451,7 +442,11 @@ static void update_title()
         if(d.fade_frame < 24)
             d.fade_frame += FADE_SPEED;
         else if(btns_pressed & BTN_A)
-            d.fade_frame = 0, d.going_to_resume = true;
+        {
+            d.fade_frame = 0;
+            d.going_to_resume = true;
+            platform_audio_play_song(song_main3());
+        }
     }
 }
 

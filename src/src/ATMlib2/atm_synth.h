@@ -17,7 +17,7 @@ ct_assert(ATM_SFX_SLOT_COUNT <= OSC_CH_COUNT, channel_count);
 
 #define ATM_HAS_FX_NOTE_RETRIG (0)
 #define ATM_HAS_FX_SLIDE (1)
-#define ATM_HAS_FX_LFO (0)
+#define ATM_HAS_FX_LFO (1)
 #define ATM_HAS_FX_GLISSANDO (0)
 #define ATM_HAS_FX_LOOP (1)
 

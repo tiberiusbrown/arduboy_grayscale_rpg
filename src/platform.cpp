@@ -47,19 +47,19 @@ void platform_fade(uint8_t f)
     if(f > 15) f = 15;
     f *= 17;
 
-    static uint8_t const VCOM_DES[] PROGMEM = { 0x10, 0x10, 0x10, 0x20 };
+    //static uint8_t const VCOM_DES[] PROGMEM = { 0x10, 0x10, 0x10, 0x20 };
 #ifdef ARDUINO
     static uint8_t const CONTRAST[] PROGMEM = { 0x20, 0x60, 0x90, 0xff };
 #else
     static uint8_t const CONTRAST[] PROGMEM = { 0x6f, 0x9f, 0xcf, 0xff };
 #endif
-    uint8_t vcom_des = pgm_read_byte(&VCOM_DES[savefile.brightness]);
+    //uint8_t vcom_des = pgm_read_byte(&VCOM_DES[savefile.brightness]);
     uint8_t brightness = pgm_read_byte(&CONTRAST[savefile.brightness]);
     f = (f * brightness + f) >> 8;
 
 #ifdef ARDUINO
     FX::enableOLED();
-    abg_detail::send_cmds(0xDB, vcom_des, 0x81, f);
+    abg_detail::send_cmds(/* 0xDB, vcom_des, */ 0x81, f);
     FX::disableOLED();
 #else
     fade_factor = float(f) / 255;

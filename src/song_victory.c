@@ -10,7 +10,7 @@
 #endif
 
 #ifndef DEFINE_PATTERN
-#define DEFINE_PATTERN(pattern_id, values) const uint8_t pattern_id[] = values;
+#define DEFINE_PATTERN(pattern_id, values) static const uint8_t pattern_id[] = values;
 #endif
 
 #define pattern0_data { \
@@ -52,7 +52,7 @@ DEFINE_PATTERN(pattern1_array, pattern1_data);
 }
 DEFINE_PATTERN(pattern2_array, pattern2_data);
 
-const PROGMEM struct score_data {
+static const PROGMEM struct score_data {
   uint8_t fmt;
   uint8_t num_patterns;
   uint16_t patterns_offset[3];
