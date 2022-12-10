@@ -235,6 +235,9 @@ struct sdata_items
     uint8_t cat;         // current category
     uint8_t cat_nums[IT_NUM_CATS]; // number of items in each category
     item_t  item_count;  // total number of items
+    uint8_t consw;
+    uint8_t consfill;
+    uint8_t conspause;
     bool battle;         // whether we are in battle
     char str[ITEM_TOTAL_LEN];
 };
@@ -322,6 +325,7 @@ enum battle_phase_t
     BPHASE_ATTACK2, // attack animation (damage)
     BPHASE_ATTACK3, // attack animation (return)
     BPHASE_DEFEND,  // move to defense
+    BPHASE_ITEM,    // consume an item
     BPHASE_SPRITES, // wait until sprites are done
     BPHASE_DELAY,   // delay until frame == 0 (set frame to -N)
     BPHASE_DEFEAT,
@@ -371,6 +375,7 @@ struct sdata_battle
     bool sprites_done;
 
     sdata_items items;
+    uint8_t itemsy;
 };
 struct sdata_game_over
 {
@@ -421,13 +426,6 @@ struct active_chunk_t
 // 2 3
 extern active_chunk_t active_chunks[4];
 
-enum
-{
-    CIT_HEALTH_SALVE,
-    CIT_HEALTH_ELIXIR,
-    NUM_CONSUMABLE_ITEM_TYPES,
-};
-
 struct party_member_t
 {
     battle_member_t battle;
@@ -446,7 +444,7 @@ struct savefile_t
     uint8_t sound;
     uint8_t brightness;
     bool no_battery_alert;
-    int8_t chunk_regs[8+ NUM_CONSUMABLE_ITEM_TYPES];
+    int8_t chunk_regs[8 + NUM_CONSUMABLES];
     sprite_t chunk_sprites[4];
 };
 extern savefile_t savefile;
@@ -458,6 +456,7 @@ static auto& party = savefile.party;
 static auto& nparty = savefile.nparty;
 static auto& story_flags = savefile.story_flags;
 static auto& chunk_sprites = savefile.chunk_sprites;
+constexpr auto* consumables = &savefile.chunk_regs[8];
 
 constexpr auto SIZEOF_SAVEFILE = sizeof(savefile);
 
@@ -593,13 +592,14 @@ void update_battle();
 void render_battle();
 
 // items.cpp
+void use_consumable(uint8_t user, uint8_t i);
 bool user_is_wearing(uint8_t user, item_t i);
 int8_t items_att(uint8_t user);
 int8_t items_def(uint8_t user);
 int8_t items_spd(uint8_t user);
 int8_t items_mhp(uint8_t user);
 void update_items_numcat(sdata_items& d);
-void update_items(sdata_items& d);
+bool update_items(sdata_items& d); // returns true in battle mode after consuming item
 void render_items(int16_t y, sdata_items& d);
 void toggle_item(uint8_t user, item_t i);
 

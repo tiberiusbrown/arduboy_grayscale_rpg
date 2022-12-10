@@ -21,14 +21,6 @@ static uint8_t const BATTLE_POS[] PROGMEM =
     94, 20, 94, 45, 111, 12, 111, 34,
 };
 
-static uint8_t calc_hp_bar_width(uint8_t hp, uint8_t mhp)
-{
-    uint8_t f = ((uint8_t(hp) * HP_BAR_WIDTH + mhp / 2) / mhp);
-    if(f == 0 && hp > 0)
-        f = 1;
-    return f;
-}
-
 static void move_sprite(uint8_t i, uint8_t x, uint8_t y)
 {
     auto& d = sdata.battle;
@@ -85,6 +77,24 @@ static uint8_t get_mhp(uint8_t id)
     return pgm_read_byte(&ENEMY_INFO[d.enemies[id - 4].id].mhp);
 }
 
+static uint8_t calc_hp_bar_width(uint8_t hp, uint8_t mhp)
+{
+    uint8_t f = ((uint8_t(hp) * HP_BAR_WIDTH + mhp / 2) / mhp);
+    if(f == 0 && hp > 0)
+        f = 1;
+    return f;
+}
+
+static void init_hp_bars()
+{
+    auto& d = sdata.battle;
+    for(uint8_t i = 0; i < 8; ++i)
+    {
+        auto& s = d.sprites[i];
+        s.hpt = calc_hp_bar_width(member(i).hp, get_mhp(i));
+    }
+}
+
 static void init_attack_order() {
     auto& d = sdata.battle;
     uint8_t speeds[9]; // +1 slot for amulet of Zhar-Tul double turn
@@ -132,12 +142,13 @@ static void init_sprites()
         if(id == INVALID) continue;
         auto& s = d.sprites[i];
         s.active = true;
-        s.hp = s.hpt = calc_hp_bar_width(member(i).hp, get_mhp(i));
+        s.hp = s.hpt;
         s.bx = s.tx = s.x = pgm_read_byte(&BATTLE_POS[i * 2 + 0]);
         s.by = s.ty = s.y = pgm_read_byte(&BATTLE_POS[i * 2 + 1]);
         s.frame_base = pgm_read_byte(i < 4 ?
             &PARTY_INFO[id].sprite : &ENEMY_INFO[id].sprite) * 16;
     }
+    init_hp_bars();
 }
 
 static uint8_t calc_attack_damage(uint8_t attacker, uint8_t defender)
@@ -379,7 +390,8 @@ void update_battle()
     d.msely = (d.msely + d.msel * 8) / 2;
     ++d.frame;
     //if(++d.selframe >= 7) d.selframe = 0;
-    update_battle_sprites();
+    if(d.itemsy == 0)
+        update_battle_sprites();
     switch(d.phase)
     {
     case BPHASE_ALERT:
@@ -428,11 +440,12 @@ void update_battle()
             }
             else
             {
-                d.next_phase = BPHASE_OUTRO;
-                d.phase = BPHASE_DELAY;
-                d.frame = -32;
+                update_items_numcat(d.items);
+                d.items.cat = IT_CONSUMABLE;
+                d.items.battle = true;
+                d.phase = BPHASE_ITEM;
             }
-            if(d.phase != BPHASE_MENU)
+            if(d.msel != BPHASE_MENU)
             {
                 d.menuy_target = -33;
                 d.msel = 0;
@@ -530,6 +543,19 @@ void update_battle()
         d.next_phase = BPHASE_NEXT;
         break;
     }
+    case BPHASE_ITEM:
+        if(btns_pressed & BTN_B)
+            d.phase = BPHASE_MENU, d.msel = 2;
+        if(d.itemsy == 64)
+        {
+            bool consumed = update_items(d.items);
+            if(consumed)
+            {
+                init_hp_bars();
+                battle_next_turn();
+            }
+        }
+        break;
     case BPHASE_SPRITES:
         if(d.sprites_done)
             d.phase = d.next_phase;
@@ -547,6 +573,7 @@ void update_battle()
         break;
     default: break;
     }
+    adjust(d.itemsy, d.phase == BPHASE_ITEM ? 64 : 0);
 }
 
 static void draw_battle_background()
@@ -634,7 +661,12 @@ static void draw_battle_sprites()
 
 void render_battle()
 {
-    auto const& d = sdata.battle;
+    auto& d = sdata.battle;
+    if(d.itemsy == 64)
+    {
+        render_items(0, d.items);
+        return;
+    }
     uint8_t phase = d.phase;
     if(phase == BPHASE_ALERT)
     {
@@ -693,5 +725,11 @@ void render_battle()
         uint8_t fade_frame = uint8_t(-d.frame) * FADE_SPEED;
         if(fade_frame < 16)
             platform_fade(fade_frame);
+    }
+    if(d.itemsy > 0)
+    {
+        int16_t y = 64 - d.itemsy;
+        platform_fillrect(0, y, 128, 64, BLACK);
+        render_items(y, d.items);
     }
 }

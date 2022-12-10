@@ -80,8 +80,12 @@ void toggle_item(uint8_t user, item_t i)
 void update_items_numcat(sdata_items& d)
 {
     for(auto& n : d.cat_nums) n = 0;
-    d.cat_nums[IT_CONSUMABLE] = 1;
+    d.cat_nums[IT_CONSUMABLE] = NUM_CONSUMABLES;
     d.item_count = 0;
+
+    // restrict access to equippable items in battle
+    if(d.battle)
+        return;
 
     ROTA_FOREACH_ITEM(i, {
         ++d.cat_nums[item_cat(i)];
@@ -100,12 +104,24 @@ static item_t selected_item(sdata_items const& d)
     return INVALID_ITEM;
 }
 
-void update_items(sdata_items& d)
+static uint8_t selected_consumable(sdata_items const& d)
+{
+    uint8_t n = 0;
+    for(uint8_t ni = 0; ni < NUM_CONSUMABLES; ++ni)
+    {
+        if(consumables[ni] == 0) continue;
+        if(n == d.n) return ni;
+        ++n;
+    }
+    return INVALID_ITEM;
+}
+
+bool update_items(sdata_items& d)
 {
     if(d.x != d.xt)
     {
         adjust(d.x, d.xt);
-        return;
+        return false;
     }
 
     if(d.item_count != 0)
@@ -140,12 +156,45 @@ void update_items(sdata_items& d)
         d.off = d.n;
     if(d.off < d.n - 2)
         d.off = d.n - 2;
-    if(btns_pressed & BTN_A)
+    if((btns_pressed & BTN_A) && d.cat != IT_CONSUMABLE)
     {
         item_t selitem = selected_item(d);
         if(selitem != INVALID_ITEM)
             toggle_item(d.user_index, selitem);
     }
+    if(d.conspause > 0)
+    {
+        if(--d.conspause == 0)
+        {
+            uint8_t selitem = selected_consumable(d);
+            if(selitem != INVALID_ITEM)
+            {
+                use_consumable(d.user_index, selitem);
+                if(consumables[selitem] == 0)
+                {
+                    --d.cat_nums[IT_CONSUMABLE];
+                    if(d.n == d.cat_nums[IT_CONSUMABLE])
+                    {
+                        if(d.n != 0) --d.n;
+                    }
+                }
+            }
+            d.consfill = d.consw = 0;
+            if(d.battle) return true;
+        }
+    }
+    else if((btns_down & BTN_A) && d.cat == IT_CONSUMABLE)
+    {
+        if(d.consfill >= 128)
+            d.conspause = 16;
+        else
+            d.consfill += 8;
+    }
+    else
+        d.consfill = 0;
+
+    adjust(d.consw, d.consfill);
+    return false;
 }
 
 static inline void render_item_row(
@@ -168,20 +217,49 @@ static inline void render_item_row(
         num = ITEM_NAME_LEN;
     platform_fx_read_data_bytes(
         ITEM_STRINGS + ITEM_TOTAL_LEN * i, d.str, num);
-    draw_text_noclip(x + 2, rowy + 1, d.str);
-    if(cat != IT_CONSUMABLE)
+    // find if there is a user who has the item equipped
+    for(uint8_t user = 0; user < nparty; ++user)
     {
-        // find if there is a user who has the item equipped
-        for(uint8_t user = 0; user < nparty; ++user)
-        {
-            if(!user_is_wearing(user, i)) continue;
-            char const* name = pgmptr(&PARTY_INFO[party[user].battle.id].name);
-            uint8_t w = text_width_prog(name);
-            draw_text_noclip(x + 127 - w, rowy + 1, name, NOCLIPFLAG_PROG);
-        }
+        if(!user_is_wearing(user, i)) continue;
+        char const* name = pgmptr(&PARTY_INFO[party[user].battle.id].name);
+        uint8_t w = text_width_prog(name);
+        draw_text_noclip(x + 127 - w, rowy + 1, name, NOCLIPFLAG_PROG);
     }
+    draw_text_noclip(x + 2, rowy + 1, d.str);
     if(d.n == pn)
         draw_text_noclip(x + 2, y + 46, &d.str[ITEM_NAME_LEN]);
+}
+
+static inline void render_consumable_row(
+    int16_t x, int16_t y, sdata_items& d, int8_t n, uint8_t ni)
+{
+    int16_t rowy = y + n * 10 + 13;
+    size_t num;
+    bool selected = (d.n == d.off + n);
+    if(selected)
+    {
+        num = ITEM_TOTAL_LEN;
+        platform_drawrect(x, rowy, 128, 10, DARK_GRAY);
+    }
+    else
+        num = ITEM_NAME_LEN;
+    platform_fx_read_data_bytes(
+        ITEM_STRINGS + ITEM_TOTAL_LEN * NUM_ITEMS + ITEM_TOTAL_LEN * ni,
+        d.str, num);
+    draw_text_noclip(x + 2, rowy + 1, d.str);
+    {
+        char buf[5];
+        buf[0] = 'x';
+        dec_to_str(&buf[1], consumables[ni]);
+        uint8_t w = text_width(buf);
+        draw_text_noclip(x + 126 - w, rowy + 1, buf);
+    }
+    if(selected)
+    {
+        draw_text_noclip(x + 2, y + 46, &d.str[ITEM_NAME_LEN]);
+        if(plane() == 0)
+            platform_fillrect(x, rowy + 1, d.consw, 8, DARK_GRAY);
+    }
 }
 
 static void render_items_page(
@@ -189,10 +267,25 @@ static void render_items_page(
 {
     platform_fx_drawoverwrite(x + 33, y + 0, ITEM_CATS_IMG, cat);
 
-    uint8_t n = 0;
-    ROTA_FOREACH_ITEM(i, {
-        render_item_row(x, y, cat, d, i, n);
-    });
+    if(cat == IT_CONSUMABLE)
+    {
+        int8_t n = -d.off;
+        for(uint8_t ni = 0; ni < NUM_CONSUMABLES; ++ni)
+        {
+            if(consumables[ni] == 0) continue;
+            if(n < 0) continue;
+            if(n >= 3) break;
+            render_consumable_row(x, y, d, n, ni);
+            ++n;
+        }
+    }
+    else
+    {
+        uint8_t n = 0;
+        ROTA_FOREACH_ITEM(i, {
+            render_item_row(x, y, cat, d, i, n);
+        });
+    }
 }
 
 void render_items(int16_t y, sdata_items& d)
@@ -222,4 +315,23 @@ void render_items(int16_t y, sdata_items& d)
 
     platform_fillrect(0, y + 11, 128, 1, WHITE);
     platform_fillrect(0, y + 44, 128, 1, WHITE);
+}
+
+void use_consumable(uint8_t user, uint8_t i)
+{
+    auto& u = party[user];
+    MY_ASSERT(i < NUM_CONSUMABLES);
+    --consumables[i];
+    switch(i)
+    {
+    case CIT_Healing_Salve:
+        u.battle.hp += 10;
+        break;
+    case CIT_Elixir_of_Health:
+        u.battle.hp += 25;
+        break;
+    default:
+        break;
+    }
+    party_clip_hp();
 }

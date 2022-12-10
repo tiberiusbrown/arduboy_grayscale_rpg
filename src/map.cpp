@@ -324,7 +324,7 @@ static bool run_chunk()
 static void clamp_regs()
 {
     savefile.chunk_regs[0] = 0;
-    for(uint8_t i = 0; i < NUM_CONSUMABLE_ITEM_TYPES; ++i)
+    for(uint8_t i = 0; i < NUM_CONSUMABLES; ++i)
     {
         int8_t* xp = &savefile.chunk_regs[8 + i];
         int8_t x = *xp;

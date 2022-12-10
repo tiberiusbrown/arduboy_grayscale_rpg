@@ -32,7 +32,8 @@ void new_game()
     party[0].battle.id = 0;
     party[0].battle.hp = party_mhp(0);
 
-    story_flag_set(SFLAG_ITEM_Defender_s_Breastplate);
+    consumables[0] = 1;
+    consumables[1] = 1;
 }
 
 void initialize()
