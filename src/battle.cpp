@@ -493,13 +493,13 @@ void update_battle()
         uint8_t dam = calc_attack_damage(d.attacker_id, d.defender_id);
         take_damage(d.defender_id, (int8_t)dam);
 
-        // Dismas innate: 50% chance to strike back when defending
+        // Dismas innate: strike back at 50% damage when defending
         if(d.pdef == d.defender_id &&
-            party[d.defender_id].battle.id == 3 &&
-            (u8rand() & 1))
+            party[d.defender_id].battle.id == 3)
         {
-            take_damage(d.attacker_id,
-                (int8_t)calc_attack_damage(d.defender_id, d.attacker_id));
+            uint8_t dam = calc_attack_damage(d.defender_id, d.attacker_id);
+            dam = (dam + 1) >> 1;
+            take_damage(d.attacker_id, (int8_t)dam);
         }
 
         // Catherine innate: after attacking, heal a wounded ally for 50% damage
@@ -604,8 +604,23 @@ static void draw_battle_background()
 static void draw_selection_arrow(uint8_t x, uint8_t y)
 {
     auto const& d = sdata.battle;
-    uint8_t f = (d.frame >> 1) & 7;
-    f = (f < 4 ? f : 7 - f);
+#ifdef ARDUINO
+    uint8_t f;
+    asm volatile(
+        R"ASM(
+            lds %[f], %[frame]
+            lsr %[f]
+            andi %[f], 7
+        )ASM"
+        : [f]     "=&d" (f)
+        : [frame] ""    (&d.frame)
+        );
+#else
+    uint8_t f = d.frame;
+    f = (f >> 1) & 7;
+#endif
+    if(f >= 4) f ^= 7;
+    //f = (f < 4 ? f : 7 - f);
     platform_fx_drawplusmask(x + 4, y - 12 + f, BATTLE_ARROW_IMG, 0, 9, 8);
 }
 

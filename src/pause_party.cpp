@@ -57,7 +57,7 @@ static void render_pause_party_offset(int16_t x, int16_t y, uint8_t i)
     platform_fx_drawoverwrite(x, y + 32, INNATES_IMG, i);
 #else
     {
-        char t[] = "While defending, Dismas has a 50% chance to strike back.";
+        char t[] = "While defending, Dismas strikes his attacker at half damage.";
         wrap_text(t, 128);
         draw_text_noclip(x, y + 37, t);
     }

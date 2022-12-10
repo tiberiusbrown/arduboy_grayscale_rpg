@@ -15,7 +15,7 @@ arduino-cli.exe compile -v --log-level info ^
     -b arduboy:avr:arduboy . ^
     --output-dir "%dir%" ^
     --build-property compiler.c.elf.extra_flags="-Wl,--relax" ^
-    --build-property compiler.c.extra_flags="-mcall-prologues -mstrict-X %remove_timer0%" ^
+    --build-property compiler.c.extra_flags="-frename-registers -fno-tree-scev-cprop -mcall-prologues -mstrict-X %remove_timer0%" ^
     --build-property compiler.cpp.extra_flags="{compiler.c.extra_flags}"
 if NOT %errorlevel%==0 goto error
 
