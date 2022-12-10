@@ -211,32 +211,32 @@ void render_pause()
         render_map();
     if(d.menuy > 0)
     {
-        platform_fx_drawoverwrite(0, d.menuy - 16, PAUSE_MENU_IMG, 0);
-        platform_fillrect(d.ax, d.menuy - 5, (d.bx - d.ax + 1), 2, WHITE);
+        platform_fx_drawoverwrite(0, d.menuy - 16, PAUSE_MENU_IMG);
+        platform_fillrect_i8(d.ax, d.menuy - 5, (d.bx - d.ax + 1), 2, WHITE);
     }
     if(d.optionsy > 0)
     {
         int16_t y = 64 - d.optionsy;
-        platform_fx_drawoverwrite(0, y, OPTIONS_IMG, 0);
-        platform_fx_drawoverwrite(d.brightnessx, y + 40, SLIDER_IMG, 0);
+        platform_fx_drawoverwrite(0, y, OPTIONS_IMG);
+        platform_fx_drawoverwrite(d.brightnessx, y + 40, SLIDER_IMG);
 
         if(savefile.sound & 2)
-            platform_fx_drawoverwrite(71, y + 20, CHECK_IMG, 0);
+            platform_fx_drawoverwrite(71, y + 20, CHECK_IMG);
         if(savefile.sound & 1)
-            platform_fx_drawoverwrite(71, y + 31, CHECK_IMG, 0);
+            platform_fx_drawoverwrite(71, y + 31, CHECK_IMG);
         if(!savefile.no_battery_alert)
-            platform_fx_drawoverwrite(71, y + 53, CHECK_IMG, 0);
+            platform_fx_drawoverwrite(71, y + 53, CHECK_IMG);
         if(plane() == 0)
             platform_drawrect(1, y + d.optionsiy, 126, 12, DARK_GRAY);
     }
     if(d.quity > 0)
     {
         int16_t y = 64 - d.quity;
-        platform_fx_drawoverwrite(0, y, QUIT_IMG, 0);
+        platform_fx_drawoverwrite(0, y, QUIT_IMG);
         if(plane() == 0)
         {
             platform_drawrect(16, y + d.quitiy, 96, 12, DARK_GRAY);
-            platform_fillrect(16, y + d.quitiy, d.quitf, 12, DARK_GRAY);
+            platform_fillrect_i8(16, y + d.quitiy, d.quitf, 12, DARK_GRAY);
         }
         if(d.quitfade > 16 * FADE_SPEED)
             platform_fade(16 * FADE_SPEED + 15 - d.quitfade);
@@ -244,7 +244,7 @@ void render_pause()
     if(d.savey > 0)
     {
         int16_t y = 64 - d.savey;
-        platform_fillrect(0, y, 128, 64, BLACK);
+        platform_fillrect_i8(0, (int8_t)y, 128, 64, BLACK);
         draw_text_noclip(39, y + 28, PSTR("Saving..."), NOCLIPFLAG_PROG);
         if(d.save_wait > 0)
             draw_text_noclip(71, y + 28, PSTR("Done!"), NOCLIPFLAG_PROG);

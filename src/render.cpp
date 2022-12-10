@@ -31,10 +31,10 @@ static void render_dialog()
             uint8_t w = 128 - x;
             uint8_t f = (d.questionfillw * w + 128) >> 8;
             platform_drawrect(x - 2, d.questioniy, w + 2, 12, DARK_GRAY);
-            platform_fillrect(x - 1, d.questioniy + 1, f, 10, DARK_GRAY);
+            platform_fillrect_i8(x - 1, d.questioniy + 1, f, 10, DARK_GRAY);
         }
     }
-    platform_fillrect(0, 35, 128, 1, LIGHT_GRAY);
+    platform_fillrect_i8(0, 35, 128, 1, LIGHT_GRAY);
 
     if(portrait)
     {
@@ -48,7 +48,7 @@ static void render_dialog()
     }
     else if(d.portrait == 254)
     {
-        platform_fx_drawoverwrite(33, 16, GOT_ITEM_IMG, 0);
+        platform_fx_drawoverwrite(33, 16, GOT_ITEM_IMG);
     }
 
     c = d.message[d.char_progress];
@@ -71,10 +71,10 @@ static void render_tp()
         uint8_t h2 = 64 - h * 2;
         draw_tiles();
         draw_sprites();
-        platform_fillrect(0, 0, 128, h, BLACK);
-        platform_fillrect(0, 64 - h, 128, h, BLACK);
-        platform_fillrect(0, h, w, h2, BLACK);
-        platform_fillrect(128 - w, h, w, h2, BLACK);
+        platform_fillrect_i8(0, 0, 128, h, BLACK);
+        platform_fillrect_i8(0, 64 - h, 128, h, BLACK);
+        platform_fillrect_i8(0, h, w, h2, BLACK);
+        platform_fillrect_i8(128 - w, h, w, h2, BLACK);
     }
     draw_player();
 }
@@ -84,7 +84,7 @@ static void render_game_over()
     auto const& d = sdata.game_over;
 
     if(d.fade_frame < 8) return;
-    platform_fx_drawoverwrite(0, 0, GAME_OVER_IMG, 0);
+    platform_fx_drawoverwrite(uint8_t(0), uint8_t(0), GAME_OVER_IMG);
 
     uint8_t n = d.msg_lines;
     uint8_t y = 39 - n * 4;
@@ -123,14 +123,14 @@ static void render_title()
     {
         if(d.fade_frame < 16)
         {
-            platform_fx_drawoverwrite(0, 0, TITLE_IMG, 0);
+            platform_fx_drawoverwrite(0, 0, TITLE_IMG);
             platform_fade(15 - d.fade_frame);
         }
     }
     else
     {
         if(d.fade_frame < 8) return;
-        platform_fx_drawoverwrite(0, 0, TITLE_IMG, 0);
+        platform_fx_drawoverwrite(0, 0, TITLE_IMG);
         if(d.fade_frame < 24)
             platform_fade(d.fade_frame - 8);
     }

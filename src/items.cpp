@@ -258,7 +258,7 @@ static inline void render_consumable_row(
     {
         draw_text_noclip(x + 2, y + 46, &d.str[ITEM_NAME_LEN]);
         if(plane() == 0)
-            platform_fillrect(x, rowy + 1, d.consw, 8, DARK_GRAY);
+            platform_fillrect_i8(int8_t(x), int8_t(rowy + 1), d.consw, 8, DARK_GRAY);
     }
 }
 
@@ -307,14 +307,14 @@ void render_items(int16_t y, sdata_items& d)
 
     if(d.item_count != 0)
     {
-        platform_fillrect(0, 0, 8, 10, BLACK);
-        platform_fillrect(120, 0, 8, 10, BLACK);
-        platform_fx_drawoverwrite(0, y + 1, ARROWS_IMG, 0);
+        platform_fillrect_i8(0, 0, 8, 10, BLACK);
+        platform_fillrect_i8(120, 0, 8, 10, BLACK);
+        platform_fx_drawoverwrite(0, y + 1, ARROWS_IMG);
         platform_fx_drawoverwrite(120, y + 1, ARROWS_IMG, 1);
     }
 
-    platform_fillrect(0, y + 11, 128, 1, WHITE);
-    platform_fillrect(0, y + 44, 128, 1, WHITE);
+    platform_fillrect_i8(0, y + 11, 128, 1, WHITE);
+    platform_fillrect_i8(0, y + 44, 128, 1, WHITE);
 }
 
 void use_consumable(uint8_t user, uint8_t i)

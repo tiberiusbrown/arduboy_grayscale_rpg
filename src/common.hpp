@@ -530,11 +530,13 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h);
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame);
+void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr) FORCE_NOINLINE;
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h);
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame);
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
+void platform_fillrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c) FORCE_NOINLINE;
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_fx_erase_save_sector();
 void platform_fx_write_save_page(uint16_t page, void const* data, size_t num);

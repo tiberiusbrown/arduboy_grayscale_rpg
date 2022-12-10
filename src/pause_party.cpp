@@ -66,7 +66,7 @@ static void render_pause_party_offset(int16_t x, int16_t y, uint8_t i)
     uint8_t sprite = pgm_read_byte(&pi->sprite);
     uint8_t portrait = pgm_read_byte(&pi->portrait);
     platform_drawrect(x, y, 36, 36, LIGHT_GRAY);
-    platform_fillrect(x + 36, y + 15, 92, 1, LIGHT_GRAY);
+    platform_fillrect_i8(x + 36, y + 15, 92, 1, LIGHT_GRAY);
     platform_fx_drawoverwrite(x + 2, y + 2, PORTRAIT_IMG, portrait);
     draw_text_noclip(x + 38, y + 6, name, NOCLIPFLAG_PROG);
     {
@@ -85,7 +85,7 @@ static void render_pause_party_offset(int16_t x, int16_t y, uint8_t i)
         platform_drawrect(x + 38, y + 0, W + 2, H + 2, DARK_GRAY);
         uint8_t mhp = party_mhp(i);
         uint8_t f = (b.hp * W + mhp / 2) / mhp;
-        platform_fillrect(x + 39, y + 1, f, H, WHITE);
+        platform_fillrect_i8(x + 39, y + 1, f, H, WHITE);
     }
     draw_text_noclip(x + 44, y + 17, PSTR("Attack:"), NOCLIPFLAG_PROG);
     draw_text_noclip(x + 38, y + 26, PSTR("Defense:"), NOCLIPFLAG_PROG);
@@ -107,7 +107,7 @@ void render_pause_party()
         return;
 
     //platform_fx_drawoverwrite(0, y, PARTY_MEMBERS_IMG, 0);
-    platform_fillrect(0, y, 128, 64, BLACK);
+    platform_fillrect_i8(0, (int8_t)y, 128, 64, BLACK);
     if(d.partyx < d.partyxt)
     {
         render_pause_party_offset(d.partyx - 128, y, d.partyi);
@@ -122,11 +122,11 @@ void render_pause_party()
     {
         render_pause_party_offset(0, y, d.partyi);
     }
-    platform_fx_drawoverwrite(49, y + 55, A_ITEMS_IMG, 0);
-    platform_fillrect(0, y + 35, 128, 1, LIGHT_GRAY);
+    platform_fx_drawoverwrite(49, y + 55, A_ITEMS_IMG);
+    platform_fillrect_i8(0, y + 35, 128, 1, LIGHT_GRAY);
 
     if(d.partyi > 0)
-        platform_fx_drawoverwrite(0, y + 56, ARROWS_IMG, 0);
+        platform_fx_drawoverwrite(0, y + 56, ARROWS_IMG);
     if(d.partyi < nparty - 1)
         platform_fx_drawoverwrite(120, y + 56, ARROWS_IMG, 1);
 }

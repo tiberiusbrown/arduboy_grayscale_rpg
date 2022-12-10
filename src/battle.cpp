@@ -595,9 +595,9 @@ static void draw_battle_background()
         if(plane() > 1)
             platform_fx_drawplusmask(s.bx, s.by, SPRITES_IMG, s.frame_base, 16, 16);
     }
-    platform_fillrect(DEFEND_X1 + 1, DEFEND_Y + 7, 14, 12, WHITE);
+    platform_fillrect_i8(DEFEND_X1 + 1, DEFEND_Y + 7, 14, 12, WHITE);
     platform_drawrect(DEFEND_X1 + 3, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
-    platform_fillrect(DEFEND_X2 + 1, DEFEND_Y + 7, 14, 12, WHITE);
+    platform_fillrect_i8(DEFEND_X2 + 1, DEFEND_Y + 7, 14, 12, WHITE);
     platform_drawrect(DEFEND_X2 + 3, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
 }
 
@@ -645,9 +645,9 @@ static void draw_health(uint8_t i)
 
     uint8_t hp = s.hp, hpt = s.hpt;
     if(hpt < hp) tswap(hpt, hp);
-    platform_fillrect(x + 1 + hpt, y + 2, w - 2 - hpt, h - 2, BLACK);
-    platform_fillrect(x + 1 + hp, y + 2, hpt - hp, h - 2, LIGHT_GRAY);
-    platform_fillrect(x + 1, y + 2, hp, h - 2, WHITE);
+    platform_fillrect_i8(x + 1 + hpt, y + 2, w - 2 - hpt, h - 2, BLACK);
+    platform_fillrect_i8(x + 1 + hp, y + 2, hpt - hp, h - 2, LIGHT_GRAY);
+    platform_fillrect_i8(x + 1, y + 2, hp, h - 2, WHITE);
 }
 
 static void draw_battle_sprites()
@@ -726,7 +726,7 @@ void render_battle()
     {
         platform_fx_drawplusmask(51, menuy, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
         platform_fx_drawplusmask(74, menuy, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
-        platform_fx_drawoverwrite(48, menuy + 8, BATTLE_MENU_IMG, 0);
+        platform_fx_drawoverwrite(48, menuy + 8, BATTLE_MENU_IMG);
         draw_text_noclip(50, menuy + 9 + d.msely, PSTR("\x7f"), NOCLIPFLAG_PROG);
     }
     if(phase == BPHASE_MENU || phase == BPHASE_ESEL)
@@ -748,7 +748,7 @@ void render_battle()
     if(d.itemsy > 0)
     {
         int16_t y = 64 - d.itemsy;
-        platform_fillrect(0, y, 128, 64, BLACK);
+        platform_fillrect_i8(0, (int8_t)y, 128, 64, BLACK);
         render_items(y, d.items);
     }
 }
