@@ -561,8 +561,8 @@ void draw_text_prog(int16_t x, int16_t y, char const* str); // str in PROGMEM
 // and is much faster because of that assumption (str in RAM)
 constexpr uint8_t NOCLIPFLAG_BIGLINES = 1;
 constexpr uint8_t NOCLIPFLAG_PROG = 2;
-void draw_text_noclip(int16_t x, int16_t y, char const* str, uint8_t f = 0);
-void draw_dec(int16_t x, int16_t y, uint8_t val);
+void draw_text_noclip(int8_t x, int8_t y, char const* str, uint8_t f = 0);
+void draw_dec(int8_t x, int8_t y, uint8_t val);
 uint8_t dec_to_str(char* dst, uint8_t val);
 void wrap_text(char* str, uint8_t w); // replace ' ' with '\n' to wrap to width
 uint8_t text_width(char const* str);

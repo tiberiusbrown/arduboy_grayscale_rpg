@@ -178,7 +178,7 @@ void draw_tiles()
     draw_chunk_tiles(3, ox + 128, oy + 64);
 }
 
-void draw_text_noclip(int16_t x, int16_t y, char const* str, uint8_t f)
+void draw_text_noclip(int8_t x, int8_t y, char const* str, uint8_t f)
 {
     char t;
     uint8_t cx = (uint8_t)x;
@@ -297,7 +297,7 @@ uint8_t dec_to_str(char* dst, uint8_t val)
     return (uint8_t)(uintptr_t)(t - dst - 1);
 }
 
-void draw_dec(int16_t x, int16_t y, uint8_t val)
+void draw_dec(int8_t x, int8_t y, uint8_t val)
 {
     char b[4];
     (void)dec_to_str(b, val);
