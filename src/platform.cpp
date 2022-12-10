@@ -446,6 +446,11 @@ void platform_audio_update()
         platform_audio_toggle();
 }
 
+bool platform_audio_song_playing()
+{
+    return atm_synth_is_score_playing() != 0;
+}
+
 #else
 
 static bool audio_enabled;
@@ -460,5 +465,6 @@ void platform_audio_off() { audio_enabled = false; }
 bool platform_audio_enabled() { return audio_enabled; }
 void platform_audio_play_song(uint8_t const* song) {}
 void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot) {}
+bool platform_audio_song_playing() { return true; }
 
 #endif

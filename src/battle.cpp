@@ -579,10 +579,14 @@ void update_battle()
 static void draw_battle_background()
 {
     static constexpr uint8_t TS[] PROGMEM = { 10, 11, 26, 27 };
-    for(uint8_t r = 0, n = 0, t = 0x23; r < 4; ++r)
-        for(uint8_t c = 0; c < 8; ++c, ++n, t ^= (t >> 3) ^ (t << 1))
-            draw_tile(c * 16, r * 16, pgm_read_byte(&TS[t & 3]), n);
     auto const& d = sdata.battle;
+    for(uint8_t r = 0, n = 0, t = 0x23; r < 4; ++r)
+    {
+        uint8_t y = r * 16;
+        if(y + d.itemsy >= 64) break;
+        for(uint8_t c = 0; c < 8; ++c, ++n, t ^= (t >> 3) ^ (t << 1))
+            draw_tile(c * 16, y, pgm_read_byte(&TS[t & 3]), n);
+    }
     // sleeping sprites
     for(uint8_t i = 0; i < nparty; ++i)
     {

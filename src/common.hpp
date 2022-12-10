@@ -540,6 +540,7 @@ void platform_audio_toggle();
 void platform_audio_update(); // update on/off from savefile.sound
 bool platform_audio_enabled();
 void platform_audio_play_song(uint8_t const* song);
+bool platform_audio_song_playing();
 void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot);
 void platform_audio_play_sfx(uint8_t const* sfx);
 
@@ -611,11 +612,9 @@ void new_game();
 extern "C" {
 #ifdef ARDUINO
 uint8_t const* song_victory();
-uint8_t const* song_main2();
-uint8_t const* song_main3();
+uint8_t const* song_peaceful();
 #else
 inline uint8_t const* song_victory() { return nullptr; }
-inline uint8_t const* song_main2() { return nullptr; }
-inline uint8_t const* song_main3() { return nullptr; }
+inline uint8_t const* song_peaceful() { return nullptr; }
 #endif
 }

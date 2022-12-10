@@ -445,7 +445,6 @@ static void update_title()
         {
             d.fade_frame = 0;
             d.going_to_resume = true;
-            platform_audio_play_song(song_main3());
         }
     }
 }
@@ -497,6 +496,18 @@ void update()
         update_battle,
         update_game_over,
     };
+
+    // try to play music if no song is playing
+    if(!platform_audio_song_playing() && (savefile.sound & 2))
+    {
+        uint8_t const* song = nullptr;
+
+        // decide which song to play
+        song = song_peaceful();
+
+        if(song != nullptr)
+            platform_audio_play_song(song);
+    }
 
     // arrow button repeat logic
     process_repeat(0, BTN_UP   );

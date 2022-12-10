@@ -350,4 +350,4 @@ static const PROGMEM struct score_data {
   .pattern11 = pattern11_data,
 };
 
-uint8_t const* song_main3() { return (uint8_t const*)&score; }
+uint8_t const* song_peaceful() { return (uint8_t const*)&score; }
