@@ -108,10 +108,10 @@ static void update_sprites()
 static uint8_t solid_mask()
 {
     uint8_t m = 0;
-    if(check_solid(px +  4, py +  4)) m |= 1;
-    if(check_solid(px + 11, py +  4)) m |= 2;
-    if(check_solid(px +  4, py + 11)) m |= 4;
-    if(check_solid(px + 11, py + 11)) m |= 8;
+    if(check_solid(px +  5, py +  5)) m |= 1;
+    if(check_solid(px + 10, py +  5)) m |= 2;
+    if(check_solid(px +  5, py + 10)) m |= 4;
+    if(check_solid(px + 10, py + 10)) m |= 8;
     return m;
 }
 
@@ -425,6 +425,17 @@ static void update_title()
 {
     static bool first_loaded = false;
     auto& d = sdata.title;
+
+#if DETECT_FX_CHIP
+    if(!FX::detect())
+    {
+        d.no_fx_chip = true;
+        if(btns_pressed & (BTN_A | BTN_B))
+            a.exitToBootloader();
+        return;
+    }
+#endif
+
     if(d.going_to_resume)
     {
         if(d.fade_frame < 16)

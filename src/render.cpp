@@ -108,6 +108,17 @@ static void render_game_over()
 static void render_title()
 {
     auto const& d = sdata.title;
+#if DETECT_FX_CHIP
+    if(d.no_fx_chip)
+    {
+        static char const ROTA[] PROGMEM = "Return of the Ardu";
+        static char const NO_FX_CHIP[] PROGMEM = "NO FLASH CHIP DETECTED";
+        draw_text_noclip(31, 16, ROTA, NOCLIPFLAG_PROG);
+        draw_text_noclip(12, 40, NO_FX_CHIP, NOCLIPFLAG_PROG);
+        platform_fade(15);
+        return;
+    }
+#endif
     if(d.going_to_resume)
     {
         if(d.fade_frame < 16)

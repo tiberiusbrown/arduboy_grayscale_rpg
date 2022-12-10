@@ -104,6 +104,7 @@ void draw_tile(int16_t x, int16_t y, uint8_t t, uint8_t n)
     uint16_t f = t;
     uint8_t nf = (uint8_t)nframe;
 #if 0
+    // animated tiles code
 #ifdef ARDUINO
     asm volatile(R"ASM(
         mov  r0, %[n]

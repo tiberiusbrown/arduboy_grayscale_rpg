@@ -17,6 +17,12 @@ constexpr uint8_t MAX_AP = 6;
 #define RECORD_LIPO_DISCHARGE 0
 #endif
 
+#ifdef ARDUINO
+#define DETECT_FX_CHIP 0
+#else
+#define DETECT_FX_CHIP 0
+#endif
+
 #include "generated/story_flags.hpp"
 #include "generated/num_items.hpp"
 
@@ -173,6 +179,7 @@ struct sdata_title
 {
     uint8_t fade_frame;
     bool going_to_resume;
+    bool no_fx_chip;
 };
 struct sdata_resume
 {

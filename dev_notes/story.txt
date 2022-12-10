@@ -5,9 +5,13 @@ Talk to him again:
 The strange figure is gone now. An exit in the clearing is now open. Go through it.
 A warror is patrolling. Walk into him.
     Warrior: What? The Ardu boy! And yet to achieve full potential. Die now!
+
 Teleport to the Matthias's home in his bed.
     Mother: Matthias! I heard you cry out. Was it another of those dreams?
     Matthias: I... I think so. But this one was different, mother. The figure... he spoke to me. Something about my path and... he said something about the "Ardu".
     Mother: The... Ardu?
     Mother: Are you sure?
-    Mother: I mean... it was just a dream, dear son. Come along, the morning's getting on. I need you to go to market and get some fish for tonight from Old Charlie. A walk in the fresh air will ease your mind.
+    Mother: I mean... it was just a dream, dear son. Come along, the morning's getting on. I need you to go to Old Charlie and get some fish for tonight. A walk in the fresh air will ease your mind.
+
+Walk to the village square. Take to Old Charlie.
+    Old Charlie: Matthias! Good to see you, boy. How's your mother? 
