@@ -387,8 +387,8 @@ static void update_battle_sprites()
 void update_battle()
 {
     auto& d = sdata.battle;
-    d.menuy = uint8_t(d.menuy + d.menuy_target) / 2;
-    d.msely = uint8_t(d.msely + d.msel * 8) / 2;
+    adjust(d.menuy, d.menuy_target);
+    adjust(d.msely, d.msel * 8);
     ++d.frame;
     //if(++d.selframe >= 7) d.selframe = 0;
     if(d.itemsy == 0)
@@ -403,7 +403,6 @@ void update_battle()
         }
         break;
     case BPHASE_INTRO:
-        d.menuy = d.menuy_target = -32;
         if(d.frame == 8 && d.remove_enemy)
         {
             chunk_sprites[d.enemy_chunk].active = false;
@@ -423,7 +422,7 @@ void update_battle()
         battle_next_turn();
         break;
     case BPHASE_MENU:
-        d.menuy_target = 0;
+        d.menuy_target = 32;
         if(btns_pressed & BTN_A)
         {
             if(d.msel == 0)
@@ -448,7 +447,7 @@ void update_battle()
             }
             if(d.msel != BPHASE_MENU)
             {
-                d.menuy_target = -33;
+                d.menuy_target = 0;
                 d.msel = 0;
             }
         }
@@ -726,13 +725,14 @@ void render_battle()
     }
     draw_battle_background();
     draw_battle_sprites();
-    int8_t menuy = d.menuy;
-    if(menuy > -45)
+    uint8_t menuy = d.menuy;
+    if(menuy > 0)
     {
-        platform_fx_drawplusmask(51, menuy, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
-        platform_fx_drawplusmask(74, menuy, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
-        platform_fx_drawoverwrite(48, menuy + 8, BATTLE_MENU_IMG);
-        draw_text_noclip(50, menuy + 9 + d.msely, PSTR("\x7f"), NOCLIPFLAG_PROG);
+        int16_t y = d.menuy - 32;
+        platform_fx_drawplusmask(51, y, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
+        platform_fx_drawplusmask(74, y, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
+        platform_fx_drawoverwrite(48, y + 8, BATTLE_MENU_IMG);
+        draw_text_noclip(50, y + 9 + d.msely, PSTR("\x7f"), NOCLIPFLAG_PROG);
     }
     if(phase == BPHASE_MENU || phase == BPHASE_ESEL)
     {

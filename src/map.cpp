@@ -44,6 +44,10 @@ static bool run_chunk()
                 sel_sprite = true;
         }
     }
+    bool no_state_actions = (
+        state == STATE_RESUME ||
+        state == STATE_TITLE || 
+        state == STATE_TP);
     while(chunk_instr < CHUNK_SCRIPT_SIZE)
     {
         script_command_t instr = (script_command_t)c.script[chunk_instr++];
@@ -63,8 +67,7 @@ static bool run_chunk()
             if(instr == CMD_TDLG) t1 = c.script[chunk_instr++];
             uint16_t stri = c.script[chunk_instr++];
             stri |= uint16_t(c.script[chunk_instr++]) << 8;
-            if(state == STATE_RESUME) break;
-            if(state == STATE_TP) break; // don't execute during teleports
+            if(no_state_actions) break;
             static_assert(!((CMD_TMSG | CMD_TDLG) & 1), "");
             if(!(instr & 1) && t0 != sel_tile)
                 break;
@@ -87,7 +90,7 @@ static bool run_chunk()
             e[1] = c.script[chunk_instr++];
             e[2] = c.script[chunk_instr++];
             e[3] = c.script[chunk_instr++];
-            if(state == STATE_RESUME) break;
+            if(no_state_actions) break;
             if(story_flag_get(f)) break;
             change_state(STATE_BATTLE);
             sdata.battle.remove_enemy = (instr == CMD_EBAT);
@@ -121,7 +124,7 @@ static bool run_chunk()
             tx |= uint16_t(c.script[chunk_instr++]) << 8;
             ty = c.script[chunk_instr++];
             ty |= uint16_t(c.script[chunk_instr++]) << 8;
-            if(state == STATE_RESUME) break;
+            if(no_state_actions) break;
             if(instr == CMD_TTP && t != sel_tile) break;
             if(instr == CMD_WTP && t != walk_tile) break;
             change_state(STATE_TP);
@@ -162,7 +165,7 @@ static bool run_chunk()
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
             bool already_have = story_flag_get(f);
             story_flag_set(f);
-            if(!already_have && f < NUM_ITEMS)
+            if(!no_state_actions && !already_have && f < NUM_ITEMS)
             {
                 // special message
                 change_state(STATE_DIALOG);
@@ -245,6 +248,7 @@ static bool run_chunk()
                 party[nparty].battle.id = id;
                 party[nparty].battle.hp = party_mhp(nparty);
                 ++nparty;
+                if(no_state_actions) break;
                 change_state(STATE_DIALOG);
                 sdata.dialog.portrait = 0x80 + pgm_read_byte(&PARTY_INFO[id].portrait);
                 char* m = sdata.dialog.message;

@@ -180,6 +180,10 @@ struct sdata_title
     uint8_t fade_frame;
     bool going_to_resume;
     bool no_fx_chip;
+
+    // sliding map
+    uint8_t progress;
+    bool dir;
 };
 struct sdata_resume
 {
@@ -365,8 +369,8 @@ struct sdata_battle
     uint8_t psel;       // party member select
     uint8_t msel;       // menu select
     uint8_t msely;
-    int8_t menuy;       // menu position
-    int8_t menuy_target;
+    uint8_t menuy;       // menu position
+    uint8_t menuy_target;
 
     battle_phase_t phase;
     battle_phase_t prev_phase;

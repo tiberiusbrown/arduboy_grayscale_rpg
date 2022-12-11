@@ -50,7 +50,7 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
 
     // check collision with player
     e.walking = true;
-    if(sprite_contacts_player(c, e))
+    if(state == STATE_MAP && sprite_contacts_player(c, e))
     {
         e.walking = false;
         return;
@@ -436,19 +436,49 @@ static void update_title()
     }
 #endif
 
+    constexpr uint16_t ax = 10 * 16;
+    constexpr uint16_t ay =  4 * 16;
+    constexpr uint16_t bx = 31 * 16;
+    constexpr uint16_t by = 19 * 16;
+    constexpr uint8_t PROGRESS_INC = 1;
+
+    px = ax + d.progress;
+    py = ay + d.progress;
+    selx = sely = uint16_t(-1);
+    if(!(nframe & 1))
+    {
+        if(!d.dir)
+            d.progress += PROGRESS_INC;
+        else
+            d.progress -= PROGRESS_INC;
+        if(d.progress == 0 || d.progress == 255)
+            d.dir = !d.dir;
+    }
+
+    update_sprites();
+    load_chunks();
+    run_chunks();
+
     if(d.going_to_resume)
     {
         if(d.fade_frame < 16)
             d.fade_frame += FADE_SPEED;
         else
+        {
+            load(false);
             change_state(STATE_RESUME);
+        }
     }
     else
     {
         if(d.fade_frame == 0)
         {
-            load(!first_loaded);
-            first_loaded = true;
+            if(!first_loaded)
+            {
+                load(true);
+                first_loaded = true;
+                new_game();
+            }
         }
         if(d.fade_frame < 24)
             d.fade_frame += FADE_SPEED;
