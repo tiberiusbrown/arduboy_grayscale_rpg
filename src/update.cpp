@@ -474,7 +474,7 @@ static void update_resume()
         change_state(STATE_MAP);
 }
 
-void process_repeat(uint8_t i, uint8_t btn)
+static inline void process_repeat(uint8_t i, uint8_t btn)
 {
     constexpr uint8_t REP_INIT = 16;
     constexpr uint8_t REP_DELAY = 8;
@@ -521,10 +521,16 @@ void update()
     }
 
     // arrow button repeat logic
-    process_repeat(0, BTN_UP   );
-    process_repeat(1, BTN_DOWN );
-    process_repeat(2, BTN_LEFT );
-    process_repeat(3, BTN_RIGHT);
+    static_assert(BTN_DOWN  == 0x10, "");
+    static_assert(BTN_LEFT  == 0x20, "");
+    static_assert(BTN_RIGHT == 0x40, "");
+    static_assert(BTN_UP    == 0x80, "");
+    for(uint8_t b = 0x10, i = 0; b != 0; b <<= 1, ++i)
+        process_repeat(i, b);
+    //process_repeat(0, BTN_UP   );
+    //process_repeat(1, BTN_DOWN );
+    //process_repeat(2, BTN_LEFT );
+    //process_repeat(3, BTN_RIGHT);
 
     pmoving = false;
     (pgmptr(&FUNCS[state]))();

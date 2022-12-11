@@ -198,7 +198,7 @@ bool update_items(sdata_items& d)
 }
 
 static inline void render_item_row(
-    int16_t x, int16_t y, uint8_t cat, sdata_items& d,
+    int8_t x, int8_t y, uint8_t cat, sdata_items& d,
     item_t i, uint8_t& n)
 {
     if(item_cat(i) != cat) return;
@@ -207,11 +207,11 @@ static inline void render_item_row(
     ++n;
     if(row >= 3) return;
     size_t num;
-    int16_t rowy = y + row * 10 + 13;
+    int8_t rowy = y + row * 10 + 13;
     if(d.n == pn)
     {
         num = ITEM_TOTAL_LEN;
-        platform_drawrect(x, rowy, 128, 10, DARK_GRAY);
+        platform_drawrect_i8((int8_t)x, rowy, 128, 10, DARK_GRAY);
     }
     else
         num = ITEM_NAME_LEN;
@@ -231,15 +231,15 @@ static inline void render_item_row(
 }
 
 static inline void render_consumable_row(
-    int16_t x, int16_t y, sdata_items& d, int8_t n, uint8_t ni)
+    int8_t x, int8_t y, sdata_items& d, int8_t n, uint8_t ni)
 {
-    int16_t rowy = y + n * 10 + 13;
+    int8_t rowy = y + n * 10 + 13;
     size_t num;
     bool selected = (d.n == d.off + n);
     if(selected)
     {
         num = ITEM_TOTAL_LEN;
-        platform_drawrect(x, rowy, 128, 10, DARK_GRAY);
+        platform_drawrect_i8(x, rowy, 128, 10, DARK_GRAY);
     }
     else
         num = ITEM_NAME_LEN;
@@ -263,7 +263,7 @@ static inline void render_consumable_row(
 }
 
 static void render_items_page(
-    int16_t x, int16_t y, uint8_t cat, sdata_items& d)
+    int8_t x, int8_t y, uint8_t cat, sdata_items& d)
 {
     platform_fx_drawoverwrite(x + 33, y + 0, ITEM_CATS_IMG, cat);
 
@@ -288,7 +288,7 @@ static void render_items_page(
     }
 }
 
-void render_items(int16_t y, sdata_items& d)
+void render_items(int8_t y, sdata_items& d)
 {
     if(d.x < d.xt)
     {

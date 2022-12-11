@@ -156,7 +156,7 @@ struct map_chunk_t
     uint8_t script[CHUNK_SCRIPT_SIZE];
 };
 
-extern uint16_t nframe;
+extern uint8_t nframe;
 
 enum
 {
@@ -485,8 +485,8 @@ extern struct battery_info_t
 {
     int16_t  raw, r32, r, dr, ddr;
     uint8_t  stage;
-    bool low_battery;
-} bat;
+    bool low;
+} battery;
 void update_battery();
 
 // pause.cpp
@@ -538,6 +538,7 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_fillrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c) FORCE_NOINLINE;
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
+void platform_drawrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_fx_erase_save_sector();
 void platform_fx_write_save_page(uint16_t page, void const* data, size_t num);
 void platform_fx_read_save_bytes(uint24_t addr, void* data, size_t num);
@@ -610,7 +611,7 @@ int8_t items_spd(uint8_t user);
 int8_t items_mhp(uint8_t user);
 void update_items_numcat(sdata_items& d);
 bool update_items(sdata_items& d); // returns true in battle mode after consuming item
-void render_items(int16_t y, sdata_items& d);
+void render_items(int8_t y, sdata_items& d);
 void toggle_item(uint8_t user, item_t i);
 
 // init.cpp

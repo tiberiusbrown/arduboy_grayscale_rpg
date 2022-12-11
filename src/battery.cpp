@@ -1,6 +1,6 @@
 #include "common.hpp"
 
-battery_info_t bat;
+battery_info_t battery;
 
 static int16_t filter256(int16_t y, int16_t x)
 {
@@ -16,6 +16,8 @@ static int16_t filter256(int16_t y, int16_t x)
 
 static void battery_dsp(int16_t reading)
 {
+    auto bat = battery;
+
     if(bat.stage != 255) ++bat.stage;
 
     // update reading
@@ -57,7 +59,7 @@ static void battery_dsp(int16_t reading)
     // update low battery decision
     if(bat.stage >= 64)
     {
-        bat.low_battery = (bat.dr >= 0 && bat.ddr >= 800);
+        bat.low = (bat.dr >= 0 && bat.ddr >= 800);
     }
 
     bat.raw = reading;
@@ -74,6 +76,8 @@ static void battery_dsp(int16_t reading)
         save_addr += 2;
     }
 #endif
+
+    battery = bat;
 }
 
 void update_battery()

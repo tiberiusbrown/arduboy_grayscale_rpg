@@ -166,6 +166,21 @@ extern uint8_t volatile current_phase;
 #endif
 extern bool volatile needs_display; // needs display work
 
+template<class T>
+inline uint8_t pgm_read_byte_inc(T const*& p)
+{
+    uint8_t r;
+    asm volatile("lpm %[r], %a[p]+\n" : [p] "+&z" (p), [r] "=&r" (r));
+    return r;
+}
+template<class T>
+inline uint8_t deref_inc(T const*& p)
+{
+    uint8_t r;
+    asm volatile("ld %[r], %a[p]+\n" : [p] "+&e" (p), [r] "=&r" (r) :: "memory");
+    return r;
+}
+
 void send_cmds_(uint8_t const* d, uint8_t n);
 void send_cmds_prog_(uint8_t const* d, uint8_t n);
 
@@ -175,10 +190,25 @@ template<uint8_t... CMDS> void send_cmds_prog()
     send_cmds_prog_(CMDS_, sizeof(CMDS_));
 }
 
-template<class... CMDS> void send_cmds(CMDS... cmds)
+inline void send_cmds_helper() {}
+
+template<class... CMDS>
+inline void send_cmds_helper(uint8_t first, CMDS... rest)
 {
+    Arduboy2Base::SPItransfer(first);
+    send_cmds_helper(rest...);
+}
+
+template<class... CMDS> inline void send_cmds(CMDS... cmds)
+{
+#if 1
     uint8_t const CMDS_[] = { cmds... };
     send_cmds_(CMDS_, sizeof(CMDS_));
+#else
+    Arduboy2Base::LCDCommandMode();
+    send_cmds_helper(cmds...);
+    Arduboy2Base::LCDDataMode();
+#endif
 }
 
 extern uint8_t const YMASK0[8] PROGMEM;
@@ -718,7 +748,6 @@ struct ArduboyG_Common : public BASE
         if(update_counter >= update_every_n)
         {
             update_counter -= update_every_n;
-            ++BASE::frameCount; // to allow everyXFrames
             return true;
         }
         return false;
@@ -1040,8 +1069,8 @@ void send_cmds_(uint8_t const* d, uint8_t n)
 void send_cmds_prog_(uint8_t const* d, uint8_t n)
 {
     Arduboy2Base::LCDCommandMode();
-    while(n-- != 0)
-        Arduboy2Base::SPItransfer(pgm_read_byte(d++));
+    do Arduboy2Base::SPItransfer(pgm_read_byte_inc(d));
+    while(--n != 0);
     Arduboy2Base::LCDDataMode();
 }
 

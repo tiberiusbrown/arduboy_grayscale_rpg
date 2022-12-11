@@ -157,7 +157,7 @@ static uint8_t calc_attack_damage(uint8_t attacker, uint8_t defender)
     uint8_t att = get_att(attacker);
     uint8_t def = get_def(defender);
 
-    int16_t dam = (att * att + (uint8_t(att + def) >> 1)) / (att + def);
+    int16_t dam = (att * att + (uint8_t(att + def) / 2)) / (att + def);
     
     // test if attacker is Lucy (double damage to back row)
     if(attacker < 4 && party[attacker].battle.id == 2 && defender >= 6)
@@ -329,7 +329,7 @@ static void remove_enemy(uint8_t i)
 static void update_battle_sprites()
 {
     auto& d = sdata.battle;
-    uint8_t nf = (d.frame >> 2) & 3;
+    uint8_t nf = (d.frame / 4) & 3;
     d.sprites_done = true;
     for(uint8_t i = 0; i < 8; ++i)
     {
@@ -386,8 +386,8 @@ static void update_battle_sprites()
 void update_battle()
 {
     auto& d = sdata.battle;
-    d.menuy = (d.menuy + d.menuy_target) / 2;
-    d.msely = (d.msely + d.msel * 8) / 2;
+    d.menuy = uint8_t(d.menuy + d.menuy_target) / 2;
+    d.msely = uint8_t(d.msely + d.msel * 8) / 2;
     ++d.frame;
     //if(++d.selframe >= 7) d.selframe = 0;
     if(d.itemsy == 0)
@@ -490,20 +490,23 @@ void update_battle()
         d.frame = -20;
         d.phase = BPHASE_DELAY;
         d.next_phase = BPHASE_ATTACK3;
-        uint8_t dam = calc_attack_damage(d.attacker_id, d.defender_id);
-        take_damage(d.defender_id, (int8_t)dam);
+        uint8_t attacker = d.attacker_id;
+        uint8_t defender = d.defender_id;
+        uint8_t dam = calc_attack_damage(attacker, defender);
+        take_damage(defender, (int8_t)dam);
 
         // Dismas innate: strike back at 50% damage when defending
-        if(d.pdef == d.defender_id &&
-            party[d.defender_id].battle.id == 3)
+        if(d.pdef == defender &&
+            party[defender].battle.id == 3)
         {
-            uint8_t dam = calc_attack_damage(d.defender_id, d.attacker_id);
-            dam = (dam + 1) >> 1;
-            take_damage(d.attacker_id, (int8_t)dam);
+            uint8_t dismas_dam = calc_attack_damage(defender, attacker);
+            ++dismas_dam;
+            dismas_dam /= 2;
+            take_damage(attacker, (int8_t)dismas_dam);
         }
 
         // Catherine innate: after attacking, heal a wounded ally for 50% damage
-        if(party[d.attacker_id].battle.id == 1)
+        if(party[attacker].battle.id == 1)
         {
             uint8_t ally = 0;
             uint8_t hp = 0;
@@ -513,7 +516,10 @@ void update_battle()
                 if(uhp > hp)
                     ally = i, hp = uhp;
             }
-            take_damage(ally, -int8_t((dam + 1) >> 1));
+            uint8_t catherine_heal = dam;
+            ++catherine_heal;
+            catherine_heal /= 2;
+            take_damage(ally, -int8_t(catherine_heal));
         }
 
         break;
@@ -596,9 +602,9 @@ static void draw_battle_background()
             platform_fx_drawplusmask(s.bx, s.by, SPRITES_IMG, s.frame_base, 16, 16);
     }
     platform_fillrect_i8(DEFEND_X1 + 1, DEFEND_Y + 7, 14, 12, WHITE);
-    platform_drawrect(DEFEND_X1 + 3, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
+    platform_drawrect_i8(DEFEND_X1 + 3, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
     platform_fillrect_i8(DEFEND_X2 + 1, DEFEND_Y + 7, 14, 12, WHITE);
-    platform_drawrect(DEFEND_X2 + 3, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
+    platform_drawrect_i8(DEFEND_X2 + 3, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
 }
 
 static void draw_selection_arrow(uint8_t x, uint8_t y)
@@ -641,7 +647,7 @@ static void draw_health(uint8_t i)
     uint8_t y = uint8_t(s.y - 5);
     constexpr uint8_t w = HP_BAR_WIDTH + 2;
     constexpr uint8_t h = 4;
-    platform_drawrect(x, y + 1, w, h, DARK_GRAY);
+    platform_drawrect_i8(x, y + 1, w, h, DARK_GRAY);
 
     uint8_t hp = s.hp, hpt = s.hpt;
     if(hpt < hp) tswap(hpt, hp);
@@ -689,8 +695,7 @@ void render_battle()
     uint8_t phase = d.phase;
     if(phase == BPHASE_ALERT)
     {
-        draw_tiles();
-        draw_sprites();
+        render_map();
         uint8_t f = d.frame;
         if(f > 7) f = 7;
         platform_fx_drawplusmask(58, 10, BATTLE_ALERT_IMG, f, 13, 16);
@@ -705,8 +710,7 @@ void render_battle()
         if( (phase == BPHASE_INTRO && d.frame <= 8) ||
             (phase == BPHASE_OUTRO && d.frame > 24))
         {
-            draw_tiles();
-            draw_sprites();
+            render_map();
         }
         else {
             draw_battle_background();
@@ -747,7 +751,7 @@ void render_battle()
     }
     if(d.itemsy > 0)
     {
-        int16_t y = 64 - d.itemsy;
+        uint8_t y = 64 - d.itemsy;
         platform_fillrect_i8(0, (int8_t)y, 128, 64, BLACK);
         render_items(y, d.items);
     }

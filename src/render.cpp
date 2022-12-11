@@ -30,7 +30,7 @@ static void render_dialog()
         {
             uint8_t w = 128 - x;
             uint8_t f = (d.questionfillw * w + 128) >> 8;
-            platform_drawrect(x - 2, d.questioniy, w + 2, 12, DARK_GRAY);
+            platform_drawrect_i8(x - 2, d.questioniy, w + 2, 12, DARK_GRAY);
             platform_fillrect_i8(x - 1, d.questioniy + 1, f, 10, DARK_GRAY);
         }
     }
@@ -43,8 +43,8 @@ static void render_dialog()
         if(p >= 0x80)
             p -= 0x80, x = 48;
         platform_fx_drawoverwrite(x + 2, 2, PORTRAIT_IMG, p);
-        platform_drawrect(x + 0, 0, 36, 36, LIGHT_GRAY);
-        platform_drawrect(x + 1, 1, 34, 34, BLACK);
+        platform_drawrect_i8(x + 0, 0, 36, 36, LIGHT_GRAY);
+        platform_drawrect_i8(x + 1, 1, 34, 34, BLACK);
     }
     else if(d.portrait == 254)
     {
@@ -69,8 +69,7 @@ static void render_tp()
         uint8_t w = XB * t;
         uint8_t h = YB * t;
         uint8_t h2 = 64 - h * 2;
-        draw_tiles();
-        draw_sprites();
+        render_map();
         platform_fillrect_i8(0, 0, 128, h, BLACK);
         platform_fillrect_i8(0, 64 - h, 128, h, BLACK);
         platform_fillrect_i8(0, h, w, h2, BLACK);
@@ -192,7 +191,7 @@ static void render_battery()
     draw_uint16(0, 36, bat.stage);
 #endif
 
-    if(!savefile.no_battery_alert && bat.low_battery)
+    if(!savefile.no_battery_alert && battery.low)
     {
         uint8_t f = (nframe & 0x10) ? 0 : 1;
         platform_fx_drawplusmask(118, 0, BATTERY_IMG, f, 10, 8);

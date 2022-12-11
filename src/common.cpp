@@ -132,10 +132,16 @@ bool story_flag_get(uint16_t index)
 void adjust(uint8_t& rx, uint8_t tx)
 {
     uint8_t x = rx;
-    if(x < tx)
-        x += (uint8_t(tx - x + 1) >> 1);
-    else
-        x -= (uint8_t(x - tx + 1) >> 1);
+    uint8_t dx = x - tx;
+    if(x < tx) dx = -dx;
+    ++dx;
+    dx /= 2;
+    if(x < tx) dx = -dx;
+    x -= dx;
+    //if(x < tx)
+    //    x += (uint8_t(tx - x + 1) / 2);
+    //else
+    //    x -= (uint8_t(x - tx + 1) / 2);
     rx = x;
 }
 
@@ -144,7 +150,7 @@ uint16_t rand_seed;
 uint8_t state;
 sdata_t sdata;
 
-uint16_t nframe;
+uint8_t nframe;
 
 bool pmoving;
 uint16_t selx, sely;

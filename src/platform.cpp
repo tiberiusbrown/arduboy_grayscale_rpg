@@ -345,6 +345,11 @@ void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c)
 #endif
 }
 
+void platform_drawrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c)
+{
+    platform_drawrect(x, y, w, h, c);
+}
+
 void platform_fx_erase_save_sector()
 {
 #ifdef ARDUINO

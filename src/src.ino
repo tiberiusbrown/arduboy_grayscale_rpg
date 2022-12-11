@@ -186,10 +186,21 @@ static void custom_bootOLED()
 
     // run our customized boot-up command sequence against the
     // OLED to initialize it properly for Arduboy
-    a.LCDCommandMode();
-    for (uint8_t i = 0; i < sizeof(lcdBootProgram); i++)
-        a.SPItransfer(pgm_read_byte(lcdBootProgram + i));
-    a.LCDDataMode();
+    
+    abg_detail::send_cmds_prog<
+        0x20, 0x00,
+        0x81, 0x00,
+        0xDB, 0x20,
+        0xD5, 0xF0,
+        0x8D, 0x14,
+        0xAF
+    >();
+    
+    
+    //a.LCDCommandMode();
+    //for (uint8_t i = 0; i < sizeof(lcdBootProgram); i++)
+    //    a.SPItransfer(pgm_read_byte(lcdBootProgram + i));
+    //a.LCDDataMode();
 }
 
 void setup()

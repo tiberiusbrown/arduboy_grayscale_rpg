@@ -156,49 +156,23 @@ void update_pause()
     {
         update_pause_party();
     }
-    if(d.state == OS_MENU)
-        d.menuy += uint8_t(17 - d.menuy) >> 1;
-    else
-        d.menuy >>= 1;
-    if(d.state == OS_OPTIONS)
-        d.optionsy += uint8_t(65 - d.optionsy) >> 1;
-    else
-        d.optionsy >>= 1;
-    if(d.state == OS_QUIT)
-        d.quity += uint8_t(65 - d.quity) >> 1;
-    else
-        d.quity >>= 1, d.quitp = false, d.quitfade = 0;
+    adjust(d.menuy, d.state == OS_MENU ? 16 : 0);
+    adjust(d.optionsy, d.state == OS_OPTIONS ? 64 : 0);
+    adjust(d.quity, d.state == OS_QUIT ? 64 : 0);
     adjust(d.quitf, d.quitft);
-    if(d.state == OS_SAVE)
-        d.savey += uint8_t(65 - d.savey) >> 1;
-    else
-        d.savey >>= 1;
-    if(d.state == OS_PARTY)
-        d.partyy += uint8_t(65 - d.partyy) >> 1;
-    else
-        d.partyy >>= 1;
+    adjust(d.savey, d.state == OS_SAVE ? 64 : 0);
+    adjust(d.partyy, d.state == OS_PARTY ? 64 : 0);
     {
-        uint8_t ax = pgm_read_byte(&OPTION_X[d.menui * 2 + 0]);
-        uint8_t bx = pgm_read_byte(&OPTION_X[d.menui * 2 + 1]);
+        uint8_t const* ptr = &OPTION_X[uint8_t(d.menui * 2)];
+        uint8_t ax = pgm_read_byte_inc(ptr);
+        uint8_t bx = pgm_read_byte(ptr);
         if(d.ax == 0) d.ax = ax, d.bx = bx;
         adjust(d.ax, ax);
         adjust(d.bx, bx);
     }
-    {
-        uint8_t ty = d.optionsi * 11 + 18;
-        if(d.optionsiy == 0) d.optionsiy = ty;
-        adjust(d.optionsiy, ty);
-    }
-    {
-        uint8_t ty = d.quiti * 13 + 25;
-        if(d.quitiy == 0) d.quitiy = ty;
-        adjust(d.quitiy, ty);
-    }
-    {
-        uint8_t tx = savefile.brightness * 16 + 70;
-        if(d.brightnessx == 0) d.brightnessx = tx;
-        adjust(d.brightnessx, tx);
-    }
+    adjust(d.optionsiy, d.optionsi * 11);
+    adjust(d.quitiy, d.quiti * 13);
+    adjust(d.brightnessx, savefile.brightness * 16);
     d.ally = d.optionsy | d.quity | d.savey | d.partyy;
 }
 
@@ -216,9 +190,9 @@ void render_pause()
     }
     if(d.optionsy > 0)
     {
-        int16_t y = 64 - d.optionsy;
+        uint8_t y = 64 - d.optionsy;
         platform_fx_drawoverwrite(0, y, OPTIONS_IMG);
-        platform_fx_drawoverwrite(d.brightnessx, y + 40, SLIDER_IMG);
+        platform_fx_drawoverwrite(d.brightnessx + 70, y + 40, SLIDER_IMG);
 
         if(savefile.sound & 2)
             platform_fx_drawoverwrite(71, y + 20, CHECK_IMG);
@@ -227,23 +201,24 @@ void render_pause()
         if(!savefile.no_battery_alert)
             platform_fx_drawoverwrite(71, y + 53, CHECK_IMG);
         if(plane() == 0)
-            platform_drawrect(1, y + d.optionsiy, 126, 12, DARK_GRAY);
+            platform_drawrect_i8(1, y + d.optionsiy + 18, 126, 12, DARK_GRAY);
     }
     if(d.quity > 0)
     {
-        int16_t y = 64 - d.quity;
+        uint8_t y = 64 - d.quity;
         platform_fx_drawoverwrite(0, y, QUIT_IMG);
         if(plane() == 0)
         {
-            platform_drawrect(16, y + d.quitiy, 96, 12, DARK_GRAY);
-            platform_fillrect_i8(16, y + d.quitiy, d.quitf, 12, DARK_GRAY);
+            int8_t qy = (int8_t)y + d.quitiy + 25;
+            platform_drawrect_i8(16, qy, 96, 12, DARK_GRAY);
+            platform_fillrect_i8(16, qy, d.quitf, 12, DARK_GRAY);
         }
         if(d.quitfade > 16 * FADE_SPEED)
             platform_fade(16 * FADE_SPEED + 15 - d.quitfade);
     }
     if(d.savey > 0)
     {
-        int16_t y = 64 - d.savey;
+        uint8_t y = 64 - d.savey;
         platform_fillrect_i8(0, (int8_t)y, 128, 64, BLACK);
         draw_text_noclip(39, y + 28, PSTR("Saving..."), NOCLIPFLAG_PROG);
         if(d.save_wait > 0)
