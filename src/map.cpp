@@ -448,11 +448,9 @@ bool check_solid(uint16_t tx, uint16_t ty)
     if(cx > 1 || cy > 1) return true;
     uint8_t ctx = uint8_t(tx) & 127;
     uint8_t cty = uint8_t(ty) & 63;
-    uint8_t x = ctx >> 4;
-    uint8_t y = cty >> 4;
     uint8_t ci = cy * 2 + cx;
     auto const& c = active_chunks[ci];
-    uint8_t t = c.chunk.tiles[y][x];
+    uint8_t t = c.chunk.tiles[cty / 16][ctx / 16];
     t = pgm_read_byte(&TILE_SOLID[t]);
     // identify quarter tiles
     uint8_t q = 1;

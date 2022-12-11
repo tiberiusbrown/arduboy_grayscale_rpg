@@ -143,8 +143,9 @@ static void init_sprites()
         auto& s = d.sprites[i];
         s.active = true;
         s.hp = s.hpt;
-        s.bx = s.tx = s.x = pgm_read_byte(&BATTLE_POS[i * 2 + 0]);
-        s.by = s.ty = s.y = pgm_read_byte(&BATTLE_POS[i * 2 + 1]);
+        uint8_t const* ptr = &BATTLE_POS[uint8_t(i * 2)];
+        s.bx = s.tx = s.x = pgm_read_byte_inc(ptr);
+        s.by = s.ty = s.y = pgm_read_byte(ptr);
         s.frame_base = pgm_read_byte(i < 4 ?
             &PARTY_INFO[id].sprite : &ENEMY_INFO[id].sprite) * 16;
     }
