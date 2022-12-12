@@ -112,7 +112,7 @@ static bool run_chunk()
             return true;
         }
 
-            // teleport
+        // teleport
         case CMD_TP:
         case CMD_TTP:
         case CMD_WTP:
@@ -163,6 +163,7 @@ static bool run_chunk()
         {
             uint16_t f = c.script[chunk_instr++];
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
+            if(no_state_actions) break;
             bool already_have = story_flag_get(f);
             story_flag_set(f);
             if(!no_state_actions && !already_have && f < NUM_ITEMS)
@@ -190,6 +191,7 @@ static bool run_chunk()
         {
             uint16_t f = c.script[chunk_instr++];
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
+            if(no_state_actions) break;
             story_flag_clr(f);
             break;
         }
@@ -197,6 +199,7 @@ static bool run_chunk()
         {
             uint16_t f = c.script[chunk_instr++];
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
+            if(no_state_actions) break;
             story_flag_tog(f);
             break;
         }
@@ -211,6 +214,7 @@ static bool run_chunk()
             }
             uint8_t id = c.script[chunk_instr++];
             uint8_t n = c.script[chunk_instr++];
+            uint8_t open = c.script[chunk_instr++];
             if(instr == CMD_EPF && story_flag_get(f))
             {
                 sprite.active = false;
@@ -227,6 +231,7 @@ static bool run_chunk()
             }
             sprite.path_num = n;
             sprite.active = (n > 0);
+            sprite.path_dir = (open ? 1 : 0);
             if(reset) reset_enemy(sprite);
             break;
         }
@@ -316,6 +321,18 @@ static bool run_chunk()
         {
             int8_t i = (int8_t)c.script[chunk_instr++];
             if(!sel_sprite) chunk_instr += i;
+            break;
+        }
+        case CMD_BRNI:
+        {
+            uint16_t f = c.script[chunk_instr++];
+            f |= (uint16_t(c.script[chunk_instr++]) << 8);
+            int8_t t = (int8_t)c.script[chunk_instr++];
+            bool jmp = true;
+            for(uint8_t i = 0; i < nparty; ++i)
+                if(user_is_wearing(i, (item_t)f))
+                    jmp = false;
+            if(jmp) chunk_instr += t;
             break;
         }
 

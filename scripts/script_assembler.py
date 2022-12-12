@@ -82,6 +82,7 @@ class CMD(AutoNumber):
     BRNW = ()
     BRNE = ()
     BRNS = ()
+    BRNI = ()
 
 # TODO: merge duplicate strings
 def addstring(b, s):
@@ -144,12 +145,15 @@ def addpath(b, s, eps):
         sys.exit(1)
     b += eps[s]
 
-def addsprite(b, s):
+def sprite(s):
     if s not in sprites:
         print('Sprite not found: "%s"' % s)
         print('Sprites: ', sprites)
         sys.exit(1)
-    b.append(sprites[s])
+    return sprites[s]
+    
+def addsprite(b, s):
+    b.append(sprite(s))
 
 def addportrait(b, s):
     if s not in portraits:
@@ -158,12 +162,15 @@ def addportrait(b, s):
         sys.exit(1)
     b.append(portraits[s])
 
-def addenemy(b, s):
+def enemy(s):
     if s not in enemies:
         print('Enemy not found: "%s"' % s)
         print('Enemies: ', enemies)
         sys.exit(1)
-    b.append(enemies[s])
+    return enemies[s]
+
+def addenemy(b, s):
+    b.append(enemy(s))
 
 def etype(s):
     if s == '-': return 255
@@ -328,6 +335,11 @@ def assemble(s, eps):
             
         elif s[i] == 'brns':
             b.append(CMD.BRNS); i += 1
+            b.append(s[i]); i += 1
+            
+        elif s[i] == 'brni':
+            b.append(CMD.BRNI); i += 1
+            addflag(b, s[i]); i += 1
             b.append(s[i]); i += 1
             
         elif s[i][-1] == ':':

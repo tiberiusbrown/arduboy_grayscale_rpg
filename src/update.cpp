@@ -75,7 +75,21 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
                 return;
             }
         }
-        if(++e.path_index == e.path_num) e.path_index = 0;
+        if(e.path_dir == 0)
+        {
+            if(++e.path_index == e.path_num)
+                e.path_index = 0;
+        }
+        else if(e.path_dir == 1)
+        {
+            if(++e.path_index == e.path_num)
+                e.path_index -= 2, e.path_dir = 2;
+        }
+        else if(e.path_dir == 2)
+        {
+            if(e.path_index-- == 0)
+                e.path_index = 1, e.path_dir = 1;
+        }
         uint8_t t = e.path[e.path_index];
         uint8_t x = (t & 7) * 16;
         uint8_t y = ((t >> 3) & 3) * 16;

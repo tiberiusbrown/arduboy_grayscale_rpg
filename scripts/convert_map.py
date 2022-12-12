@@ -2,6 +2,7 @@ import itertools
 import script_assembler
 from pathlib import Path
 import sys
+import re
 
 import pytmx
 tm = pytmx.TiledMap('world.tmx')
@@ -49,6 +50,8 @@ def pixel_to_tile(x, y):
 
 epaths = [{} for x in range(CHUNKS_W * CHUNKS_H)]
 
+script_assembler.init()
+
 def convert_path(obj):
     chunk = pixel_to_chunk(obj.x, obj.y)
     if hasattr(obj, 'points'):
@@ -59,7 +62,8 @@ def convert_path(obj):
                 print('Path between two chunks: chunk %d' % chunk)
                 sys.exit(1)
         i = 1
-        if not(
+        openpath = 0 if obj.closed else 1
+        if not openpath and not(
                 ((tiles[0] & 0x07) == (tiles[-1] & 0x07)) or
                 ((tiles[0] & 0x18) == (tiles[-1] & 0x18))):
             print('Non orthogonal path: chunk %d' % chunk)
@@ -89,18 +93,30 @@ def convert_path(obj):
 for obj in tm.layers[2]:
     chunk = pixel_to_chunk(obj.x, obj.y)
     tiles = convert_path(obj)
-    if obj.name[0] == '!':
+    openpath = 0 if obj.closed else 1
+    if obj.name is not None and obj.name[0] == '!':
         f = script_assembler.flag(obj.name)
         bs[chunk] += [script_assembler.CMD.EPF._value_]
         bs[chunk] += [(f >> 0) % 256]
         bs[chunk] += [(f >> 8) % 256]
-        bs[chunk] += [int(getattr(obj, 'class'))]
-        bs[chunk] += [len(tiles)] + tiles
+        bs[chunk] += [script_assembler.sprite(getattr(obj, 'class'))]
+        bs[chunk] += [len(tiles), openpath] + tiles
         continue
-    epaths[chunk][obj.name] = [len(tiles)] + tiles
+    epaths[chunk][obj.name] = [len(tiles), openpath] + tiles
 
+locations = {}
+# record all locations
+for obj in tm.layers[3]:
+    x = int(obj.x)
+    y = int(obj.y)
+    tx = x // 16
+    ty = y // 16
+    locations[obj.name] = '%d %d' % (tx, ty)
+    
+def locreplace(match):
+    return locations[match.group(0)]
+    
 # assemble all script objects
-script_assembler.init()
 for obj in tm.layers[1]:
     x = int(obj.x)
     y = int(obj.y)
@@ -118,6 +134,8 @@ for obj in tm.layers[1]:
             t = t.replace('$brnw ', 'brnw $T ')
             t = t.replace('$st ', 'st $T ')
             t = t.replace('$T', str(tile))
+            t = re.sub('|'.join(r'@\b%s\b' % re.escape(loc[1:]) for loc in locations), 
+                locreplace, t)
             s = s + t + '\n'
     b = script_assembler.assemble(s, epaths[chunk])
     bs[chunk] += b

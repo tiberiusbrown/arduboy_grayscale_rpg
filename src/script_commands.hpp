@@ -109,6 +109,9 @@ Control Instructions
     brns label
         If player is NOT selecting <sprite>, jmp label
 
+    brni <item flag> label
+        If no party member has equipped <item flag>, jmp label
+
 Other Assembly Syntax
 
     Shortcut          Meaning
@@ -123,6 +126,7 @@ Other Assembly Syntax
     $st               st $T
     label_name:       label the position of the following instruction
     !flag_name        unique flag identifier (auto-assigns to index)
+    @location         <tx> <ty> - location for teleport
     {string message}  unique string identifier (auto-assigns to index)
 
 Asking questions:
@@ -194,4 +198,5 @@ enum script_command_t
     CMD_BRNW,
     CMD_BRNE,
     CMD_BRNS,
+    CMD_BRNI,
 };

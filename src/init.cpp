@@ -11,8 +11,8 @@ void new_game()
     savefile.sound = sound;
     savefile.brightness = brightness;
     savefile.no_battery_alert = no_battery_alert;
-    px = 100;
-    py = 135;
+    px = 170;
+    py = 71;
     pdir = 0;
     pmoving = false;
     for(auto& f : story_flags) f = 0;
@@ -32,8 +32,8 @@ void new_game()
     party[0].battle.id = 0;
     party[0].battle.hp = party_mhp(0);
 
-    consumables[0] = 1;
-    consumables[1] = 1;
+    //consumables[0] = 1;
+    //consumables[1] = 1;
 }
 
 void initialize()
