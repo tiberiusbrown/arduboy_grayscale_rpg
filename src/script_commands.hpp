@@ -65,11 +65,11 @@ Game Manipulation
     ft <flag>
         Toggle <flag>
 
-    ep <enemy_type> <path_name>
+    ep <enemy_sprite> <path_name>
         Set the enemy path.
 
-    epf <flag> <enemy_type> <path_name>
-        If <flag> is cleared, ep <enemy_type> <path_name>
+    epf <flag> <enemy_sprite> <path_name>
+        If <flag> is cleared, ep <enemy_sprite> <path_name>
 
     st <tile> <tile_img>
         Overwrite image at <tile> with <tile_img>

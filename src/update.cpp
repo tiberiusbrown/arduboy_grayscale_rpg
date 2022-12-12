@@ -49,12 +49,9 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
         return;
 
     // check collision with player
-    e.walking = true;
-    if(state == STATE_MAP && sprite_contacts_player(c, e))
-    {
-        e.walking = false;
-        return;
-    }
+    if(state == STATE_MAP)
+        e.walking = !sprite_contacts_player(c, e);
+    if(!e.walking) return;
 
     if(e.dir < 8)
     {
