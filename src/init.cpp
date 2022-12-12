@@ -2,6 +2,12 @@
 
 #include <string.h>
 
+static void test_lightsout()
+{
+    px = 736;
+    py = 176;
+}
+
 void new_game()
 {
     uint8_t sound = savefile.sound;
@@ -32,8 +38,7 @@ void new_game()
     party[0].battle.id = 0;
     party[0].battle.hp = party_mhp(0);
 
-    //consumables[0] = 1;
-    //consumables[1] = 1;
+    test_lightsout();
 }
 
 void initialize()

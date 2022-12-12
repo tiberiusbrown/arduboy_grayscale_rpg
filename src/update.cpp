@@ -131,15 +131,14 @@ static uint8_t solid_mask()
 
 static void update_map()
 {
-    if(chunks_are_running && run_chunks()) return;
+    if(chunks_are_running && run_chunks())
+        return;
 
     if(btns_pressed & BTN_B)
     {
         change_state(STATE_PAUSE);
         return;
     }
-
-    update_sprites();
 
     selx = sely = uint16_t(-1);
     if(btns_pressed & BTN_A)
@@ -249,6 +248,8 @@ static void update_map()
 
     load_chunks();
     run_chunks();
+
+    update_sprites();
 }
 
 static void skip_dialog_animation(uint8_t third_newline)

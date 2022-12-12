@@ -45,6 +45,15 @@ static void render_dialog()
         platform_fx_drawoverwrite(x + 2, 2, PORTRAIT_IMG, p);
         platform_drawrect_i8(x + 0, 0, 36, 36, LIGHT_GRAY);
         platform_drawrect_i8(x + 1, 1, 34, 34, BLACK);
+        if(!d.questiondraw)
+        {
+            uint8_t w = text_width(d.name);
+            uint8_t x = 35;
+            uint8_t y = 0;
+            platform_fillrect_i8(x, y, w + 4, 12, BLACK);
+            platform_drawrect_i8(x, y, w + 4, 12, LIGHT_GRAY);
+            draw_text_noclip(x + 2, y + 2, d.name);
+        }
     }
     else if(d.portrait == 254)
     {

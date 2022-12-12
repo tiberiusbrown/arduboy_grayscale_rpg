@@ -3,18 +3,38 @@ import sys
 import csv
 from font import wrap
 
+MAX_STRING_LENGTH = 219
+MAX_NAME_LENGTH = 19
+
 portraits = {}
 sprites = {}
 enemies = {}
+
+tiles = {
+    'T_OutdoorSwitchOff'  : 59,
+    'T_OutdoorSwitchOn'   : 43,
+    'T_DungeonSwitchOff'  : 60,
+    'T_DungeonSwitchOn'   : 44,
+    'T_OutdoorStairs'     : 114,
+    'T_IndoorStairs'      : 130,
+    'T_DungeonStairs'     : 129,
+    'T_DungeonBarsOpen'   : 57,
+    'T_DungeonBarsClosed' : 41,
+    }
 
 def id_helper(x):
     return re.sub('[^a-zA-Z]+', '_', x)
 
 def init():
+    portrait_names = {}
+    maxpn = 0
     with open('portraits.csv', newline='') as f:
         reader = csv.reader(f, delimiter=',', quotechar='"')
         for row in reader:
-            portraits['P_' + id_helper(row[1])] = int(row[0])
+            id = int(row[0])
+            portraits['P_' + id_helper(row[1])] = id
+            portrait_names[id] = row[1]
+            if id > maxpn: maxpn = id
     with open('sprites.csv', newline='') as f:
         reader = csv.reader(f, delimiter=',', quotechar='"')
         for row in reader:
@@ -23,6 +43,16 @@ def init():
         reader = csv.reader(f, delimiter=',', quotechar='"')
         for row in reader:
             enemies['E_' + id_helper(row[1])] = int(row[0])
+    with open('../arduboy_build/portrait_strings.bin', 'wb') as f:
+        bytes = [0] * ((maxpn + 1) * (MAX_NAME_LENGTH + 1))
+        for k in portrait_names:
+            pn = portrait_names[k]
+            if len(pn) > MAX_NAME_LENGTH:
+                print('Portrait name too long: "%s"' % pn)
+                sys.exit(1)
+            for n in range(len(pn)):
+                bytes[k * (MAX_NAME_LENGTH + 1) + n] = ord(pn[n])
+        f.write(bytearray(bytes))
 
 strings = []
 flags = {}
@@ -35,8 +65,6 @@ for i in range(len(items)):
     items[i] = re.sub('[^a-zA-Z]+', '_', items[i].split('|')[0].strip())
 for i in items:
     flags['!ITEM_' + i] = len(flags)
-
-MAX_STRING_LENGTH = 240
 
 from enum import IntEnum, auto
 
@@ -71,6 +99,7 @@ class CMD(AutoNumber):
     EP   = ()
     EPF  = ()
     ST   = ()
+    STF  = ()
     PA   = ()
 
     JMP  = ()
@@ -144,6 +173,11 @@ def addpath(b, s, eps):
         print('Path "%s" not found' % s)
         sys.exit(1)
     b += eps[s]
+
+def tile(s):
+    if s not in tiles:
+        return int(s)
+    return tiles[s]
 
 def sprite(s):
     if s not in sprites:
@@ -289,7 +323,13 @@ def assemble(s, eps):
         elif s[i] == 'st':
             b.append(CMD.ST); i += 1
             b.append(int(s[i])); i += 1
+            b.append(tile(s[i])); i += 1
+            
+        elif s[i] == 'stf':
+            b.append(CMD.STF); i += 1
             b.append(int(s[i])); i += 1
+            addflag(b, s[i]); i += 1
+            b.append(tile(s[i])); i += 1
             
         elif s[i] == 'pa':
             b.append(CMD.PA); i += 1

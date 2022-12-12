@@ -8,9 +8,9 @@ constexpr uint16_t VERSION = 1;
 constexpr uint8_t TELEPORT_TRANSITION_FRAMES = 16;
 constexpr uint8_t FADE_SPEED = 2;
 
-constexpr uint8_t MAP_CHUNK_H = 32;
 constexpr uint8_t MAP_CHUNK_W = 32;
-constexpr uint8_t CHUNK_SCRIPT_SIZE = 64;
+constexpr uint8_t MAP_CHUNK_H = 64;
+constexpr uint8_t CHUNK_SCRIPT_SIZE = 80;
 constexpr uint8_t CHUNK_SPRITE_PATH_SIZE = 8;
 
 #define DEBUG_LIPO_DISCHARGE 0
@@ -201,7 +201,8 @@ struct sdata_dialog
     bool questionpause;
     uint8_t questionfill;
     uint8_t questionfillw;
-    char message[241];
+    char name[20];
+    char message[220];
 };
 struct sdata_tp
 {
@@ -213,7 +214,7 @@ enum {
     IT_WEAPON,
     IT_SHIELD,
     IT_ARMOR,
-    IT_HAT,
+    IT_HELM,
     IT_SHOES,
     IT_RING,
     IT_AMULET,

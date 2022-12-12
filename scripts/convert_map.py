@@ -8,8 +8,8 @@ import pytmx
 tm = pytmx.TiledMap('world.tmx')
 
 CHUNKS_W = 32
-CHUNKS_H = 32
-CHUNK_SCRIPT_SIZE = 64
+CHUNKS_H = 64
+CHUNK_SCRIPT_SIZE = 80
 CHUNK_ENEMY_PATH_SIZE = 8
 
 TILES_W = CHUNKS_W * 8
@@ -133,6 +133,7 @@ for obj in tm.layers[1]:
             t = t.replace('$brnt ', 'brnt $T ')
             t = t.replace('$brnw ', 'brnw $T ')
             t = t.replace('$st ', 'st $T ')
+            t = t.replace('$stf ', 'stf $T ')
             t = t.replace('$T', str(tile))
             t = re.sub('|'.join(r'@\b%s\b' % re.escape(loc[1:]) for loc in locations), 
                 locreplace, t)
@@ -141,6 +142,7 @@ for obj in tm.layers[1]:
     bs[chunk] += b
     if len(bs[chunk]) > CHUNK_SCRIPT_SIZE:
         print('Script too large at chunk: %d,%d' %(obj.x, obj.y))
+        print('Size: %d' % len(bs[chunk]))
         sys.exit(1)
 
 for chunk in range(CHUNKS_W * CHUNKS_H):

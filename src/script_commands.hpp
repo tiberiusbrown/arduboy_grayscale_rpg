@@ -74,6 +74,9 @@ Game Manipulation
     st <tile> <tile_img>
         Overwrite image at <tile> with <tile_img>
 
+    stf <tile> <flag> <tile_img>
+        if <flag> is cleared, st <tile> <tile_img>
+
     pa <id>
         Add party member <id> to party
 
@@ -124,6 +127,7 @@ Other Assembly Syntax
     $brnt             brnt $T
     $brnw             brnw $T
     $st               st $T
+    $stf              stf $T
     label_name:       label the position of the following instruction
     !flag_name        unique flag identifier (auto-assigns to index)
     @location         <tx> <ty> - location for teleport
@@ -187,6 +191,7 @@ enum script_command_t
     CMD_EP,
     CMD_EPF,
     CMD_ST,
+    CMD_STF,
     CMD_PA,
 
     CMD_JMP,

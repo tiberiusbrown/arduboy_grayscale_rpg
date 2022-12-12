@@ -14,6 +14,7 @@ static void reset_enemy(sprite_t& e)
     e.frames_rem = 1;
     e.dir = 0xff;
     e.active = (e.path_num > 0);
+    if(e.path_dir != 0) e.path_dir = 1;
 }
 
 static bool run_chunk()
@@ -58,8 +59,8 @@ static bool run_chunk()
 
             // message/dialog
         case CMD_MSG:
-        case CMD_DLG:
         case CMD_TMSG:
+        case CMD_DLG:
         case CMD_TDLG:
         {
             uint8_t t0, t1;
@@ -72,9 +73,17 @@ static bool run_chunk()
             if(!(instr & 1) && t0 != sel_tile)
                 break;
             change_state(STATE_DIALOG);
-            sdata.dialog.portrait = 255;
-            if(instr == CMD_DLG) sdata.dialog.portrait = t0;
-            if(instr == CMD_TDLG) sdata.dialog.portrait = t1;
+            uint8_t portrait = INVALID;
+            if(instr == CMD_DLG) portrait = t0;
+            if(instr == CMD_TDLG) portrait = t1;
+            if(portrait != INVALID)
+            {
+                platform_fx_read_data_bytes(
+                    PORTRAIT_STRINGS + sizeof(sdata.dialog.name) * portrait,
+                    sdata.dialog.name,
+                    sizeof(sdata.dialog.name));
+            }
+            sdata.dialog.portrait = portrait;
             platform_fx_read_data_bytes(STRINGDATA + stri, sdata.dialog.message,
                                         sizeof(sdata.dialog.message));
             //wrap_text(sdata.dialog.message, 128);
@@ -147,7 +156,32 @@ static bool run_chunk()
             int8_t imm = (int8_t)c.script[chunk_instr++];
             uint8_t dst = t & 0xf;
             uint8_t src = t >> 4;
-            savefile.chunk_regs[dst] = savefile.chunk_regs[src] + imm;
+            int8_t newdst = savefile.chunk_regs[src] + imm;
+            if(!no_state_actions && dst >= 8)
+            {
+                int8_t diff = newdst - savefile.chunk_regs[dst];
+                if(diff > 0)
+                {
+                    // special message
+                    change_state(STATE_DIALOG);
+                    sdata.dialog.portrait = 254;
+                    char* ptr = sdata.dialog.message;
+                    *ptr++ = 'x';
+                    ptr += dec_to_str(ptr, (uint8_t)diff);
+                    *ptr++ = ' ';
+                    platform_fx_read_data_bytes(
+                        ITEM_STRINGS + ITEM_TOTAL_LEN * NUM_ITEMS + ITEM_TOTAL_LEN * (dst - 8),
+                        ptr, ITEM_TOTAL_LEN);
+                    for(uint8_t i = 0; i < ITEM_NAME_LEN - 1; ++i)
+                    {
+                        char& c = ptr[i];
+                        if(c == '\0') c = ' ';
+                    }
+                    ptr[ITEM_NAME_LEN - 1] = '\n';
+                    return true;
+                }
+            }
+            savefile.chunk_regs[dst] = newdst;
             break;
         }
         case CMD_SUB:
@@ -231,15 +265,26 @@ static bool run_chunk()
             }
             sprite.path_num = n;
             sprite.active = (n > 0);
-            sprite.path_dir = (open ? 1 : 0);
+            if(!open)
+                sprite.path_dir = 0;
+            else if(sprite.path_dir == 0)
+                sprite.path_dir = 1;
             if(reset) reset_enemy(sprite);
             break;
         }
         case CMD_ST:
+        case CMD_STF:
         {
             uint8_t t = c.script[chunk_instr++];
+            uint16_t f;
+            if(instr == CMD_STF)
+            {
+                f = c.script[chunk_instr++];
+                f |= (uint16_t(c.script[chunk_instr++]) << 8);
+            }
             uint8_t i = c.script[chunk_instr++];
-            c.tiles_flat[t] = i;
+            if(instr != CMD_STF || !story_flag_get(f))
+                c.tiles_flat[t] = i;
             break;
         }
         case CMD_PA:
