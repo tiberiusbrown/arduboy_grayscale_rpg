@@ -197,6 +197,7 @@ def addportrait(b, s):
     b.append(portraits[s])
 
 def enemy(s):
+    if s == '-': return 255
     if s not in enemies:
         print('Enemy not found: "%s"' % s)
         print('Enemies: ', enemies)
@@ -205,10 +206,6 @@ def enemy(s):
 
 def addenemy(b, s):
     b.append(enemy(s))
-
-def etype(s):
-    if s == '-': return 255
-    return int(s)
 
 def assemble(s, eps):
     b = []
@@ -248,10 +245,6 @@ def assemble(s, eps):
             addenemy(b, s[i]); i += 1
             addenemy(b, s[i]); i += 1
             addenemy(b, s[i]); i += 1
-            #b.append(etype(s[i])); i += 1
-            #b.append(etype(s[i])); i += 1
-            #b.append(etype(s[i])); i += 1
-            #b.append(etype(s[i])); i += 1
             
         elif s[i] == 'ebat':
             b.append(CMD.EBAT); i += 1
@@ -260,10 +253,6 @@ def assemble(s, eps):
             addenemy(b, s[i]); i += 1
             addenemy(b, s[i]); i += 1
             addenemy(b, s[i]); i += 1
-            #b.append(etype(s[i])); i += 1
-            #b.append(etype(s[i])); i += 1
-            #b.append(etype(s[i])); i += 1
-            #b.append(etype(s[i])); i += 1
             
         elif s[i] == 'tp':
             b.append(CMD.TP); i += 1

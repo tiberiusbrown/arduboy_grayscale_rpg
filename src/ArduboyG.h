@@ -311,6 +311,7 @@ struct ArduboyG_Common : public BASE
     {
         update_every_n = num;
         update_every_n_denom = denom;
+        update_counter = 0;
     }
     
     static void setRefreshHz(uint8_t hz)

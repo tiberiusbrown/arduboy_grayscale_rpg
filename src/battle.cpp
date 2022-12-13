@@ -584,14 +584,30 @@ void update_battle()
 
 static void draw_battle_background()
 {
-    static constexpr uint8_t TS[] PROGMEM = { 10, 11, 26, 27 };
     auto const& d = sdata.battle;
-    for(uint8_t r = 0, n = 0, t = 0x23; r < 4; ++r)
+    if(py >= 128 * 16)
     {
-        uint8_t y = r * 16;
-        if(y + d.itemsy >= 64) break;
-        for(uint8_t c = 0; c < 8; ++c, ++n, t ^= (t >> 3) ^ (t << 1))
-            draw_tile(c * 16, y, pgm_read_byte(&TS[t & 3]), n);
+        // outdoor background
+        static constexpr uint8_t TS[] PROGMEM = { 10, 11, 26, 27 };
+        for(uint8_t r = 0, n = 0, t = 0x23; r < 4; ++r)
+        {
+            uint8_t y = r * 16;
+            if(y + d.itemsy >= 64) break;
+            for(uint8_t c = 0; c < 8; ++c, ++n, t ^= (t >> 3) ^ (t << 1))
+                draw_tile(c * 16, y, pgm_read_byte(&TS[t & 3]), n);
+        }
+    }
+    else
+    {
+        // dungeon background
+        for(uint8_t x = 0; x < 128; x += 16)
+            draw_tile(x, 0, 12, 0);
+        for(uint8_t y = 16; y < 64; y += 16)
+        {
+            if(y + d.itemsy >= 64) break;
+            for(uint8_t x = 0; x < 128; x += 16)
+                draw_tile(x, y, 28, 0);
+        }
     }
     // sleeping sprites
     for(uint8_t i = 0; i < nparty; ++i)
@@ -601,9 +617,9 @@ static void draw_battle_background()
         if(plane() > 1)
             platform_fx_drawplusmask(s.bx, s.by, SPRITES_IMG, s.frame_base, 16, 16);
     }
-    platform_fillrect_i8(DEFEND_X1 + 1, DEFEND_Y + 7, 14, 12, WHITE);
+    //platform_fillrect_i8(DEFEND_X1 + 1, DEFEND_Y + 7, 14, 12, WHITE);
     platform_drawrect_i8(DEFEND_X1 + 3, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
-    platform_fillrect_i8(DEFEND_X2 + 1, DEFEND_Y + 7, 14, 12, WHITE);
+    //platform_fillrect_i8(DEFEND_X2 + 1, DEFEND_Y + 7, 14, 12, WHITE);
     platform_drawrect_i8(DEFEND_X2 + 3, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
 }
 

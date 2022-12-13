@@ -2,11 +2,7 @@
 
 #include <string.h>
 
-static void test_lightsout()
-{
-    px = 736;
-    py = 176;
-}
+#include "generated/locations.hpp"
 
 void new_game()
 {
@@ -38,9 +34,7 @@ void new_game()
     party[0].battle.id = 0;
     party[0].battle.hp = party_mhp(0);
 
-    //test_lightsout();
-    px = 787;
-    py = 2658;
+    LOC_dungeon_lightsout();
 }
 
 void initialize()

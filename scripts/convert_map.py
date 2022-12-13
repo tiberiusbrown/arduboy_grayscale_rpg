@@ -113,6 +113,13 @@ for obj in tm.layers[3]:
     ty = y // 16
     locations[obj.name] = '%d %d' % (tx, ty)
     
+with open('../src/generated/locations.hpp', 'w') as f:
+    f.write('#pragma once\n\n')
+    for k in locations:
+        t = locations[k].split()
+        f.write('inline void LOC_%-32s() { px = %5d; py = %5d; }\n' %
+            (k[1:], int(t[0]) * 16, int(t[1]) * 16))
+    
 def locreplace(match):
     return locations[match.group(0)]
     

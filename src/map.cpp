@@ -22,6 +22,11 @@ static bool run_chunk()
     auto& ac = active_chunks[running_chunk];
     auto& sprite = chunk_sprites[running_chunk];
     auto& c = ac.chunk;
+    {
+        uint16_t ci = ac.cy * MAP_CHUNK_W + ac.cx;
+        uint24_t addr = MAPDATA + uint24_t(ci) * sizeof(map_chunk_t);
+        platform_fx_read_data_bytes(addr, c.tiles_flat, 32);
+    }
     uint8_t walk_tile = 255;
     uint8_t sel_tile = 255;
     bool sel_sprite = false;
@@ -430,7 +435,7 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
     active_chunk_t& active_chunk = active_chunks[index];
     map_chunk_t* chunk = &active_chunk.chunk;
     uint16_t ci = cy * MAP_CHUNK_W + cx;
-    uint24_t addr = uint24_t(ci) * sizeof(map_chunk_t);
+    uint24_t addr = MAPDATA + uint24_t(ci) * sizeof(map_chunk_t);
     if(active_chunk.cx != cx || active_chunk.cy != cy)
     {
         memset(&active_chunk, 0, sizeof(active_chunk));
@@ -438,12 +443,13 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
             memset(&chunk_sprites[index], 0, sizeof(sprite_t));
         active_chunk.cx = cx;
         active_chunk.cy = cy;
+        platform_fx_read_data_bytes(addr, chunk, sizeof(map_chunk_t));
     }
     else if(cx != 255 && cy != 255) {
-        platform_fx_read_data_bytes(addr, chunk->tiles_flat, 32);
+        //platform_fx_read_data_bytes(addr, chunk->tiles_flat, 32);
         return;
     }
-    if(cx == 255 || cy == 255)
+    else
     {
         for(uint8_t i = 0; i < 32; ++i)
             chunk->tiles_flat[i] = 30;
@@ -452,7 +458,6 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
         chunk_sprites[index].active = false;
         return;
     }
-    platform_fx_read_data_bytes(addr, chunk, sizeof(map_chunk_t));
 }
 
 static void shift_chunk(uint8_t dst, uint8_t src)

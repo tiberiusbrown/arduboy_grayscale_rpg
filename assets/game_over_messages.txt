@@ -1,8 +1,12 @@
 Defenders take half damage from all attacks.
 Defenders direct all targetable attacks toward themselves.
 Those with greater speed attack earlier during a battle.
+Each party member has a unique passive ability.
 Legends tell of an amulet which allows attacking twice per turn...
 An ancient people, the Ardu are but myths now.
 Courage shall triumph in the end.
 Strength is perfected through weakness.
+Some magical items are more powerful when used by an Ardu.
 Many Ardu champions of old gave their lives for the cause of peace.
+If you have some distance to run, hold down A to enable turbo mode!
+The Ardu had the power to shield their allies from lethal blows.

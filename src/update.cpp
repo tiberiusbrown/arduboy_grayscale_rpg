@@ -128,6 +128,10 @@ static uint8_t solid_mask()
 
 static void update_map()
 {
+#ifdef ARDUINO
+    a.setUpdateEveryN(ABG_UPDATE_EVERY_N_DEFAULT, ABG_UPDATE_EVERY_N_DENOM_DEFAULT);
+#endif
+
     if(chunks_are_running && run_chunks())
         return;
 
@@ -246,6 +250,12 @@ static void update_map()
     load_chunks();
     run_chunks();
     update_sprites();
+
+#ifdef ARDUINO
+    a.setUpdateEveryN(ABG_UPDATE_EVERY_N_DEFAULT, ABG_UPDATE_EVERY_N_DENOM_DEFAULT);
+    if(state == STATE_MAP && (btns_down & BTN_A))
+        a.setUpdateEveryN(1, 1);
+#endif
 }
 
 static void skip_dialog_animation(uint8_t third_newline)
@@ -438,8 +448,8 @@ static void update_game_over()
 
 static uint8_t const TITLE_PATH[] PROGMEM =
 {
-    8, 16, 7, 48, 0, 80, 8, 32, 2, 64, 4, 8, 8, 32, 7, 20, 6, 56, 0, 4, 8, 32,
-    6, 80, 4, 8, 8, 32, 6, 24, 5, 16, 4, 64, 3, 32, 2, 100, 3, 24, 2, 24,
+    8, 64, 7, 48, 0, 80, 8, 64, 2, 64, 4, 8, 8, 64, 7, 20, 6, 56, 0, 4, 8, 64,
+    6, 80, 4, 8, 8, 64, 6, 24, 5, 16, 4, 64, 3, 32, 2, 100, 3, 24, 2, 24,
 };
 constexpr uint16_t PATH_START_X = 930;
 constexpr uint16_t PATH_START_Y = 2803;

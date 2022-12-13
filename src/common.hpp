@@ -36,6 +36,8 @@ constexpr uint8_t CHUNK_SPRITE_PATH_SIZE = 8;
 #define ABG_SYNC_PARK_ROW
 #define ABG_UPDATE_EVERY_N_DEFAULT 11
 #define ABG_UPDATE_EVERY_N_DENOM_DEFAULT 7
+//#define ABG_UPDATE_EVERY_N_DEFAULT 1
+//#define ABG_UPDATE_EVERY_N_DENOM_DEFAULT 1
 #define ABG_PRECHARGE_CYCLES 1
 #define ABG_DISCHARGE_CYCLES 2
 #define ABG_FPS_DEFAULT 156
@@ -310,7 +312,6 @@ struct party_info_t
 {
     uint8_t sprite;
     uint8_t portrait;
-    uint8_t speed;
     uint8_t base_mhp;
     uint8_t base_att;
     uint8_t base_def;
