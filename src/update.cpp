@@ -504,7 +504,6 @@ static void update_title()
         }
     }
 
-#if 1
     if(!d.path_started)
     {
         d.path_started = true;
@@ -522,26 +521,6 @@ static void update_title()
     int8_t dy = (int8_t)pgm_read_byte(&DIRY[dir]);
     px += dx;
     py += dy;
-#else
-    constexpr uint16_t ax = 10 * 16;
-    constexpr uint16_t ay = 4 * 16;
-    constexpr uint16_t bx = 31 * 16;
-    constexpr uint16_t by = 19 * 16;
-    constexpr uint8_t PROGRESS_INC = 1;
-
-    px = ax + d.progress;
-    py = ay + d.progress;
-    selx = sely = uint16_t(-1);
-    if(!(nframe & 1))
-    {
-        if(!d.dir)
-            d.progress += PROGRESS_INC;
-        else
-            d.progress -= PROGRESS_INC;
-        if(d.progress == 0 || d.progress == 255)
-            d.dir = !d.dir;
-    }
-#endif
 
     load_chunks();
     run_chunks();
