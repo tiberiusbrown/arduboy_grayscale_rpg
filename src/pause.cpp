@@ -99,11 +99,8 @@ void update_pause()
                     }
                     if(d.quiti == 2)
                     {
-                        // change to title just for the fade in effect
-                        change_state(STATE_TITLE);
+                        change_state(STATE_RESUME);
                         new_game();
-                        sdata.title.fade_frame = 16;
-                        sdata.title.going_to_resume = true;
                         return;
                     }
             }

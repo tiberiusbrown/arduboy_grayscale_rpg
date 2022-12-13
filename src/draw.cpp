@@ -183,7 +183,7 @@ void draw_text_noclip(int8_t x, int8_t y, char const* str, uint8_t f)
     char t;
     uint8_t cx = (uint8_t)x;
     uint8_t plane8 = plane() * 8;
-    uint8_t const* font_img = FONT_IMG + plane() * 8 + -(' ' * (8 * PLANES)) + 2;
+    uint8_t const* font_img = FONT_IMG + plane() * 8 - (' ' * (8 * PLANES)) + 2;
     uint8_t const* font_adv = FONT_ADV - ' ';
     uint8_t page = (uint8_t)y;
 #ifdef ARDUINO
@@ -198,6 +198,7 @@ void draw_text_noclip(int8_t x, int8_t y, char const* str, uint8_t f)
     page >>= 3;
 #endif
     if(page >= 8) return;
+    uint16_t shift_mask = ~(0xff * shift_coef);
     for(;;)
     {
         if(f & NOCLIPFLAG_PROG)
@@ -224,6 +225,7 @@ void draw_text_noclip(int8_t x, int8_t y, char const* str, uint8_t f)
                     page += 1, shift_coef <<= 1;
             }
             if(page >= 8) return;
+            shift_mask = ~(0xff * shift_coef);
             cx = (uint8_t)x;
             continue;
         }
@@ -231,8 +233,8 @@ void draw_text_noclip(int8_t x, int8_t y, char const* str, uint8_t f)
         uint8_t adv = pgm_read_byte(&font_adv[t]);
         if(cx <= uint8_t(128 - adv))
         {
-            platform_drawoverwritemonochrome_noclip(
-                cx, page, shift_coef, adv, 1, bitmap);
+            platform_drawcharfast(
+                cx, page, shift_coef, adv, shift_mask, bitmap);
         }
         cx += adv;
     }

@@ -87,19 +87,12 @@ void platform_drawoverwritemonochrome(int16_t x, int16_t y, uint8_t w,
 #endif
 }
 
-void platform_drawoverwritemonochrome_noclip(
+// specialized draw method for 8px high characters
+void platform_drawcharfast(
     uint8_t x, uint8_t page_start, uint8_t shift_coef,
-    uint8_t w, uint8_t pages, uint8_t const* bitmap)
+    uint8_t w, uint16_t shift_mask, uint8_t const* bitmap)
 {
 #ifdef ARDUINO
-    uint16_t shift_mask = ~(0xff * shift_coef);
-    bool bottom = false;
-    if(pages > uint8_t(7 - page_start))
-    {
-        pages = 7 - page_start;
-        bottom = true;
-    }
-    uint8_t buf_adv = 128 - w;
     uint16_t image_data;
     uint8_t buf_data;
     uint8_t count;
@@ -122,8 +115,12 @@ void platform_drawoverwritemonochrome_noclip(
 
     asm volatile(R"ASM(
 
-                tst %[pages]
+                cpi %[page_start], 7
                 breq L%=_bottom
+
+                ; tests if 8-px aligned vertically
+                ;cpi %[shift_coef], 1
+                ;breq L%=_bottom
 
                 ; need Y pointer for middle pages
                 ;push r28
@@ -131,12 +128,9 @@ void platform_drawoverwritemonochrome_noclip(
                 movw r28, %[buf]
                 subi r28, lo8(-128)
                 sbci r29, hi8(-128)
-
-            L%=_middle_loop_outer:
-
                 mov %[count], %[cols]
 
-            L%=_middle_loop_inner:
+            L%=_middle:
 
                 ; write one page from image to buf/buf+128
                 lpm %A[image_data], %a[image]+
@@ -150,28 +144,15 @@ void platform_drawoverwritemonochrome_noclip(
                 or %[buf_data], r1
                 st Y+, %[buf_data]
                 dec %[count]
-                brne L%=_middle_loop_inner
-
-                ; advance buf, buf+128 to the next page
-                ; image doesn't need to advance because no clip
-                clr __zero_reg__
-                add %A[buf], %[buf_adv]
-                adc %B[buf], __zero_reg__
-                add r28, %[buf_adv]
-                adc r29, __zero_reg__
-                dec %[pages]
-                brne L%=_middle_loop_outer
+                brne L%=_middle
 
                 ; done with Y pointer
                 ;pop r29
                 ;pop r28
 
+                jmp L%=_finish
+
             L%=_bottom:
-
-                tst %[bottom]
-                breq L%=_finish
-
-            L%=_bottom_loop:
 
                 ; write one page from image to buf
                 lpm %A[image_data], %a[image]+
@@ -181,7 +162,7 @@ void platform_drawoverwritemonochrome_noclip(
                 or %[buf_data], r0
                 st %a[buf]+, %[buf_data]
                 dec %[cols]
-                brne L%=_bottom_loop
+                brne L%=_bottom
 
             L%=_finish:
 
@@ -191,16 +172,14 @@ void platform_drawoverwritemonochrome_noclip(
         :
         [buf]        "+&x" (buf),
         [image]      "+&z" (bitmap),
-        [pages]      "+&r" (pages),
         [count]      "=&r" (count),
         [buf_data]   "=&r" (buf_data),
         [image_data] "=&r" (image_data)
         :
         [cols]       "r"   (w),
-        [buf_adv]    "r"   (buf_adv),
         [shift_mask] "r"   (shift_mask),
         [shift_coef] "r"   (shift_coef),
-        [bottom]     "r"   (bottom)
+        [page_start] "r"   (page_start)
         :
         "r28", "r29", "memory"
         );
@@ -213,7 +192,7 @@ void platform_drawoverwritemonochrome_noclip(
     if(page_start > 7 || x + w > 128)
         return;
     platform_drawoverwritemonochrome(
-        x, page_start * 8 + oy, w, pages * 8, bitmap);
+        x, page_start * 8 + oy, w, 8, bitmap);
 #endif
 }
 

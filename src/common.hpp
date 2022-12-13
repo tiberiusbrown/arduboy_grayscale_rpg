@@ -448,6 +448,7 @@ struct savefile_t
 {
     uint16_t checksum;
     uint8_t identifier[8];
+    bool loaded;
     uint16_t px, py;     // player position (in pixels)
     uint8_t pdir;        // player direction
     uint8_t nparty;
@@ -527,9 +528,9 @@ void platform_drawoverwritemonochrome(int16_t x, int16_t y, uint8_t w,
     uint8_t h, uint8_t const* bitmap);
 // this method assumes the image never clips outside the display
 // and can be much faster because of that assumption
-void platform_drawoverwritemonochrome_noclip(
+void platform_drawcharfast(
     uint8_t x, uint8_t page_start, uint8_t shift_coef,
-    uint8_t w, uint8_t pages, uint8_t const* bitmap);
+    uint8_t w, uint16_t shift_mask, uint8_t const* bitmap);
 void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num);
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h);

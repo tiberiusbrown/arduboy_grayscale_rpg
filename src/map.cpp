@@ -256,11 +256,13 @@ static bool run_chunk()
                 break;
             }
             bool reset = false;
-            if(sprite.type != id) reset = true;
+            if(sprite.type != id)
+                reset = true;
             sprite.type = id;
             for(uint8_t j = 0; j < n; ++j)
             {
-                if(sprite.path[j] != c.script[chunk_instr]) reset = true;
+                if(sprite.path[j] != c.script[chunk_instr])
+                    reset = true;
                 sprite.path[j] = c.script[chunk_instr++];
             }
             sprite.path_num = n;
@@ -432,7 +434,8 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
     if(active_chunk.cx != cx || active_chunk.cy != cy)
     {
         memset(&active_chunk, 0, sizeof(active_chunk));
-        memset(&chunk_sprites[index], 0, sizeof(sprite_t));
+        if(!savefile.loaded)
+            memset(&chunk_sprites[index], 0, sizeof(sprite_t));
         active_chunk.cx = cx;
         active_chunk.cy = cy;
     }

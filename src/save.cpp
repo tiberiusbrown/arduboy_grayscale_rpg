@@ -44,6 +44,7 @@ bool save_done()
         uint8_t const* p = &IDENTIFIER[0];
         for(uint8_t i = 0; i < 8; ++i)
             savefile.identifier[i] = pgm_read_byte_inc(p);
+        savefile.loaded = true;
         savefile.checksum = compute_checksum();
         return false;
     }

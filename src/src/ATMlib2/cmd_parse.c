@@ -87,8 +87,10 @@ static void process_immediate_cmd(const uint8_t cmd_id, struct atm_player_state 
 stop_channel:
 	ch->dst_osc_params->vol = 0;
 	ch->delay = 0xFFFF;
+#if ATM_HAS_FX_LOOP
 	/* reset pattern pointer in preparation for loop */
 	pattern_cmd_ptr(ch) = get_track_start_ptr(player_state, ch->loop_pattern_index);
+#endif
 }
 
 static void process_1p_cmd(const struct atm_cmd_data *cmd, struct atm_player_state *player_state, struct atm_channel_state *ch)

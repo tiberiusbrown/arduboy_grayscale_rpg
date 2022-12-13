@@ -49,7 +49,7 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
         return;
 
     // check collision with player
-    if(state == STATE_MAP)
+    if(state == STATE_MAP || state == STATE_TITLE)
         e.walking = !sprite_contacts_player(c, e);
     if(!e.walking) return;
 
@@ -359,11 +359,15 @@ static void update_dialog()
     {
         if(d.char_progress == third_newline)
         {
+#ifdef ARDUINO
+            strcpy(&d.message[0], &d.message[third_newline]);
+#else
             for(uint8_t i = 0;; ++i)
             {
                 d.message[i] = d.message[i + third_newline];
                 if(d.message[i] == '\0') break;
             }
+#endif
             d.char_progress = 0;
         }
         else if(message_done)
@@ -435,7 +439,7 @@ static void update_game_over()
 static uint8_t const TITLE_PATH[] PROGMEM =
 {
     8, 16, 7, 48, 0, 80, 8, 32, 2, 64, 4, 8, 8, 32, 7, 20, 6, 56, 0, 4, 8, 32,
-    6, 80, 4, 8, 8, 32, 6, 24, 5, 16, 4, 64, 3, 32, 2, 100, 3, 26, 2, 22,
+    6, 80, 4, 8, 8, 32, 6, 24, 5, 16, 4, 64, 3, 32, 2, 100, 3, 24, 2, 24,
 };
 constexpr uint16_t PATH_START_X = 930;
 constexpr uint16_t PATH_START_Y = 2803;

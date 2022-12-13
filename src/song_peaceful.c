@@ -23,7 +23,6 @@ DEFINE_PATTERN(pattern0_array, pattern0_data);
     ATM_CMD_M_SLIDE_VOL_ADV_ON(-3, 0x40 + 1), \
     ATM_CMD_M_CALL_REPEAT(6, 10), \
     \
-    ATM_CMD_M_SET_LOOP_PATTERN(1), \
     ATM_CMD_I_STOP, \
 }
 DEFINE_PATTERN(pattern1_array, pattern1_data);
@@ -109,7 +108,6 @@ DEFINE_PATTERN(pattern6_array, pattern6_data);
     ATM_CMD_M_CALL_REPEAT(10, 2), \
     ATM_CMD_I_NOTE_OFF, \
     \
-    ATM_CMD_M_SET_LOOP_PATTERN(7), \
     ATM_CMD_I_STOP, \
 }
 DEFINE_PATTERN(pattern7_array, pattern7_data);
