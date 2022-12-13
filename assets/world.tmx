@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="135">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="137">
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer id="1" name="Tiles" width="256" height="256">
   <data encoding="csv">
@@ -544,13 +544,15 @@ end:</property>
   </object>
   <object id="120" x="728.5" y="89">
    <properties>
-    <property name="script">$brnt end
+    <property name="script">brfs !lightsout_pot_a end
+$brnt end
 addi r8 r8 1
+fs !lightsout_pot_a
 end:</property>
    </properties>
    <point/>
   </object>
-  <object id="124" x="904.25" y="2696.5">
+  <object id="124" x="1047.88" y="2824.25">
    <properties>
     <property name="script">ep S_Hermit Hermit
 brns end
@@ -563,8 +565,10 @@ end:</property>
   </object>
   <object id="125" x="792" y="89.5">
    <properties>
-    <property name="script">$brnt end
+    <property name="script">brfs !lightsout_pot_b end
+$brnt end
 addi r8 r8 1
+fs !lightsout_pot_b
 end:</property>
    </properties>
    <point/>
@@ -579,15 +583,18 @@ end:</property>
   </object>
   <object id="127" x="792" y="2678.25">
    <properties>
-    <property name="script">$brnt end
+    <property name="script">brfs !village_nw_pot end
+$brnt end
 addi r8 r8 1
+fs !village_nw_pot
 end:</property>
    </properties>
    <point/>
   </object>
   <object id="129" x="137.273" y="119.455">
    <properties>
-    <property name="script">brns end
+    <property name="script">brfs !Hooded_Figure_Dream end
+brns end
 dlg P_Hooded_Figure {Very soon will your path become known, Matthias..
 
 The time for the Return of the Ardu has come.}
@@ -604,8 +611,8 @@ end:</property>
   <object id="90" name="!Mother_Pacing" class="S_Mother" x="394.75" y="74.25">
    <polyline points="0,0 -3.25,2.5 -6.75,1.25 -8,-3 -6.5,-7 -0.75,-7.75 2.5,-4 56.25,-7.75 54.5,-3 59.5,-7.5 55.75,-0.25 63,-7.25 56.75,3.25 64.25,-1.5 43.75,-1.5 45,47.5 65,39.5 56.5,46 64.75,43 58,48.5 65.75,45.75 58.25,51.25 66.25,49.5 94.5,48.5 98.5,31.25 94.75,35.75 98.25,26.5 91,35.25 95.25,24 88.75,33.75 88.75,25.5"/>
   </object>
-  <object id="121" name="Hermit" class="S_Hermit" x="899.5" y="2717.13">
-   <polyline points="0,0 -1.25,-5 4.25,0.5 -1.5,-9.75 9.25,0.25 2.75,-10.75 9.5,-5.25 8.25,-10 113.75,1.25 111,-3.25 117.25,0.75 110.75,-7 120.75,1 112.5,-10.75 122.75,-0.5 117.25,-10.25"/>
+  <object id="121" name="Hermit" class="S_Hermit" x="1044" y="2828.63">
+   <polyline points="0,0 -1.25,-5 4.25,0.5 -1.5,-9.75 9.25,0.25 2.75,-10.75 9.5,-5.25 8.25,-10 81.5,2 78.75,-2.5 85,1.5 78.5,-6.25 88.5,1.75 80.25,-10 90.5,0.25 85,-9.5"/>
   </object>
   <object id="130" name="!Hooded_Figure_Dream" class="S_Hooded_Figure" x="151.273" y="124.727">
    <polyline points="0,0 2.72727,-3.27273"/>
@@ -614,10 +621,13 @@ end:</property>
    <polyline points="7,-8.27273 3.90909,-9.72727 5.54545,-5.18182 1.18182,-8.63636 3.36364,-4.09091 -4.09091,-9 -0.818182,-3.72727 4.09091,14.8182 6.81818,10.6364 -0.272727,14.6364 6.27273,8.09091 -3.54545,13.3636 4.63636,5.90909 -4.81818,9.36364"/>
   </object>
   <object id="132" name="!Catherine_fountain" class="S_Catherine" x="968.25" y="2953.25">
-   <polygon points="0,0 47.5,-1 47,47.25 -0.25,47.25"/>
+   <polygon points="48,-2 48.75,46 0.25,46.75 -2,-0.75"/>
   </object>
   <object id="134" name="!Charlie_by_house" class="S_Old_Charlie" x="1067.75" y="2941.25">
    <polyline points="0,0 1.75,-6 -3.75,0.25 0,-10.25 -8,1.5 -4.5,-11.25 -9.25,-5.75 -31.25,0 -28,-6 -36.75,0.75 -29,-10 -40.5,0.25 -35,-10.75 -41,-7 -29.5,-33.75 -36.5,-30.5 -29.75,-37.5 -40.75,-31.75 -30.25,-41.25 -41.5,-36.25 -37.75,-41"/>
+  </object>
+  <object id="136" name="!Cecilia_near_fountain" class="S_Cecilia" x="1143.25" y="2951">
+   <polyline points="-5.75,3.75 -2,-4 6.5,-2.25 1.75,2.25 3.75,6 -3.5,5.5 0,0 -31.75,1 -34.25,19 -108.75,11.25 -105.5,15.5 -113,11.25 -106.25,18.25 -116.75,15.25 -107.75,20.5 -114.25,22 -106.5,45.75 -111.25,43.5 -105.75,49 -117.5,45 -112.5,52 -36.25,52 -31.5,53.75 -38,48 -28,53 -36,46.25 -26,50.25 -30.75,45"/>
   </object>
  </objectgroup>
  <objectgroup color="#aaaa00" id="4" name="Locations">

@@ -157,9 +157,10 @@ static bool run_chunk()
             uint8_t dst = t & 0xf;
             uint8_t src = t >> 4;
             int8_t newdst = savefile.chunk_regs[src] + imm;
+            int8_t diff = newdst - savefile.chunk_regs[dst];
+            savefile.chunk_regs[dst] = newdst;
             if(!no_state_actions && dst >= 8)
             {
-                int8_t diff = newdst - savefile.chunk_regs[dst];
                 if(diff > 0)
                 {
                     // special message
@@ -181,7 +182,6 @@ static bool run_chunk()
                     return true;
                 }
             }
-            savefile.chunk_regs[dst] = newdst;
             break;
         }
         case CMD_SUB:

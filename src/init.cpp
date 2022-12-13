@@ -39,6 +39,8 @@ void new_game()
     party[0].battle.hp = party_mhp(0);
 
     //test_lightsout();
+    px = 787;
+    py = 2658;
 }
 
 void initialize()

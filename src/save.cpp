@@ -99,6 +99,7 @@ void load(bool first)
         savefile.brightness = brightness;
         savefile.no_battery_alert = battery;
     }
+    platform_audio_update();
 }
 
 uint16_t compute_checksum()
