@@ -6,13 +6,9 @@
 
 void new_game()
 {
-    uint8_t sound = savefile.sound;
-    uint8_t brightness = savefile.brightness;
-    bool no_battery_alert = savefile.no_battery_alert;
+    auto old_settings = savefile.settings;
     memset(&savefile, 0, sizeof(savefile));
-    savefile.sound = sound;
-    savefile.brightness = brightness;
-    savefile.no_battery_alert = no_battery_alert;
+    savefile.settings = old_settings;
     px = 170;
     py = 71;
     pdir = 0;
@@ -35,6 +31,7 @@ void new_game()
     party[0].battle.hp = party_mhp(0);
 
     //LOC_dungeon_lightsout();
+    LOC_home_outside();
 }
 
 void initialize()

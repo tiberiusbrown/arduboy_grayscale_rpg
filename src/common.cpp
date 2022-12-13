@@ -7,12 +7,14 @@
 static char const EN_DARK_GUARD[] PROGMEM = "Dark Guard";
 static char const EN_DARK_WIZARD[] PROGMEM = "Dark Wizard";
 static char const EN_SKELETON[] PROGMEM = "Skeleton";
+static char const EN_PSY_RAPTER[] PROGMEM = "Psy-Rapter";
 
 enemy_info_t const ENEMY_INFO[] PROGMEM =
 {
     {  4, 4, 0, 4, 10,  64, 128, EN_DARK_GUARD },
     {  5, 4, 0, 4,  6,   0, 255, EN_DARK_WIZARD },
-    { 10, 1, 0, 1,  4,   0,   0, EN_SKELETON },
+    { 10, 1, 0, 1,  6,   0,   0, EN_SKELETON },
+    { 13, 1, 0, 3,  3,   0,   0, EN_PSY_RAPTER },
 };
 
 static char const PN_MATTHIAS[] PROGMEM = "Matthias";
@@ -101,6 +103,10 @@ void change_state(uint8_t new_state)
 {
     state = new_state;
     memset(&sdata, 0, sizeof(sdata));
+    if(state == STATE_MAP)
+        platform_set_game_speed_saved();
+    else
+        platform_set_game_speed_default();
 }
 
 void story_flag_set(uint16_t index)

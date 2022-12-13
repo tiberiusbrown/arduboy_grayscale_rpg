@@ -91,6 +91,7 @@ static void init_hp_bars()
     for(uint8_t i = 0; i < 8; ++i)
     {
         auto& s = d.sprites[i];
+        if(!s.active) continue;
         s.hpt = calc_hp_bar_width(member(i).hp, get_mhp(i));
     }
 }
@@ -330,7 +331,7 @@ static void remove_enemy(uint8_t i)
 static void update_battle_sprites()
 {
     auto& d = sdata.battle;
-    uint8_t nf = (d.frame / 4) & 3;
+    uint8_t nf = (nframe / 4) & 3;
     d.sprites_done = true;
     for(uint8_t i = 0; i < 8; ++i)
     {
@@ -351,6 +352,8 @@ static void update_battle_sprites()
         if(s.x == s.tx && s.y == s.ty)
         {
             s.frame_dir = 0;
+            if(s.frame_base == 13 * 16) // Psy-Bat
+                s.frame_dir += nf;
             continue;
         }
         d.sprites_done = false;

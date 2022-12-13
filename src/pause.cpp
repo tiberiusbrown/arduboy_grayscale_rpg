@@ -50,31 +50,38 @@ void update_pause()
             if(btns_pressed & BTN_B)
                 d.state = OS_MENU;
             else if((btns_pressed & BTN_UP) && optionsi-- == 0)
-                optionsi = 2;
-            else if((btns_pressed & BTN_DOWN) && optionsi++ == 3)
+                optionsi = 4;
+            else if((btns_pressed & BTN_DOWN) && optionsi++ == 4)
                 optionsi = 0;
             else if(btns_pressed & (BTN_A | BTN_LEFT | BTN_RIGHT))
             {
                 if(optionsi == 0)
                 {
-                    savefile.sound ^= 2;
+                    savefile.settings.sound ^= 2;
                     platform_audio_update();
                 }
                 else if(optionsi == 1)
                 {
-                    savefile.sound ^= 1;
+                    savefile.settings.sound ^= 1;
                     platform_audio_update();
                 }
                 else if(optionsi == 2)
                 {
-                    if(savefile.brightness < 3 && (btns_pressed & (BTN_A | BTN_RIGHT)))
-                        ++savefile.brightness;
-                    if(savefile.brightness > 0 && (btns_pressed & BTN_LEFT))
-                        --savefile.brightness;
-                    platform_fade(15);
+                    if(savefile.settings.game_speed < 6 && (btns_pressed & (BTN_A | BTN_RIGHT)))
+                        ++savefile.settings.game_speed;
+                    if(savefile.settings.game_speed > 0 && (btns_pressed & BTN_LEFT))
+                        --savefile.settings.game_speed;
                 }
                 else if(optionsi == 3)
-                    savefile.no_battery_alert = !savefile.no_battery_alert;
+                {
+                    if(savefile.settings.brightness < 3 && (btns_pressed & (BTN_A | BTN_RIGHT)))
+                        ++savefile.settings.brightness;
+                    if(savefile.settings.brightness > 0 && (btns_pressed & BTN_LEFT))
+                        --savefile.settings.brightness;
+                    platform_fade(15);
+                }
+                else if(optionsi == 4)
+                    savefile.settings.no_battery_alert = !savefile.settings.no_battery_alert;
             }
             d.optionsi = optionsi;
         }
@@ -167,9 +174,10 @@ void update_pause()
         adjust(d.ax, ax);
         adjust(d.bx, bx);
     }
-    adjust(d.optionsiy, d.optionsi * 11);
+    adjust(d.optionsiy, d.optionsi * 12);
     adjust(d.quitiy, d.quiti * 13);
-    adjust(d.brightnessx, savefile.brightness * 16);
+    adjust(d.brightnessx, savefile.settings.brightness * 16);
+    adjust(d.speedx, savefile.settings.game_speed * 8);
     d.ally = d.optionsy | d.quity | d.savey | d.partyy;
 }
 
@@ -189,16 +197,17 @@ void render_pause()
     {
         uint8_t y = 64 - d.optionsy;
         platform_fx_drawoverwrite(0, y, OPTIONS_IMG);
-        platform_fx_drawoverwrite(d.brightnessx + 70, y + 40, SLIDER_IMG);
+        platform_fx_drawoverwrite(d.brightnessx + 70, y + 38, SLIDER_IMG);
+        platform_fx_drawoverwrite(d.speedx + 70, y + 26, SLIDER_IMG);
 
-        if(savefile.sound & 2)
-            platform_fx_drawoverwrite(71, y + 20, CHECK_IMG);
-        if(savefile.sound & 1)
-            platform_fx_drawoverwrite(71, y + 31, CHECK_IMG);
-        if(!savefile.no_battery_alert)
-            platform_fx_drawoverwrite(71, y + 53, CHECK_IMG);
+        if(savefile.settings.sound & 2)
+            platform_fx_drawoverwrite(71, y + 4, CHECK_IMG);
+        if(savefile.settings.sound & 1)
+            platform_fx_drawoverwrite(71, y + 16, CHECK_IMG);
+        if(!savefile.settings.no_battery_alert)
+            platform_fx_drawoverwrite(71, y + 52, CHECK_IMG);
         if(plane() == 0)
-            platform_drawrect_i8(1, y + d.optionsiy + 18, 126, 12, DARK_GRAY);
+            platform_drawrect_i8(0, y + d.optionsiy + 2, 128, 12, DARK_GRAY);
     }
     if(d.quity > 0)
     {

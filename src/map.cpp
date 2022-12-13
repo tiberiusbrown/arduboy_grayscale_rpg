@@ -6,13 +6,13 @@
 #include "script_commands.hpp"
 #include "tile_solid.hpp"
 
-static void reset_enemy(sprite_t& e)
+static void reset_sprite(sprite_t& e)
 {
     e.path_index = 0;
     e.x = (e.path[0] & 7) * 16;
     e.y = ((e.path[0] >> 3) & 3) * 16;
     e.frames_rem = 1;
-    e.dir = 0xff;
+    e.dir = 0x80;
     e.active = (e.path_num > 0);
     if(e.path_dir != 0) e.path_dir = 1;
 }
@@ -276,7 +276,7 @@ static bool run_chunk()
                 sprite.path_dir = 0;
             else if(sprite.path_dir == 0)
                 sprite.path_dir = 1;
-            if(reset) reset_enemy(sprite);
+            if(reset) reset_sprite(sprite);
             break;
         }
         case CMD_ST:

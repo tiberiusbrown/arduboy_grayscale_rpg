@@ -18,9 +18,12 @@ static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     if(!e.active) return 0;
     uint8_t f = e.type * 16;
     uint8_t d = e.dir;
-    if(e.walking && !(d & 0x80))
+    bool walking = e.walking;
+    if(d & 0x80) walking = false;
+    if(e.type == 13) walking = true;
+    if(walking)
     {
-        f += d * 2;
+        f += (d & 7) * 2;
         if(state == STATE_MAP || state == STATE_TITLE)
             f += (((uint8_t)nframe >> 2) & 3);
     }

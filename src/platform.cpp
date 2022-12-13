@@ -47,14 +47,12 @@ void platform_fade(uint8_t f)
     if(f > 15) f = 15;
     f *= 17;
 
-    //static uint8_t const VCOM_DES[] PROGMEM = { 0x10, 0x10, 0x10, 0x20 };
 #ifdef ARDUINO
     static uint8_t const CONTRAST[] PROGMEM = { 0x20, 0x60, 0x90, 0xff };
 #else
     static uint8_t const CONTRAST[] PROGMEM = { 0x6f, 0x9f, 0xcf, 0xff };
 #endif
-    //uint8_t vcom_des = pgm_read_byte(&VCOM_DES[savefile.brightness]);
-    uint8_t brightness = pgm_read_byte(&CONTRAST[savefile.brightness]);
+    uint8_t brightness = pgm_read_byte(&CONTRAST[savefile.settings.brightness]);
     f = (f * brightness + f) >> 8;
 
 #ifdef ARDUINO
@@ -399,6 +397,23 @@ void platform_audio_play_sfx(uint8_t const* sfx)
     platform_audio_play_sfx(sfx, 0);
 }
 
+void platform_set_game_speed_default()
+{
+    platform_set_game_speed(11, 7);
+}
+
+void platform_set_game_speed_saved()
+{
+    static uint8_t const SPEEDS[14] PROGMEM =
+    {
+        2, 1, 11, 7, 26, 21, 1, 1, 2, 3, 1, 2, 1, 3,
+    };
+    uint8_t const* ptr = &SPEEDS[savefile.settings.game_speed * 2];
+    uint8_t num = pgm_read_byte_inc(ptr);
+    uint8_t denom = pgm_read_byte(ptr);
+    platform_set_game_speed(num, denom);
+}
+
 #ifdef ARDUINO
 
 void platform_audio_init()
@@ -423,20 +438,20 @@ bool platform_audio_enabled()
 
 void platform_audio_play_song(uint8_t const* song)
 {
-    if(savefile.sound & 2)
+    if(savefile.settings.sound & 2)
         atm_synth_start_score(song);
 }
 
 void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot)
 {
-    if(savefile.sound & 1)
+    if(savefile.settings.sound & 1)
         atm_synth_play_sfx_track(slot, slot, sfx);
 }
 
 void platform_audio_update()
 {
-    atm_synth_set_score_paused((savefile.sound & 2) == 0);
-    if((savefile.sound != 0) != platform_audio_enabled())
+    atm_synth_set_score_paused((savefile.settings.sound & 2) == 0);
+    if((savefile.settings.sound != 0) != platform_audio_enabled())
         platform_audio_toggle();
 }
 
@@ -445,12 +460,17 @@ bool platform_audio_song_playing()
     return atm_synth_is_score_playing() != 0;
 }
 
+void platform_set_game_speed(uint8_t num, uint8_t denom)
+{
+    a.setUpdateEveryN(num, denom);
+}
+
 #else
 
 static bool audio_enabled;
 void platform_audio_update()
 {
-    if((savefile.sound != 0) != platform_audio_enabled())
+    if((savefile.settings.sound != 0) != platform_audio_enabled())
         platform_audio_toggle();
 }
 void platform_audio_init() {}
@@ -460,5 +480,11 @@ bool platform_audio_enabled() { return audio_enabled; }
 void platform_audio_play_song(uint8_t const* song) {}
 void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot) {}
 bool platform_audio_song_playing() { return true; }
+
+extern float target_frame_time;
+void platform_set_game_speed(uint8_t num, uint8_t denom)
+{
+    target_frame_time = (1.f / 52) * num / denom;
+}
 
 #endif

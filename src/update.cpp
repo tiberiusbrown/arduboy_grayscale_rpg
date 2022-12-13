@@ -51,7 +51,8 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
     // check collision with player
     if(state == STATE_MAP || state == STATE_TITLE)
         e.walking = !sprite_contacts_player(c, e);
-    if(!e.walking) return;
+    if(!e.walking)
+        return;
 
     if(e.dir < 8)
     {
@@ -68,7 +69,7 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
             {
                 // delay
                 e.frames_rem = (t >> 5) * 16;
-                e.dir = 0xff;
+                e.dir = 0x80;
                 return;
             }
         }
@@ -128,10 +129,6 @@ static uint8_t solid_mask()
 
 static void update_map()
 {
-#ifdef ARDUINO
-    a.setUpdateEveryN(ABG_UPDATE_EVERY_N_DEFAULT, ABG_UPDATE_EVERY_N_DENOM_DEFAULT);
-#endif
-
     if(chunks_are_running && run_chunks())
         return;
 
@@ -250,12 +247,6 @@ static void update_map()
     load_chunks();
     run_chunks();
     update_sprites();
-
-#ifdef ARDUINO
-    a.setUpdateEveryN(ABG_UPDATE_EVERY_N_DEFAULT, ABG_UPDATE_EVERY_N_DENOM_DEFAULT);
-    if(state == STATE_MAP && (btns_down & BTN_A))
-        a.setUpdateEveryN(1, 1);
-#endif
 }
 
 static void skip_dialog_animation(uint8_t third_newline)
@@ -424,6 +415,7 @@ static void update_game_over()
         if(d.msg[0] == '\0')
         {
             uint8_t n = u8rand(NUM_GAME_OVER_MESSAGES);
+            n = 10;
             platform_fx_read_data_bytes(
                 GAME_OVER_MESSAGES + n * GAME_OVER_MESSAGE_LEN, d.msg,
                 GAME_OVER_MESSAGE_LEN);
@@ -472,6 +464,33 @@ static void title_advance_path()
     d.path_frames = frames;
 }
 
+static void title_animation()
+{
+    auto& d = sdata.title;
+    if(!d.path_started)
+    {
+        d.path_started = true;
+        pdir = 0;
+        px = PATH_START_X;
+        py = PATH_START_Y;
+        title_advance_path();
+    }
+    else if(--d.path_frames == 0)
+        title_advance_path();
+    uint8_t dir = d.path_dir;
+    if(dir < 8) pdir = dir;
+    pmoving = (dir < 8);
+    int8_t dx = (int8_t)pgm_read_byte(&DIRX[dir]);
+    int8_t dy = (int8_t)pgm_read_byte(&DIRY[dir]);
+    px += dx;
+    py += dy;
+
+    load_chunks();
+    run_chunks();
+    update_sprites();
+
+}
+
 static void update_title()
 {
     static bool first_loaded = false;
@@ -511,34 +530,17 @@ static void update_title()
         }
         if(d.fade_frame < 24)
             d.fade_frame += FADE_SPEED;
-        else if(btns_pressed & BTN_A)
+        else
         {
-            d.fade_frame = 0;
-            d.going_to_resume = true;
+            if(btns_pressed & BTN_A)
+            {
+                d.fade_frame = 0;
+                d.going_to_resume = true;
+            }
         }
     }
 
-    if(!d.path_started)
-    {
-        d.path_started = true;
-        pdir = 0;
-        px = PATH_START_X;
-        py = PATH_START_Y;
-        title_advance_path();
-    }
-    else if(--d.path_frames == 0)
-        title_advance_path();
-    uint8_t dir = d.path_dir;
-    if(dir < 8) pdir = dir;
-    pmoving = (dir < 8);
-    int8_t dx = (int8_t)pgm_read_byte(&DIRX[dir]);
-    int8_t dy = (int8_t)pgm_read_byte(&DIRY[dir]);
-    px += dx;
-    py += dy;
-
-    load_chunks();
-    run_chunks();
-    update_sprites();
+    title_animation();
 }
 
 static void update_resume()
@@ -590,7 +592,7 @@ void update()
     };
 
     // try to play music if no song is playing
-    if(!platform_audio_song_playing() && (savefile.sound & 2))
+    if(!platform_audio_song_playing() && (savefile.settings.sound & 2))
     {
         uint8_t const* song = nullptr;
 

@@ -210,7 +210,7 @@ static void render_battery()
     draw_uint16(0, 36, bat.stage);
 #endif
 
-    if(!savefile.no_battery_alert && battery.low)
+    if(!savefile.settings.no_battery_alert && battery.low)
     {
         uint8_t f = (nframe & 0x10) ? 0 : 1;
         platform_fx_drawplusmask(118, 0, BATTERY_IMG, f, 10, 8);

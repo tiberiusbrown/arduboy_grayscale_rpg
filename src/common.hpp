@@ -34,10 +34,10 @@ constexpr uint8_t CHUNK_SPRITE_PATH_SIZE = 8;
 #include "src/ATMlib2/ATMlib2.h"
 #define ABG_TIMER1
 #define ABG_SYNC_PARK_ROW
-#define ABG_UPDATE_EVERY_N_DEFAULT 11
-#define ABG_UPDATE_EVERY_N_DENOM_DEFAULT 7
-//#define ABG_UPDATE_EVERY_N_DEFAULT 1
-//#define ABG_UPDATE_EVERY_N_DENOM_DEFAULT 1
+#define ABG_UPDATE_EVERY_N_MOD 11
+#define ABG_UPDATE_EVERY_N_DENOM_MOD 7
+#define ABG_UPDATE_EVERY_N_DEFAULT 1
+#define ABG_UPDATE_EVERY_N_DENOM_DEFAULT 1
 #define ABG_PRECHARGE_CYCLES 1
 #define ABG_DISCHARGE_CYCLES 2
 #define ABG_FPS_DEFAULT 156
@@ -265,6 +265,7 @@ struct sdata_pause
     uint8_t optionsi;
     uint8_t optionsiy;
     uint8_t brightnessx;
+    uint8_t speedx;
 
     uint8_t quity;
     uint8_t quiti;
@@ -445,6 +446,14 @@ struct party_member_t
     item_t equipped_items[IT_NUM_CATS - 1];
 };
 
+struct settings_t
+{
+    uint8_t sound;
+    uint8_t brightness;
+    uint8_t game_speed;
+    bool no_battery_alert;
+};
+
 struct savefile_t
 {
     uint16_t checksum;
@@ -455,9 +464,7 @@ struct savefile_t
     uint8_t nparty;
     party_member_t party[4];
     uint8_t story_flags[STORY_FLAG_BYTES];
-    uint8_t sound;
-    uint8_t brightness;
-    bool no_battery_alert;
+    settings_t settings;
     int8_t chunk_regs[8 + NUM_CONSUMABLES];
     sprite_t chunk_sprites[4];
 };
@@ -560,6 +567,9 @@ void platform_audio_play_song(uint8_t const* song);
 bool platform_audio_song_playing();
 void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot);
 void platform_audio_play_sfx(uint8_t const* sfx);
+void platform_set_game_speed(uint8_t num, uint8_t denom);
+void platform_set_game_speed_default();
+void platform_set_game_speed_saved();
 
 // draw.cpp
 void draw_tile(int16_t x, int16_t y, uint8_t t, uint8_t n);

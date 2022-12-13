@@ -26,6 +26,7 @@ float fade_factor = 1.f;
 int gplane;
 uint8_t pixels[3][128 * 64];
 uint8_t tex_pixels[128 * FBH * 4];
+float target_frame_time = (1.f / 33);
 
 inline uint8_t fadef(uint8_t x)
 {

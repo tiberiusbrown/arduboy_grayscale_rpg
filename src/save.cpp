@@ -68,10 +68,7 @@ bool save_done()
 
 void load(bool first)
 {
-    uint8_t sound = savefile.sound;
-    uint8_t brightness = savefile.brightness;
-    uint8_t battery = savefile.no_battery_alert;
-
+    auto old_settings = savefile.settings;
     platform_fx_read_save_bytes(0, &savefile, sizeof(savefile));
     bool id = true;
     for(uint8_t i = 0; i < 8; ++i)
@@ -81,8 +78,9 @@ void load(bool first)
     {
         memset(&savefile, 0, sizeof(savefile));
         new_game();
-        savefile.sound = 3;
-        savefile.brightness = 3;
+        savefile.settings.sound = 3;
+        savefile.settings.brightness = 3;
+        savefile.settings.game_speed = 1;
     }
 
     if(first)
@@ -90,14 +88,12 @@ void load(bool first)
 #ifdef ARDUINO
         Arduboy2Audio::begin();
         if(!Arduboy2Audio::enabled())
-            savefile.sound = 0;
+            savefile.settings.sound = 0;
 #endif
     }
     else
     {
-        savefile.sound = sound;
-        savefile.brightness = brightness;
-        savefile.no_battery_alert = battery;
+        savefile.settings = old_settings;
     }
     platform_audio_update();
 }
