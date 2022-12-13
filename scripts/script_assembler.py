@@ -55,6 +55,7 @@ def init():
         f.write(bytearray(bytes))
 
 strings = []
+stringdict = {}
 flags = {}
 
 with open('items.csv', newline='') as f:
@@ -113,19 +114,26 @@ class CMD(AutoNumber):
     BRNS = ()
     BRNI = ()
 
-# TODO: merge duplicate strings
-def addstring(b, s):
+def stringid(s):
     s = s[1:-1]
+    if s in stringdict:
+        return stringdict[s]
     if len(s) > MAX_STRING_LENGTH:
         print('String too long: %s' % s)
         print('Length: %d' % len(s))
         print('Max:    %d' % MAX_STRING_LENGTH)
         sys.exit(1)
     x = len(strings)
+    stringdict[s] = x
     s = '\n'.join(wrap(s, 128))
     for c in s:
         strings.append(ord(c))
     strings.append(0)
+    return x
+
+# TODO: merge duplicate strings
+def addstring(b, s):
+    x = stringid(s)
     b.append((x >> 0) % 256)
     b.append((x >> 8) % 256)
 
