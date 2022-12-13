@@ -182,6 +182,11 @@ struct sdata_title
     // sliding map
     uint8_t progress;
     bool dir;
+
+    bool    path_started;
+    uint8_t path_index;
+    uint8_t path_dir;
+    uint8_t path_frames;
 };
 struct sdata_resume
 {

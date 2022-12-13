@@ -61,7 +61,6 @@ void draw_sprites()
     uint8_t n = 0;
 
     // player sprite
-    if(state != STATE_TITLE)
     {
         uint8_t f = pdir * 4;
         if(pmoving) f += (((uint8_t)nframe >> 2) & 3);

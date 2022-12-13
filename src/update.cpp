@@ -3,11 +3,11 @@
 #include "generated/fxdata.h"
 #include "generated/num_game_over_messages.hpp"
 
-static int8_t const DIRX[8] PROGMEM = {
-    0, -1, -1, -1, 0, 1, 1, 1,
+static int8_t const DIRX[9] PROGMEM = {
+    0, -1, -1, -1, 0, 1, 1, 1, 0,
 };
-static int8_t const DIRY[8] PROGMEM = {
-    1, 1, 0, -1, -1, -1, 0, 1,
+static int8_t const DIRY[9] PROGMEM = {
+    1, 1, 0, -1, -1, -1, 0, 1, 0,
 };
 
 void back_to_map()
@@ -245,7 +245,6 @@ static void update_map()
 
     load_chunks();
     run_chunks();
-
     update_sprites();
 }
 
@@ -433,6 +432,32 @@ static void update_game_over()
 #include <hardwareSerial.h>
 #endif
 
+static uint8_t const TITLE_PATH[] PROGMEM =
+{
+    8, 16, 7, 48, 0, 80, 8, 32, 2, 64, 4, 8, 8, 32, 7, 20, 6, 56, 0, 4, 8, 32,
+    6, 80, 4, 8, 8, 32, 6, 24, 5, 16, 4, 64, 3, 32, 2, 100, 3, 26, 2, 22,
+};
+constexpr uint16_t PATH_START_X = 930;
+constexpr uint16_t PATH_START_Y = 2803;
+
+static void title_advance_path()
+{
+    auto& d = sdata.title;
+    uint8_t pi = d.path_index;
+    if(pi >= sizeof(TITLE_PATH) / 2)
+    {
+        pi = 0;
+        px = PATH_START_X;
+        py = PATH_START_Y;
+    }
+    uint8_t const* ptr = &TITLE_PATH[pi * 2];
+    uint8_t dir = pgm_read_byte_inc(ptr);
+    uint8_t frames = pgm_read_byte(ptr);
+    d.path_index = pi + 1;
+    d.path_dir = dir;
+    d.path_frames = frames;
+}
+
 static void update_title()
 {
     static bool first_loaded = false;
@@ -448,29 +473,6 @@ static void update_title()
     }
 #endif
 
-    constexpr uint16_t ax = 10 * 16;
-    constexpr uint16_t ay =  4 * 16;
-    constexpr uint16_t bx = 31 * 16;
-    constexpr uint16_t by = 19 * 16;
-    constexpr uint8_t PROGRESS_INC = 1;
-
-    px = ax + d.progress;
-    py = ay + d.progress;
-    selx = sely = uint16_t(-1);
-    if(!(nframe & 1))
-    {
-        if(!d.dir)
-            d.progress += PROGRESS_INC;
-        else
-            d.progress -= PROGRESS_INC;
-        if(d.progress == 0 || d.progress == 255)
-            d.dir = !d.dir;
-    }
-
-    update_sprites();
-    load_chunks();
-    run_chunks();
-
     if(d.going_to_resume)
     {
         if(d.fade_frame < 16)
@@ -479,6 +481,7 @@ static void update_title()
         {
             load(false);
             change_state(STATE_RESUME);
+            return;
         }
     }
     else
@@ -500,6 +503,49 @@ static void update_title()
             d.going_to_resume = true;
         }
     }
+
+#if 1
+    if(!d.path_started)
+    {
+        d.path_started = true;
+        pdir = 0;
+        px = PATH_START_X;
+        py = PATH_START_Y;
+        title_advance_path();
+    }
+    else if(--d.path_frames == 0)
+        title_advance_path();
+    uint8_t dir = d.path_dir;
+    if(dir < 8) pdir = dir;
+    pmoving = (dir < 8);
+    int8_t dx = (int8_t)pgm_read_byte(&DIRX[dir]);
+    int8_t dy = (int8_t)pgm_read_byte(&DIRY[dir]);
+    px += dx;
+    py += dy;
+#else
+    constexpr uint16_t ax = 10 * 16;
+    constexpr uint16_t ay = 4 * 16;
+    constexpr uint16_t bx = 31 * 16;
+    constexpr uint16_t by = 19 * 16;
+    constexpr uint8_t PROGRESS_INC = 1;
+
+    px = ax + d.progress;
+    py = ay + d.progress;
+    selx = sely = uint16_t(-1);
+    if(!(nframe & 1))
+    {
+        if(!d.dir)
+            d.progress += PROGRESS_INC;
+        else
+            d.progress -= PROGRESS_INC;
+        if(d.progress == 0 || d.progress == 255)
+            d.dir = !d.dir;
+    }
+#endif
+
+    load_chunks();
+    run_chunks();
+    update_sprites();
 }
 
 static void update_resume()
