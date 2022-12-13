@@ -80,6 +80,12 @@ def convert_path(obj):
                 tiles.pop(i)
             else:
                 i += 1
+        if tiles[0] == tiles[-1] & 0x1f:
+            if (tiles[0] >> 5) + (tiles[-1] >> 5) > 7:
+                print('Too many path delays: chunk %d' % chunk)
+                sys.exit(1)
+            tiles[0] += (tiles[-1] & 0xe0)
+            tiles.pop(-1)
         if len(tiles) > CHUNK_ENEMY_PATH_SIZE:
             print('Path too long in chunk %d' % chunk)
             sys.exit(1)

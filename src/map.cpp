@@ -367,6 +367,7 @@ static bool run_chunk()
         {
             int8_t i = (int8_t)c.script[chunk_instr++];
             if(!sprite_contacts_player(ac, sprite)) chunk_instr += i;
+            else sprite.walking = false;
             break;
         }
         case CMD_BRNS:

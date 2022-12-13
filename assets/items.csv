@@ -12,3 +12,4 @@ Att,Def,Spd,MHP,Type,Name,Description
 ,,5,,ring,Tempus Ring,It hums and vibrates unnaturally. +5 speed.
 ,,,,ring,Strange Ring,"It looks magical, but doesn’t seem to do anything."
 ,4,,,armor,Defender’s Breastplate,+4 defense. The wearer does not stop defending at start of turn.
+,4,-4,,ring,Dreamer’s Ring,"Where did this come from? +4 defense, -4 speed."

@@ -15,4 +15,5 @@ item_info_t const ITEM_INFO[] PROGMEM =
     { 0, 0, 5, 0, IT_RING },
     { 0, 0, 0, 0, IT_RING },
     { 0, 4, 0, 0, IT_ARMOR },
+    { 0, 4, -4, 0, IT_RING },
 };
