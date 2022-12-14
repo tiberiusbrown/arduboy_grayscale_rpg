@@ -12,7 +12,8 @@ static void render_dialog()
 {
     auto& d = sdata.dialog;
     char c;
-    bool portrait = (d.portrait < 254);
+    uint8_t portrait_id = (uint8_t)d.name[0];
+    bool portrait = (portrait_id < 254);
 
     if(!d.questiondraw)
     {
@@ -38,7 +39,7 @@ static void render_dialog()
 
     if(portrait)
     {
-        uint8_t p = d.portrait;
+        uint8_t p = portrait_id;
         uint8_t x = 0;
         if(p >= 0x80)
             p -= 0x80, x = 48;
@@ -47,15 +48,15 @@ static void render_dialog()
         platform_drawrect_i8(x + 1, 1, 34, 34, BLACK);
         if(!d.questiondraw)
         {
-            uint8_t w = text_width(d.name);
+            uint8_t w = text_width(&d.name[1]);
             uint8_t x = 35;
             uint8_t y = 0;
             platform_fillrect_i8(x, y, w + 4, 12, BLACK);
             platform_drawrect_i8(x, y, w + 4, 12, LIGHT_GRAY);
-            draw_text_noclip(x + 2, y + 2, d.name);
+            draw_text_noclip(x + 2, y + 2, &d.name[1]);
         }
     }
-    else if(d.portrait == 254)
+    else if(portrait_id == 254)
     {
         platform_fx_drawoverwrite(33, 16, GOT_ITEM_IMG);
     }

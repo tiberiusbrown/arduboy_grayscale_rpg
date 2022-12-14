@@ -399,7 +399,7 @@ void platform_audio_play_sfx(uint8_t const* sfx)
 
 void platform_set_game_speed_default()
 {
-    platform_set_game_speed(11, 7);
+    platform_set_game_speed(26, 21);
 }
 
 void platform_set_game_speed_saved()

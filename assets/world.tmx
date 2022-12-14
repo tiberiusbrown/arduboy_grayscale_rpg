@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="157">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="158">
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer id="1" name="Tiles" width="256" height="256">
   <data encoding="csv">
@@ -660,7 +660,7 @@ end:</property>
   </object>
   <object id="154" x="887.75" y="3128.25">
    <properties>
-    <property name="script" value="$tmsg {DANGER! Scary stuff to the south!}"/>
+    <property name="script" value="$tmsg {DANGER! The raptor forest lies across this bridge. Travelers beware.}"/>
    </properties>
    <point/>
   </object>

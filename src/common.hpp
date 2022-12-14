@@ -192,7 +192,6 @@ struct sdata_resume
 };
 struct sdata_dialog
 {
-    uint8_t portrait;
     uint8_t char_progress;
     bool question;
     bool questiondraw;

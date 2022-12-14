@@ -78,6 +78,7 @@ static bool run_chunk()
             if(!(instr & 1) && t0 != sel_tile)
                 break;
             change_state(STATE_DIALOG);
+            sdata.dialog.name[0] = (char)INVALID;
             uint8_t portrait = INVALID;
             if(instr == CMD_DLG) portrait = t0;
             if(instr == CMD_TDLG) portrait = t1;
@@ -88,7 +89,6 @@ static bool run_chunk()
                     sdata.dialog.name,
                     sizeof(sdata.dialog.name));
             }
-            sdata.dialog.portrait = portrait;
             platform_fx_read_data_bytes(STRINGDATA + stri, sdata.dialog.message,
                                         sizeof(sdata.dialog.message));
             //wrap_text(sdata.dialog.message, 128);
@@ -170,7 +170,7 @@ static bool run_chunk()
                 {
                     // special message
                     change_state(STATE_DIALOG);
-                    sdata.dialog.portrait = 254;
+                    sdata.dialog.name[0] = (char)254;
                     char* ptr = sdata.dialog.message;
                     *ptr++ = 'x';
                     ptr += dec_to_str(ptr, (uint8_t)diff);
@@ -209,7 +209,7 @@ static bool run_chunk()
             {
                 // special message
                 change_state(STATE_DIALOG);
-                sdata.dialog.portrait = 254;
+                sdata.dialog.name[0] = (char)254;
                 static char const YOU_FOUND[] PROGMEM = "Item: ";
                 memcpy_P(sdata.dialog.message, YOU_FOUND, sizeof(YOU_FOUND));
                 platform_fx_read_data_bytes(
@@ -307,7 +307,7 @@ static bool run_chunk()
                 ++nparty;
                 if(no_state_actions) break;
                 change_state(STATE_DIALOG);
-                sdata.dialog.portrait = 0x80 + pgm_read_byte(&PARTY_INFO[id].portrait);
+                sdata.dialog.name[0] = char(0x80 + pgm_read_byte(&PARTY_INFO[id].portrait));
                 char* m = sdata.dialog.message;
                 char const* n = pgmptr(&PARTY_INFO[id].name);
                 char c;

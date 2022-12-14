@@ -4,7 +4,7 @@ import csv
 from font import wrap
 
 MAX_STRING_LENGTH = 219
-MAX_NAME_LENGTH = 19
+MAX_NAME_LENGTH = 18
 
 portraits = {}
 sprites = {}
@@ -26,15 +26,6 @@ def id_helper(x):
     return re.sub('[^a-zA-Z]+', '_', x)
 
 def init():
-    portrait_names = {}
-    maxpn = 0
-    with open('portraits.csv', newline='') as f:
-        reader = csv.reader(f, delimiter=',', quotechar='"')
-        for row in reader:
-            id = int(row[0])
-            portraits['P_' + id_helper(row[1])] = id
-            portrait_names[id] = row[1]
-            if id > maxpn: maxpn = id
     with open('sprites.csv', newline='') as f:
         reader = csv.reader(f, delimiter=',', quotechar='"')
         for row in reader:
@@ -42,17 +33,23 @@ def init():
     with open('enemies.csv', newline='') as f:
         reader = csv.reader(f, delimiter=',', quotechar='"')
         for row in reader:
-            enemies['E_' + id_helper(row[1])] = int(row[0])
-    with open('../arduboy_build/portrait_strings.bin', 'wb') as f:
-        bytes = [0] * ((maxpn + 1) * (MAX_NAME_LENGTH + 1))
-        for k in portrait_names:
-            pn = portrait_names[k]
-            if len(pn) > MAX_NAME_LENGTH:
-                print('Portrait name too long: "%s"' % pn)
-                sys.exit(1)
-            for n in range(len(pn)):
-                bytes[k * (MAX_NAME_LENGTH + 1) + n] = ord(pn[n])
-        f.write(bytearray(bytes))
+            enemies['E_' + id_helper(row[1])] = int(row[0])    
+    with open('portraits.csv', newline='') as f:
+        reader = csv.reader(f, delimiter=',', quotechar='"')
+        id = 0
+        with open('../arduboy_build/portrait_strings.bin', 'wb') as fo:
+            for row in reader:
+                pn = row[1]
+                if len(pn) > MAX_NAME_LENGTH:
+                    print('Portrait name too long: "%s"' % row[1])
+                    sys.exit(1)
+                portraits['P_' + id_helper(pn)] = id
+                id += 1
+                bytes = [0] * (MAX_NAME_LENGTH + 2)
+                bytes[0] = int(row[0])
+                for n in range(len(pn)):
+                    bytes[n + 1] = ord(pn[n])
+                fo.write(bytearray(bytes))
 
 strings = []
 stringdict = {}

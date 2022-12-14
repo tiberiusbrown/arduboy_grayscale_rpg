@@ -80,7 +80,7 @@ void load(bool first)
         new_game();
         savefile.settings.sound = 3;
         savefile.settings.brightness = 3;
-        savefile.settings.game_speed = 1;
+        savefile.settings.game_speed = 2;
     }
 
     if(first)

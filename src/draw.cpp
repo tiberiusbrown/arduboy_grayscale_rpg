@@ -25,7 +25,7 @@ static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     {
         f += (d & 7) * 2;
         if(state == STATE_MAP || state == STATE_TITLE)
-            f += (((uint8_t)nframe >> 2) & 3);
+            f += (((uint8_t)nframe >> 3) & 3);
     }
     entry->addr = SPRITES_IMG;
     entry->frame = f;
@@ -66,7 +66,7 @@ void draw_sprites()
     // player sprite
     {
         uint8_t f = pdir * 4;
-        if(pmoving) f += (((uint8_t)nframe >> 2) & 3);
+        if(pmoving) f += (((uint8_t)nframe >> 3) & 3);
         entries[n++] = {PLAYER_IMG, f, 64 - 8, 32 - 8 - 4};
     }
 
