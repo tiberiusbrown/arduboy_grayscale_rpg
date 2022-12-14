@@ -149,8 +149,7 @@ static void render_title()
     {
         if(d.fade_frame < 8) return;
         render_title_graphics();
-        if(d.fade_frame < 24)
-            platform_fade(d.fade_frame - 8);
+        platform_fade(d.fade_frame - 8);
     }
 }
 

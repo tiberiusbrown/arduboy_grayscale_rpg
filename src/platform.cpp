@@ -481,10 +481,11 @@ void platform_audio_play_song(uint8_t const* song) {}
 void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot) {}
 bool platform_audio_song_playing() { return true; }
 
-extern float target_frame_time;
+extern float target_frame_time, ft_rem;
 void platform_set_game_speed(uint8_t num, uint8_t denom)
 {
     target_frame_time = (1.f / 52) * num / denom;
+    if(ft_rem >= target_frame_time) ft_rem = 0.f;
 }
 
 #endif

@@ -27,6 +27,7 @@ int gplane;
 uint8_t pixels[3][128 * 64];
 uint8_t tex_pixels[128 * FBH * 4];
 float target_frame_time = (1.f / 33);
+float ft_rem = 0.f;
 
 inline uint8_t fadef(uint8_t x)
 {
@@ -35,11 +36,15 @@ inline uint8_t fadef(uint8_t x)
 
 inline uint8_t colormap(uint8_t x)
 {
+    uint8_t r;
 #if MUTED_PALETTE
-    return uint8_t((fadef(x * 0x38) + 0x10) & 0xff);
+    r = uint8_t((fadef(x * 0x38) + 0x10) & 0xff);
 #else
-    return uint8_t(fadef(x * 0x55) & 0xff);
+    r = uint8_t(fadef(x * 0x55) & 0xff);
 #endif
+    if(r == 255)
+        r = 254;
+    return r;
 }
 
 static void send_gif_frame(int ds = 3)
@@ -55,12 +60,12 @@ static void send_gif_frame(int ds = 3)
             gif->frame[i] = p;
 #endif
         }
-        //gif_ds += ds;
-        //if(gif_ds > 0 && 0 != memcmp(gif_prev, gif->frame, sizeof(gif_prev)))
+        gif_ds += ds;
+        if(gif_ds == 0 || 0 != memcmp(gif_prev, gif->frame, sizeof(gif_prev)))
         {
-            ge_add_frame(gif, ds);
-            //memcpy(gif_prev, gif->frame, sizeof(gif_prev));
-            //gif_ds = 0;
+            ge_add_frame(gif, gif_ds);
+            memcpy(gif_prev, gif->frame, sizeof(gif_prev));
+            gif_ds = 0;
         }
     }
 }
@@ -161,10 +166,10 @@ int main(int argc, char** argv)
                 screen_recording_toggle();
         }
 
-        static int frame = 0;
-
-        if(frame == 0)
+        bool updated = false;
+        while(ft_rem >= target_frame_time)
         {
+            ft_rem -= target_frame_time;
             auto const* k = SDL_GetKeyboardState(nullptr);
             uint8_t b = 0;
             if(k[SDL_SCANCODE_UP]) b |= BTN_UP;
@@ -176,21 +181,51 @@ int main(int argc, char** argv)
             btns_pressed = b & ~btns_down;
             btns_down = b;
             update();
+            updated = true;
         }
-        if(++frame == 2) frame = 0;
 
         memset(pixels, 0, sizeof(pixels));
+        for(gplane = 0; gplane < 3; ++gplane)
+            render();
 
-        gplane = 0;
-        render();
+        {
+            static Uint64 prev = SDL_GetTicks64();
+            Uint64 curr = SDL_GetTicks64();
+            ft_rem += float(curr - prev) * 0.001f;
+            prev = curr;
+        }
 
-        gplane = 1;
-        render();
+        //if(updated)
+        {
+            static Uint64 prev = SDL_GetTicks64();
+            Uint64 curr = SDL_GetTicks64();
 
-        gplane = 2;
-        render();
+            static float dt_rem = 0.f;
+            float dt = float(curr - prev) + dt_rem;
+            int ds = 0;
+            while(dt >= 10.f)
+            {
+                ++ds;
+                dt -= 10.f;
+            }
+            dt_rem = dt;
+            if(ds == 1)
+                ds = 0, dt_rem += 10.f;
 
-        if(frame == 1) send_gif_frame();
+            //static int dt_rem = 0;
+            //int dt = int(curr - prev);
+            //int ds = dt / 10;
+            //dt_rem += dt % 10;
+            //int adjust = dt_rem / 10;
+            //ds += adjust;
+            //dt_rem -= adjust * 10;
+
+            if(ds > 0)
+                send_gif_frame(ds);
+            //if(ds == 1) __debugbreak();
+            prev = curr;
+        }
+        //send_gif_frame(3);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
