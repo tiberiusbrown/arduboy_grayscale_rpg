@@ -11,6 +11,105 @@
 #include "generated/rounded_borders_white_img.hpp"
 #include "generated/rounded_borders_black_img.hpp"
 
+static int8_t fmulshi(int8_t x, int8_t y)
+{
+    return int8_t(fmuls(x, y) >> 8);
+}
+
+inline int8_t i8abs(int8_t x) { return x < 0 ? -x : x; }
+
+void draw_objective()
+{
+    if(py < 128 * 16) return;
+
+    uint8_t objx = savefile.objx;
+    uint8_t objy = savefile.objy;
+    if((objx | objy) == 0) return;
+
+    if(rframe & 16) return;
+
+    static_assert(MAP_CHUNK_W <= 32, "expand calculations to 16-bit");
+    static_assert(MAP_CHUNK_H <= 64, "expand calculations to 16-bit");
+
+    // direction to objective
+    int8_t dx = objx - (px >> 4);
+    int8_t dy = objy - (py >> 4);
+
+    // rotate by 22.5 degrees
+    constexpr int8_t M00 = int8_t(+0.9239 * 127);
+    constexpr int8_t M01 = int8_t(-0.3827 * 127);
+    constexpr int8_t M10 = int8_t(+0.3827 * 127);
+    constexpr int8_t M11 = int8_t(+0.9239 * 127);
+    int8_t rx = fmulshi(M00, dx) + fmulshi(M01, dy);
+    int8_t ry = fmulshi(M10, dx) + fmulshi(M11, dy);
+
+    uint8_t f;
+    int16_t x, y;
+
+    if(i8abs(dx) <= 5 && i8abs(dy - 1) <= 3)
+    {
+        // objective in view
+        f = 3;
+        x = objx * 16 - px + 56;
+        y = objy * 16 - py + 8;
+    }
+    else
+    {
+        // calculate arrow image frame
+        f = 0;
+        if(rx < 0) f |= 2, rx = -rx;
+        if(ry < 0) f |= 4, ry = -ry;
+        if(ry > rx) f |= 1;
+
+        constexpr int16_t XC = 56;
+        constexpr int16_t YC = 24;
+        x = objx * 16 - px;
+        y = objy * 16 - py;
+
+        // project arrow image to screen edges
+        if(x < -XC)
+        {
+            y = y * -XC / x;
+            x = -XC;
+        }
+        else if(x > XC)
+        {
+            y = y * XC / x;
+            x = XC;
+        }
+        if(y < -YC)
+        {
+            x = x * -YC / y;
+            y = -YC;
+        }
+        else if(y > YC)
+        {
+            x = x * YC / y;
+            y = YC;
+        }
+
+        x += XC;
+        y += YC;
+    }
+
+#if 0
+    // animate arrow
+    static int8_t const DIRS[16] PROGMEM =
+    {
+        1, 0, 1, 1, -1, 1, 0, 1, 1, -1, 0, -1, -1, 0, -1, -1,
+    };
+    uint8_t const* ptr = (uint8_t const*)(&DIRS[f * 2]);
+    int8_t ax = (int8_t)pgm_read_byte_inc(ptr);
+    int8_t ay = (int8_t)pgm_read_byte(ptr);
+    uint8_t af = (rframe >> 2) & 7;
+    if(af >= 4) af = 7 - af;
+    x += ax * af;
+    y += ay * af;
+#endif
+
+    platform_fx_drawplusmask(x, y, OBJECTIVE_ARROWS_IMG, f);
+}
+
 static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
                                       int16_t ox, int16_t oy)
 {

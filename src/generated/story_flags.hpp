@@ -37,3 +37,4 @@ constexpr uint16_t SFLAG_LightsOut_9 = 31;
 constexpr uint16_t SFLAG_lightsout_pot_a = 32;
 constexpr uint16_t SFLAG_lightsout_pot_b = 33;
 constexpr uint16_t SFLAG_village_nw_pot = 34;
+constexpr uint16_t SFLAG_tip_objective = 35;

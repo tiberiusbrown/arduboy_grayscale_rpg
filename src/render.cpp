@@ -8,6 +8,13 @@ void render_map()
     draw_sprites();
 }
 
+static void render_map_and_objective()
+{
+    render_map();
+    if(btns_down & BTN_A)
+        draw_objective();
+}
+
 static void render_dialog()
 {
     auto& d = sdata.dialog;
@@ -223,7 +230,7 @@ void render()
     static render_func const FUNCS[] PROGMEM = {
         render_title,
         render_resume,
-        render_map,
+        render_map_and_objective,
         render_pause,
         render_dialog,
         render_tp,
@@ -236,4 +243,7 @@ void render()
     update_battery();
 
     render_battery();
+
+    if(plane() == 0)
+        ++rframe;
 }

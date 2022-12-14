@@ -120,8 +120,6 @@ static bool run_chunk()
             sdata.battle.pdef = sdata.battle.edef = INVALID;
             sdata.battle.defender_id = INVALID;
             sdata.battle.flag = f;
-            //for(auto& p : party)
-            //    p.battle.ap = 0;
             story_flag_set(f);
             return true;
         }
@@ -133,11 +131,13 @@ static bool run_chunk()
         {
             uint8_t t;
             if(instr != CMD_TP) t = c.script[chunk_instr++];
-            uint16_t tx, ty;
+            static_assert(MAP_CHUNK_W <= 32, "expand to 16-bit");
+            static_assert(MAP_CHUNK_H <= 64, "expand to 16-bit");
+            uint8_t tx, ty;
             tx = c.script[chunk_instr++];
-            tx |= uint16_t(c.script[chunk_instr++]) << 8;
+            //tx |= uint16_t(c.script[chunk_instr++]) << 8;
             ty = c.script[chunk_instr++];
-            ty |= uint16_t(c.script[chunk_instr++]) << 8;
+            //ty |= uint16_t(c.script[chunk_instr++]) << 8;
             if(no_state_actions) break;
             if(instr == CMD_TTP && t != sel_tile) break;
             if(instr == CMD_WTP && t != walk_tile) break;
@@ -295,28 +295,33 @@ static bool run_chunk()
             break;
         }
         case CMD_PA:
-            if(nparty >= 4)
-                break;
-            {
-                uint8_t id = c.script[chunk_instr++];
-                for(uint8_t u = 0; u < nparty; ++u)
-                    if(party[u].battle.id == id)
-                        break;
-                party[nparty].battle.id = id;
-                party[nparty].battle.hp = party_mhp(nparty);
-                ++nparty;
-                if(no_state_actions) break;
-                change_state(STATE_DIALOG);
-                sdata.dialog.name[0] = char(0x80 + pgm_read_byte(&PARTY_INFO[id].portrait));
-                char* m = sdata.dialog.message;
-                char const* n = pgmptr(&PARTY_INFO[id].name);
-                char c;
-                do *m++ = c = (char)pgm_read_byte_inc(n);
-                while(c != '\0');
-                static char const JOINED[] PROGMEM = " has joined the party!";
-                memcpy_P(m - 1, JOINED, sizeof(JOINED));
-                return true;
-            }
+        {
+            if(nparty >= 4) break;
+            uint8_t id = c.script[chunk_instr++];
+            for(uint8_t u = 0; u < nparty; ++u)
+                if(party[u].battle.id == id)
+                    break;
+            party[nparty].battle.id = id;
+            party[nparty].battle.hp = party_mhp(nparty);
+            ++nparty;
+            if(no_state_actions) break;
+            change_state(STATE_DIALOG);
+            sdata.dialog.name[0] = char(0x80 + pgm_read_byte(&PARTY_INFO[id].portrait));
+            char* m = sdata.dialog.message;
+            char const* n = pgmptr(&PARTY_INFO[id].name);
+            char c;
+            do *m++ = c = (char)pgm_read_byte_inc(n);
+            while(c != '\0');
+            static char const JOINED[] PROGMEM = " has joined the party!";
+            memcpy_P(m - 1, JOINED, sizeof(JOINED));
+            return true;
+        }
+        case CMD_OBJ:
+        {
+            savefile.objx = c.script[chunk_instr++];
+            savefile.objy = c.script[chunk_instr++];
+            break;
+        }
 
         case CMD_JMP:
         {

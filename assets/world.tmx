@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="158">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="160">
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer id="1" name="Tiles" width="256" height="256">
   <data encoding="csv">
@@ -323,6 +323,7 @@ Are you sure?
 
 
 Well, it was just a dream. Come along, the morning's getting on. Why don't you go to Old Charlie and get some fish for tonight? A walk in the fresh air will ease your mind.}
+obj @obj_oldcharlie
 end:</property>
    </properties>
   </object>
@@ -672,6 +673,16 @@ end:</property>
    </properties>
    <point/>
   </object>
+  <object id="159" x="891.636" y="2792.91">
+   <properties>
+    <property name="script">brfs !tip_objective end
+dlg P_Matthias {Time to go see Old Charlie for some fish!}
+msg {While outside, press and hold A to show the direction to your current objective.}
+fs !tip_objective
+end:</property>
+   </properties>
+   <point/>
+  </object>
  </objectgroup>
  <objectgroup color="#ff0000" id="3" name="Paths">
   <object id="90" name="!Mother_Pacing" class="S_Mother" x="394.75" y="74.25">
@@ -689,8 +700,8 @@ end:</property>
   <object id="132" name="!Catherine_fountain" class="S_Catherine" x="968.25" y="2953.25">
    <polygon points="48,-2 48.75,46 0.25,46.75 -2,-0.75"/>
   </object>
-  <object id="134" name="!Charlie_by_house" class="S_Old_Charlie" x="1067.75" y="2941.25">
-   <polyline points="0,0 1.75,-6 -3.75,0.25 0,-10.25 -8,1.5 -4.5,-11.25 -9.25,-5.75 -31.25,0 -28,-6 -36.75,0.75 -29,-10 -40.5,0.25 -35,-10.75 -41,-7 -29.5,-33.75 -36.5,-30.5 -29.75,-37.5 -40.75,-31.75 -30.25,-41.25 -41.5,-36.25 -37.75,-41"/>
+  <object id="134" name="!Charlie_by_house" class="S_Old_Charlie" x="1062.75" y="2939">
+   <polyline points="-31.25,0 -28,-6"/>
   </object>
   <object id="136" name="!Cecilia_near_fountain" class="S_Cecilia" x="1143.25" y="2951">
    <polyline points="-5.75,3.75 -2,-4 6.5,-2.25 1.75,2.25 3.75,6 -3.5,5.5 0,0 -31.75,1 -34.25,19 -108.75,11.25 -105.5,15.5 -113,11.25 -106.25,18.25 -116.75,15.25 -107.75,20.5 -114.25,22 -106.5,45.75 -111.25,43.5 -105.75,49 -117.5,45 -112.5,52 -36.25,52 -31.5,53.75 -38,48 -28,53 -36,46.25 -26,50.25 -30.75,45"/>
@@ -734,6 +745,9 @@ end:</property>
    <point/>
   </object>
   <object id="137" name="@stairs_village_dungeon" x="2472.59" y="76.5303">
+   <point/>
+  </object>
+  <object id="158" name="@obj_oldcharlie" x="1033.04" y="2936.92">
    <point/>
   </object>
  </objectgroup>

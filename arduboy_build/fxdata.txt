@@ -29,6 +29,7 @@ raw_t NO_ITEMS_IMG = "no_items_img.bin"
 raw_t GOT_ITEM_IMG = "got_item_img.bin"
 raw_t TITLE_MASKED_IMG = "title_masked_img.bin"
 raw_t PRESS_A_IMG = "press_a_img.bin"
+raw_t OBJECTIVE_ARROWS_IMG = "objective_arrows_img.bin"
 
 // put string data last to avoid large diffs in git when scripts are updated
 raw_t GAME_OVER_MESSAGES = "game_over_messages.bin"

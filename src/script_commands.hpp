@@ -80,6 +80,9 @@ Game Manipulation
     pa <id>
         Add party member <id> to party
 
+    obj <tx> <ty>
+        Set objective marker position to <tx> <ty>
+
 Control Instructions
 
     end
@@ -193,6 +196,7 @@ enum script_command_t
     CMD_ST,
     CMD_STF,
     CMD_PA,
+    CMD_OBJ,
 
     CMD_JMP,
     CMD_BRZ,

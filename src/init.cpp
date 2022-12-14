@@ -31,7 +31,7 @@ void new_game()
     party[0].battle.hp = party_mhp(0);
 
     //LOC_dungeon_lightsout();
-    LOC_home_outside();
+    LOC_home_inside();
 }
 
 void initialize()

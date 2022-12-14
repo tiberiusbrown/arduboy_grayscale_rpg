@@ -159,6 +159,7 @@ uint8_t state;
 sdata_t sdata;
 
 uint8_t nframe;
+uint8_t rframe;
 
 bool pmoving;
 uint16_t selx, sely;

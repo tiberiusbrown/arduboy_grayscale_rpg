@@ -99,6 +99,7 @@ class CMD(AutoNumber):
     ST   = ()
     STF  = ()
     PA   = ()
+    OBJ  = ()
 
     JMP  = ()
     BRZ  = ()
@@ -261,20 +262,26 @@ def assemble(s, eps):
             
         elif s[i] == 'tp':
             b.append(CMD.TP); i += 1
-            append16(b, s[i]); i += 1
-            append16(b, s[i]); i += 1
+            #append16(b, s[i]); i += 1
+            #append16(b, s[i]); i += 1
+            b.append(int(s[i])); i += 1
+            b.append(int(s[i])); i += 1
             
         elif s[i] == 'ttp':
             b.append(CMD.TTP); i += 1
             b.append(int(s[i])); i += 1
-            append16(b, s[i]); i += 1
-            append16(b, s[i]); i += 1
+            #append16(b, s[i]); i += 1
+            #append16(b, s[i]); i += 1
+            b.append(int(s[i])); i += 1
+            b.append(int(s[i])); i += 1
             
         elif s[i] == 'wtp':
             b.append(CMD.WTP); i += 1
             b.append(int(s[i])); i += 1
-            append16(b, s[i]); i += 1
-            append16(b, s[i]); i += 1
+            #append16(b, s[i]); i += 1
+            #append16(b, s[i]); i += 1
+            b.append(int(s[i])); i += 1
+            b.append(int(s[i])); i += 1
             
         elif s[i] == 'add':
             b.append(CMD.ADD); i += 1
@@ -327,6 +334,13 @@ def assemble(s, eps):
             
         elif s[i] == 'pa':
             b.append(CMD.PA); i += 1
+            b.append(int(s[i])); i += 1
+            
+        elif s[i] == 'obj':
+            b.append(CMD.OBJ); i += 1
+            #append16(b, s[i]); i += 1
+            #append16(b, s[i]); i += 1
+            b.append(int(s[i])); i += 1
             b.append(int(s[i])); i += 1
             
         elif s[i] == 'jmp':

@@ -67,6 +67,7 @@ inline uint8_t deref_inc(T const*& p)
 #define FORCE_INLINE __attribute__((always_inline))
 #define FORCE_NOINLINE __attribute__((noinline))
 inline uint8_t bitmask(uint8_t x) { return FX::bitShiftLeftUInt8(x); }
+inline int16_t fmuls(int8_t x, int8_t y) { return __builtin_avr_fmuls(x, y); }
 #else
 #include <assert.h>
 #define MY_ASSERT(cond__) assert(cond__)
@@ -119,6 +120,7 @@ inline void* memcpy_P(void* dst, void const* src, size_t num)
 {
     return memcpy(dst, src, num);
 }
+inline int16_t fmuls(int8_t x, int8_t y) { return (x * y) << 1; }
 #endif
 
 constexpr uint8_t PLANES = 3;
@@ -156,7 +158,8 @@ struct map_chunk_t
     uint8_t script[CHUNK_SCRIPT_SIZE];
 };
 
-extern uint8_t nframe;
+extern uint8_t nframe; // update frame
+extern uint8_t rframe; // render frame
 
 enum
 {
@@ -208,7 +211,9 @@ struct sdata_dialog
 };
 struct sdata_tp
 {
-    uint16_t tx, ty;
+    static_assert(MAP_CHUNK_W <= 32, "expand to 16-bit");
+    static_assert(MAP_CHUNK_H <= 64, "expand to 16-bit");
+    uint8_t tx, ty;
     uint8_t frame;
 };
 
@@ -458,6 +463,7 @@ struct savefile_t
     uint16_t checksum;
     uint8_t identifier[8];
     bool loaded;
+    uint8_t objx, objy;  // objective marker position
     uint16_t px, py;     // player position (in pixels)
     uint8_t pdir;        // player direction
     uint8_t nparty;
@@ -571,6 +577,7 @@ void platform_set_game_speed_default();
 void platform_set_game_speed_saved();
 
 // draw.cpp
+void draw_objective();
 void draw_tile(int16_t x, int16_t y, uint8_t t, uint8_t n);
 void draw_text(int16_t x, int16_t y, char const* str);      // str in RAM
 void draw_text_prog(int16_t x, int16_t y, char const* str); // str in PROGMEM
