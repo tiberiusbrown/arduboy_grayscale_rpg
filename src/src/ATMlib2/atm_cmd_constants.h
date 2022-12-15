@@ -1,4 +1,4 @@
-
+#pragma once
 #include <stdint.h>
 
 #ifndef ATM_CMD_CONSTANTS_H

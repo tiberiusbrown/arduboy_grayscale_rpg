@@ -76,7 +76,6 @@ void load(bool first)
             id = false;
     if(!id || compute_checksum() != savefile.checksum)
     {
-        memset(&savefile, 0, sizeof(savefile));
         new_game();
         savefile.settings.sound = 3;
         savefile.settings.brightness = 3;
@@ -106,7 +105,7 @@ uint16_t compute_checksum()
     for(size_t i = 2; i < sizeof(savefile); ++i)
     {
         x = (crc >> 8) ^ ((uint8_t const*)&savefile)[i];
-        x ^= x >> 4;
+        x ^= div16(x);
         crc = (crc << 8) ^
             (uint16_t(x) << 12) ^
             (uint16_t(x) << 5) ^

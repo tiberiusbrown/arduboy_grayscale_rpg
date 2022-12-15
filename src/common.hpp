@@ -42,32 +42,32 @@ constexpr uint8_t CHUNK_SPRITE_PATH_SIZE = 8;
 #define ABG_DISCHARGE_CYCLES 2
 #define ABG_FPS_DEFAULT 156
 #include "ArduboyG.h"
+#define FORCE_INLINE __attribute__((always_inline))
+#define FORCE_NOINLINE __attribute__((noinline))
 extern ArduboyGBase_Config<ABG_Mode::L4_Triplane> a;
 using int24_t = __int24;
 using uint24_t = __uint24;
-inline uint8_t plane()
+FORCE_INLINE inline uint8_t plane()
 {
     return a.currentPlane();
 }
 #define MY_ASSERT(cond__) (void)0
 template<class T>
-inline uint8_t pgm_read_byte_inc(T const*& p)
+FORCE_INLINE inline uint8_t pgm_read_byte_inc(T const*& p)
 {
     uint8_t r;
     asm volatile("lpm %[r], %a[p]+\n" : [p] "+&z" (p), [r] "=&r" (r));
     return r;
 }
 template<class T>
-inline uint8_t deref_inc(T const*& p)
+FORCE_INLINE inline uint8_t deref_inc(T const*& p)
 {
     uint8_t r;
     asm volatile("ld %[r], %a[p]+\n" : [p] "+&e" (p), [r] "=&r" (r) :: "memory");
     return r;
 }
-#define FORCE_INLINE __attribute__((always_inline))
-#define FORCE_NOINLINE __attribute__((noinline))
-inline uint8_t bitmask(uint8_t x) { return FX::bitShiftLeftUInt8(x); }
-inline int16_t fmuls(int8_t x, int8_t y) { return __builtin_avr_fmuls(x, y); }
+FORCE_INLINE inline uint8_t bitmask(uint8_t x) { return FX::bitShiftLeftUInt8(x); }
+FORCE_INLINE inline int16_t fmuls(int8_t x, int8_t y) { return __builtin_avr_fmuls(x, y); }
 #else
 #include <assert.h>
 #define MY_ASSERT(cond__) assert(cond__)
@@ -562,7 +562,7 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_fillrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c) FORCE_NOINLINE;
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
-void platform_drawrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c);
+void platform_drawrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c) FORCE_NOINLINE;
 void platform_fx_erase_save_sector();
 void platform_fx_write_save_page(uint16_t page, void const* data, size_t num);
 void platform_fx_read_save_bytes(uint24_t addr, void* data, size_t num);
@@ -654,5 +654,38 @@ uint8_t const* song_peaceful();
 #else
 inline uint8_t const* song_victory() { return nullptr; }
 inline uint8_t const* song_peaceful() { return nullptr; }
+#endif
+}
+
+inline uint8_t div16_u16(uint16_t x)
+{
+#ifdef ARDUINO
+    asm volatile(R"ASM(
+        swap %A[x]
+        andi %A[x], 0x0f
+        swap %B[x]
+        andi %B[x], 0xf0
+        or   %A[x], %B[x]
+        )ASM"
+        : [x] "+&d" (x)
+        );
+    return (uint8_t)x;
+#else
+    return uint8_t(x >> 4);
+#endif
+}
+
+inline uint8_t div16(uint8_t x)
+{
+#ifdef ARDUINO
+    asm volatile(R"ASM(
+        swap %[x]
+        andi %[x], 0x0f
+        )ASM"
+        : [x] "+&d" (x)
+        );
+    return x;
+#else
+    return x >> 4;
 #endif
 }

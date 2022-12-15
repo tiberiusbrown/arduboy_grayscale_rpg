@@ -31,14 +31,16 @@ static bool run_chunk()
     uint8_t sel_tile = 255;
     bool sel_sprite = false;
     {
-        uint16_t tx = ac.cx * 8;
-        uint16_t ty = ac.cy * 4;
+        static_assert(MAP_CHUNK_W <= 32, "expand tx to 16-bit");
+        static_assert(MAP_CHUNK_H <= 64, "expand ty to 16-bit");
+        uint8_t tx = ac.cx * 8;
+        uint8_t ty = ac.cy * 4;
         uint8_t dx, dy;
-        dx = uint8_t(((px + 8) >> 4) - tx);
-        dy = uint8_t(((py + 8) >> 4) - ty);
+        dx = div16_u16(px + 8) - tx;
+        dy = div16_u16(py + 8) - ty;
         if((dx | dy) < 8) walk_tile = dy * 8 + dx;
-        dx = uint8_t((selx >> 4) - tx);
-        dy = uint8_t((sely >> 4) - ty);
+        dx = div16_u16(selx) - tx;
+        dy = div16_u16(sely) - ty;
         if((dx | dy) < 8)
         {
             sel_tile = dy * 8 + dx;
@@ -54,9 +56,10 @@ static bool run_chunk()
         state == STATE_RESUME ||
         state == STATE_TITLE || 
         state == STATE_TP);
-    while(chunk_instr < CHUNK_SCRIPT_SIZE)
+    uint8_t const* instr_ptr = &c.script[chunk_instr];
+    while(instr_ptr < &c.script[0] + sizeof(c.script))
     {
-        script_command_t instr = (script_command_t)c.script[chunk_instr++];
+        script_command_t instr = (script_command_t)deref_inc(instr_ptr);
         switch(instr)
         {
         case CMD_END:
@@ -69,10 +72,10 @@ static bool run_chunk()
         case CMD_TDLG:
         {
             uint8_t t0, t1;
-            if(instr != CMD_MSG) t0 = c.script[chunk_instr++];
-            if(instr == CMD_TDLG) t1 = c.script[chunk_instr++];
-            uint16_t stri = c.script[chunk_instr++];
-            stri |= uint16_t(c.script[chunk_instr++]) << 8;
+            if(instr != CMD_MSG) t0 = deref_inc(instr_ptr);
+            if(instr == CMD_TDLG) t1 = deref_inc(instr_ptr);
+            uint16_t stri = deref_inc(instr_ptr);
+            stri |= uint16_t(deref_inc(instr_ptr)) << 8;
             if(no_state_actions) break;
             static_assert(!((CMD_TMSG | CMD_TDLG) & 1), "");
             if(!(instr & 1) && t0 != sel_tile)
@@ -92,18 +95,18 @@ static bool run_chunk()
             platform_fx_read_data_bytes(STRINGDATA + stri, sdata.dialog.message,
                                         sizeof(sdata.dialog.message));
             //wrap_text(sdata.dialog.message, 128);
-            return true;
+            goto pause;
         }
         case CMD_BAT:
         case CMD_EBAT:
         {
-            uint8_t f = c.script[chunk_instr++];
-            f |= uint16_t(c.script[chunk_instr++]) << 8;
+            uint8_t f = deref_inc(instr_ptr);
+            f |= uint16_t(deref_inc(instr_ptr)) << 8;
             uint8_t e[4];
-            e[0] = c.script[chunk_instr++];
-            e[1] = c.script[chunk_instr++];
-            e[2] = c.script[chunk_instr++];
-            e[3] = c.script[chunk_instr++];
+            e[0] = deref_inc(instr_ptr);
+            e[1] = deref_inc(instr_ptr);
+            e[2] = deref_inc(instr_ptr);
+            e[3] = deref_inc(instr_ptr);
             if(no_state_actions) break;
             if(story_flag_get(f)) break;
             change_state(STATE_BATTLE);
@@ -121,7 +124,7 @@ static bool run_chunk()
             sdata.battle.defender_id = INVALID;
             sdata.battle.flag = f;
             story_flag_set(f);
-            return true;
+            goto pause;
         }
 
         // teleport
@@ -130,37 +133,37 @@ static bool run_chunk()
         case CMD_WTP:
         {
             uint8_t t;
-            if(instr != CMD_TP) t = c.script[chunk_instr++];
+            if(instr != CMD_TP) t = deref_inc(instr_ptr);
             static_assert(MAP_CHUNK_W <= 32, "expand to 16-bit");
             static_assert(MAP_CHUNK_H <= 64, "expand to 16-bit");
             uint8_t tx, ty;
-            tx = c.script[chunk_instr++];
-            //tx |= uint16_t(c.script[chunk_instr++]) << 8;
-            ty = c.script[chunk_instr++];
-            //ty |= uint16_t(c.script[chunk_instr++]) << 8;
+            tx = deref_inc(instr_ptr);
+            //tx |= uint16_t(deref_inc(instr_ptr)) << 8;
+            ty = deref_inc(instr_ptr);
+            //ty |= uint16_t(deref_inc(instr_ptr)) << 8;
             if(no_state_actions) break;
             if(instr == CMD_TTP && t != sel_tile) break;
             if(instr == CMD_WTP && t != walk_tile) break;
             change_state(STATE_TP);
             sdata.tp.tx = tx;
             sdata.tp.ty = ty;
-            return true;
+            goto pause;
         }
 
         case CMD_ADD:
         {
-            uint8_t t = c.script[chunk_instr++];
+            uint8_t t = deref_inc(instr_ptr);
             uint8_t dst = t & 0xf;
-            uint8_t src = t >> 4;
+            uint8_t src = div16(t);
             savefile.chunk_regs[dst] += savefile.chunk_regs[src];
             break;
         }
         case CMD_ADDI:
         {
-            uint8_t t = c.script[chunk_instr++];
-            int8_t imm = (int8_t)c.script[chunk_instr++];
+            uint8_t t = deref_inc(instr_ptr);
+            int8_t imm = (int8_t)deref_inc(instr_ptr);
             uint8_t dst = t & 0xf;
-            uint8_t src = t >> 4;
+            uint8_t src = div16(t);
             int8_t newdst = savefile.chunk_regs[src] + imm;
             int8_t diff = newdst - savefile.chunk_regs[dst];
             savefile.chunk_regs[dst] = newdst;
@@ -184,24 +187,24 @@ static bool run_chunk()
                         if(c == '\0') c = ' ';
                     }
                     ptr[ITEM_NAME_LEN - 1] = '\n';
-                    return true;
+                    goto pause;
                 }
             }
             break;
         }
         case CMD_SUB:
         {
-            uint8_t t = c.script[chunk_instr++];
+            uint8_t t = deref_inc(instr_ptr);
             uint8_t dst = t & 0xf;
-            uint8_t src = t >> 4;
+            uint8_t src = div16(t);
             savefile.chunk_regs[dst] -= savefile.chunk_regs[src];
             break;
         }
 
         case CMD_FS:
         {
-            uint16_t f = c.script[chunk_instr++];
-            f |= (uint16_t(c.script[chunk_instr++]) << 8);
+            uint16_t f = deref_inc(instr_ptr);
+            f |= (uint16_t(deref_inc(instr_ptr)) << 8);
             if(no_state_actions) break;
             bool already_have = story_flag_get(f);
             story_flag_set(f);
@@ -222,22 +225,22 @@ static bool run_chunk()
                     if(c == '\0') c = ' ';
                 }
                 sdata.dialog.message[sizeof(YOU_FOUND) - 1 + ITEM_NAME_LEN - 1] = '\n';
-                return true;
+                goto pause;
             }
             break;
         }
         case CMD_FC:
         {
-            uint16_t f = c.script[chunk_instr++];
-            f |= (uint16_t(c.script[chunk_instr++]) << 8);
+            uint16_t f = deref_inc(instr_ptr);
+            f |= (uint16_t(deref_inc(instr_ptr)) << 8);
             if(no_state_actions) break;
             story_flag_clr(f);
             break;
         }
         case CMD_FT:
         {
-            uint16_t f = c.script[chunk_instr++];
-            f |= (uint16_t(c.script[chunk_instr++]) << 8);
+            uint16_t f = deref_inc(instr_ptr);
+            f |= (uint16_t(deref_inc(instr_ptr)) << 8);
             if(no_state_actions) break;
             story_flag_tog(f);
             break;
@@ -248,16 +251,16 @@ static bool run_chunk()
             uint16_t f;
             if(instr == CMD_EPF)
             {
-                f = c.script[chunk_instr++];
-                f |= (uint16_t(c.script[chunk_instr++]) << 8);
+                f = deref_inc(instr_ptr);
+                f |= (uint16_t(deref_inc(instr_ptr)) << 8);
             }
-            uint8_t id = c.script[chunk_instr++];
-            uint8_t n = c.script[chunk_instr++];
-            uint8_t open = c.script[chunk_instr++];
+            uint8_t id = deref_inc(instr_ptr);
+            uint8_t n = deref_inc(instr_ptr);
+            uint8_t open = deref_inc(instr_ptr);
             if(instr == CMD_EPF && story_flag_get(f))
             {
                 sprite.active = false;
-                chunk_instr += n;
+                instr_ptr += n;
                 break;
             }
             bool reset = false;
@@ -266,9 +269,9 @@ static bool run_chunk()
             sprite.type = id;
             for(uint8_t j = 0; j < n; ++j)
             {
-                if(sprite.path[j] != c.script[chunk_instr])
+                if(sprite.path[j] != *instr_ptr)
                     reset = true;
-                sprite.path[j] = c.script[chunk_instr++];
+                sprite.path[j] = deref_inc(instr_ptr);
             }
             sprite.path_num = n;
             sprite.active = (n > 0);
@@ -282,14 +285,14 @@ static bool run_chunk()
         case CMD_ST:
         case CMD_STF:
         {
-            uint8_t t = c.script[chunk_instr++];
+            uint8_t t = deref_inc(instr_ptr);
             uint16_t f;
             if(instr == CMD_STF)
             {
-                f = c.script[chunk_instr++];
-                f |= (uint16_t(c.script[chunk_instr++]) << 8);
+                f = deref_inc(instr_ptr);
+                f |= (uint16_t(deref_inc(instr_ptr)) << 8);
             }
-            uint8_t i = c.script[chunk_instr++];
+            uint8_t i = deref_inc(instr_ptr);
             if(instr != CMD_STF || !story_flag_get(f))
                 c.tiles_flat[t] = i;
             break;
@@ -297,7 +300,7 @@ static bool run_chunk()
         case CMD_PA:
         {
             if(nparty >= 4) break;
-            uint8_t id = c.script[chunk_instr++];
+            uint8_t id = deref_inc(instr_ptr);
             for(uint8_t u = 0; u < nparty; ++u)
                 if(party[u].battle.id == id)
                     break;
@@ -314,83 +317,83 @@ static bool run_chunk()
             while(c != '\0');
             static char const JOINED[] PROGMEM = " has joined the party!";
             memcpy_P(m - 1, JOINED, sizeof(JOINED));
-            return true;
+            goto pause;
         }
         case CMD_OBJ:
         {
-            savefile.objx = c.script[chunk_instr++];
-            savefile.objy = c.script[chunk_instr++];
+            savefile.objx = deref_inc(instr_ptr);
+            savefile.objy = deref_inc(instr_ptr);
             break;
         }
 
         case CMD_JMP:
         {
-            int8_t i = c.script[chunk_instr++];
-            chunk_instr += i;
+            int8_t i = deref_inc(instr_ptr);
+            instr_ptr += i;
             break;
         }
         case CMD_BZ:
         {
-            uint8_t t = c.script[chunk_instr++];
-            int8_t i = (int8_t)c.script[chunk_instr++];
-            if(savefile.chunk_regs[t] == 0) chunk_instr += i;
+            uint8_t t = deref_inc(instr_ptr);
+            int8_t i = (int8_t)deref_inc(instr_ptr);
+            if(savefile.chunk_regs[t] == 0) instr_ptr += i;
             break;
         }
         case CMD_BNZ:
         {
-            uint8_t t = c.script[chunk_instr++];
-            int8_t i = (int8_t)c.script[chunk_instr++];
-            if(savefile.chunk_regs[t] < 0) chunk_instr += i;
+            uint8_t t = deref_inc(instr_ptr);
+            int8_t i = (int8_t)deref_inc(instr_ptr);
+            if(savefile.chunk_regs[t] < 0) instr_ptr += i;
             break;
         }
         case CMD_BFS:
         case CMD_BFC:
         {
-            uint16_t f = c.script[chunk_instr++];
-            f |= (uint16_t(c.script[chunk_instr++]) << 8);
-            int8_t t = (int8_t)c.script[chunk_instr++];
+            uint16_t f = deref_inc(instr_ptr);
+            f |= (uint16_t(deref_inc(instr_ptr)) << 8);
+            int8_t t = (int8_t)deref_inc(instr_ptr);
             bool fs = story_flag_get(f);
             if(instr == CMD_BFC) fs = !fs;
-            if(fs) chunk_instr += t;
+            if(fs) instr_ptr += t;
             break;
         }
         case CMD_BNST:
         {
-            uint8_t t = c.script[chunk_instr++];
-            int8_t i = (int8_t)c.script[chunk_instr++];
-            if(t != sel_tile) chunk_instr += i;
+            uint8_t t = deref_inc(instr_ptr);
+            int8_t i = (int8_t)deref_inc(instr_ptr);
+            if(t != sel_tile) instr_ptr += i;
             break;
         }
         case CMD_BNWT:
         {
-            uint8_t t = c.script[chunk_instr++];
-            int8_t i = (int8_t)c.script[chunk_instr++];
-            if(t != walk_tile) chunk_instr += i;
+            uint8_t t = deref_inc(instr_ptr);
+            int8_t i = (int8_t)deref_inc(instr_ptr);
+            if(t != walk_tile) instr_ptr += i;
             break;
         }
         case CMD_BNWE:
         {
-            int8_t i = (int8_t)c.script[chunk_instr++];
-            if(!sprite_contacts_player(ac, sprite)) chunk_instr += i;
+            int8_t i = (int8_t)deref_inc(instr_ptr);
+            if(!sprite_contacts_player(ac, sprite)) instr_ptr += i;
             else sprite.walking = false;
             break;
         }
         case CMD_BNSE:
         {
-            int8_t i = (int8_t)c.script[chunk_instr++];
-            if(!sel_sprite) chunk_instr += i;
+            int8_t i = (int8_t)deref_inc(instr_ptr);
+            if(!sel_sprite) instr_ptr += i;
             break;
         }
         case CMD_BNI:
         {
-            uint16_t f = c.script[chunk_instr++];
-            f |= (uint16_t(c.script[chunk_instr++]) << 8);
-            int8_t t = (int8_t)c.script[chunk_instr++];
+            uint16_t f = deref_inc(instr_ptr);
+            f |= (uint16_t(deref_inc(instr_ptr)) << 8);
+            int8_t t = (int8_t)deref_inc(instr_ptr);
             bool jmp = true;
             for(uint8_t i = 0; i < nparty; ++i)
                 if(user_is_wearing(i, (item_t)f))
                     jmp = false;
-            if(jmp) chunk_instr += t;
+            if(jmp) instr_ptr += t;
             break;
         }
 
@@ -398,6 +401,10 @@ static bool run_chunk()
         }
     }
     return false;
+
+pause:
+    chunk_instr = uint8_t(ptrdiff_t(instr_ptr - &c.script[0]));
+    return true;
 }
 
 static void clamp_regs()

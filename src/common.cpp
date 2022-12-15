@@ -112,28 +112,28 @@ void change_state(uint8_t new_state)
 void story_flag_set(uint16_t index)
 {
     uint8_t i = index >> 3;
-    uint8_t m = 1 << (index & 7);
+    uint8_t m = bitmask((uint8_t)index);
     story_flags[i] |= m;
 }
 
 void story_flag_clr(uint16_t index)
 {
     uint8_t i = index >> 3;
-    uint8_t m = 1 << (index & 7);
+    uint8_t m = bitmask((uint8_t)index);
     story_flags[i] &= ~m;
 }
 
 void story_flag_tog(uint16_t index)
 {
     uint8_t i = index >> 3;
-    uint8_t m = 1 << (index & 7);
+    uint8_t m = bitmask((uint8_t)index);
     story_flags[i] ^= m;
 }
 
 bool story_flag_get(uint16_t index)
 {
     uint8_t i = index >> 3;
-    uint8_t m = 1 << (index & 7);
+    uint8_t m = bitmask((uint8_t)index);
     return (story_flags[i] & m) != 0;
 }
 
@@ -146,10 +146,6 @@ void adjust(uint8_t& rx, uint8_t tx)
     dx /= 2;
     if(x < tx) dx = -dx;
     x -= dx;
-    //if(x < tx)
-    //    x += (uint8_t(tx - x + 1) / 2);
-    //else
-    //    x -= (uint8_t(x - tx + 1) / 2);
     rx = x;
 }
 

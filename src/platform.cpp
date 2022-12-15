@@ -445,12 +445,13 @@ void platform_audio_play_song(uint8_t const* song)
 void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot)
 {
     if(savefile.settings.sound & 1)
-        atm_synth_play_sfx_track(slot, slot, sfx);
+        atm_synth_play_sfx_track(3, 0, sfx);
 }
 
 void platform_audio_update()
 {
-    atm_synth_set_score_paused((savefile.settings.sound & 2) == 0);
+    if(atm_synth_is_score_playing())
+        atm_synth_set_score_paused((savefile.settings.sound & 2) == 0);
     if((savefile.settings.sound != 0) != platform_audio_enabled())
         platform_audio_toggle();
 }

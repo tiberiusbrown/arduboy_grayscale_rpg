@@ -32,8 +32,8 @@ void draw_objective()
     static_assert(MAP_CHUNK_H <= 64, "expand calculations to 16-bit");
 
     // direction to objective
-    int8_t dx = objx - (px >> 4);
-    int8_t dy = objy - (py >> 4);
+    int8_t dx = objx - div16_u16(px);
+    int8_t dy = objy - div16_u16(py);
 
     // rotate by 22.5 degrees
     constexpr int8_t M00 = int8_t(+0.9239 * 127);
@@ -69,22 +69,22 @@ void draw_objective()
         // project arrow image to screen edges
         if(x < -XC)
         {
-            y = y * -XC / x;
+            y = (int24_t)y * -XC / x;
             x = -XC;
         }
         else if(x > XC)
         {
-            y = y * XC / x;
+            y = (int24_t)y * XC / x;
             x = XC;
         }
         if(y < -YC)
         {
-            x = x * -YC / y;
+            x = (int24_t)x * -YC / y;
             y = -YC;
         }
         else if(y > YC)
         {
-            x = x * YC / y;
+            x = (int24_t)x * YC / y;
             y = YC;
         }
 
@@ -124,7 +124,7 @@ static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     {
         f += (d & 7) * 2;
         if(state == STATE_MAP || state == STATE_TITLE)
-            f += (((uint8_t)nframe >> 3) & 3);
+            f += ((nframe >> 3) & 3);
     }
     entry->addr = SPRITES_IMG;
     entry->frame = f;
@@ -165,7 +165,7 @@ void draw_sprites()
     // player sprite
     {
         uint8_t f = pdir * 4;
-        if(pmoving) f += (((uint8_t)nframe >> 3) & 3);
+        if(pmoving) f += ((nframe >> 3) & 3);
         entries[n++] = {PLAYER_IMG, f, 64 - 8, 32 - 8 - 4};
     }
 
@@ -289,14 +289,15 @@ void draw_text_noclip(int8_t x, int8_t y, char const* str, uint8_t f)
     uint8_t const* font_adv = FONT_ADV - ' ';
     uint8_t page = (uint8_t)y;
 #ifdef ARDUINO
-    uint8_t shift_coef = FX::bitShiftLeftUInt8(y);
+    //uint8_t shift_coef = FX::bitShiftLeftUInt8(y);
+    uint8_t shift_coef = bitmask(page);
     asm volatile(
         "lsr %[page]\n"
         "lsr %[page]\n"
         "lsr %[page]\n"
         : [page] "+&r" (page));
 #else
-    uint8_t shift_coef = 1 << (page & 7);
+    uint8_t shift_coef = bitmask(page);
     page >>= 3;
 #endif
     if(page >= 8) return;

@@ -9,6 +9,18 @@ constexpr uint8_t DEFEND_X2 = 77;
 constexpr uint8_t ASLEEP_FRAMES = 16;
 constexpr uint8_t DAMAGED_FRAMES = 8;
 
+#include "src/ATMlib2/atm_synth.h"
+static uint8_t const SFX_HIT[] PROGMEM = {
+    ATM_SCORE_FMT_MINIMAL_MONO,
+    ATM_CMD_M_SET_WAVEFORM(1),
+    ATM_CMD_M_SET_TEMPO(24),
+    ATM_CMD_M_SET_VOLUME(63),
+    ATM_CMD_M_SLIDE_VOL_ON(-8),
+    ATM_CMD_I_NOTE_C4,
+    ATM_CMD_M_DELAY_TICKS(8),
+    ATM_CMD_I_STOP,
+};
+
 static battle_member_t& member(uint8_t id)
 {
     auto& d = sdata.battle;
@@ -497,6 +509,7 @@ void update_battle()
         uint8_t defender = d.defender_id;
         uint8_t dam = calc_attack_damage(attacker, defender);
         take_damage(defender, (int8_t)dam);
+        platform_audio_play_sfx(SFX_HIT);
 
         // Dismas innate: strike back at 50% damage when defending
         if(d.pdef == defender &&

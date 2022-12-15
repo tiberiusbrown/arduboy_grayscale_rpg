@@ -217,7 +217,7 @@ void setup()
 #endif
     
     FX::begin(FX_DATA_PAGE, 0);
-    initialize();
     FX::enableOLED();
+    initialize();
     a.startGray();
 }
