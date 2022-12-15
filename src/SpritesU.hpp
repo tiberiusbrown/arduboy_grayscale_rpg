@@ -46,17 +46,22 @@ struct SpritesU
     static void fillRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t color);
 #endif
 
+    static constexpr uint8_t MODE_OVERWRITE   = 0;
+    static constexpr uint8_t MODE_PLUSMASK    = 1;
+    static constexpr uint8_t MODE_OVERWRITEFX = 2;
+    static constexpr uint8_t MODE_PLUSMASKFX  = 3;
+
+    static void drawBasic(
+        int16_t x, int16_t y, uint8_t w, uint8_t h,
+        uint24_t image, uint16_t frame, uint8_t mode);
+    __attribute__((noinline)) static void drawBasicNoChecks(
+        int16_t x, int16_t y, uint8_t w, uint8_t h,
+        uint24_t image, uint16_t frame, uint8_t mode);
 };
 
 #ifdef SPRITESU_IMPLEMENTATION
 
-constexpr uint8_t SPRITESU_MODE_OVERWRITE   = 0;
-constexpr uint8_t SPRITESU_MODE_PLUSMASK    = 1;
-constexpr uint8_t SPRITESU_MODE_OVERWRITEFX = 2;
-constexpr uint8_t SPRITESU_MODE_PLUSMASKFX  = 3;
-
-__attribute__((noinline))
-static void SpritesU_DrawCommon(
+void SpritesU::drawBasic(
     int16_t x, int16_t y, uint8_t w, uint8_t h,
     uint24_t image, uint16_t frame, uint8_t mode)
 {
@@ -65,6 +70,13 @@ static void SpritesU_DrawCommon(
     if(x + w <= 0) return;
     if(y + h <= 0) return;
 
+    drawBasicNoChecks(x, y, w, h, image, frame, mode);
+}
+
+void SpritesU::drawBasicNoChecks(
+    int16_t x, int16_t y, uint8_t w, uint8_t h,
+    uint24_t image, uint16_t frame, uint8_t mode)
+{
     uint8_t pages = h;
     asm volatile(
         "lsr %[pages]\n"
@@ -165,7 +177,7 @@ static void SpritesU_DrawCommon(
     uint8_t count;
 
 #ifdef SPRITESU_OVERWRITE
-    if(mode == SPRITESU_MODE_OVERWRITE)
+    if(mode == MODE_OVERWRITE)
     {
         uint8_t const* image_ptr = (uint8_t const*)image;
         asm volatile(R"ASM(
@@ -731,12 +743,12 @@ void SpritesU::drawOverwrite(
         "lpm %[w], Z+\n"
         "lpm %[h], Z+\n"
         : [w] "=r" (w), [h] "=r" (h), [image] "+z" (image));
-    SpritesU_DrawCommon(x, y, w, h, (uint24_t)image, frame, SPRITESU_MODE_OVERWRITE);
+    drawBasic(x, y, w, h, (uint24_t)image, frame, MODE_OVERWRITE);
 }
 void SpritesU::drawOverwrite(
     int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t const* image)
 {
-    SpritesU_DrawCommon(x, y, w, h, (uint24_t)image, 0, SPRITESU_MODE_OVERWRITE);
+    drawBasic(x, y, w, h, (uint24_t)image, 0, MODE_OVERWRITE);
 }
 #endif
 
@@ -749,12 +761,12 @@ void SpritesU::drawPlusMask(
         "lpm %[w], Z+\n"
         "lpm %[h], Z+\n"
         : [w] "=r" (w), [h] "=r" (h), [image] "+z" (image));
-    SpritesU_DrawCommon(x, y, w, h, (uint24_t)image, frame, SPRITESU_MODE_PLUSMASK);
+    drawBasic(x, y, w, h, (uint24_t)image, frame, MODE_PLUSMASK);
 }
 void SpritesU::drawPlusMask(
     int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t const* image)
 {
-    SpritesU_DrawCommon(x, y, w, h, (uint24_t)image, 0, SPRITESU_MODE_PLUSMASK);
+    drawBasic(x, y, w, h, (uint24_t)image, 0, MODE_PLUSMASK);
 }
 #endif
 
@@ -765,12 +777,12 @@ void SpritesU::drawOverwriteFX(
     FX::seekData(image);
     uint8_t w = FX::readPendingUInt8();
     uint8_t h = FX::readEnd();
-    SpritesU_DrawCommon(x, y, w, h, image + 2, frame, SPRITESU_MODE_OVERWRITEFX);
+    drawBasic(x, y, w, h, image + 2, frame, MODE_OVERWRITEFX);
 }
 void SpritesU::drawOverwriteFX(
     int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame)
 {
-    SpritesU_DrawCommon(x, y, w, h, image + 2, frame, SPRITESU_MODE_OVERWRITEFX);
+    drawBasic(x, y, w, h, image + 2, frame, MODE_OVERWRITEFX);
 }
 void SpritesU::drawPlusMaskFX(
     int16_t x, int16_t y, uint24_t image, uint16_t frame)
@@ -778,12 +790,12 @@ void SpritesU::drawPlusMaskFX(
     FX::seekData(image);
     uint8_t w = FX::readPendingUInt8();
     uint8_t h = FX::readEnd();
-    SpritesU_DrawCommon(x, y, w, h, image + 2, frame, SPRITESU_MODE_PLUSMASKFX);
+    drawBasic(x, y, w, h, image + 2, frame, MODE_PLUSMASKFX);
 }
 void SpritesU::drawPlusMaskFX(
     int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame)
 {
-    SpritesU_DrawCommon(x, y, w, h, image + 2, frame, SPRITESU_MODE_PLUSMASKFX);
+    drawBasic(x, y, w, h, image + 2, frame, MODE_PLUSMASKFX);
 }
 #endif
 

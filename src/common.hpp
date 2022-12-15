@@ -583,7 +583,7 @@ void platform_set_game_speed_saved();
 
 // draw.cpp
 void draw_objective();
-void draw_tile(int16_t x, int16_t y, uint8_t t, uint8_t n);
+void draw_tile(int16_t x, int16_t y, uint8_t t);
 void draw_text(int16_t x, int16_t y, char const* str);      // str in RAM
 void draw_text_prog(int16_t x, int16_t y, char const* str); // str in PROGMEM
 // this method assumes the text never clips outside the display

@@ -9,7 +9,7 @@
 #endif
 
 #ifndef OSC_CH_COUNT
-#define OSC_CH_COUNT (4)
+#define OSC_CH_COUNT (3)
 #endif
 
 ct_assert(OSC_CH_COUNT <= 8 && OSC_CH_COUNT > 0, osc_channel_count);

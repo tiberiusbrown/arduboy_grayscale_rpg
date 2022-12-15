@@ -28,45 +28,45 @@ DEFINE_PATTERN(pattern0_array, pattern0_data);
 DEFINE_PATTERN(pattern1_array, pattern1_data);
 
 #define pattern2_data { \
-    ATM_CMD_I_NOTE_C5, \
-    ATM_CMD_M_DELAY_TICKS(6), \
-    ATM_CMD_I_NOTE_G4, \
-    ATM_CMD_M_DELAY_TICKS(6), \
-    ATM_CMD_I_NOTE_C5, \
-    ATM_CMD_M_DELAY_TICKS(6), \
     ATM_CMD_I_NOTE_E5, \
     ATM_CMD_M_DELAY_TICKS(6), \
     ATM_CMD_I_NOTE_G5, \
+    ATM_CMD_M_DELAY_TICKS(6), \
+    ATM_CMD_I_NOTE_E5, \
+    ATM_CMD_M_DELAY_TICKS(6), \
+    ATM_CMD_I_NOTE_C5, \
+    ATM_CMD_M_DELAY_TICKS(6), \
+    ATM_CMD_I_NOTE_G4, \
     ATM_CMD_M_DELAY_TICKS(24), \
     ATM_CMD_I_RETURN, \
 }
 DEFINE_PATTERN(pattern2_array, pattern2_data);
 
 #define pattern3_data { \
-    ATM_CMD_I_NOTE_B4, \
-    ATM_CMD_M_DELAY_TICKS(6), \
-    ATM_CMD_I_NOTE_G4, \
-    ATM_CMD_M_DELAY_TICKS(6), \
-    ATM_CMD_I_NOTE_B4, \
-    ATM_CMD_M_DELAY_TICKS(6), \
     ATM_CMD_I_NOTE_D5, \
     ATM_CMD_M_DELAY_TICKS(6), \
     ATM_CMD_I_NOTE_G5, \
+    ATM_CMD_M_DELAY_TICKS(6), \
+    ATM_CMD_I_NOTE_D5, \
+    ATM_CMD_M_DELAY_TICKS(6), \
+    ATM_CMD_I_NOTE_B4, \
+    ATM_CMD_M_DELAY_TICKS(6), \
+    ATM_CMD_I_NOTE_G4, \
     ATM_CMD_M_DELAY_TICKS(24), \
     ATM_CMD_I_RETURN, \
 }
 DEFINE_PATTERN(pattern3_array, pattern3_data);
 
 #define pattern4_data { \
-    ATM_CMD_I_NOTE_A4, \
-    ATM_CMD_M_DELAY_TICKS(6), \
-    ATM_CMD_I_NOTE_E4, \
-    ATM_CMD_M_DELAY_TICKS(6), \
-    ATM_CMD_I_NOTE_A4, \
-    ATM_CMD_M_DELAY_TICKS(6), \
     ATM_CMD_I_NOTE_C5, \
     ATM_CMD_M_DELAY_TICKS(6), \
     ATM_CMD_I_NOTE_E5, \
+    ATM_CMD_M_DELAY_TICKS(6), \
+    ATM_CMD_I_NOTE_C5, \
+    ATM_CMD_M_DELAY_TICKS(6), \
+    ATM_CMD_I_NOTE_A4, \
+    ATM_CMD_M_DELAY_TICKS(6), \
+    ATM_CMD_I_NOTE_E4, \
     ATM_CMD_M_DELAY_TICKS(24), \
     ATM_CMD_I_RETURN, \
 }
@@ -297,7 +297,7 @@ static const PROGMEM struct score_data {
   uint8_t num_patterns;
   uint16_t patterns_offset[12];
   uint8_t num_channels;
-  uint8_t start_patterns[4];
+  uint8_t start_patterns[3];
   uint8_t pattern0[sizeof(pattern0_array)];
   uint8_t pattern1[sizeof(pattern1_array)];
   uint8_t pattern2[sizeof(pattern2_array)];
@@ -327,12 +327,12 @@ static const PROGMEM struct score_data {
       offsetof(struct score_data, pattern10),
       offsetof(struct score_data, pattern11),
   },
-  .num_channels = 4,
+  .num_channels = 3,
   .start_patterns = {
     7,                         // Channel 0 entry track (PULSE)
     1,                         // Channel 1 entry track (SQUARE)
     0,                         // Channel 2 entry track (TRIANGLE)
-    0,                         // Channel 3 entry track (NOISE)
+    //0,                         // Channel 3 entry track (NOISE)
   },
   .pattern0 = pattern0_data,
   .pattern1 = pattern1_data,

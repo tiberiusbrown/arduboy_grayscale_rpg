@@ -11,6 +11,10 @@
 #include "generated/rounded_borders_white_img.hpp"
 #include "generated/rounded_borders_black_img.hpp"
 
+#ifdef ARDUINO
+#include "SpritesU.hpp"
+#endif
+
 static int8_t fmulshi(int8_t x, int8_t y)
 {
     return int8_t(fmuls(x, y) >> 8);
@@ -195,7 +199,7 @@ void draw_player()
     platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, PLAYER_IMG, f, 16, 16);
 }
 
-void draw_tile(int16_t x, int16_t y, uint8_t t, uint8_t n)
+void draw_tile(int16_t x, int16_t y, uint8_t t)
 {
 #if TILES_IN_PROG > 0
     if(t < TILES_IN_PROG)
@@ -249,6 +253,7 @@ static void draw_chunk_tiles(uint8_t i, int16_t ox, int16_t oy)
     uint8_t maxy = 64;
     if(state == STATE_PAUSE) maxy -= sdata.pause.ally;
     else if(state == STATE_DIALOG) maxy = 35;
+    uint24_t tile_img = TILE_IMG + 2 + 32 * plane();
     for(uint8_t r = 0, n = 0; r < 64; r += 16)
     {
         int16_t y = oy + r;
@@ -261,7 +266,16 @@ static void draw_chunk_tiles(uint8_t i, int16_t ox, int16_t oy)
         for(uint8_t c = 0; c < 128; c += 16, ++n)
         {
             int16_t x = ox + c;
-            draw_tile(x, y, tiles[n], n);
+            if(x <= -16) continue;
+            if(x >= 128) continue;
+#ifdef ARDUINO
+            SpritesU::drawBasicNoChecks(
+                x, y, 16, 16,
+                tile_img + (PLANES * 32) * tiles[n],
+                0, SpritesU::MODE_OVERWRITEFX);
+#else
+            draw_tile(x, y, tiles[n]);
+#endif
         }
     }
 }

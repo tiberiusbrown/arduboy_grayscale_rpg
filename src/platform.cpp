@@ -445,7 +445,7 @@ void platform_audio_play_song(uint8_t const* song)
 void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot)
 {
     if(savefile.settings.sound & 1)
-        atm_synth_play_sfx_track(3, 0, sfx);
+        atm_synth_play_sfx_track(2, 0, sfx);
 }
 
 void platform_audio_update()

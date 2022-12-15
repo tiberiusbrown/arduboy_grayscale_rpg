@@ -605,24 +605,24 @@ static void draw_battle_background()
     {
         // outdoor background
         static constexpr uint8_t TS[] PROGMEM = { 10, 11, 26, 27 };
-        for(uint8_t r = 0, n = 0, t = 0x23; r < 4; ++r)
+        for(uint8_t r = 0, t = 0x23; r < 4; ++r)
         {
             uint8_t y = r * 16;
             if(y + d.itemsy >= 64) break;
-            for(uint8_t c = 0; c < 8; ++c, ++n, t ^= (t >> 3) ^ (t << 1))
-                draw_tile(c * 16, y, pgm_read_byte(&TS[t & 3]), n);
+            for(uint8_t c = 0; c < 8; ++c, t ^= (t >> 3) ^ (t << 1))
+                draw_tile(c * 16, y, pgm_read_byte(&TS[t & 3]));
         }
     }
     else
     {
         // dungeon background
         for(uint8_t x = 0; x < 128; x += 16)
-            draw_tile(x, 0, 12, 0);
+            draw_tile(x, 0, 12);
         for(uint8_t y = 16; y < 64; y += 16)
         {
             if(y + d.itemsy >= 64) break;
             for(uint8_t x = 0; x < 128; x += 16)
-                draw_tile(x, y, 28, 0);
+                draw_tile(x, y, 28);
         }
     }
     // sleeping sprites

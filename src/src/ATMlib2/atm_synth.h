@@ -6,7 +6,7 @@
 #include "atm_cmd_constants.h"
 
 /* Adjust the following to reduce memory usage */
-#define ATM_SCORE_CHANNEL_COUNT (4)
+#define ATM_SCORE_CHANNEL_COUNT (3)
 #define ATM_SFX_SLOT_COUNT (1)
 #define ATM_PATTERN_STACK_DEPTH (3)
 
