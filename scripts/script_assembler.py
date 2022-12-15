@@ -102,15 +102,15 @@ class CMD(AutoNumber):
     OBJ  = ()
 
     JMP  = ()
-    BRZ  = ()
-    BRN  = ()
-    BRFS = ()
-    BRFC = ()
-    BRNT = ()
-    BRNW = ()
-    BRNE = ()
-    BRNS = ()
-    BRNI = ()
+    BZ   = ()
+    BNZ  = ()
+    BFS  = ()
+    BFC  = ()
+    BNST = ()
+    BNWT = ()
+    BNWE = ()
+    BNSE = ()
+    BNI  = ()
 
 def stringid(s):
     s = s[1:-1]
@@ -347,46 +347,46 @@ def assemble(s, eps):
             b.append(CMD.JMP); i += 1
             b.append(s[i]); i += 1
             
-        elif s[i] == 'brz':
-            b.append(CMD.BRZ); i += 1
+        elif s[i] == 'bz':
+            b.append(CMD.BZ); i += 1
             b.append(reg(s[i])); i += 1
             b.append(s[i]); i += 1
             
-        elif s[i] == 'brn':
-            b.append(CMD.BRN); i += 1
+        elif s[i] == 'bnz':
+            b.append(CMD.BNZ); i += 1
             b.append(reg(s[i])); i += 1
             b.append(s[i]); i += 1
             
-        elif s[i] == 'brfs':
-            b.append(CMD.BRFS); i += 1
+        elif s[i] == 'bfs':
+            b.append(CMD.BFS); i += 1
             addflag(b, s[i]); i += 1
             b.append(s[i]); i += 1
             
-        elif s[i] == 'brfc':
-            b.append(CMD.BRFC); i += 1
+        elif s[i] == 'bfc':
+            b.append(CMD.BFC); i += 1
             addflag(b, s[i]); i += 1
             b.append(s[i]); i += 1
             
-        elif s[i] == 'brnt':
-            b.append(CMD.BRNT); i += 1
+        elif s[i] == 'bnst':
+            b.append(CMD.BNST); i += 1
             b.append(int(s[i])); i += 1
             b.append(s[i]); i += 1
             
-        elif s[i] == 'brnw':
-            b.append(CMD.BRNW); i += 1
+        elif s[i] == 'bnwt':
+            b.append(CMD.BNWT); i += 1
             b.append(int(s[i])); i += 1
             b.append(s[i]); i += 1
             
-        elif s[i] == 'brne':
-            b.append(CMD.BRNE); i += 1
+        elif s[i] == 'bnwe':
+            b.append(CMD.BNWE); i += 1
             b.append(s[i]); i += 1
             
-        elif s[i] == 'brns':
-            b.append(CMD.BRNS); i += 1
+        elif s[i] == 'bnse':
+            b.append(CMD.BNSE); i += 1
             b.append(s[i]); i += 1
             
-        elif s[i] == 'brni':
-            b.append(CMD.BRNI); i += 1
+        elif s[i] == 'bni':
+            b.append(CMD.BNI); i += 1
             addflag(b, s[i]); i += 1
             b.append(s[i]); i += 1
             

@@ -402,8 +402,13 @@ struct sdata_game_over
     bool going_to_resume;
     char msg[128];
 };
+struct sdata_map
+{
+    bool a_pressed;
+};
 extern union sdata_t
 {
+    sdata_map map;
     sdata_title title;
     sdata_resume resume;
     sdata_dialog dialog;

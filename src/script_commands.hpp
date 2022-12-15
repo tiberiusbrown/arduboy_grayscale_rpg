@@ -91,31 +91,31 @@ Control Instructions
     jmp label
         Unconditionally branch to label
 
-    brz <reg> label
+    bz <reg> label
         If <reg> is zero, jmp label
 
-    brn <reg> label
+    bnz <reg> label
         If <reg> is nonzero, jmp label
 
-    brfs <flag> label
+    bfs <flag> label
         If <flag> is set, jmp label
 
-    brfc <flag> label
+    bfc <flag> label
         If <flag> is cleared, jmp label
 
-    brnt <tile> label
+    bnst <tile> label
         If player is NOT selecting <tile>, jmp label
 
-    brnw <tile> label
+    bnwt <tile> label
         If player is NOT walking on <tile>, jmp label
 
-    brne label
+    bnwe label
         If player is NOT walking into chunk sprite, jmp label
 
-    brns label
-        If player is NOT selecting <sprite>, jmp label
+    bnse label
+        If player is NOT selecting chunk sprite, jmp label
 
-    brni <item flag> label
+    bni <item flag> label
         If no party member has equipped <item flag>, jmp label
 
 Other Assembly Syntax
@@ -127,8 +127,8 @@ Other Assembly Syntax
     $tdlg             tdlg $T
     $ttp              ttp $T
     $wtp              wtp $T
-    $brnt             brnt $T
-    $brnw             brnw $T
+    $bnst             bnst $T
+    $bnwt             bnwt $T
     $st               st $T
     $stf              stf $T
     label_name:       label the position of the following instruction
@@ -199,13 +199,13 @@ enum script_command_t
     CMD_OBJ,
 
     CMD_JMP,
-    CMD_BRZ,
-    CMD_BRN,
-    CMD_BRFS,
-    CMD_BRFC,
-    CMD_BRNT,
-    CMD_BRNW,
-    CMD_BRNE,
-    CMD_BRNS,
-    CMD_BRNI,
+    CMD_BZ,
+    CMD_BNZ,
+    CMD_BFS,
+    CMD_BFC,
+    CMD_BNST,
+    CMD_BNWT,
+    CMD_BNWE,
+    CMD_BNSE,
+    CMD_BNI,
 };

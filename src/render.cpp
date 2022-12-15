@@ -11,7 +11,7 @@ void render_map()
 static void render_map_and_objective()
 {
     render_map();
-    if(btns_down & BTN_A)
+    if(sdata.map.a_pressed && (btns_down & BTN_A))
         draw_objective();
 }
 
@@ -219,7 +219,7 @@ static void render_battery()
 
     if(!savefile.settings.no_battery_alert && battery.low)
     {
-        uint8_t f = (nframe & 0x10) ? 0 : 1;
+        uint8_t f = (rframe & 0x20) ? 0 : 1;
         platform_fx_drawplusmask(118, 0, BATTERY_IMG, f, 10, 8);
     }
 }

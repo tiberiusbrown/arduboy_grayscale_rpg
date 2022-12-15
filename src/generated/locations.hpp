@@ -7,4 +7,5 @@ inline void LOC_stairs_village_outside          () { px =  1200; py =  2768; }
 inline void LOC_dungeon_lightsout               () { px =  2176; py =   224; }
 inline void LOC_entrance_lightsout              () { px =   752; py =  2640; }
 inline void LOC_stairs_village_dungeon          () { px =  2464; py =    64; }
-inline void LOC_obj_oldcharlie                  () { px =  1024; py =  2928; }
+inline void LOC_obj_oldcharlie                  () { px =  1152; py =  3056; }
+inline void LOC_mother_grieving                 () { px =   816; py =  2752; }

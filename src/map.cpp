@@ -329,59 +329,59 @@ static bool run_chunk()
             chunk_instr += i;
             break;
         }
-        case CMD_BRZ:
+        case CMD_BZ:
         {
             uint8_t t = c.script[chunk_instr++];
             int8_t i = (int8_t)c.script[chunk_instr++];
             if(savefile.chunk_regs[t] == 0) chunk_instr += i;
             break;
         }
-        case CMD_BRN:
+        case CMD_BNZ:
         {
             uint8_t t = c.script[chunk_instr++];
             int8_t i = (int8_t)c.script[chunk_instr++];
             if(savefile.chunk_regs[t] < 0) chunk_instr += i;
             break;
         }
-        case CMD_BRFS:
-        case CMD_BRFC:
+        case CMD_BFS:
+        case CMD_BFC:
         {
             uint16_t f = c.script[chunk_instr++];
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
             int8_t t = (int8_t)c.script[chunk_instr++];
             bool fs = story_flag_get(f);
-            if(instr == CMD_BRFC) fs = !fs;
+            if(instr == CMD_BFC) fs = !fs;
             if(fs) chunk_instr += t;
             break;
         }
-        case CMD_BRNT:
+        case CMD_BNST:
         {
             uint8_t t = c.script[chunk_instr++];
             int8_t i = (int8_t)c.script[chunk_instr++];
             if(t != sel_tile) chunk_instr += i;
             break;
         }
-        case CMD_BRNW:
+        case CMD_BNWT:
         {
             uint8_t t = c.script[chunk_instr++];
             int8_t i = (int8_t)c.script[chunk_instr++];
             if(t != walk_tile) chunk_instr += i;
             break;
         }
-        case CMD_BRNE:
+        case CMD_BNWE:
         {
             int8_t i = (int8_t)c.script[chunk_instr++];
             if(!sprite_contacts_player(ac, sprite)) chunk_instr += i;
             else sprite.walking = false;
             break;
         }
-        case CMD_BRNS:
+        case CMD_BNSE:
         {
             int8_t i = (int8_t)c.script[chunk_instr++];
             if(!sel_sprite) chunk_instr += i;
             break;
         }
-        case CMD_BRNI:
+        case CMD_BNI:
         {
             uint16_t f = c.script[chunk_instr++];
             f |= (uint16_t(c.script[chunk_instr++]) << 8);
