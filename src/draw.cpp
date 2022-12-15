@@ -207,42 +207,7 @@ void draw_tile(int16_t x, int16_t y, uint8_t t)
     else
         platform_fx_drawoverwrite(x, y, TILE_IMG, t - TILES_IN_PROG, 16, 16);
 #else
-    uint16_t f = t;
-    uint8_t nf = (uint8_t)nframe;
-#if 0
-    // animated tiles code
-#ifdef ARDUINO
-    asm volatile(R"ASM(
-        mov  r0, %[n]
-        lsr  r0
-        lsr  r0
-        eor  %[n], r0
-        mul  %[n], %[k]
-        mov  %[n], r0
-        lsr  r0
-        eor  %[n], r0
-        clr  r1
-        lsr  %[nf]
-        lsr  %[nf]
-        add  %[n], %[nf]
-        andi %[n], 63
-        cpi  %[n], 4
-        brge .+2
-        add  %B[f], %[n]
-        )ASM"
-        : [n] "+&r" (n), [f] "+&r" (f), [nf] "+&r" (nf)
-        : [k] "r" (uint8_t(223))
-        );
-#else
-    n ^= (n >> 2);
-    n *= 223;
-    n ^= (n >> 1);
-    n += (nf >> 2);
-    n &= 63;
-    if(n < 4) f += (uint16_t(n) << 8);
-#endif
-#endif
-    platform_fx_drawoverwrite(x, y, TILE_IMG, f, 16, 16);
+    platform_fx_drawoverwrite(x, y, TILE_IMG, t, 16, 16);
 #endif
 }
 
@@ -282,10 +247,8 @@ static void draw_chunk_tiles(uint8_t i, int16_t ox, int16_t oy)
 
 void draw_tiles()
 {
-    uint16_t tx = px - 64 + 8;
-    uint16_t ty = py - 32 + 8;
-    uint8_t cx = uint8_t(tx >> 7);
-    uint8_t cy = uint8_t(ty >> 6);
+    uint8_t tx = px - 64 + 8;
+    uint8_t ty = py - 32 + 8;
     int16_t ox = -int16_t(tx & 0x7f);
     int16_t oy = -int16_t(ty & 0x3f);
     draw_chunk_tiles(0, ox, oy);
