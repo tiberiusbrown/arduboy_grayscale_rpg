@@ -528,8 +528,8 @@ static void update_title()
             {
                 load(true);
                 first_loaded = true;
-                new_game();
             }
+            new_game();
         }
         if(d.fade_frame < 24)
             d.fade_frame += FADE_SPEED;
