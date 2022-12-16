@@ -131,29 +131,45 @@ int main()
 
 uint8_t updown_frames;
 
+static void handle_buttons_and_update()
+{
+    uint8_t b = btns_down;
+    btns_down = a.buttonsState();
+    btns_pressed = btns_down & ~b;
+#ifdef REMOVE_TIMER0
+    if((btns_down & (BTN_UP | BTN_DOWN)) == (BTN_UP | BTN_DOWN))
+        ++updown_frames;
+    else
+        updown_frames = 0;
+    if(updown_frames == 45)
+        a.exitToBootloader();
+#endif
+    update();
+}
+
 void loop()
 {
-    //while(!a.nextFrame())
-    //    ;
+#ifdef DEBUG_MONOCHROME
+    abg_detail::current_plane = 0;
+    FX::disableOLED();
+    handle_buttons_and_update();
+    render();
+    FX::enableOLED();
+    Arduboy2Base::display(CLEAR_BUFFER);
+    static uint32_t prev = 0;
+    uint32_t curr = millis();
+    int16_t diff = curr - prev;
+    if(diff < 30)
+        delay(30 - diff);
+    prev = curr;
+#else
     a.waitForNextFrame();
     FX::disableOLED();
     if(a.needsUpdate())
-    {
-        uint8_t b = btns_down;
-        btns_down = a.buttonsState();
-        btns_pressed = btns_down & ~b;
-#ifdef REMOVE_TIMER0
-        if((btns_down & (BTN_UP | BTN_DOWN)) == (BTN_UP | BTN_DOWN))
-            ++updown_frames;
-        else
-            updown_frames = 0;
-        if(updown_frames == 45)
-            a.exitToBootloader();
-#endif
-        update();
-    }
+        handle_buttons_and_update();
     render();
     FX::enableOLED();
+#endif
 }
 
 static void delay5us()
@@ -219,5 +235,7 @@ void setup()
     FX::begin(FX_DATA_PAGE, 0);
     FX::enableOLED();
     initialize();
+#ifndef DEBUG_MONOCHROME
     a.startGray();
+#endif
 }

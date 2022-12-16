@@ -5,8 +5,9 @@ cd /d %~dp0
 call ..\assets\_update_generated.bat subcall
 if NOT %errorlevel%==0 goto error
 
-set "remove_timer0=-D__vector_23=__attribute__((naked,weak))remove_timer0 -DREMOVE_TIMER0"
+rem set "remove_timer0=-D__vector_23=__attribute__((naked,weak))remove_timer0 -DREMOVE_TIMER0"
 rem set "remove_timer0=-DDEBUG_BUILD"
+set "remove_timer0=-DDEBUG_MONOCHROME"
 
 cd ..\src
 set dir=%temp%/arduboy_grayscale_rpg_build

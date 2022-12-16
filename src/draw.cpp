@@ -111,7 +111,7 @@ void draw_objective()
     y += ay * af;
 #endif
 
-    platform_fx_drawplusmask(x, y, OBJECTIVE_ARROWS_IMG, f);
+    platform_fx_drawplusmask(x, y, OBJECTIVE_ARROWS_IMG, f, 16, 16);
 }
 
 static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,

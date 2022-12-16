@@ -126,9 +126,9 @@ static void render_title_graphics()
     //platform_fx_drawoverwrite(0, 0, TITLE_IMG);
     auto const& d = sdata.title;
     render_map();
-    platform_fx_drawplusmask(7, 0, TITLE_MASKED_IMG, 0);
+    platform_fx_drawplusmask(7, 0, TITLE_MASKED_IMG, 0, 114, 16);
     if(!d.going_to_resume && (nframe & 0x1f) < 0x18)
-        platform_fx_drawplusmask(47, 48, PRESS_A_IMG, 0);
+        platform_fx_drawplusmask(47, 48, PRESS_A_IMG, 0, 34, 16);
 }
 
 static void render_title()
