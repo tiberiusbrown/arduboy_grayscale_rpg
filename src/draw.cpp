@@ -319,8 +319,8 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
     tiles += t;
     tile_img += 32 * plane();
 #endif
-#ifdef ARDUINO
-//#if 0
+//#ifdef ARDUINO
+#if 0
     register int16_t moved_x __asm__("r14");
     register int16_t moved_oy __asm__("r12") = oy;
     // call to SpritesU::drawBasicNoChecks needs:
