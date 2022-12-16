@@ -128,7 +128,7 @@ static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     {
         f += (d & 7) * 2;
         if(state == STATE_MAP || state == STATE_TITLE)
-            f += ((nframe >> 3) & 3);
+            f += (div8(nframe) & 3);
     }
     entry->addr = SPRITES_IMG;
     entry->frame = f;
@@ -169,7 +169,7 @@ void draw_sprites()
     // player sprite
     {
         uint8_t f = pdir * 4;
-        if(pmoving) f += ((nframe >> 3) & 3);
+        if(pmoving) f += (div8(nframe) & 3);
         entries[n++] = {PLAYER_IMG, f, 64 - 8, 32 - 8 - 4};
     }
 
@@ -211,50 +211,199 @@ void draw_tile(int16_t x, int16_t y, uint8_t t)
 #endif
 }
 
-static void draw_chunk_tiles(uint8_t i, int16_t ox, int16_t oy)
+static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
 {
-    auto const& ac = active_chunks[i];
-    uint8_t const* tiles = ac.chunk.tiles_flat;
-    uint8_t maxy = 64;
-    if(state == STATE_PAUSE) maxy -= sdata.pause.ally;
-    else if(state == STATE_DIALOG) maxy = 35;
-    uint24_t tile_img = TILE_IMG + 2 + 32 * plane();
-    for(uint8_t r = 0, n = 0; r < 64; r += 16)
+    uint8_t nx;
+    uint8_t ny;
+    uint8_t t;
+    uint24_t tile_img = TILE_IMG + 2;
+    int16_t x;
+#ifdef ARDUINO
+//#if 0
+    asm volatile(R"ASM(
+            clr %[t]
+            sbrs %B[ox], 7
+            rjmp 1f
+            mov  %[t], %A[ox]
+            neg  %[t]
+            andi %[t], 0xf0
+            add  %A[ox], %[t]
+            adc  %B[ox], __zero_reg__
+            swap %[t]
+            ldi  %[nx], 8
+            sub  %[nx], %[t]
+            rjmp 2f
+        1:
+            ldi  %[nx], 128+15
+            sub  %[nx], %A[ox]
+            swap %[nx]
+            andi %[nx], 0x0f
+        2:
+            brne .+2
+            rjmp draw_chunk_tiles_return
+            add  %A[tiles], %[t]
+            adc  %B[tiles], __zero_reg__
+            clr  %[t]
+            sbrs %B[oy], 7
+            rjmp 3f
+            mov  %[t], %A[oy]
+            neg  %[t]
+            andi %[t], 0xf0
+            add  %A[oy], %[t]
+            adc  %B[oy], __zero_reg__
+            mov  __tmp_reg__, %[t]
+            swap __tmp_reg__
+            lsr  %[t]
+            ldi  %[ny], 4
+            sub  %[ny], __tmp_reg__
+            rjmp 4f
+        3:
+            ldi  %[ny], 64+15
+            sub  %[ny], %A[oy]
+            swap %[ny]
+            andi %[ny], 0x0f
+        4:
+            brne .+2
+            rjmp draw_chunk_tiles_return
+            add  %A[tiles], %[t]
+            adc  %B[tiles], __zero_reg__
+            
+            lds  __tmp_reg__, %[plane]
+            swap __tmp_reg__
+            lsl  __tmp_reg__
+            add  %A[tile_img], __tmp_reg__
+            adc  %B[tile_img], __zero_reg__
+            adc  %C[tile_img], __zero_reg__
+        )ASM"
+        :
+        [nx]       "=&d" (nx),
+        [ny]       "=&d" (ny),
+        [t]        "=&d" (t),
+        [ox]       "+&r" (ox),
+        [oy]       "+&r" (oy),
+        [tiles]    "+&r" (tiles),
+        [tile_img] "+&r" (tile_img)
+        :
+        [plane] ""    (&abg_detail::current_plane)
+        );
+#else
+
+    t = 0;
+    if(ox < 0)
     {
-        int16_t y = oy + r;
-        if(y <= -16)
-        {
-            n += 8;
-            continue;
-        }
-        if(y >= maxy) break;
-        for(uint8_t c = 0; c < 128; c += 16, ++n)
-        {
-            int16_t x = ox + c;
-            if(x <= -16) continue;
-            if(x >= 128) continue;
+        t = uint8_t(-int8_t(ox));
+        t &= 0xf0;
+        ox += t;
+        t = nibswap(t); // t >>= 4
+        nx = 8 - t;
+    }
+    else
+        nx = div16(uint8_t(128 + 15 - uint8_t(ox)));
+    if(nx == 0)
+        return;
+    tiles += t;
+    t = 0;
+    if(oy < 0)
+    {
+        t = uint8_t(-int8_t(oy));
+        t &= 0xf0;
+        oy += t;
+        uint8_t tmp = t;
+        tmp = nibswap(tmp); // tmp >>= 4
+        t >>= 1;
+        ny = 4 - tmp;
+    }
+    else
+        ny = div16(uint8_t(64 + 15 - oy));
+    if(ny == 0) return;
+    tiles += t;
+    tile_img += 32 * plane();
+#endif
+//#ifdef ARDUINO
+#if 0
+    asm volatile(R"ASM(
+            movw r28, %[tiles]
+        1:
+            mov  %[t], %[nx]
+            movw %[x], %[ox]
+        2:
+            movw r24, %[x]
+            movw r22, %[oy]
+            ldi  r18, 32*3
+            ld   r19, Y+
+            mul  r19, r18
+            movw r18, %A[tile_img]
+            mov  r20, %C[tile_img]
+            add  r18, r0
+            adc  r19, r1
+            clr  __zero_reg__
+            adc  r20, __zero_reg__
+            rcall SpritesU_drawBasicNoChecks
+            add  %A[x], %[c16]
+            adc  %B[x], __zero_reg__
+            dec  %[t]
+            brne 2b
+            add  %A[oy], %[c16]
+            adc  %B[oy], __zero_reg__
+            ldi  r18, 8
+            sub  r18, %[nx]
+            add  r28, r18
+            adc  r29, __zero_reg__
+            dec  %[ny]
+            brne 1b
+        )ASM"
+        : 
+        [ny]        "+&l" (ny),
+        [t]         "=&l" (t),
+        [x]         "+&l" (x),
+        [oy]        "+&l" (oy)
+        :
+        [nx]        "l"   (nx),
+        [ox]        "l"   (ox),
+        [tile_img]  "l"   (tile_img),
+        [tiles]     "r"   (tiles),
+        [c16]       "l"   (16)
+        :
+        //"r10", "r12", "r14", "r15", "r16",
+        "r18", "r19", "r20", "r22", "r23", "r24", "r25", "r28", "r29"
+        );
+#else
+    do {
+        t = nx;
+        x = ox;
+        do {
+            MY_ASSERT(x > -16 && x < 128);
+            MY_ASSERT(oy > -16 && oy < 64);
 #ifdef ARDUINO
             SpritesU::drawBasicNoChecks(
-                x, y, 16, 16,
-                tile_img + (PLANES * 32) * tiles[n],
+                x, oy, 16, 16,
+                tile_img + (PLANES * 32) * deref_inc(tiles),
                 0, SpritesU::MODE_OVERWRITEFX);
 #else
-            draw_tile(x, y, tiles[n]);
+            draw_tile(x, oy, *tiles++);
 #endif
-        }
-    }
+            x += 16;
+        } while(--t != 0);
+        oy += 16;
+        tiles += (8 - nx);
+    } while(--ny != 0);
+#endif
+
+#ifdef ARDUINO
+    asm volatile("draw_chunk_tiles_return:\n");
+#endif
 }
 
 void draw_tiles()
 {
-    uint8_t tx = px - 64 + 8;
-    uint8_t ty = py - 32 + 8;
-    int16_t ox = -int16_t(tx & 0x7f);
-    int16_t oy = -int16_t(ty & 0x3f);
-    draw_chunk_tiles(0, ox, oy);
-    draw_chunk_tiles(1, ox + 128, oy);
-    draw_chunk_tiles(2, ox, oy + 64);
-    draw_chunk_tiles(3, ox + 128, oy + 64);
+    uint8_t tx = (px - 64 + 8) & 0x7f;
+    uint8_t ty = (py - 32 + 8) & 0x3f;
+    int16_t ox = -int16_t(tx);
+    int16_t oy = -int16_t(ty);
+    draw_chunk_tiles(active_chunks[0].chunk.tiles_flat, ox, oy);
+    draw_chunk_tiles(active_chunks[1].chunk.tiles_flat, ox + 128, oy);
+    draw_chunk_tiles(active_chunks[2].chunk.tiles_flat, ox, oy + 64);
+    draw_chunk_tiles(active_chunks[3].chunk.tiles_flat, ox + 128, oy + 64);
 }
 
 void draw_text_noclip(int8_t x, int8_t y, char const* str, uint8_t f)

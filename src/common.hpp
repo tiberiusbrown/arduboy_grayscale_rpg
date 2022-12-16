@@ -68,6 +68,7 @@ FORCE_INLINE inline uint8_t deref_inc(T const*& p)
 }
 FORCE_INLINE inline uint8_t bitmask(uint8_t x) { return FX::bitShiftLeftUInt8(x); }
 FORCE_INLINE inline int16_t fmuls(int8_t x, int8_t y) { return __builtin_avr_fmuls(x, y); }
+FORCE_INLINE inline uint8_t nibswap(uint8_t x) { return __builtin_avr_swap(x); }
 #else
 #include <assert.h>
 #define MY_ASSERT(cond__) assert(cond__)
@@ -121,6 +122,7 @@ inline void* memcpy_P(void* dst, void const* src, size_t num)
     return memcpy(dst, src, num);
 }
 inline int16_t fmuls(int8_t x, int8_t y) { return (x * y) << 1; }
+inline uint8_t nibswap(uint8_t x) { return (x >> 4) | (x << 4); }
 #endif
 
 constexpr uint8_t PLANES = 3;
@@ -687,5 +689,21 @@ inline uint8_t div16(uint8_t x)
     return x;
 #else
     return x >> 4;
+#endif
+}
+
+FORCE_INLINE inline uint8_t div8(uint8_t x)
+{
+#ifdef ARDUINO
+    asm volatile(R"ASM(
+        lsr %[x]
+        lsr %[x]
+        lsr %[x]
+        )ASM"
+        : [x] "+&r" (x)
+        );
+    return x;
+#else
+    return x >> 3;
 #endif
 }
