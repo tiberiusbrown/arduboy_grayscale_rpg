@@ -458,19 +458,6 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
         active_chunk.cy = cy;
         platform_fx_read_data_bytes(addr, chunk, sizeof(map_chunk_t));
     }
-    else if(cx != 255 && cy != 255) {
-        //platform_fx_read_data_bytes(addr, chunk->tiles_flat, 32);
-        return;
-    }
-    else
-    {
-        for(uint8_t i = 0; i < 32; ++i)
-            chunk->tiles_flat[i] = 30;
-        for(uint8_t i = 0; i < CHUNK_SCRIPT_SIZE; ++i)
-            chunk->script[i] = 0;
-        chunk_sprites[index].active = false;
-        return;
-    }
 }
 
 static void shift_chunk(uint8_t dst, uint8_t src)

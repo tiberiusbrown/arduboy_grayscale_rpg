@@ -32,6 +32,7 @@ void new_game()
 
     //LOC_dungeon_lightsout();
     //LOC_home_inside();
+    LOC_home_outside();
 }
 
 void initialize()

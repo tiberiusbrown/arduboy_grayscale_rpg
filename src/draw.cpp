@@ -123,12 +123,16 @@ static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     uint8_t d = e.dir;
     bool walking = e.walking;
     if(d & 0x80) walking = false;
-    if(e.type == 13) walking = true;
+    uint8_t nf = nframe >> 2;
+    if(e.type == 13)
+        walking = true;
+    else
+        nf >>= 1;
     if(walking)
     {
         f += (d & 7) * 2;
         if(state == STATE_MAP || state == STATE_TITLE)
-            f += (div8(nframe) & 3);
+            f += (nf & 3);
     }
     entry->addr = SPRITES_IMG;
     entry->frame = f;
