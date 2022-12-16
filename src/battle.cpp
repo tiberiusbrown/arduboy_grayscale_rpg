@@ -522,7 +522,7 @@ void update_battle()
         }
 
         // Catherine innate: after attacking, heal a wounded ally for 50% damage
-        if(party[attacker].battle.id == 1)
+        if(attacker < 4 && party[attacker].battle.id == 1)
         {
             uint8_t ally = 0;
             uint8_t hp = 0;
