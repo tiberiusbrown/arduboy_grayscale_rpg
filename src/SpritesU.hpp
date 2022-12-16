@@ -55,8 +55,9 @@ struct SpritesU
         int16_t x, int16_t y, uint8_t w, uint8_t h,
         uint24_t image, uint16_t frame, uint8_t mode);
     __attribute__((noinline)) static void drawBasicNoChecks(
-        int16_t x, int16_t y, uint8_t w, uint8_t h,
-        uint24_t image, uint16_t frame, uint8_t mode);
+        uint16_t w_and_h,
+        uint24_t image, uint16_t frame, uint8_t mode,
+        int16_t x, int16_t y);
 };
 
 #ifdef SPRITESU_IMPLEMENTATION
@@ -69,15 +70,19 @@ void SpritesU::drawBasic(
     if(y >= 64)  return;
     if(x + w <= 0) return;
     if(y + h <= 0) return;
+    
+    uint16_t w_and_h = (uint16_t(h) << 8) | w;
 
-    drawBasicNoChecks(x, y, w, h, image, frame, mode);
+    drawBasicNoChecks(w_and_h, image, frame, mode, x, y);
 }
 
 void SpritesU::drawBasicNoChecks(
-    int16_t x, int16_t y, uint8_t w, uint8_t h,
-    uint24_t image, uint16_t frame, uint8_t mode)
-{
-    asm volatile("SpritesU_drawBasicNoChecks:\n");
+    uint16_t w_and_h,
+    uint24_t image, uint16_t frame, uint8_t mode,
+    int16_t x, int16_t y)
+{    
+    uint8_t w = uint8_t(w_and_h);
+    uint8_t h = uint8_t(w_and_h >> 8);
     
     uint8_t pages = h;
     asm volatile(

@@ -319,31 +319,47 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
     tiles += t;
     tile_img += 32 * plane();
 #endif
-//#ifdef ARDUINO
-#if 0
+#ifdef ARDUINO
+//#if 0
+    register int16_t moved_x __asm__("r14");
+    register int16_t moved_oy __asm__("r12") = oy;
+    // call to SpritesU::drawBasicNoChecks needs:
+    // ======== lo ======== hi ========
+    //     r24: 16          16
+    //     r22: C[tile_img]
+    //     r20: A[tile_img] B[tile_img]
+    //     r18: 0           0
+    //     r16: 2
+    //     r14: A[x]        B[x]        <-- already there
+    //     r12: A[oy]       B[oy]       <-- already there
+
     asm volatile(R"ASM(
             movw r28, %[tiles]
         1:
             mov  %[t], %[nx]
             movw %[x], %[ox]
         2:
-            movw r24, %[x]
-            movw r22, %[oy]
+            ldi  r24, 16
+            ldi  r25, 16
             ldi  r18, 32*3
             ld   r19, Y+
             mul  r19, r18
-            movw r18, %A[tile_img]
-            mov  r20, %C[tile_img]
-            add  r18, r0
-            adc  r19, r1
+            movw r20, %A[tile_img]
+            mov  r22, %C[tile_img]
+            add  r20, r0
+            adc  r21, r1
             clr  __zero_reg__
-            adc  r20, __zero_reg__
-            rcall SpritesU_drawBasicNoChecks
-            add  %A[x], %[c16]
+            adc  r22, __zero_reg__
+            ldi  r18, 0
+            ldi  r19, 0
+            ldi  r16, 2
+            %~call %x[drawfunc]
+            ldi  r18, 16
+            add  %A[x], r18
             adc  %B[x], __zero_reg__
             dec  %[t]
             brne 2b
-            add  %A[oy], %[c16]
+            add  %A[oy], r18
             adc  %B[oy], __zero_reg__
             ldi  r18, 8
             sub  r18, %[nx]
@@ -355,17 +371,17 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
         : 
         [ny]        "+&l" (ny),
         [t]         "=&l" (t),
-        [x]         "+&l" (x),
-        [oy]        "+&l" (oy)
+        [x]         "=&l" (moved_x),
+        [oy]        "+&l" (moved_oy)
         :
         [nx]        "l"   (nx),
         [ox]        "l"   (ox),
         [tile_img]  "l"   (tile_img),
         [tiles]     "r"   (tiles),
-        [c16]       "l"   (16)
+        [drawfunc]  "i"   (SpritesU::drawBasicNoChecks)
         :
-        //"r10", "r12", "r14", "r15", "r16",
-        "r18", "r19", "r20", "r22", "r23", "r24", "r25", "r28", "r29"
+        "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
+        "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31"
         );
 #else
     do {
@@ -376,9 +392,10 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
             MY_ASSERT(oy > -16 && oy < 64);
 #ifdef ARDUINO
             SpritesU::drawBasicNoChecks(
-                x, oy, 16, 16,
+                (16 << 8) | 16,
                 tile_img + (PLANES * 32) * deref_inc(tiles),
-                0, SpritesU::MODE_OVERWRITEFX);
+                0, SpritesU::MODE_OVERWRITEFX,
+                x, oy);
 #else
             draw_tile(x, oy, *tiles++);
 #endif
