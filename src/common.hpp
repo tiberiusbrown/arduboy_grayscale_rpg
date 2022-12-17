@@ -577,7 +577,6 @@ void platform_audio_update(); // update on/off from savefile.sound
 bool platform_audio_enabled();
 void platform_audio_play_song(uint8_t const* song);
 bool platform_audio_song_playing();
-void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot);
 void platform_audio_play_sfx(uint8_t const* sfx);
 void platform_set_game_speed(uint8_t num, uint8_t denom);
 void platform_set_game_speed_default();

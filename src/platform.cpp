@@ -392,11 +392,6 @@ void platform_audio_toggle()
         platform_audio_on();
 }
 
-void platform_audio_play_sfx(uint8_t const* sfx)
-{
-    platform_audio_play_sfx(sfx, 0);
-}
-
 void platform_set_game_speed_default()
 {
     platform_set_game_speed(26, 21);
@@ -442,10 +437,10 @@ void platform_audio_play_song(uint8_t const* song)
         atm_synth_start_score(song);
 }
 
-void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot)
+void platform_audio_play_sfx(uint8_t const* sfx)
 {
     if(savefile.settings.sound & 1)
-        atm_synth_play_sfx_track(2, 0, sfx);
+        atm_synth_play_sfx_track(1, 0, sfx);
 }
 
 void platform_audio_update()
@@ -479,7 +474,7 @@ void platform_audio_on() { audio_enabled = true; }
 void platform_audio_off() { audio_enabled = false; }
 bool platform_audio_enabled() { return audio_enabled; }
 void platform_audio_play_song(uint8_t const* song) {}
-void platform_audio_play_sfx(uint8_t const* sfx, uint8_t slot) {}
+void platform_audio_play_sfx(uint8_t const* sfx) {}
 bool platform_audio_song_playing() { return true; }
 
 extern float target_frame_time, ft_rem;

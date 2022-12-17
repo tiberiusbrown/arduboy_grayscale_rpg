@@ -138,7 +138,6 @@ void SpritesU::drawBasicNoChecks(
             com  %A[shift_mask]
             com  %B[shift_mask]
             
-            
             asr  %B[y]
             ror  %A[y]
             asr  %B[y]
@@ -225,7 +224,7 @@ void SpritesU::drawBasicNoChecks(
         [buf_adv]    "=&a" (buf_adv),
         [image_adv]  "=&r" (image_adv),
         [x]          "+&r" (x),
-        [y]          "+&d" (y),
+        [y]          "+&r" (y),
         [image]      "+&r" (image)
         :
         [mode]       "r"   (mode),

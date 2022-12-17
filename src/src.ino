@@ -150,7 +150,7 @@ static void handle_buttons_and_update()
 void loop()
 {
 #ifdef DEBUG_MONOCHROME
-    abg_detail::current_plane = 0;
+    abg_detail::current_plane = 1;
     FX::disableOLED();
     handle_buttons_and_update();
     render();
