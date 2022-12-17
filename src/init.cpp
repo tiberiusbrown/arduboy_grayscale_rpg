@@ -30,9 +30,10 @@ void new_game()
     party[0].battle.id = 0;
     party[0].battle.hp = party_mhp(0);
 
-    //LOC_dungeon_lightsout();
-    //LOC_home_inside();
     LOC_home_outside();
+    story_flag_set(SFLAG_story_charlie_job);
+    //story_flag_set(SFLAG_charlie_raptor);
+    //story_flag_set(SFLAG_story_got_fish);
 }
 
 void initialize()

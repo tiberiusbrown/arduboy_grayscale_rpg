@@ -455,10 +455,10 @@ void update_battle()
             }
             else
             {
-                update_items_numcat(d.items);
                 d.items.cat = IT_CONSUMABLE;
                 d.items.battle = true;
                 d.phase = BPHASE_ITEM;
+                update_items_numcat(d.items);
             }
             if(d.msel != BPHASE_MENU)
             {

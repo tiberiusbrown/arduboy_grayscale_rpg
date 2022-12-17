@@ -9,3 +9,6 @@ inline void LOC_entrance_lightsout              () { px =   752; py =  2640; }
 inline void LOC_stairs_village_dungeon          () { px =  2464; py =    64; }
 inline void LOC_obj_oldcharlie                  () { px =  1152; py =  3056; }
 inline void LOC_mother_grieving                 () { px =   816; py =  2752; }
+inline void LOC_charlie_switch                  () { px =  1200; py =  2720; }
+inline void LOC_charlie_basement                () { px =  1200; py =  2752; }
+inline void LOC_charlie_after_job               () { px =  1168; py =  2992; }
