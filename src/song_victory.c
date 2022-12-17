@@ -57,7 +57,7 @@ static const PROGMEM struct score_data {
   uint8_t num_patterns;
   uint16_t patterns_offset[3];
   uint8_t num_channels;
-  uint8_t start_patterns[1];
+  uint8_t start_patterns[2];
   uint8_t pattern0[sizeof(pattern0_array)];
   uint8_t pattern1[sizeof(pattern1_array)];
   uint8_t pattern2[sizeof(pattern2_array)];
@@ -69,10 +69,10 @@ static const PROGMEM struct score_data {
       offsetof(struct score_data, pattern1),
       offsetof(struct score_data, pattern2),
   },
-  .num_channels = 1,
+  .num_channels = 2,
   .start_patterns = {
     0x00,                         // Channel 0 entry track (PULSE)
-    //0x02,                         // Channel 1 entry track (SQUARE)
+    0x02,                         // Channel 1 entry track (SQUARE)
     //0x02,                         // Channel 2 entry track (TRIANGLE)
     //0x02,                         // Channel 3 entry track (NOISE)
   },
