@@ -95,12 +95,10 @@ void SpritesU::drawBasicNoChecks(
     uint16_t image_adv;
     uint8_t* buf = Arduboy2Base::sBuffer;
     
-#if 0
+#if 1
     asm volatile(R"ASM(
             mov  %[col_start], %A[x]
             clr  %[bottom]
-            mov  %A[image_adv], %[w]
-            clr  %B[image_adv]
             mov  %[cols], %[w]
     
             lsr  %[pages]
@@ -116,15 +114,14 @@ void SpritesU::drawBasicNoChecks(
             lsl  %[shift_coef]
             mul  %[shift_coef], %[w]
             movw %A[shift_mask], r0
-            mul  %A[shift_mask], %B[frame]
-            add  %B[image], r0
-            adc  %C[image], r1
-            mul  %B[shift_mask], %A[frame]
-            add  %B[image], r0
-            adc  %C[image], r1
             mul  %A[shift_mask], %A[frame]
-            add  %A[image], r0
-            adc  %B[image], r1
+            movw %A[image_adv], r0
+            mul  %A[shift_mask], %B[frame]
+            add  %B[image_adv], r0
+            mul  %B[shift_mask], %A[frame]
+            add  %B[image_adv], r0
+            add  %A[image], %A[image_adv]
+            adc  %B[image], %B[image_adv]
             adc  %C[image], %[bottom]
         1:
             ; precompute vertical shift coef and mask
@@ -182,15 +179,14 @@ void SpritesU::drawBasicNoChecks(
             ; compute buffer start address
             ldi  %[buf_adv], 128
             mulsu %[page_start], %[buf_adv]
+            add  r0, %[col_start]
             add  %A[buf], r0
             adc  %B[buf], r1
-            add  %A[buf], %[col_start]
-            adc  %B[buf], %[bottom]
             
             ; clip against right edge
             sub  %[buf_adv], %[col_start]
-            cp   %[buf_adv], %[cols]
-            brge 5f
+            cp   %[cols], %[buf_adv]
+            brlo 5f
             mov  %[cols], %[buf_adv]
         5:
             ; clip against bottom edge
@@ -203,17 +199,19 @@ void SpritesU::drawBasicNoChecks(
         6:
             ldi  %[buf_adv], 128
             sub  %[buf_adv], %[cols]
-            clr __zero_reg__
+            mov  %A[image_adv], %[w]
+            clr  %B[image_adv]
             sbrc %[mode], 1
             rjmp 7f
             sub  %A[image_adv], %[cols]
-            sbc  %B[image_adv], __zero_reg__
+            sbc  %B[image_adv], %B[image_adv]
         7:
             sbrs %[mode], 0
             rjmp 8f
             lsl  %A[image_adv]
             rol  %B[image_adv]
         8:
+            clr __zero_reg__
         )ASM"
         :
         [pages]      "+&r" (pages),
@@ -239,7 +237,6 @@ void SpritesU::drawBasicNoChecks(
     page_start = int8_t(y);
     col_start = uint8_t(x);
     bottom = false;
-    image_adv = w;
     cols = w;
 
     asm volatile(
@@ -250,9 +247,11 @@ void SpritesU::drawBasicNoChecks(
 
     if(frame != 0)
     {
-        uint8_t frame_pages = pages;
-        if(mode & 1) frame_pages *= 2;
-        image += uint16_t((frame_pages * w) * frame);
+        shift_coef = pages;
+        if(mode & 1) shift_coef *= 2;
+        shift_mask = shift_coef * w;
+        image_adv = shift_mask * frame;
+        image += image_adv;
     }
 
     // precompute vertical shift coef and mask
@@ -319,6 +318,7 @@ void SpritesU::drawBasicNoChecks(
     }
 
     buf_adv = 128 - cols;
+    image_adv = w;
 #ifdef SPRITESU_FX
     if(!(mode & 2))
 #endif
