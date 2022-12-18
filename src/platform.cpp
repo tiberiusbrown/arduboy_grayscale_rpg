@@ -393,7 +393,7 @@ void platform_audio_toggle()
 
 void platform_set_game_speed_default()
 {
-    platform_set_game_speed(26, 21);
+    platform_set_game_speed(1, 1);
 }
 
 void platform_set_game_speed_saved()

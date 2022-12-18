@@ -127,7 +127,7 @@ static void render_title_graphics()
     auto const& d = sdata.title;
     render_map();
     platform_fx_drawplusmask(7, 0, TITLE_MASKED_IMG, 0, 114, 16);
-    if(!d.going_to_resume && (nframe & 0x1f) < 0x18)
+    if(!d.going_to_resume && (nframe & 0x3f) < 0x30)
         platform_fx_drawplusmask(47, 48, PRESS_A_IMG, 0, 34, 16);
 }
 
