@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="185">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="194">
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer id="1" name="Tiles" width="256" height="256">
   <data encoding="csv">
@@ -796,6 +796,52 @@ end:</property>
    </properties>
    <point/>
   </object>
+  <object id="185" x="952.333" y="3000">
+   <properties>
+    <property name="script">bnse end
+dlg P_Catherine {Good morning Matthias! Any adventures today? I'd love to get away from these Old Dark soldiers.}
+dlg P_Matthias {Hey Catherine. Not at the moment, I'm afraid.}
+dlg P_Catherine {Alright, well let me know if something comes up!}
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="188" x="952.909" y="2920.36">
+   <properties>
+    <property name="script">ep S_Dark_Guard guard
+bnse end
+dlg P_Dark_Guard {Hail to the Old Dark. Now get out of my way, peasant.}
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="189" x="1164.23" y="2920.82">
+   <properties>
+    <property name="script">ep S_Dark_Guard guard
+bnse end
+dlg P_Dark_Guard {Hail to the Old Dark.}
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="192" x="969.333" y="3031">
+   <properties>
+    <property name="script">ep S_Dark_Guard guard
+bnse end
+dlg P_Dark_Guard {Mind yourself, little peasant. Oh yeah, and Hail to the Old Dark.}
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="193" x="1050" y="2934.75">
+   <properties>
+    <property name="script">ep S_Dark_Guard guard
+bnse end
+dlg P_Dark_Guard {Hail to the Old Dark. Don't cause any trouble.}
+end:</property>
+   </properties>
+   <point/>
+  </object>
  </objectgroup>
  <objectgroup color="#ff0000" id="3" name="Paths">
   <object id="90" name="!story_got_fish" class="S_Mother" x="394.75" y="74.25">
@@ -849,8 +895,20 @@ end:</property>
   <object id="183" name="!raptor_east_bridge" class="S_Psy_Raptor" x="1397.64" y="2678.55">
    <polyline points="0,0 6.5,4.75"/>
   </object>
+  <object id="186" name="guard" x="1031.75" y="2937.68">
+   <polyline points="0,0 -1.5,-50.75"/>
+  </object>
+  <object id="187" name="guard" x="937" y="2935.5">
+   <polyline points="0,0 78.5,1.25"/>
+  </object>
+  <object id="190" name="guard" x="1157.82" y="2937.27">
+   <polyline points="0,0 -1.5,-50.75"/>
+  </object>
+  <object id="191" name="guard" x="937.333" y="3015">
+   <polyline points="0,0 78.5,1.25"/>
+  </object>
  </objectgroup>
- <objectgroup color="#aaaa00" id="4" name="Locations">
+ <objectgroup color="#aaaa00" id="4" name="Locations" visible="0">
   <object id="80" name="@home_inside" x="407.5" y="120">
    <point/>
   </object>

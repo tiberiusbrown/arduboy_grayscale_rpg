@@ -443,8 +443,9 @@ static void update_game_over()
 
 static uint8_t const TITLE_PATH[] PROGMEM =
 {
-    8, 64, 7, 48, 0, 80, 8, 64, 2, 64, 4, 8, 8, 64, 7, 20, 6, 56, 0, 4, 8, 64,
-    6, 80, 4, 8, 8, 64, 6, 24, 5, 16, 4, 64, 3, 32, 2, 100, 3, 24, 2, 24,
+    8, 64, 7, 48, 0, 60, 8, 60, 0, 20, 8, 30, 2, 64, 4, 8, 8, 40, 7, 20,
+    6, 56, 0, 4, 8, 64, 6, 80, 4, 8, 8, 64, 6, 24, 5, 16, 4, 64, 3, 32,
+    2, 100, 3, 24, 2, 24,
 };
 constexpr uint16_t PATH_START_X = 930;
 constexpr uint16_t PATH_START_Y = 2803;
@@ -453,16 +454,16 @@ static void title_advance_path()
 {
     auto& d = sdata.title;
     uint8_t pi = d.path_index;
-    if(pi >= sizeof(TITLE_PATH) / 2)
+    if(pi >= (uint8_t)sizeof(TITLE_PATH))
     {
         pi = 0;
         px = PATH_START_X;
         py = PATH_START_Y;
     }
-    uint8_t const* ptr = &TITLE_PATH[pi * 2];
+    uint8_t const* ptr = &TITLE_PATH[pi];
     uint8_t dir = pgm_read_byte_inc(ptr);
     uint8_t frames = pgm_read_byte(ptr);
-    d.path_index = pi + 1;
+    d.path_index = pi + 2;
     d.path_dir = dir;
     d.path_frames = frames;
 }

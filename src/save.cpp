@@ -77,6 +77,7 @@ void load(bool first)
     if(!id || compute_checksum() != savefile.checksum)
     {
         new_game();
+        savefile.settings.no_battery_alert = false;
         savefile.settings.sound = 3;
         savefile.settings.brightness = 3;
         savefile.settings.game_speed = 3;

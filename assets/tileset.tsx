@@ -69,6 +69,8 @@
    <wangtile tileid="124" wangid="6,6,6,6,6,0,6,6"/>
    <wangtile tileid="133" wangid="2,2,2,0,0,0,0,0"/>
    <wangtile tileid="134" wangid="2,0,0,0,0,0,2,2"/>
+   <wangtile tileid="137" wangid="6,0,6,6,6,0,6,6"/>
+   <wangtile tileid="138" wangid="6,6,6,0,6,6,6,0"/>
    <wangtile tileid="139" wangid="6,0,6,6,6,6,6,6"/>
    <wangtile tileid="140" wangid="6,6,6,6,6,6,6,0"/>
    <wangtile tileid="153" wangid="2,2,2,0,2,2,2,2"/>

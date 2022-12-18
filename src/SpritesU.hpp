@@ -671,7 +671,7 @@ void SpritesU::drawBasicNoChecks(
                 sbc %B[image], %B[image_adv]
                 sbc %C[image], __zero_reg__
                 rcall L%=_seek
-                cpi %[page_start], 0
+                cp %[page_start], __zero_reg__
                 brlt L%=_top
                 tst %[pages]
                 brne L%=_middle_skip_reseek
@@ -862,13 +862,13 @@ void SpritesU::drawBasicNoChecks(
                 lpm
                 lpm
                 nop
-                in %A[shift_mask], %[spdr]
+                in %[pages], %[spdr]
                 out %[spdr], __zero_reg__
-                mul %A[shift_mask], %[shift_coef]
-                movw %A[shift_mask], r0
+                mul %[pages], %[shift_coef]
+                mov %[pages], r0
                 ld %[buf_data], %a[buf]
-                com %A[shift_mask]
-                and %[buf_data], %A[shift_mask]
+                com %[pages]
+                and %[buf_data], %[pages]
                 or %[buf_data], %A[image_data]
                 st %a[buf]+, %[buf_data]
                 lpm
@@ -890,15 +890,15 @@ void SpritesU::drawBasicNoChecks(
             [pages]      "+&r" (pages),
             [count]      "=&r" (count),
             [buf_data]   "=&r" (buf_data),
-            [image_data] "=&r" (image_data),
-            [shift_mask] "+&r" (shift_mask)
+            [image_data] "=&r" (image_data)
             :
             [cols]       "r"   (cols),
             [buf_adv]    "r"   (buf_adv),
             [image_adv]  "r"   (image_adv),
             [shift_coef] "r"   (shift_coef),
-            [bottom]     "d"   (bottom),
-            [page_start] "d"   (page_start),
+            [shift_mask] "r"   (shift_mask),
+            [bottom]     "r"   (bottom),
+            [page_start] "r"   (page_start),
             [reseek]     "r"   (reseek),
             [mode]       "r"   (mode),
             [sfc_read]   "r"   (SFC_READ),
