@@ -44,6 +44,7 @@ struct SpritesU
 #ifdef SPRITESU_RECT
     // color: zero for BLACK, 1 for WHITE
     static void fillRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t color);
+    static void fillRect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t color);
 #endif
 
     static constexpr uint8_t MODE_OVERWRITE   = 0;
@@ -56,7 +57,7 @@ struct SpritesU
         uint24_t image, uint16_t frame, uint8_t mode);
     __attribute__((noinline)) static void drawBasicNoChecks(
         uint16_t w_and_h,
-        uint24_t image, uint16_t frame, uint8_t mode,
+        uint24_t image, uint8_t mode,
         int16_t x, int16_t y);
 };
 
@@ -72,13 +73,59 @@ void SpritesU::drawBasic(
     if(y + h <= 0) return;
     
     uint16_t w_and_h = (uint16_t(h) << 8) | w;
+    
+    //if(frame != 0)
+    //{
+    //    uint8_t tmp = h >> 3;
+    //    if(mode & 1) tmp *= 2;
+    //    uint16_t tmp2 = tmp * w;
+    //    tmp2 = tmp2 * frame;
+    //    image += tmp2;
+    //}
+    
+    uint16_t tmp, tmp2;
+    asm volatile(R"ASM(
+            cp   %A[frame], __zero_reg__
+            cpc  %B[frame], __zero_reg__
+            breq 1f
+            
+            ; add frame offset to image
+            lsr  %[h]
+            lsr  %[h]
+            lsr  %[h]
+            sbrc %[mode], 0
+            lsl  %A[h]
+            mul  %A[h], %[w]
+            movw %A[tmp], r0
+            mul  %A[tmp], %A[frame]
+            movw %A[tmp2], r0
+            mul  %A[tmp], %B[frame]
+            add  %B[tmp2], r0
+            mul  %B[tmp], %A[frame]
+            add  %B[tmp2], r0
+            add  %A[image], %A[tmp2]
+            adc  %B[image], %B[tmp2]
+            clr  __zero_reg__
+            adc  %C[image], __zero_reg__
+        1:
+        )ASM"
+        :
+        [h]     "+&r" (h),
+        [image] "+&r" (image),
+        [tmp]   "=&r" (tmp),
+        [tmp2]  "=&r" (tmp2)
+        :
+        [frame] "r"   (frame),
+        [mode]  "r"   (mode),
+        [w]     "r"   (w)
+        );
 
-    drawBasicNoChecks(w_and_h, image, frame, mode, x, y);
+    drawBasicNoChecks(w_and_h, image, mode, x, y);
 }
 
 void SpritesU::drawBasicNoChecks(
     uint16_t w_and_h,
-    uint24_t image, uint16_t frame, uint8_t mode,
+    uint24_t image, uint8_t mode,
     int16_t x, int16_t y)
 {
     uint8_t w = uint8_t(w_and_h);
@@ -104,26 +151,7 @@ void SpritesU::drawBasicNoChecks(
             lsr  %[pages]
             lsr  %[pages]
             lsr  %[pages]
-            cp   %A[frame], %[bottom]
-            cpc  %B[frame], %[bottom]
-            breq 1f
             
-            ; add frame offset to image
-            mov  %[shift_coef], %[pages]
-            sbrc %[mode], 0
-            lsl  %[shift_coef]
-            mul  %[shift_coef], %[w]
-            movw %A[shift_mask], r0
-            mul  %A[shift_mask], %A[frame]
-            movw %A[image_adv], r0
-            mul  %A[shift_mask], %B[frame]
-            add  %B[image_adv], r0
-            mul  %B[shift_mask], %A[frame]
-            add  %B[image_adv], r0
-            add  %A[image], %A[image_adv]
-            adc  %B[image], %B[image_adv]
-            adc  %C[image], %[bottom]
-        1:
             ; precompute vertical shift coef and mask
             ldi  %[shift_coef], 1
             sbrc %A[y], 1
@@ -228,7 +256,6 @@ void SpritesU::drawBasicNoChecks(
         [image]      "+&r" (image)
         :
         [mode]       "r"   (mode),
-        [frame]      "d"   (frame),
         [w]          "r"   (w)
         );
     
@@ -956,8 +983,15 @@ void SpritesU::drawPlusMaskFX(
 #ifdef SPRITESU_RECT
 void SpritesU::fillRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t color)
 {
-    if(w == 0 || h == 0) return;
     if(x >= 128) return;
+    if(x + w <= 0) return;
+    if(y + h <= 0) return;
+    fillRect_i8((int8_t)x, (int8_t)y, w, h, color);
+}
+
+void SpritesU::fillRect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t color)
+{
+    if(w == 0 || h == 0) return;
     if(y >= 64)  return;
     if(x + w <= 0) return;
     if(y + h <= 0) return;

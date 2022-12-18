@@ -736,7 +736,7 @@ void render_battle()
     if(phase == BPHASE_INTRO || phase == BPHASE_OUTRO)
     {
         int16_t x;
-        if(d.frame <= 8) x = 128 - d.frame * 16;
+        if(d.frame <= 8) x = 127 - d.frame * 16;
         else if(d.frame <= 24) x = (8 - d.frame);
         else x = -16 - (d.frame - 24) * 16;
         if( (phase == BPHASE_INTRO && d.frame <= 8) ||
@@ -749,8 +749,11 @@ void render_battle()
             draw_battle_sprites();
         }
         int16_t x2 = -(x + 16);
-        platform_fillrect(x2,  0, 144, 24, BLACK);
-        platform_fillrect(x2, 40, 144, 24, BLACK);
+        if(int8_t(x2) == x2)
+        {
+            platform_fillrect_i8(int8_t(x2), 0, 144, 24, BLACK);
+            platform_fillrect_i8(int8_t(x2), 40, 144, 24, BLACK);
+        }
         uint8_t f = (phase == BPHASE_INTRO ? 0 : 1);
         platform_fx_drawoverwrite(x, 24, BATTLE_BANNERS_IMG, f);
         return;

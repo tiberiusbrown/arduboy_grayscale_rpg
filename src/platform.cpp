@@ -289,7 +289,6 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c)
 {
 #ifdef ARDUINO
-    //a.fillRect(x, y, w, h, c);
     c = (c > plane()) ? 1 : 0;
     SpritesU::fillRect(x, y, w, h, c);
 #else
@@ -303,28 +302,28 @@ void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c)
 
 void platform_fillrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c)
 {
+#ifdef ARDUINO
+    c = (c > plane()) ? 1 : 0;
+    SpritesU::fillRect_i8(x, y, w, h, c);
+#else
     platform_fillrect(x, y, w, h, c);
+#endif
 }
 
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c)
 {
-#ifdef ARDUINO
-    //a.drawRect(x, y, w, h, c);
     platform_fillrect(x, y, w, 1, c);
     platform_fillrect(x, y + h - 1, w, 1, c);
     platform_fillrect(x, y, 1, h, c);
     platform_fillrect(x + w - 1, y, 1, h, c);
-#else
-    platform_fillrect(x, y, w, 1, c);
-    platform_fillrect(x, y + h - 1, w, 1, c);
-    platform_fillrect(x, y, 1, h, c);
-    platform_fillrect(x + w - 1, y, 1, h, c);
-#endif
 }
 
 void platform_drawrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c)
 {
-    platform_drawrect(x, y, w, h, c);
+    platform_fillrect_i8(x, y, w, 1, c);
+    platform_fillrect_i8(x, y + h - 1, w, 1, c);
+    platform_fillrect_i8(x, y, 1, h, c);
+    platform_fillrect_i8(x + w - 1, y, 1, h, c);
 }
 
 void platform_fx_erase_save_sector()

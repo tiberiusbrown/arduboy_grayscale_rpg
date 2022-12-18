@@ -25,7 +25,7 @@ static void render_dialog()
     if(!d.questiondraw)
     {
         render_map();
-        platform_fillrect(0, 36, 128, 28, BLACK);
+        platform_fillrect_i8(0, 36, 128, 28, BLACK);
     }
     else
     {

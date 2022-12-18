@@ -83,6 +83,8 @@ void update_items_numcat(sdata_items& d)
     for(uint8_t i = 0; i < NUM_CONSUMABLES; ++i)
         if(savefile.chunk_regs[8 + i] != 0)
             ++d.cat_nums[IT_CONSUMABLE];
+    if(d.cat_nums[IT_CONSUMABLE] == 0)
+        d.cat_nums[IT_CONSUMABLE] = 1;
     d.item_count = 0;
 
     // restrict access to equippable items in battle

@@ -388,6 +388,9 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
         "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31"
         );
 #else
+    uint8_t maxy = 64;
+    if(state == STATE_PAUSE) maxy -= sdata.pause.ally;
+    else if(state == STATE_DIALOG) maxy = 35;
     do {
         t = nx;
         x = ox;
@@ -398,7 +401,7 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
             SpritesU::drawBasicNoChecks(
                 (16 << 8) | 16,
                 tile_img + (PLANES * 32) * deref_inc(tiles),
-                0, SpritesU::MODE_OVERWRITEFX,
+                SpritesU::MODE_OVERWRITEFX,
                 x, oy);
 #else
             draw_tile(x, oy, *tiles++);
@@ -406,6 +409,7 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
             x += 16;
         } while(--t != 0);
         oy += 16;
+        if(oy >= maxy) break;
         tiles += (8 - nx);
     } while(--ny != 0);
 #endif
@@ -431,7 +435,6 @@ void draw_text_noclip(int8_t x, int8_t y, char const* str, uint8_t f)
 {
     char t;
     uint8_t cx = (uint8_t)x;
-    uint8_t plane8 = plane() * 8;
     uint8_t const* font_img = FONT_IMG + plane() * 8 - (' ' * (8 * PLANES)) + 2;
     uint8_t const* font_adv = FONT_ADV - ' ';
     uint8_t page = (uint8_t)y;
