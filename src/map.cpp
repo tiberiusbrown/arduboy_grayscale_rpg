@@ -39,6 +39,9 @@ static bool run_chunk()
 {
     auto& ac = active_chunks[running_chunk];
     auto& sprite = chunk_sprites[running_chunk];
+    // reset sprite at the beginning of chunk script
+    if(!chunks_are_running)
+        sprite.active = false;
     auto& c = ac.chunk;
     {
         uint16_t ci = ac.cy * MAP_CHUNK_W + ac.cx;
@@ -447,20 +450,20 @@ bool run_chunks()
     {
         running_chunk = 0;
         chunk_instr = 0;
-        chunks_are_running = true;
     }
     while(running_chunk < 4)
     {
         if(run_chunk())
         {
             clamp_regs();
+            chunks_are_running = true;
             return true;
         }
         ++running_chunk;
         chunk_instr = 0;
     }
-    chunks_are_running = false;
     clamp_regs();
+    chunks_are_running = false;
     return false;
 }
 

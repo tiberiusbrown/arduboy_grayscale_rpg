@@ -481,6 +481,7 @@ struct savefile_t
     sprite_t chunk_sprites[4];
 };
 extern savefile_t savefile;
+static_assert(sizeof(savefile.chunk_regs) <= 16, "revisit reg command encoding");
 
 static auto& px = savefile.px;
 static auto& py = savefile.py;

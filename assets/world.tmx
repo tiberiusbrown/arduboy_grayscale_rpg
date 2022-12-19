@@ -702,12 +702,12 @@ end:</property>
     <property name="script">bfc !story_got_fish skip
 
 ep S_Mother mother
-bfs !story_fish_delivered skip_fish
 bnse skip
 
+bfs !story_fish_delivered skip_fish
 dlg P_Matthias {Here's the fish, mother. Old Charlie refused to take payment.}
 dlg P_Mother {Thank you, dear.}
-fs !story_delivered_fish
+fs !story_fish_delivered
 skip_fish:
 
 bfs !story_met_catherine skip
@@ -802,9 +802,13 @@ ep S_Old_Charlie Charlie
 bfs !story_got_fish end
 bnse end
 dlg P_Matthias {I took care of that raptor for you, Old Charlie.}
-dlg P_Old_Charlie {Many thanks, Matty. Alas, pest control is not easy for me at my age. Here, take this fish back to your mother.}
+dlg P_Old_Charlie {Many thanks, Matty. Alas, pest control is not easy for me at my age. Here, take this fish back to your mother.
+
+
+Oh, and if that raptor was a handful, here's something that can help.}
 fs !story_got_fish
 obj @mother_grieving
+addi r8 r8 1
 end:
 </property>
    </properties>
@@ -820,7 +824,7 @@ end:</property>
   </object>
   <object id="185" x="952.333" y="3000">
    <properties>
-    <property name="script">bfs !story_delivered_fish fish_delivered
+    <property name="script">bfs !story_fish_delivered fish_delivered
 ep S_Catherine catherine_fountain
 bnse end
 dlg P_Catherine {Good morning Matthias! Any adventures today? I'd love to get away from these Old Dark soldiers.}
@@ -844,6 +848,7 @@ dlg P_Catherine {Can I come with you?|
 Of course you can!
 Not yet.}
 bz r1 end
+dlg P_Catherine {Wonderful! I'm so excited!}
 fs !party_catherine
 pa 1
 
