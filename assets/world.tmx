@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="202">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="205">
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer id="1" name="Tiles" width="256" height="256">
   <data encoding="csv">
@@ -700,7 +700,20 @@ end:</property>
   <object id="160" x="823.75" y="2776.5">
    <properties>
     <property name="script">bfc !story_got_fish skip
+
 ep S_Mother mother
+bfs !story_fish_delivered skip_fish
+bnse skip
+
+dlg P_Matthias {Here's the fish, mother. Old Charlie refused to take payment.}
+dlg P_Mother {Thank you, dear.}
+fs !story_delivered_fish
+skip_fish:
+
+bfs !story_met_catherine skip
+dlg P_Mother {Oh, Catherine dropped by while you were away. It sounded like she wanted your help with something.}
+obj @catherine_quest
+
 skip:
 
 $tdlg P_Matthias {Wish you were here with me, Father...}</property>
@@ -807,10 +820,33 @@ end:</property>
   </object>
   <object id="185" x="952.333" y="3000">
    <properties>
-    <property name="script">bnse end
+    <property name="script">bfs !story_delivered_fish fish_delivered
+ep S_Catherine catherine_fountain
+bnse end
 dlg P_Catherine {Good morning Matthias! Any adventures today? I'd love to get away from these Old Dark soldiers.}
-dlg P_Matthias {Hey Catherine. Not at the moment, I'm afraid.}
-dlg P_Catherine {Alright, well let me know if something comes up!}
+dlg P_Matthias {Hey Catherine. Not at the moment, I'm afraid. I'm just getting some fish for dinner tonight.}
+dlg P_Catherine {Alright, well come back when you're free!}
+jmp end
+
+fish_delivered:
+bfs !party_catherine end
+ep S_Catherine catherine_quest
+bnse end
+
+bfs !story_met_catherine already_met
+dlg P_Catherine {Matthias! I was just looking for you! I was out exploring and found a strange cave a little ways to the west of the village. I didn't go in because it looked too scary. Wanna see?}
+dlg P_Matthias {Sounds exciting! Yeah, I'll go check it out.}
+obj @story_first_cave
+fs !story_met_catherine
+
+already_met:
+dlg P_Catherine {Can I come with you?|
+Of course you can!
+Not yet.}
+bz r1 end
+fs !party_catherine
+pa 1
+
 end:</property>
    </properties>
    <point/>
@@ -854,7 +890,7 @@ end:</property>
   <object id="194" x="711.75" y="2744.5">
    <properties>
     <property name="script">$bnst end
-fs !SFLAG_ITEM_Studded_Leather_Tunic
+fs !ITEM_Studded_Leather_Tunic
 end:</property>
    </properties>
    <point/>
@@ -862,7 +898,7 @@ end:</property>
   <object id="195" x="824" y="3128">
    <properties>
     <property name="script">$bnst end
-fs !SFLAG_ITEM_Brass_Knuckles
+fs !ITEM_Brass_Knuckles
 end:</property>
    </properties>
    <point/>
@@ -914,7 +950,7 @@ end:</property>
   <object id="131" name="Hermit" x="86.8182" y="45">
    <polyline points="7,-8.27273 3.90909,-9.72727 5.54545,-5.18182 1.18182,-8.63636 3.36364,-4.09091 -4.09091,-9 -0.818182,-3.72727 4.09091,14.8182 6.81818,10.6364 -0.272727,14.6364 6.27273,8.09091 -3.54545,13.3636 4.63636,5.90909 -4.81818,9.36364"/>
   </object>
-  <object id="132" name="!Catherine_fountain" class="S_Catherine" x="968.25" y="2953.25">
+  <object id="132" name="catherine_fountain" x="968.25" y="2953.25">
    <polygon points="48,-2 48.75,46 0.25,46.75 -2,-0.75"/>
   </object>
   <object id="134" name="Charlie" class="S_Old_Charlie" x="1189.08" y="3065.67">
@@ -971,8 +1007,11 @@ end:</property>
   <object id="198" name="!bridge_guard" class="S_Dark_Guard" x="903.333" y="3144.33">
    <polyline points="0,0 4.83333,-4.08333"/>
   </object>
+  <object id="203" name="catherine_quest" class="S_Old_Charlie" x="978" y="2973">
+   <polyline points="-31.25,0 -28,-6"/>
+  </object>
  </objectgroup>
- <objectgroup color="#aaaa00" id="4" name="Locations" visible="0">
+ <objectgroup color="#aaaa00" id="4" name="Locations">
   <object id="80" name="@home_inside" x="407.5" y="120">
    <point/>
   </object>
@@ -1007,6 +1046,12 @@ end:</property>
    <point/>
   </object>
   <object id="178" name="@charlie_after_job" x="1175.25" y="2999.63">
+   <point/>
+  </object>
+  <object id="202" name="@catherine_quest" x="952" y="2969.5">
+   <point/>
+  </object>
+  <object id="204" name="@story_first_cave" x="632.75" y="2808.75">
    <point/>
   </object>
  </objectgroup>

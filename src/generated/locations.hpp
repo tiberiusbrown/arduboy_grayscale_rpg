@@ -12,3 +12,5 @@ inline void LOC_mother_grieving                 () { px =   816; py =  2752; }
 inline void LOC_charlie_switch                  () { px =  1200; py =  2720; }
 inline void LOC_charlie_basement                () { px =  1200; py =  2752; }
 inline void LOC_charlie_after_job               () { px =  1168; py =  2992; }
+inline void LOC_catherine_quest                 () { px =   944; py =  2960; }
+inline void LOC_story_first_cave                () { px =   624; py =  2800; }
