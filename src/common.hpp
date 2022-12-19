@@ -651,9 +651,11 @@ void new_game();
 extern "C" {
 #ifdef ARDUINO
 uint8_t const* song_victory();
+uint8_t const* song_defeat();
 uint8_t const* song_peaceful();
 #else
 inline uint8_t const* song_victory() { return nullptr; }
+inline uint8_t const* song_defeat() { return nullptr; }
 inline uint8_t const* song_peaceful() { return nullptr; }
 #endif
 }

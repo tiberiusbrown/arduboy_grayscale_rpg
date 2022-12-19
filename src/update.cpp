@@ -602,6 +602,8 @@ void update()
 
         // decide which song to play
         song = song_peaceful();
+        if(state == STATE_GAME_OVER)
+            song = song_defeat();
 
         if(song != nullptr)
             platform_audio_play_song(song);

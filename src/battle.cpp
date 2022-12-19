@@ -587,6 +587,7 @@ void update_battle()
             d.phase = d.next_phase;
         break;
     case BPHASE_DEFEAT:
+        platform_audio_play_song(song_defeat());
         change_state(STATE_GAME_OVER);
         break;
     case BPHASE_OUTRO:
