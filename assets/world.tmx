@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="201">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="202">
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer id="1" name="Tiles" width="256" height="256">
   <data encoding="csv">
@@ -380,7 +380,6 @@ end:
   <object id="102" x="1047.33" y="2695">
    <properties>
     <property name="script">$bnst end
-solved
 fs !ITEM_Simple_Cloth_Hat
 end:</property>
    </properties>
@@ -516,17 +515,9 @@ $stf !LightsOut_9 T_DungeonSwitchOff
   </object>
   <object id="115" x="2168.44" y="152.727">
    <properties>
-    <property name="script">bfc !LightsOut_1 end
-bfc !LightsOut_2 end
-bfc !LightsOut_3 end
-bfc !LightsOut_4 end
-bfc !LightsOut_5 end
-bfc !LightsOut_6 end
-bfc !LightsOut_7 end
-bfc !LightsOut_8 end
-bfc !LightsOut_9 end
+    <property name="script">bfc !LightsOut_solved closed
 $st T_DungeonBarsOpen
-end:</property>
+closed:</property>
    </properties>
    <point/>
   </object>
@@ -888,6 +879,24 @@ end:</property>
   <object id="199" x="887" y="3062.5">
    <properties>
     <property name="script" value="$tmsg {Village Church}"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="201" x="2215.75" y="170">
+   <properties>
+    <property name="script">bfs !LightsOut_solved end
+bfc !LightsOut_1 end
+bfc !LightsOut_2 end
+bfc !LightsOut_3 end
+bfc !LightsOut_4 end
+bfc !LightsOut_5 end
+bfc !LightsOut_6 end
+bfc !LightsOut_7 end
+bfc !LightsOut_8 end
+bfc !LightsOut_9 end
+solved
+fs !LightsOut_solved
+end:</property>
    </properties>
    <point/>
   </object>

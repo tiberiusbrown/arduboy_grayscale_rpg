@@ -418,7 +418,6 @@ static void update_game_over()
         if(d.msg[0] == '\0')
         {
             uint8_t n = u8rand(NUM_GAME_OVER_MESSAGES);
-            n = 10;
             platform_fx_read_data_bytes(
                 GAME_OVER_MESSAGES + n * GAME_OVER_MESSAGE_LEN, d.msg,
                 GAME_OVER_MESSAGE_LEN);
