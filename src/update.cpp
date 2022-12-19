@@ -3,11 +3,8 @@
 #include "generated/fxdata.h"
 #include "generated/num_game_over_messages.hpp"
 
-static int8_t const DIRX[9] PROGMEM = {
-    0, -1, -1, -1, 0, 1, 1, 1, 0,
-};
-static int8_t const DIRY[9] PROGMEM = {
-    1, 1, 0, -1, -1, -1, 0, 1, 0,
+static int8_t const DIRS[9 * 2] PROGMEM = {
+    0, 1, -1, 1, -1, 0, -1, -1, 0, -1, 1, -1, 1, 0, 1, 1, 0, 0
 };
 
 void back_to_map()
@@ -56,8 +53,9 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
 
     if(e.dir < 8)
     {
-        e.x += (int8_t)pgm_read_byte(&DIRX[e.dir]);
-        e.y += (int8_t)pgm_read_byte(&DIRY[e.dir]);
+        int8_t const* ptr = &DIRS[e.dir * 2];
+        e.x += (int8_t)pgm_read_byte_inc(ptr);
+        e.y += (int8_t)pgm_read_byte(ptr);
     }
 
     if(--e.frames_rem == 0)
@@ -143,8 +141,9 @@ static void update_map()
         sdata.map.a_pressed = false;
     if(btns_pressed & BTN_A)
     {
-        int8_t dx = (int8_t)pgm_read_byte(&DIRX[pdir]) * 8;
-        int8_t dy = (int8_t)pgm_read_byte(&DIRY[pdir]) * 8;
+        int8_t const* ptr = &DIRS[pdir * 2];
+        int8_t dx = (int8_t)pgm_read_byte_inc(ptr) * 8;
+        int8_t dy = (int8_t)pgm_read_byte(ptr) * 8;
         selx = (px + 8 + dx);
         sely = (py + 8 + dy);
         sdata.map.a_pressed = true;
@@ -421,7 +420,7 @@ static void update_game_over()
             platform_fx_read_data_bytes(
                 GAME_OVER_MESSAGES + n * GAME_OVER_MESSAGE_LEN, d.msg,
                 GAME_OVER_MESSAGE_LEN);
-            //wrap_text(d.msg, 106);
+            // TODO: bake this logic into data with scripts
             d.msg_lines = 1;
             for(auto& c : d.msg)
             {
@@ -483,8 +482,9 @@ static void title_animation()
     uint8_t dir = d.path_dir;
     if(dir < 8) pdir = dir;
     pmoving = (dir < 8);
-    int8_t dx = (int8_t)pgm_read_byte(&DIRX[dir]);
-    int8_t dy = (int8_t)pgm_read_byte(&DIRY[dir]);
+    int8_t const* ptr = &DIRS[dir * 2];
+    int8_t dx = (int8_t)pgm_read_byte_inc(ptr);
+    int8_t dy = (int8_t)pgm_read_byte(ptr);
     px += dx;
     py += dy;
 
