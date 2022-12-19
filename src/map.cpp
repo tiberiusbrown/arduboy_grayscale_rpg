@@ -505,6 +505,15 @@ void load_chunks()
             shift_chunk(3, 2);
         }
     }
+    // diagonal shifts
+    if(cx == pcx + 1 && cy == pcy + 1)
+        shift_chunk(3, 0);
+    if(cx + 1 == pcx && cy + 1 == pcy)
+        shift_chunk(0, 3);
+    if(cx == pcx + 1 && cy + 1 == pcy)
+        shift_chunk(1, 2);
+    if(cx + 1 == pcx && cy == pcy + 1)
+        shift_chunk(2, 1);
 
     load_chunk(0, cx + 0, cy + 0);
     load_chunk(1, cx + 1, cy + 0);

@@ -26,7 +26,7 @@ Action Instructions
         If <flag> is cleared, start a battle with enemies and set <flag>
 
     ebat <flag> <enemy_type> <enemy_type> <enemy_type> <enemy_type>
-        Same as 'bat' but remove chunk enemy immediately (avoids glitch frame)
+        Same as 'bat' but remove chunk sprite immediately (avoids glitch frame)
 
     Teleportation instructions terminate the script processing, as they cause
     a chunk reload to occur.

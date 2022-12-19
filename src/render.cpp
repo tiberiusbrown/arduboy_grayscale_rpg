@@ -241,10 +241,7 @@ void render()
     (pgmptr(&FUNCS[state]))();
 
     update_battery();
-
     render_battery();
-
-    draw_dec(0, 0, (uint8_t)savefile.settings.no_battery_alert);
 
     if(plane() == 0)
         ++rframe;
