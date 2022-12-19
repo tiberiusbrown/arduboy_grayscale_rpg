@@ -123,11 +123,13 @@ static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     uint8_t d = e.dir;
     bool walking = e.walking;
     if(d & 0x80) walking = false;
-    uint8_t nf = nframe >> 2;
+    uint8_t nf = nframe >> 1;
     if(e.type == 13)
+        walking = true, nf >>= 1;
+    else if(e.type == 14)
         walking = true;
     else
-        nf >>= 1;
+        nf >>= 2;
     if(walking)
     {
         f += (d & 7) * 2;

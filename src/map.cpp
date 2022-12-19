@@ -6,6 +6,24 @@
 #include "script_commands.hpp"
 #include "tile_solid.hpp"
 
+#include "src/ATMlib2/atm_synth.h"
+static uint8_t const SFX_SOLVED[] PROGMEM = {
+    ATM_SCORE_FMT_MINIMAL_MONO,
+    ATM_CMD_M_SET_VOLUME(72),
+    ATM_CMD_M_SLIDE_VOL_ADV_ON(-18, 0x40 + 1),
+    ATM_CMD_I_NOTE_C6,
+    ATM_CMD_M_DELAY_TICKS(3),
+    ATM_CMD_I_NOTE_B5,
+    ATM_CMD_M_DELAY_TICKS(1),
+    ATM_CMD_I_NOTE_C6,
+    ATM_CMD_M_DELAY_TICKS(2),
+    ATM_CMD_I_NOTE_D6,
+    ATM_CMD_M_DELAY_TICKS(2),
+    ATM_CMD_I_NOTE_G6,
+    ATM_CMD_M_DELAY_TICKS(4),
+    ATM_CMD_I_STOP,
+};
+
 static void reset_sprite(sprite_t& e)
 {
     e.path_index = 0;
@@ -325,6 +343,9 @@ static bool run_chunk()
             savefile.objy = deref_inc(instr_ptr);
             break;
         }
+        case CMD_SOLVED:
+            platform_audio_play_sfx(SFX_SOLVED);
+            break;
 
         case CMD_JMP:
         {

@@ -100,6 +100,7 @@ class CMD(AutoNumber):
     STF  = ()
     PA   = ()
     OBJ  = ()
+    SOLVED = ()
 
     JMP  = ()
     BZ   = ()
@@ -342,6 +343,9 @@ def assemble(s, eps):
             #append16(b, s[i]); i += 1
             b.append(int(s[i])); i += 1
             b.append(int(s[i])); i += 1
+        
+        elif s[i] == 'solved':
+            b.append(CMD.SOLVED); i += 1
             
         elif s[i] == 'jmp':
             b.append(CMD.JMP); i += 1

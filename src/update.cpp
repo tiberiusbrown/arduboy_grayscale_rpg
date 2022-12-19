@@ -42,7 +42,7 @@ bool sprite_contacts_player(active_chunk_t const& c, sprite_t const& e)
 static inline void update_sprite(active_chunk_t& c, sprite_t& e)
 {
     if(!e.active) return;
-    if(nframe & 1) return;
+    if(e.type != 14 && (nframe & 1)) return;
 
     // no path or just waiting on a single tile
     if(e.path_num <= 1)

@@ -83,6 +83,9 @@ Game Manipulation
     obj <tx> <ty>
         Set objective marker position to <tx> <ty>
 
+    solved
+        Play "puzzle solved" sfx
+
 Control Instructions
 
     end
@@ -197,6 +200,7 @@ enum script_command_t
     CMD_STF,
     CMD_PA,
     CMD_OBJ,
+    CMD_SOLVED,
 
     CMD_JMP,
     CMD_BZ,
