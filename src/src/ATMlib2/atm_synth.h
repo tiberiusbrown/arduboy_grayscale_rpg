@@ -27,7 +27,7 @@ ct_assert(ATM_SFX_SLOT_COUNT <= OSC_CH_COUNT, channel_count);
 #define ATM_SCORE_FMT_FULL_MONO (0x2)
 #define ATM_SCORE_FMT_FULL (0x3)
 
-#define ATM_CMD_BUF_SIZE 32
+#define ATM_CMD_BUF_SIZE 16
 
 struct atm_channel_state;
 struct atm_score_state;

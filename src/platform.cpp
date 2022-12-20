@@ -436,11 +436,14 @@ void update_score_channels()
 
 void platform_audio_update()
 {
-    update_score_channels();
     if(platform_audio_song_playing())
-        update_song_buffer(atmlib_state.sfx_slot[0].channel_state[0].pstack[0]);
+    {
+        update_score_channels();
+    }
     else
         platform_audio_play_song_now(current_song);
+    if(atmlib_state.sfx_slot[0].player_state.channel_active_mask != 0)
+        update_song_buffer(atmlib_state.sfx_slot[0].channel_state[0].pstack[0]);
 }
 
 void platform_audio_init()
@@ -487,8 +490,11 @@ void platform_audio_play_song_now(uint24_t song)
 
 void platform_audio_play_sfx(uint24_t sfx)
 {
-    //if(savefile.settings.sound & 1)
-    //    atm_synth_play_sfx_track(1, 0);
+    if(savefile.settings.sound & 1)
+    {
+        init_channel(atmlib_state.sfx_slot[0].channel_state[0], sfx);
+        atm_synth_play_sfx_track(1, 0);
+    }
 }
 
 void platform_audio_from_savefile()

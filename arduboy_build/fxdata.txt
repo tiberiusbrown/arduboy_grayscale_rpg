@@ -1,4 +1,5 @@
 raw_t MAPDATA = "mapdata.bin"
+
 raw_t PORTRAIT_IMG = "portrait_img.bin"
 raw_t PLAYER_IMG = "player_img.bin"
 raw_t SPRITES_IMG = "sprites_img.bin"
@@ -30,12 +31,33 @@ raw_t GOT_ITEM_IMG = "got_item_img.bin"
 raw_t TITLE_MASKED_IMG = "title_masked_img.bin"
 raw_t PRESS_A_IMG = "press_a_img.bin"
 raw_t OBJECTIVE_ARROWS_IMG = "objective_arrows_img.bin"
+
 raw_t SONG_PEACEFUL = "song_peaceful.bin"
 raw_t SONG_VICTORY = "song_victory.bin"
 raw_t SONG_DEFEAT = "song_defeat.bin"
 
+uint8_t SFX_HIT[] = {
+    117, 1,      // set waveform to noise
+    116, 75,     // set volume
+    145, 0, -24, // set volume slide on
+    25,          // note on: C4
+    66,          // delay: 3 ticks
+    97           // stop
+};
+
+uint8_t SFX_SOLVED[] = {
+    116, 72,           // set volume
+    161, 0, -18, 0x40, // set volume slide on w/ retrig
+    49, 66,            // C6 3
+    48, 64,            // B5 1
+    49, 65,            // C6 2
+    51, 65,            // D6 2
+    56, 67,            // G6 4
+    97                 // stop
+};
+
 // put string data last to avoid large diffs in git when scripts are updated
-raw_t GAME_OVER_MESSAGES = "game_over_messages.bin"
-raw_t STRINGDATA = "stringdata.bin"
 raw_t ITEM_STRINGS = "item_strings.bin"
 raw_t PORTRAIT_STRINGS = "portrait_strings.bin"
+raw_t GAME_OVER_MESSAGES = "game_over_messages.bin"
+raw_t STRINGDATA = "stringdata.bin"

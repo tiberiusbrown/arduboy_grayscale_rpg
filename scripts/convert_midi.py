@@ -13,7 +13,10 @@ def delay_cmd(beats):
 def byte16(u16):
     return [u16 & 0xff, (u16 >> 8) & 0xff]
 
-def convert(fname):
+def convert(
+        fname,
+        qnb = QUARTER_NOTE_BEATS,
+        ev = END_VOLUME):
     mid = MidiFile(fname + '.mid')
     if mid.type == 2:
         print('asynchronous midi not supported: "%s"' % fname)
@@ -28,7 +31,7 @@ def convert(fname):
         for msg in track:
             if msg.is_meta: continue
             if msg.channel > NUM_CHANNELS - 1: continue
-            beats = int(msg.time * QUARTER_NOTE_BEATS / 96 / 2)
+            beats = int(round(msg.time * qnb / 96 / 2))
             if beats > 0:
                 for k in now_notes:
                     if k not in outstanding_notes:
@@ -73,7 +76,7 @@ def convert(fname):
                 pass
             # add note and delay
             channels[i] += [0x74, note[3]] # set volume
-            slide = int(note[3] * (1 - END_VOLUME) / note[2])
+            slide = int(note[3] * (1 - ev) / note[2])
             channels[i] += [(128 | (1 << 4)) + 1, 0, (256 - slide) & 0xff]
             channels[i] += [note[0] - 35]
             channels[i] += delay_cmd(note[2])
@@ -109,6 +112,6 @@ def convert(fname):
     with open('../arduboy_build/%s.bin' % fname, 'wb') as f:
         f.write(bytearray(bytes))
 
-convert('song_peaceful')
+convert('song_peaceful', ev = 0.5)
 convert('song_victory')
-convert('song_defeat')
+convert('song_defeat', qnb = 6)
