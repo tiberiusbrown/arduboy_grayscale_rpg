@@ -32,9 +32,7 @@ static uint16_t note_index_2_phase_inc(const uint8_t note_idx)
 
 //static void atm_synth_ext_tick_handler(uint8_t cb_index, void *priv);
 
-#define pattern_index(ch_ptr) ((ch_ptr)->pstack[(ch_ptr)->pstack_index].pattern_index)
-#define pattern_cmd_ptr(ch_ptr) ((ch_ptr)->pstack[(ch_ptr)->pstack_index].next_cmd_ptr)
-#define pattern_repetition_counter(ch_ptr) ((ch_ptr)->pstack[(ch_ptr)->pstack_index].repetitions_counter)
+#define pattern_index(ch_ptr) ((ch_ptr)->pstack[0].pattern_index)
 
 /* ---- */
 
@@ -91,26 +89,25 @@ union fmt_hdr {
 	} f;
 };
 
-static const uint8_t *get_entry_pattern_array_ptr(const uint8_t *score)
-{
-	union fmt_hdr hdr;
+//static const uint8_t *get_entry_pattern_array_ptr(const uint8_t *score)
+//{
+//	union fmt_hdr hdr;
+//
+//	hdr.u16 = pgm_read_word(score);
+//	const uint8_t pattern_count = hdr.f.fmt & 0x02 ? hdr.f.data : 0;
+//	return hdr.f.fmt & 0x01 ? score + sizeof(uint16_t)*pattern_count + 3 : NULL;
+//}
 
-	hdr.u16 = pgm_read_word(score);
-	const uint8_t pattern_count = hdr.f.fmt & 0x02 ? hdr.f.data : 0;
-	return hdr.f.fmt & 0x01 ? score + sizeof(uint16_t)*pattern_count + 3 : NULL;
-}
-
-static const uint8_t *get_track_start_ptr(const struct atm_player_state *player_state, const uint8_t track_index)
-{
-	const uint8_t *s = player_state->score_start;
-	union fmt_hdr hdr;
-
-	hdr.u16 = pgm_read_word(s);
-	if (hdr.f.fmt & 0x02) {
-		return s + pgm_read_word(s+2+sizeof(uint16_t)*track_index);
-	}
-	return hdr.f.fmt & 0x01 ? s+1+hdr.f.data : s+1;
-}
+//static const uint8_t *get_track_start_ptr(const struct atm_player_state *player_state, const uint8_t track_index)
+//{
+//	const uint8_t *s = player_state->score_start;
+//	union fmt_hdr hdr;
+//	hdr.u16 = pgm_read_word(s);
+//	if (hdr.f.fmt & 0x02) {
+//		return s + pgm_read_word(s+2+sizeof(uint16_t)*track_index);
+//	}
+//	return hdr.f.fmt & 0x01 ? s+1+hdr.f.data : s+1;
+//}
 
 void atm_synth_setup(void)
 {
@@ -125,9 +122,9 @@ void atm_synth_setup(void)
 	}
 }
 
-static void atm_synth_init_channel(struct atm_channel_state *ch, struct osc_params *dst, const struct atm_player_state *player, uint8_t pattern_index)
+static void atm_synth_init_channel(struct atm_channel_state *ch, struct osc_params *dst, const struct atm_player_state *player)
 {
-	memset(ch, 0, sizeof(*ch));
+	//memset(ch, 0, sizeof(*ch));
 #if ATM_HAS_FX_NOTE_RETRIG
 	ch->arpCount = 0x80;
 #endif
@@ -136,13 +133,13 @@ static void atm_synth_init_channel(struct atm_channel_state *ch, struct osc_para
 	ch->loop_pattern_index = 255;
 #endif
 	ch->dst_osc_params = dst;
-	ch->pstack[0].next_cmd_ptr = get_track_start_ptr(player, pattern_index);
-	ch->pstack[0].pattern_index = pattern_index;
+	ch->pstack[0].next_cmd_ptr = 0;
 }
 
-static void atm_player_init_state(const uint8_t *score, struct atm_player_state *dst)
+static void atm_player_init_state(struct atm_player_state *dst)
 {
-	dst->score_start = score;
+    // TODO
+	//dst->score_start = score;
 	dst->tick_rate = OSC_TICKRATE/ATMLIB_TICKRATE_DEFAULT-1;
 }
 
@@ -160,14 +157,14 @@ void atm_synth_release_channel(const uint8_t channel_index)
 	channel->dst_osc_params = &osc_params_array[channel_index];
 }
 
-void atm_synth_play_sfx_track(const uint8_t ch_index, const uint8_t sfx_slot, const uint8_t *sfx)
+void atm_synth_play_sfx_track(const uint8_t ch_index, const uint8_t sfx_slot)
 {
 	atm_synth_stop_sfx_track(sfx_slot);
 	struct atm_sfx_state *sfx_state = &atmlib_state.sfx_slot[sfx_slot];
 	sfx_state->ch_index = ch_index;
 	atm_synth_grab_channel(ch_index, &sfx_state->osc_params);
-	atm_player_init_state((const uint8_t*)sfx, &sfx_state->player_state);
-	atm_synth_init_channel(sfx_state->channel_state, &osc_params_array[ch_index], &sfx_state->player_state, 0);
+	atm_player_init_state(&sfx_state->player_state);
+	atm_synth_init_channel(sfx_state->channel_state, &osc_params_array[ch_index], &sfx_state->player_state);
 	/* Start SFX */
 	/* override active flags so only one channel is active for the SFX player */
 	sfx_state->player_state.channel_active_mask = 1 << ch_index;
@@ -180,19 +177,19 @@ void atm_synth_stop_sfx_track(const uint8_t sfx_slot)
 	atm_synth_release_channel(sfx_state->ch_index);
 }
 
-void atm_synth_start_score(const uint8_t *score)
+void atm_synth_start_score()
 {
 	/* stop current score if any */
 	atm_synth_set_score_paused(1);
 	/* Set default score data */
 	struct atm_score_state *score_state = &atmlib_state.score_state;
-	atm_player_init_state(score, &score_state->player_state);
+	atm_player_init_state(&score_state->player_state);
 	/* Read track count */
-	const uint8_t *ep = get_entry_pattern_array_ptr(score);
+	//const uint8_t *ep = get_entry_pattern_array_ptr(score);
 	/* Fetch starting points for each track */
 	for (unsigned n = 0; n < ARRAY_SIZE(score_state->channel_state); n++) {
 		atm_synth_init_channel(&score_state->channel_state[n],
-			score_state->channel_state[n].dst_osc_params, &score_state->player_state, pgm_read_byte(&ep[n]));
+			score_state->channel_state[n].dst_osc_params, &score_state->player_state);
 	}
 	/* Start playback */
 	atm_synth_set_score_paused(0);
@@ -307,7 +304,14 @@ static void process_channel(const uint8_t ch_index, struct atm_player_state *pla
 		takes up more progmem so we read a fixed amount.
 		maximum command size is 4 right now
 		*/
-		memcpy_P(&cmd, pattern_cmd_ptr(ch), sizeof(struct atm_cmd_data));
+		//memcpy(&cmd, pattern_cmd_ptr(ch), sizeof(struct atm_cmd_data));
+        uint8_t* dst = (uint8_t*)&cmd;
+        uint8_t p = ch->pstack[0].next_cmd_ptr;
+        for(uint8_t i = 0; i < 4; ++i)
+        {
+            *dst++ = ch->pstack[0].cmds[p];
+            p = (p + 1) & (ATM_CMD_BUF_SIZE - 1);
+        }
 		process_cmd(&cmd, player_state, ch);
 	}
 

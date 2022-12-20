@@ -347,7 +347,7 @@ static bool run_chunk()
             break;
         }
         case CMD_SOLVED:
-            platform_audio_play_sfx(SFX_SOLVED);
+            //platform_audio_play_sfx(SFX_SOLVED);
             break;
 
         case CMD_JMP:

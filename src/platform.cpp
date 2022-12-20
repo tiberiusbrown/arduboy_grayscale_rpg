@@ -383,6 +383,8 @@ bool platform_fx_busy()
 #endif
 }
 
+static uint24_t current_song;
+
 void platform_audio_toggle()
 {
     if(platform_audio_enabled())
@@ -408,7 +410,38 @@ void platform_set_game_speed_saved()
     platform_set_game_speed(num, denom);
 }
 
+void platform_audio_play_song(uint24_t song)
+{
+    current_song = song;
+}
+
 #ifdef ARDUINO
+
+static void update_song_buffer(atm_pattern_state& p)
+{
+    uint8_t buf[ATM_CMD_BUF_SIZE];
+    uint8_t i = p.next_cmd_ptr;
+    uint24_t addr = p.addr;
+    platform_fx_read_data_bytes(addr, buf, ATM_CMD_BUF_SIZE);
+    uint8_t const* ptr = buf;
+    for(uint8_t n = 0; n < ATM_CMD_BUF_SIZE; ++n)
+        p.cmds[(i + n) & (ATM_CMD_BUF_SIZE - 1)] = deref_inc(ptr);
+}
+
+void update_score_channels()
+{
+    update_song_buffer(atmlib_state.score_state.channel_state[0].pstack[0]);
+    update_song_buffer(atmlib_state.score_state.channel_state[1].pstack[0]);
+}
+
+void platform_audio_update()
+{
+    update_score_channels();
+    if(platform_audio_song_playing())
+        update_song_buffer(atmlib_state.sfx_slot[0].channel_state[0].pstack[0]);
+    else
+        platform_audio_play_song_now(current_song);
+}
 
 void platform_audio_init()
 {
@@ -430,19 +463,35 @@ bool platform_audio_enabled()
     return Arduboy2Audio::enabled();
 }
 
-void platform_audio_play_song(uint8_t const* song)
+static void init_channel(atm_channel_state& c, uint24_t addr)
 {
+    auto* osc = c.dst_osc_params;
+    memset(&c, 0, sizeof(atm_channel_state));
+    c.dst_osc_params = osc;
+    c.pstack[0].addr = addr;
+    platform_fx_read_data_bytes(addr, c.pstack[0].cmds, ATM_CMD_BUF_SIZE);
+}
+
+void platform_audio_play_song_now(uint24_t song)
+{
+    current_song = song;
     if(savefile.settings.sound & 2)
-        atm_synth_start_score(song);
+    {
+        uint16_t offsets[ATM_SCORE_CHANNEL_COUNT];
+        platform_fx_read_data_bytes(song, offsets, sizeof(offsets));
+        init_channel(atmlib_state.score_state.channel_state[0], song + offsets[0]);
+        init_channel(atmlib_state.score_state.channel_state[1], song + offsets[1]);
+        atm_synth_start_score();
+    }
 }
 
-void platform_audio_play_sfx(uint8_t const* sfx)
+void platform_audio_play_sfx(uint24_t sfx)
 {
-    if(savefile.settings.sound & 1)
-        atm_synth_play_sfx_track(1, 0, sfx);
+    //if(savefile.settings.sound & 1)
+    //    atm_synth_play_sfx_track(1, 0);
 }
 
-void platform_audio_update()
+void platform_audio_from_savefile()
 {
     if(atm_synth_is_score_playing())
         atm_synth_set_score_paused((savefile.settings.sound & 2) == 0);
@@ -463,7 +512,7 @@ void platform_set_game_speed(uint8_t num, uint8_t denom)
 #else
 
 static bool audio_enabled;
-void platform_audio_update()
+void platform_audio_from_savefile()
 {
     if((savefile.settings.sound != 0) != platform_audio_enabled())
         platform_audio_toggle();
@@ -472,8 +521,11 @@ void platform_audio_init() {}
 void platform_audio_on() { audio_enabled = true; }
 void platform_audio_off() { audio_enabled = false; }
 bool platform_audio_enabled() { return audio_enabled; }
-void platform_audio_play_song(uint8_t const* song) {}
-void platform_audio_play_sfx(uint8_t const* sfx) {}
+void platform_audio_play_song_now(uint24_t song)
+{
+    current_song = song;
+}
+void platform_audio_play_sfx(uint24_t sfx) {}
 bool platform_audio_song_playing() { return true; }
 
 extern float target_frame_time, ft_rem;

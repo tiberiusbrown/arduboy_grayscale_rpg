@@ -16,7 +16,7 @@ public:
 	void setup(void);
 
 	// Load and play specified song
-	void play(const uint8_t *song);
+	void play();
 
 	// Play or Pause playback
 	void playPause();

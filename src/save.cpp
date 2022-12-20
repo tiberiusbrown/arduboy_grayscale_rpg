@@ -95,7 +95,7 @@ void load(bool first)
     {
         savefile.settings = old_settings;
     }
-    platform_audio_update();
+    platform_audio_from_savefile();
 }
 
 uint16_t compute_checksum()

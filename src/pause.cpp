@@ -58,12 +58,12 @@ void update_pause()
                 if(optionsi == 0)
                 {
                     savefile.settings.sound ^= 2;
-                    platform_audio_update();
+                    platform_audio_from_savefile();
                 }
                 else if(optionsi == 1)
                 {
                     savefile.settings.sound ^= 1;
-                    platform_audio_update();
+                    platform_audio_from_savefile();
                 }
                 else if(optionsi == 2)
                 {

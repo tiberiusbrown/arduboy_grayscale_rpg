@@ -8,7 +8,7 @@
 /* Adjust the following to reduce memory usage */
 #define ATM_SCORE_CHANNEL_COUNT (2)
 #define ATM_SFX_SLOT_COUNT (1)
-#define ATM_PATTERN_STACK_DEPTH (2)
+#define ATM_PATTERN_STACK_DEPTH (1)
 
 ct_assert(ATM_SCORE_CHANNEL_COUNT <= OSC_CH_COUNT, channel_count);
 ct_assert(ATM_SFX_SLOT_COUNT <= OSC_CH_COUNT, channel_count);
@@ -26,6 +26,8 @@ ct_assert(ATM_SFX_SLOT_COUNT <= OSC_CH_COUNT, channel_count);
 #define ATM_SCORE_FMT_MINIMAL_MONO (0x0)
 #define ATM_SCORE_FMT_FULL_MONO (0x2)
 #define ATM_SCORE_FMT_FULL (0x3)
+
+#define ATM_CMD_BUF_SIZE 32
 
 struct atm_channel_state;
 struct atm_score_state;
@@ -49,7 +51,7 @@ struct atm_synth_ext {
 void atm_synth_setup(void);
 void atmlib_tick_handler(void);
 
-void atm_synth_start_score(const uint8_t *score);
+void atm_synth_start_score();
 uint8_t atm_synth_is_score_playing(void);
 
 void atm_synth_set_score_paused(const uint8_t paused);
@@ -70,7 +72,7 @@ being played back, the active sound effect will stop and the new one will replac
 
 Sound effect scores must be in ATM_SCORE_FMT_MINIMAL_MONO or ATM_SCORE_FMT_FULL_MONO format.
 */
-void atm_synth_play_sfx_track(const uint8_t osc_channel_index, const uint8_t sfx_slot, const uint8_t *sfx);
+void atm_synth_play_sfx_track(const uint8_t osc_channel_index, const uint8_t sfx_slot);
 
 /* Stop a previously started sound effect score */
 void atm_synth_stop_sfx_track(const uint8_t sfx_slot);
@@ -99,9 +101,9 @@ struct atm_slide_params {
 #endif
 
 struct atm_pattern_state {
-	const uint8_t *next_cmd_ptr;
-	uint8_t pattern_index;
-	uint8_t repetitions_counter;
+    uint8_t cmds[ATM_CMD_BUF_SIZE];
+	uint8_t next_cmd_ptr;
+    __uint24 addr;
 };
 
 struct atm_channel_state {
@@ -114,7 +116,6 @@ struct atm_channel_state {
 
 	// Nesting
 	struct atm_pattern_state pstack[ATM_PATTERN_STACK_DEPTH];
-	uint8_t pstack_index;
 #if ATM_HAS_FX_LOOP
 	uint8_t loop_pattern_index;
 #endif
@@ -153,7 +154,6 @@ struct atm_cmd_data {
 };
 
 struct atm_player_state {
-	const uint8_t *score_start;
 	uint8_t tick_rate;
 	uint8_t tick_counter;
 	uint8_t channel_active_mask;

@@ -54,6 +54,8 @@ static void process_immediate_cmd(const uint8_t cmd_id, struct atm_player_state 
 			break;
 
 		case ATM_CMD_I_PATTERN_END:
+            goto stop_channel;
+#if 0
 			if (pattern_repetition_counter(ch) > 0) {
 				/* Repeat track */
 				pattern_repetition_counter(ch)--;
@@ -67,6 +69,7 @@ static void process_immediate_cmd(const uint8_t cmd_id, struct atm_player_state 
 					ch->pstack_index--;
 				}
 			}
+#endif
 			break;
 
 		case ATM_CMD_I_GLISSANDO_OFF:
@@ -146,6 +149,7 @@ static void process_np_cmd(const struct atm_cmd_data *cmd, const uint8_t csz, st
 	/* Parametrised commands */
 	switch (cid) {
 		case ATM_CMD_NP_CALL:
+#if 0
 			/* ignore call command if the stack is full */
 			if (ch->pstack_index < ATM_PATTERN_STACK_DEPTH-1) {
 				const uint8_t new_track = cmd->params[0];
@@ -159,6 +163,7 @@ static void process_np_cmd(const struct atm_cmd_data *cmd, const uint8_t csz, st
 				}
 			}
 			/* if the stack is full and we cannot call, skip the call command */
+#endif
 			break;
 
 		case ATM_CMD_NP_GLISSANDO_ON:
@@ -231,8 +236,10 @@ static void process_np_cmd(const struct atm_cmd_data *cmd, const uint8_t csz, st
 
 static void process_cmd(const struct atm_cmd_data *cmd, struct atm_player_state *player_state, struct atm_channel_state *ch)
 {
-	const uint8_t **next_cmd_ptr = &pattern_cmd_ptr(ch);
+    __uint24 addr = ch->pstack[0].addr;
+	uint8_t *next_cmd_ptr = &ch->pstack[0].next_cmd_ptr;
 	*next_cmd_ptr += 1;
+    addr += 1;
 
 	if (cmd->id < ATM_CMD_BLK_DELAY) {
 		/* 0 … 63 : NOTE ON/OFF */
@@ -255,14 +262,18 @@ static void process_cmd(const struct atm_cmd_data *cmd, struct atm_player_state 
 	} else if (cmd->id < ATM_CMD_BLK_N_PARAMETER) {
 		/* 1 parameter byte command */
 		*next_cmd_ptr += 1;
+        addr += 1;
 		process_1p_cmd(cmd, player_state, ch);
 	} else {
 		const uint8_t csz = ((cmd->id >> 4) & 0x07) + 1;
 		/* n parameter byte command */
 		*next_cmd_ptr += csz;
+        addr += csz;
 		/* process_np_cmd() can modify next_cmd_ptr so increase it first */
 		process_np_cmd(cmd, csz, player_state, ch);
 	}
+    *next_cmd_ptr &= (ATM_CMD_BUF_SIZE - 1);
+    ch->pstack[0].addr = addr;
 }
 #if 0
 void ext_synth_command(const uint8_t ch_index, const struct atm_cmd_data *cmd, struct atm_player_state *player_state, struct atm_channel_state *ch)

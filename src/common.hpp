@@ -574,11 +574,13 @@ void platform_audio_init();
 void platform_audio_on();
 void platform_audio_off();
 void platform_audio_toggle();
-void platform_audio_update(); // update on/off from savefile.sound
+void platform_audio_from_savefile(); // update on/off from savefile.sound
 bool platform_audio_enabled();
-void platform_audio_play_song(uint8_t const* song);
+void platform_audio_play_song(uint24_t song); // set loop song
+void platform_audio_play_song_now(uint24_t song); // force stop music and play song
 bool platform_audio_song_playing();
-void platform_audio_play_sfx(uint8_t const* sfx);
+void platform_audio_play_sfx(uint24_t sfx);
+void platform_audio_update(); // 
 void platform_set_game_speed(uint8_t num, uint8_t denom);
 void platform_set_game_speed_default();
 void platform_set_game_speed_saved();
@@ -647,19 +649,6 @@ void toggle_item(uint8_t user, item_t i);
 // init.cpp
 void initialize();
 void new_game();
-
-// songs
-extern "C" {
-#ifdef ARDUINO
-uint8_t const* song_victory();
-uint8_t const* song_defeat();
-uint8_t const* song_peaceful();
-#else
-inline uint8_t const* song_victory() { return nullptr; }
-inline uint8_t const* song_defeat() { return nullptr; }
-inline uint8_t const* song_peaceful() { return nullptr; }
-#endif
-}
 
 inline uint8_t div16_u16(uint16_t x)
 {

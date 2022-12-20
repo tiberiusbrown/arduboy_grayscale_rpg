@@ -524,6 +524,7 @@ static void update_title()
     {
         if(d.fade_frame == 0)
         {
+            platform_audio_play_song_now(SONG_PEACEFUL);
             if(!first_loaded)
             {
                 load(true);
@@ -595,18 +596,16 @@ void update()
     };
 
     // try to play music if no song is playing
-    if(!platform_audio_song_playing() && (savefile.settings.sound & 2))
-    {
-        uint8_t const* song = nullptr;
-
-        // decide which song to play
-        song = song_peaceful();
-        if(state == STATE_GAME_OVER)
-            song = song_defeat();
-
-        if(song != nullptr)
-            platform_audio_play_song(song);
-    }
+    //if(!platform_audio_song_playing() && (savefile.settings.sound & 2))
+    //{
+    //    uint24_t song = SONG_PEACEFUL;
+    //
+    //    // decide which song to play
+    //    if(state == STATE_GAME_OVER)
+    //        song = SONG_DEFEAT;
+    //
+    //    platform_audio_play_song(song);
+    //}
 
     // arrow button repeat logic
     static_assert(BTN_DOWN  == 0x10, "");
@@ -619,6 +618,8 @@ void update()
     //process_repeat(1, BTN_DOWN );
     //process_repeat(2, BTN_LEFT );
     //process_repeat(3, BTN_RIGHT);
+
+    platform_audio_update();
 
     pmoving = false;
     (pgmptr(&FUNCS[state]))();
