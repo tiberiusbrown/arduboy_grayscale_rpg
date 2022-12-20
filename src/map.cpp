@@ -17,13 +17,15 @@ static void reset_sprite(sprite_t& e)
     if(e.path_dir != 0) e.path_dir = 1;
 }
 
+static bool chunk_sprite_defined;
+
 static bool run_chunk()
 {
     auto& ac = active_chunks[running_chunk];
     auto& sprite = chunk_sprites[running_chunk];
     // reset sprite at the beginning of chunk script
     if(!chunks_are_running)
-        sprite.active = false;
+        chunk_sprite_defined = false;
     auto& c = ac.chunk;
     {
         uint16_t ci = ac.cy * MAP_CHUNK_W + ac.cx;
@@ -66,7 +68,7 @@ static bool run_chunk()
         switch(instr)
         {
         case CMD_END:
-            return false;
+            goto finish_chunk;
 
             // message/dialog
         case CMD_MSG:
@@ -98,7 +100,7 @@ static bool run_chunk()
             platform_fx_read_data_bytes(STRINGDATA + stri, sdata.dialog.message,
                                         sizeof(sdata.dialog.message));
             //wrap_text(sdata.dialog.message, 128);
-            goto pause;
+            goto pause_chunk;
         }
         case CMD_BAT:
         case CMD_EBAT:
@@ -127,7 +129,7 @@ static bool run_chunk()
             sdata.battle.defender_id = INVALID;
             sdata.battle.flag = f;
             story_flag_set(f);
-            goto pause;
+            goto pause_chunk;
         }
 
         // teleport
@@ -150,7 +152,7 @@ static bool run_chunk()
             change_state(STATE_TP);
             sdata.tp.tx = tx;
             sdata.tp.ty = ty;
-            goto pause;
+            goto pause_chunk;
         }
 
         case CMD_ADD:
@@ -190,7 +192,7 @@ static bool run_chunk()
                         if(c == '\0') c = ' ';
                     }
                     ptr[ITEM_NAME_LEN - 1] = '\n';
-                    goto pause;
+                    goto pause_chunk;
                 }
             }
             break;
@@ -228,7 +230,7 @@ static bool run_chunk()
                     if(c == '\0') c = ' ';
                 }
                 sdata.dialog.message[sizeof(YOU_FOUND) - 1 + ITEM_NAME_LEN - 1] = '\n';
-                goto pause;
+                goto pause_chunk;
             }
             break;
         }
@@ -262,7 +264,6 @@ static bool run_chunk()
             uint8_t open = deref_inc(instr_ptr);
             if(instr == CMD_EPF && story_flag_get(f))
             {
-                sprite.active = false;
                 instr_ptr += n;
                 break;
             }
@@ -283,6 +284,7 @@ static bool run_chunk()
             else if(sprite.path_dir == 0)
                 sprite.path_dir = 1;
             if(reset) reset_sprite(sprite);
+            chunk_sprite_defined = true;
             break;
         }
         case CMD_ST:
@@ -320,7 +322,7 @@ static bool run_chunk()
             while(c != '\0');
             static char const JOINED[] PROGMEM = " has joined the party!";
             memcpy_P(m - 1, JOINED, sizeof(JOINED));
-            goto pause;
+            goto pause_chunk;
         }
         case CMD_OBJ:
         {
@@ -329,7 +331,7 @@ static bool run_chunk()
             break;
         }
         case CMD_SOLVED:
-            platform_audio_play_sfx(SFX_SOLVED);
+            platform_audio_play_sfx(SFX_SOLVED, 0);
             break;
 
         case CMD_JMP:
@@ -406,9 +408,13 @@ static bool run_chunk()
         default: break;
         }
     }
+
+finish_chunk:
+    if(!chunk_sprite_defined)
+        sprite.active = false;
     return false;
 
-pause:
+pause_chunk:
     chunk_instr = uint8_t(ptrdiff_t(instr_ptr - &c.script[0]));
     return true;
 }

@@ -497,7 +497,7 @@ void update_battle()
         uint8_t defender = d.defender_id;
         uint8_t dam = calc_attack_damage(attacker, defender);
         take_damage(defender, (int8_t)dam);
-        platform_audio_play_sfx(SFX_HIT);
+        platform_audio_play_sfx(SFX_HIT, 1);
 
         // Dismas innate: strike back at 50% damage when defending
         if(d.pdef == defender &&

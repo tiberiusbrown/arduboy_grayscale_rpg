@@ -442,7 +442,7 @@ void platform_audio_update()
     }
     else
         platform_audio_play_song_now(current_song);
-    if(atmlib_state.sfx_slot[0].player_state.channel_active_mask != 0)
+    if(platform_audio_sfx_playing())
         update_song_buffer(atmlib_state.sfx_slot[0].channel_state[0].pstack[0]);
 }
 
@@ -488,12 +488,12 @@ void platform_audio_play_song_now(uint24_t song)
     }
 }
 
-void platform_audio_play_sfx(uint24_t sfx)
+void platform_audio_play_sfx(uint24_t sfx, uint8_t channel)
 {
     if(savefile.settings.sound & 1)
     {
         init_channel(atmlib_state.sfx_slot[0].channel_state[0], sfx);
-        atm_synth_play_sfx_track(1, 0);
+        atm_synth_play_sfx_track(channel, 0);
     }
 }
 
@@ -508,6 +508,11 @@ void platform_audio_from_savefile()
 bool platform_audio_song_playing()
 {
     return atm_synth_is_score_playing() != 0;
+}
+
+bool platform_audio_sfx_playing()
+{
+    return atmlib_state.sfx_slot[0].player_state.channel_active_mask != 0;
 }
 
 void platform_set_game_speed(uint8_t num, uint8_t denom)
@@ -531,8 +536,10 @@ void platform_audio_play_song_now(uint24_t song)
 {
     current_song = song;
 }
-void platform_audio_play_sfx(uint24_t sfx) {}
+void platform_audio_play_sfx(uint24_t sfx, uint8_t channel) {}
 bool platform_audio_song_playing() { return true; }
+bool platform_audio_sfx_playing() { return true; }
+void platform_audio_update() {}
 
 extern float target_frame_time, ft_rem;
 void platform_set_game_speed(uint8_t num, uint8_t denom)
