@@ -7,6 +7,7 @@
 #define SPRITESU_RECT
 #include "SpritesU.hpp"
 #else
+extern uint8_t const FXDATA[];
 #include "generated/fxdata_emulated.hpp"
 #include <SDL.h>
 #include <assert.h>
@@ -522,24 +523,29 @@ void platform_set_game_speed(uint8_t num, uint8_t denom)
 
 #else
 
-static bool audio_enabled;
-void platform_audio_from_savefile()
+//static bool audio_enabled;
+//void platform_audio_from_savefile()
+//{
+//    if((savefile.settings.sound != 0) != platform_audio_enabled())
+//        platform_audio_toggle();
+//}
+//void platform_audio_init() {}
+//void platform_audio_on() { audio_enabled = true; }
+//void platform_audio_off() { audio_enabled = false; }
+//bool platform_audio_enabled() { return audio_enabled; }
+//void platform_audio_play_song_now(uint24_t song)
+//{
+//    current_song = song;
+//}
+//void platform_audio_play_sfx(uint24_t sfx, uint8_t channel) {}
+//bool platform_audio_song_playing() { return true; }
+//bool platform_audio_sfx_playing() { return true; }
+
+void platform_audio_update()
 {
-    if((savefile.settings.sound != 0) != platform_audio_enabled())
-        platform_audio_toggle();
+    if(!platform_audio_song_playing())
+        platform_audio_play_song_now(current_song);
 }
-void platform_audio_init() {}
-void platform_audio_on() { audio_enabled = true; }
-void platform_audio_off() { audio_enabled = false; }
-bool platform_audio_enabled() { return audio_enabled; }
-void platform_audio_play_song_now(uint24_t song)
-{
-    current_song = song;
-}
-void platform_audio_play_sfx(uint24_t sfx, uint8_t channel) {}
-bool platform_audio_song_playing() { return true; }
-bool platform_audio_sfx_playing() { return true; }
-void platform_audio_update() {}
 
 extern float target_frame_time, ft_rem;
 void platform_set_game_speed(uint8_t num, uint8_t denom)

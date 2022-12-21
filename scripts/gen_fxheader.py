@@ -2,7 +2,7 @@ with open('fxdata.bin', 'rb') as f:
     data = f.read()
     
 with open('../src/generated/fxdata_emulated.hpp', 'w') as f:
-    f.write('#pragma once\n\nconstexpr uint8_t FXDATA[] =\n{\n')
+    f.write('#pragma once\n\nuint8_t const FXDATA[] =\n{\n')
     n = 0
     for b in data:
         f.write('%3d,' % int(b))

@@ -13,6 +13,8 @@ constexpr uint8_t MAP_CHUNK_H = 64;
 constexpr uint8_t CHUNK_SCRIPT_SIZE = 80;
 constexpr uint8_t CHUNK_SPRITE_PATH_SIZE = 8;
 
+constexpr uint8_t NUM_SCORE_CHANNELS = 2;
+
 #define DEBUG_LIPO_DISCHARGE 0
 #ifdef ARDUINO
 #define RECORD_LIPO_DISCHARGE 0

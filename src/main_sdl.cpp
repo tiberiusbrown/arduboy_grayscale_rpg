@@ -287,6 +287,8 @@ int main(int argc, char** argv)
     }
 
     if(gif_recording) screen_recording_toggle();
+    
+    SDL_CloseAudio();
 
     SDL_DestroyTexture(tex);
 
