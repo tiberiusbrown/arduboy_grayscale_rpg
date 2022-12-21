@@ -1,3 +1,5 @@
+#ifndef ARDUINO
+
 #include "common.hpp"
 
 #include <SDL.h>
@@ -155,9 +157,8 @@ void platform_audio_deinit()
 
 extern uint8_t const FXDATA[];
 
-void platform_audio_play_song_now(uint24_t song)
+void platform_audio_play_song_now_once(uint24_t song)
 {
-    platform_audio_play_song(song);
     if(!(savefile.settings.sound & 2)) return;
     SDL_LockAudioDevice(device);
     memset(&channels[0], 0, sizeof(audio_channel));
@@ -214,3 +215,5 @@ void platform_audio_from_savefile()
     if((savefile.settings.sound != 0) != platform_audio_enabled())
         platform_audio_toggle();
 }
+
+#endif

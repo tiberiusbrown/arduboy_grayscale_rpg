@@ -53,7 +53,7 @@ static void render_dialog()
         platform_fx_drawoverwrite(x + 2, 2, PORTRAIT_IMG, p);
         platform_drawrect_i8(x + 0, 0, 36, 36, LIGHT_GRAY);
         platform_drawrect_i8(x + 1, 1, 34, 34, BLACK);
-        if(!d.questiondraw)
+        if(!d.questiondraw && portrait_id < 0x80)
         {
             uint8_t w = text_width(&d.name[1]);
             uint8_t x = 35;

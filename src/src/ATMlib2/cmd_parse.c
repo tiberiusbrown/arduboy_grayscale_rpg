@@ -236,10 +236,8 @@ static void process_np_cmd(const struct atm_cmd_data *cmd, const uint8_t csz, st
 
 static void process_cmd(const struct atm_cmd_data *cmd, struct atm_player_state *player_state, struct atm_channel_state *ch)
 {
-    __uint24 addr = ch->pstack[0].addr;
 	uint8_t *next_cmd_ptr = &ch->pstack[0].next_cmd_ptr;
 	*next_cmd_ptr += 1;
-    addr += 1;
 
 	if (cmd->id < ATM_CMD_BLK_DELAY) {
 		/* 0 … 63 : NOTE ON/OFF */
@@ -262,18 +260,15 @@ static void process_cmd(const struct atm_cmd_data *cmd, struct atm_player_state 
 	} else if (cmd->id < ATM_CMD_BLK_N_PARAMETER) {
 		/* 1 parameter byte command */
 		*next_cmd_ptr += 1;
-        addr += 1;
 		process_1p_cmd(cmd, player_state, ch);
 	} else {
 		const uint8_t csz = ((cmd->id >> 4) & 0x07) + 1;
 		/* n parameter byte command */
 		*next_cmd_ptr += csz;
-        addr += csz;
 		/* process_np_cmd() can modify next_cmd_ptr so increase it first */
 		process_np_cmd(cmd, csz, player_state, ch);
 	}
     *next_cmd_ptr &= (ATM_CMD_BUF_SIZE - 1);
-    ch->pstack[0].addr = addr;
 }
 #if 0
 void ext_synth_command(const uint8_t ch_index, const struct atm_cmd_data *cmd, struct atm_player_state *player_state, struct atm_channel_state *ch)

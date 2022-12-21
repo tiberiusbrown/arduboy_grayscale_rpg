@@ -57,7 +57,7 @@ static void battery_dsp(int16_t reading)
     }
 
     // update low battery decision
-    if(bat.stage >= 64)
+    if(bat.stage >= 128)
     {
         bat.low = (bat.dr >= 0 && bat.ddr >= 800);
     }

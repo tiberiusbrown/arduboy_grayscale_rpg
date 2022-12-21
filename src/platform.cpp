@@ -416,17 +416,26 @@ void platform_audio_play_song(uint24_t song)
     current_song = song;
 }
 
+void platform_audio_play_song_now(uint24_t song)
+{
+    current_song = song;
+    platform_audio_play_song_now_once(song);
+}
+
 #ifdef ARDUINO
 
 static void update_song_buffer(atm_pattern_state& p)
 {
     uint8_t buf[ATM_CMD_BUF_SIZE];
-    uint8_t i = p.next_cmd_ptr;
-    uint24_t addr = p.addr;
-    platform_fx_read_data_bytes(addr, buf, ATM_CMD_BUF_SIZE);
+    uint8_t curr = p.next_cmd_ptr;
+    uint8_t prev = p.prev_cmd_ptr;
+    uint8_t adv = (curr - prev) & (ATM_CMD_BUF_SIZE - 1);
+    platform_fx_read_data_bytes(p.addr, buf, ATM_CMD_BUF_SIZE);
     uint8_t const* ptr = buf;
     for(uint8_t n = 0; n < ATM_CMD_BUF_SIZE; ++n)
-        p.cmds[(i + n) & (ATM_CMD_BUF_SIZE - 1)] = deref_inc(ptr);
+        p.cmds[(curr + n) & (ATM_CMD_BUF_SIZE - 1)] = deref_inc(ptr);
+    p.addr += adv;
+    p.prev_cmd_ptr = curr;
 }
 
 void update_score_channels()
@@ -442,7 +451,7 @@ void platform_audio_update()
         update_score_channels();
     }
     else
-        platform_audio_play_song_now(current_song);
+        platform_audio_play_song_now_once(current_song);
     if(platform_audio_sfx_playing())
         update_song_buffer(atmlib_state.sfx_slot[0].channel_state[0].pstack[0]);
 }
@@ -476,9 +485,8 @@ static void init_channel(atm_channel_state& c, uint24_t addr)
     platform_fx_read_data_bytes(addr, c.pstack[0].cmds, ATM_CMD_BUF_SIZE);
 }
 
-void platform_audio_play_song_now(uint24_t song)
+void platform_audio_play_song_now_once(uint24_t song)
 {
-    current_song = song;
     if(savefile.settings.sound & 2)
     {
         uint16_t offsets[ATM_SCORE_CHANNEL_COUNT];
