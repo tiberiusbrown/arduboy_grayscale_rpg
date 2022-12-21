@@ -573,6 +573,7 @@ void platform_fx_write_save_page(uint16_t page, void const* data, size_t num);
 void platform_fx_read_save_bytes(uint24_t addr, void* data, size_t num);
 bool platform_fx_busy();
 void platform_audio_init();
+void platform_audio_deinit();
 void platform_audio_on();
 void platform_audio_off();
 void platform_audio_toggle();

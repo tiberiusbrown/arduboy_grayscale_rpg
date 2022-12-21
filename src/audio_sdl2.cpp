@@ -129,7 +129,7 @@ static void audio_callback(void* userdata, Uint8* stream, int len)
         sample[1] = sample_channel(channels[1]);
         sample[2] = sample_channel(channels[2]);
         if(sfx) sample[sfx_channel] = 0;
-        int s = (sample[0] + sample[1] + sample[2]) / 4;
+        int s = (sample[0] + sample[1] + sample[2]) / 16;
         if(s < -127) s = -127;
         if(s > +127) s = +127;
         stream[i] = Uint8((int8_t)s);
@@ -146,6 +146,11 @@ void platform_audio_init()
     spec.samples = SAMPLES;
     device = SDL_OpenAudioDevice(nullptr, 0, &spec, nullptr, 0);
     SDL_PauseAudioDevice(device, 0);
+}
+
+void platform_audio_deinit()
+{
+    SDL_CloseAudioDevice(device);
 }
 
 extern uint8_t const FXDATA[];
