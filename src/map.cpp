@@ -155,6 +155,10 @@ static bool run_chunk()
             goto pause_chunk;
         }
 
+        case CMD_DIE:
+            change_state(STATE_DIE);
+            goto pause_chunk;
+
         case CMD_ADD:
         {
             uint8_t t = deref_inc(instr_ptr);
@@ -393,14 +397,21 @@ static bool run_chunk()
             break;
         }
         case CMD_BNI:
+        case CMD_BNAI:
         {
             uint16_t f = deref_inc(instr_ptr);
             f |= (uint16_t(deref_inc(instr_ptr)) << 8);
             int8_t t = (int8_t)deref_inc(instr_ptr);
-            bool jmp = true;
-            for(uint8_t i = 0; i < nparty; ++i)
-                if(user_is_wearing(i, (item_t)f))
-                    jmp = false;
+            bool jmp;
+            if(instr == CMD_BNAI)
+                jmp = !user_is_wearing(0, (item_t)f);
+            else
+            {
+                jmp = true;
+                for(uint8_t i = 0; i < nparty; ++i)
+                    if(user_is_wearing(i, (item_t)f))
+                        jmp = false;
+            }
             if(jmp) instr_ptr += t;
             break;
         }

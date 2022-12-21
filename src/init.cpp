@@ -33,8 +33,9 @@ void new_game()
     LOC_home_outside();
     story_flag_set(SFLAG_story_charlie_job);
     story_flag_set(SFLAG_tip_objective);
-    //story_flag_set(SFLAG_charlie_raptor);
-    //story_flag_set(SFLAG_story_got_fish);
+    story_flag_set(SFLAG_charlie_raptor);
+    story_flag_set(SFLAG_story_got_fish);
+    story_flag_set(SFLAG_story_fish_delivered);
 }
 
 void initialize()

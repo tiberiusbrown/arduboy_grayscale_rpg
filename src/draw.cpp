@@ -127,7 +127,7 @@ static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     if(e.type == 13)
         walking = true, nf >>= 1;
     else if(e.type == 14)
-        walking = true;
+        /* walking = true */;
     else
         nf >>= 2;
     if(walking)
@@ -173,6 +173,7 @@ void draw_sprites()
     uint8_t n = 0;
 
     // player sprite
+    if(state != STATE_DIE || ((nframe & 2) && sdata.die.frame < 24))
     {
         uint8_t f = pdir * 4;
         if(pmoving) f += (div8(nframe) & 3);

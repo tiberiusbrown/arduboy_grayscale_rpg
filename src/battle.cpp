@@ -6,8 +6,8 @@ constexpr uint8_t HP_BAR_WIDTH = 14;
 constexpr uint8_t DEFEND_Y = 28;
 constexpr uint8_t DEFEND_X1 = 35;
 constexpr uint8_t DEFEND_X2 = 77;
-constexpr uint8_t ASLEEP_FRAMES = 16;
-constexpr uint8_t DAMAGED_FRAMES = 8;
+constexpr uint8_t ASLEEP_FRAMES = 24;
+constexpr uint8_t DAMAGED_FRAMES = 16;
 
 static battle_member_t& member(uint8_t id)
 {
@@ -488,9 +488,7 @@ void update_battle()
     }
     case BPHASE_ATTACK2:
     {
-        // TODO: attack/damage animation
-        // just delay for now
-        d.frame = -20;
+        d.frame = -24;
         d.phase = BPHASE_DELAY;
         d.next_phase = BPHASE_ATTACK3;
         uint8_t attacker = d.attacker_id;
@@ -575,7 +573,6 @@ void update_battle()
             d.phase = d.next_phase;
         break;
     case BPHASE_DEFEAT:
-        platform_audio_play_song_now(SONG_DEFEAT);
         change_state(STATE_GAME_OVER);
         break;
     case BPHASE_OUTRO:
@@ -689,7 +686,7 @@ static void draw_battle_sprites()
     for(auto const& s : d.sprites)
     {
         if(!s.active) continue;
-        if((nframe & 1) && s.damaged > 0)
+        if((nframe & 2) && s.damaged > 0)
             continue;
         auto& e = entries[n++];
         e.x = (uint8_t)s.x;

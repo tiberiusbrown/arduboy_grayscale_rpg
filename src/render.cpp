@@ -224,6 +224,15 @@ static void render_battery()
     }
 }
 
+static void render_die()
+{
+    auto const& d = sdata.die;
+    render_map();
+    uint8_t f = d.frame;
+    if(f >= 48)
+        platform_fade(16 + (48 - f) * FADE_SPEED);
+}
+
 void render()
 {
     using render_func = void (*)();
@@ -235,6 +244,7 @@ void render()
         render_dialog,
         render_tp,
         render_battle,
+        render_die,
         render_game_over,
     };
 

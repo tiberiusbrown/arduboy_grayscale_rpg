@@ -47,3 +47,4 @@ constexpr uint16_t SFLAG_story_fish_delivered = 41;
 constexpr uint16_t SFLAG_story_met_catherine = 42;
 constexpr uint16_t SFLAG_charlie_raptor = 43;
 constexpr uint16_t SFLAG_party_catherine = 44;
+constexpr uint16_t SFLAG_cave_gate_closed = 45;

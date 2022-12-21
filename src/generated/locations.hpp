@@ -14,3 +14,5 @@ inline void LOC_charlie_basement                () { px =  1200; py =  2752; }
 inline void LOC_charlie_after_job               () { px =  1168; py =  2992; }
 inline void LOC_catherine_quest                 () { px =   944; py =  2960; }
 inline void LOC_story_first_cave                () { px =   624; py =  2800; }
+inline void LOC_first_cave_outside              () { px =   624; py =  2816; }
+inline void LOC_first_cave_inside               () { px =  2320; py =   208; }

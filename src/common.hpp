@@ -174,6 +174,7 @@ enum
     STATE_DIALOG,  // message or dialog
     STATE_TP,      // player is teleporting (e.g., entering building or cave)
     STATE_BATTLE,
+    STATE_DIE,
     STATE_GAME_OVER,
 };
 extern uint8_t state;
@@ -410,6 +411,10 @@ struct sdata_map
 {
     bool a_pressed;
 };
+struct sdata_die
+{
+    uint8_t frame;
+};
 extern union sdata_t
 {
     sdata_map map;
@@ -418,6 +423,7 @@ extern union sdata_t
     sdata_dialog dialog;
     sdata_tp tp;
     sdata_battle battle;
+    sdata_die die;
     sdata_game_over game_over;
     sdata_pause pause;
 } sdata;

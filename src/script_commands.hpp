@@ -40,6 +40,9 @@ Action Instructions
     wtp <tile> <tx> <ty>
         If player walks onto <tile>, tp <tx> <ty>
 
+    die
+        Game over
+
 ALU Instructions
 
     Note: register 0 is fixed at zero. Writes to this register do nothing.
@@ -121,6 +124,9 @@ Control Instructions
     bni <item flag> label
         If no party member has equipped <item flag>, jmp label
 
+    bnai <item flag> label
+        If Matthias has not equipped <item flag>, jmp label
+
 Other Assembly Syntax
 
     Shortcut          Meaning
@@ -186,6 +192,7 @@ enum script_command_t
     CMD_TP,
     CMD_TTP,
     CMD_WTP,
+    CMD_DIE,
 
     CMD_ADD,
     CMD_ADDI,
@@ -212,4 +219,5 @@ enum script_command_t
     CMD_BNWE,
     CMD_BNSE,
     CMD_BNI,
+    CMD_BNAI,
 };

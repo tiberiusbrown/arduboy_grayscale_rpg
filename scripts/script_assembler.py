@@ -20,6 +20,9 @@ tiles = {
     'T_DungeonStairs'     : 129,
     'T_DungeonBarsOpen'   : 57,
     'T_DungeonBarsClosed' : 41,
+    'T_DungeonButtonOff'  : 56,
+    'T_DungeonButtonOn'   : 55,
+    'T_OutdoorRock'       : 141,
     }
 
 def id_helper(x):
@@ -86,6 +89,7 @@ class CMD(AutoNumber):
     TP   = ()
     TTP  = ()
     WTP  = ()
+    DIE  = ()
 
     ADD  = ()
     ADDI = ()
@@ -112,6 +116,7 @@ class CMD(AutoNumber):
     BNWE = ()
     BNSE = ()
     BNI  = ()
+    BNAI = ()
 
 def stringid(s):
     s = s[1:-1]
@@ -284,6 +289,9 @@ def assemble(s, eps):
             b.append(int(s[i])); i += 1
             b.append(int(s[i])); i += 1
             
+        elif s[i] == 'die':
+            b.append(CMD.DIE); i += 1
+            
         elif s[i] == 'add':
             b.append(CMD.ADD); i += 1
             b.append(dstreg(s[i]) + (reg(s[i+1])<<4)); i += 2
@@ -391,6 +399,11 @@ def assemble(s, eps):
             
         elif s[i] == 'bni':
             b.append(CMD.BNI); i += 1
+            addflag(b, s[i]); i += 1
+            b.append(s[i]); i += 1
+            
+        elif s[i] == 'bnai':
+            b.append(CMD.BNAI); i += 1
             addflag(b, s[i]); i += 1
             b.append(s[i]); i += 1
             

@@ -29,6 +29,15 @@ bool sprite_contacts_player(active_chunk_t const& c, sprite_t const& e)
     if(!e.active) return false;
     uint16_t ex = c.cx * 128 + e.x;
     uint16_t ey = c.cy * 64 + e.y;
+
+    if(e.type == 14)
+    {
+        // make spike ball collision more forgiving
+        return rect_intersect(
+        ex, ey + 2, 16, 16,
+        px + 4, py + 4, 8, 8);
+    }
+
     // sprite rect is x + 2, y + 4, 12, 12
     // player rect is x + 4, y + 4, 8, 8
     return rect_intersect(
@@ -48,6 +57,7 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
     // check collision with player
     if(state == STATE_MAP || state == STATE_TITLE)
         e.walking = !sprite_contacts_player(c, e);
+    if(e.type == 14) e.walking = true;
     if(!e.walking)
         return;
 
@@ -414,8 +424,9 @@ static void update_game_over()
     }
     else
     {
-        if(d.msg[0] == '\0')
+        if(d.fade_frame == 0)
         {
+            platform_audio_play_song_now(SONG_DEFEAT);
             uint8_t n = u8rand(NUM_GAME_OVER_MESSAGES);
             platform_fx_read_data_bytes(
                 GAME_OVER_MESSAGES + n * GAME_OVER_MESSAGE_LEN, d.msg,
@@ -561,6 +572,15 @@ static void update_resume()
         change_state(STATE_MAP);
 }
 
+static void update_die()
+{
+    auto& d = sdata.die;
+    if(d.frame >= 48 + 16 / FADE_SPEED)
+        change_state(STATE_GAME_OVER);
+    else
+        ++d.frame;
+}
+
 static inline void process_repeat(uint8_t i, uint8_t btn)
 {
     constexpr uint8_t REP_INIT = 16;
@@ -592,6 +612,7 @@ void update()
         update_dialog,
         update_tp,
         update_battle,
+        update_die,
         update_game_over,
     };
 

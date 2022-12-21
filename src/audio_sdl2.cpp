@@ -125,13 +125,15 @@ static void audio_callback(void* userdata, Uint8* stream, int len)
 {
     for(int i = 0; i < len; ++i)
     {
-        int8_t sample[3];
+        int8_t sample[NUM_SCORE_CHANNELS + 1];
         bool sfx = (channels[2].ptr != nullptr);
-        sample[0] = sample_channel(channels[0]);
-        sample[1] = sample_channel(channels[1]);
-        sample[2] = sample_channel(channels[2]);
+        for(int i = 0; i < NUM_SCORE_CHANNELS + 1; ++i)
+            sample[i] = sample_channel(channels[i]);
         if(sfx) sample[sfx_channel] = 0;
-        int s = (sample[0] + sample[1] + sample[2]) / 16;
+        int s = 0;
+        for(int i = 0; i < NUM_SCORE_CHANNELS + 1; ++i)
+            s += sample[i];
+        s /= 16;
         if(s < -127) s = -127;
         if(s > +127) s = +127;
         stream[i] = Uint8((int8_t)s);
@@ -161,14 +163,15 @@ void platform_audio_play_song_now_once(uint24_t song)
 {
     if(!(savefile.settings.sound & 2)) return;
     SDL_LockAudioDevice(device);
-    memset(&channels[0], 0, sizeof(audio_channel));
-    memset(&channels[1], 0, sizeof(audio_channel));
-    channels[0].beat_period = BEAT_PERIOD;
-    channels[1].beat_period = BEAT_PERIOD;
-    uint16_t buf[2];
-    platform_fx_read_data_bytes(song, buf, 4);
-    channels[0].ptr = &FXDATA[song + buf[0]];
-    channels[1].ptr = &FXDATA[song + buf[1]];
+    for(int i = 0; i < NUM_SCORE_CHANNELS; ++i)
+    {
+        memset(&channels[i], 0, sizeof(audio_channel));
+        channels[i].beat_period = BEAT_PERIOD;
+    }
+    uint16_t buf[NUM_SCORE_CHANNELS];
+    platform_fx_read_data_bytes(song, buf, NUM_SCORE_CHANNELS * 2);
+    for(int i = 0; i < NUM_SCORE_CHANNELS; ++i)
+        channels[i].ptr = &FXDATA[song + buf[i]];
     SDL_UnlockAudioDevice(device);
 }
 
@@ -176,21 +179,23 @@ void platform_audio_play_sfx(uint24_t sfx, uint8_t channel)
 {
     if(!(savefile.settings.sound & 1)) return;
     SDL_LockAudioDevice(device);
-    memset(&channels[2], 0, sizeof(audio_channel));
+    memset(&channels[NUM_SCORE_CHANNELS], 0, sizeof(audio_channel));
     sfx_channel = channel;
-    channels[2].beat_period = BEAT_PERIOD;
-    channels[2].ptr = &FXDATA[sfx];
+    channels[NUM_SCORE_CHANNELS].beat_period = BEAT_PERIOD;
+    channels[NUM_SCORE_CHANNELS].ptr = &FXDATA[sfx];
     SDL_UnlockAudioDevice(device);
 }
 
 bool platform_audio_song_playing()
 {
-    return channels[0].ptr != nullptr || channels[1].ptr != nullptr;
+    for(int i = 0; i < NUM_SCORE_CHANNELS; ++i)
+        if(channels[i].ptr != nullptr) return true;
+    return false;
 }
 
 bool platform_audio_sfx_playing()
 {
-    return channels[2].ptr != nullptr;
+    return channels[NUM_SCORE_CHANNELS].ptr != nullptr;
 }
 
 void platform_audio_on()
@@ -211,7 +216,11 @@ bool platform_audio_enabled()
 void platform_audio_from_savefile()
 {
     if(platform_audio_song_playing())
-        channels[0].paused = channels[1].paused = ((savefile.settings.sound & 2) == 0);
+    {
+        bool pause = ((savefile.settings.sound & 2) == 0);
+        for(int i = 0; i < NUM_SCORE_CHANNELS; ++i)
+            channels[i].paused = pause;
+    }
     if((savefile.settings.sound != 0) != platform_audio_enabled())
         platform_audio_toggle();
 }
