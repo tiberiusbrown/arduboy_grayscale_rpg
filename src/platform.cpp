@@ -514,6 +514,21 @@ void platform_audio_from_savefile()
         platform_audio_toggle();
 }
 
+void platform_audio_pause_song()
+{
+    atm_synth_set_score_paused(1);
+}
+
+void platform_audio_resume_song()
+{
+    atm_synth_set_score_paused(0);
+}
+
+void platform_audio_stop_sfx()
+{
+    atm_synth_stop_sfx_track(0);
+}
+
 bool platform_audio_song_playing()
 {
     return atm_synth_is_score_playing() != 0;
@@ -551,6 +566,9 @@ void platform_set_game_speed(uint8_t num, uint8_t denom)
 
 void platform_audio_update()
 {
+    if(platform_audio_song_playing() || platform_audio_sfx_playing())
+        assert(!platform_fx_busy());
+
     if(!platform_audio_song_playing())
         platform_audio_play_song_now(current_song);
 }

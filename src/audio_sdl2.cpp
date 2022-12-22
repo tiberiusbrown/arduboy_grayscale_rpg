@@ -186,10 +186,31 @@ void platform_audio_play_sfx(uint24_t sfx, uint8_t channel)
     SDL_UnlockAudioDevice(device);
 }
 
+void platform_audio_pause_song()
+{
+    SDL_LockAudioDevice(device);
+    for(int i = 0; i < NUM_SCORE_CHANNELS; ++i)
+        channels[i].paused = true;
+    SDL_UnlockAudioDevice(device);
+}
+
+void platform_audio_resume_song()
+{
+    SDL_LockAudioDevice(device);
+    for(int i = 0; i < NUM_SCORE_CHANNELS; ++i)
+        channels[i].paused = false;
+    SDL_UnlockAudioDevice(device);
+}
+
+void platform_audio_stop_sfx()
+{
+    channels[NUM_SCORE_CHANNELS].ptr = nullptr;
+}
+
 bool platform_audio_song_playing()
 {
     for(int i = 0; i < NUM_SCORE_CHANNELS; ++i)
-        if(channels[i].ptr != nullptr) return true;
+        if(!channels[i].paused && channels[i].ptr != nullptr) return true;
     return false;
 }
 

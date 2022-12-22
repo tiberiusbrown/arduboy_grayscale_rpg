@@ -16,9 +16,16 @@ static uint8_t const IDENTIFIER[8] PROGMEM =
 enum { SS_IDLE, SS_ERASE, SS_PROGRAM, SS_DONE };
 static uint8_t save_stage = SS_IDLE;
 static uint8_t save_page = 0;
+static uint8_t save_sound;
+static bool save_sound_resume;
 
 void save_begin()
 {
+    save_sound_resume = platform_audio_song_playing();
+    save_sound = savefile.settings.sound;
+    savefile.settings.sound = 0;
+    platform_audio_pause_song();
+    platform_audio_stop_sfx();
     platform_fx_erase_save_sector();
     save_stage = SS_ERASE;
     save_page = 0;
@@ -35,6 +42,9 @@ bool save_done()
     if(save_stage == SS_DONE)
     {
         save_stage = SS_IDLE;
+        savefile.settings.sound = save_sound;
+        if(save_sound_resume)
+            platform_audio_resume_song();
         return true;
     }
     if(save_stage == SS_ERASE)

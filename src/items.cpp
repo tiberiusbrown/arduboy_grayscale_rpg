@@ -192,7 +192,7 @@ bool update_items(sdata_items& d)
         if(d.consfill >= 128)
             d.conspause = 16;
         else
-            d.consfill += 8;
+            d.consfill += 4;
     }
     else
         d.consfill = 0;

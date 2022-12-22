@@ -588,6 +588,9 @@ bool platform_audio_enabled();
 void platform_audio_play_song(uint24_t song); // set loop song
 void platform_audio_play_song_now(uint24_t song); // force stop music and change to song
 void platform_audio_play_song_now_once(uint24_t song); // force stop music and play song
+void platform_audio_pause_song();
+void platform_audio_resume_song();
+void platform_audio_stop_sfx();
 bool platform_audio_song_playing();
 bool platform_audio_sfx_playing();
 void platform_audio_play_sfx(uint24_t sfx, uint8_t channel);

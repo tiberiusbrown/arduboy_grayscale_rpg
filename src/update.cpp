@@ -326,7 +326,7 @@ static void update_dialog()
             d.questiondone = true;
             if(d.questionpause)
             {
-                if(++d.questionfill >= 32)
+                if(++d.questionfill >= 48)
                 {
                     savefile.chunk_regs[0] = 0;
                     savefile.chunk_regs[1] = 0;
@@ -337,7 +337,7 @@ static void update_dialog()
             }
             else if(btns_down & BTN_A)
             {
-                if(d.questionfill >= 15)
+                if(d.questionfill >= 32)
                     d.questionpause = true;
                 else
                     ++d.questionfill;
@@ -356,7 +356,7 @@ static void update_dialog()
                         ++d.questioni;
                 }
             }
-            uint8_t t = (d.questionfill >= 15 ? 255 : d.questionfill * 17);
+            uint8_t t = (d.questionfill >= 32 ? 255 : d.questionfill * 8);
             adjust(d.questionfillw, t);
         }
         else
