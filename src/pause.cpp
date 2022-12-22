@@ -4,8 +4,13 @@
 
 static uint8_t const OPTION_X[] PROGMEM =
 {
-    5, 25, 32, 54, 61, 96, 103, 121,
+    0, 20, 25, 47, 52, 69, 73, 106, 111, 127,
 };
+
+constexpr int16_t PAUSE_MAP_PIXELS_W = MAP_CHUNK_W * 8 * 2;
+constexpr int16_t PAUSE_MAP_PIXELS_H = MAP_CHUNK_H * 4 * 2 / 2;
+
+constexpr uint8_t PAUSE_MAP_FRAMES_W = PAUSE_MAP_PIXELS_W / 128;
 
 void update_pause()
 {
@@ -29,18 +34,51 @@ void update_pause()
         {
             uint8_t menui = d.menui;
             if((btns_pressed & BTN_LEFT) && menui-- == 0)
-                menui = 3;
-            if((btns_pressed & BTN_RIGHT) && menui++ == 3)
+                menui = 4;
+            if((btns_pressed & BTN_RIGHT) && menui++ == 4)
                 menui = 0;
             if(btns_pressed & BTN_A)
             {
                 if(menui == 0) d.state = OS_SAVE;
                 if(menui == 1) d.state = OS_PARTY;
-                if(menui == 2) d.state = OS_OPTIONS;
-                if(menui == 3) d.state = OS_QUIT;
+                if(menui == 2) d.state = OS_MAP;
+                if(menui == 3) d.state = OS_OPTIONS;
+                if(menui == 4) d.state = OS_QUIT;
             }
             d.menui = menui;
         }
+    }
+    else if(d.state == OS_MAP)
+    {
+        if(!d.map_first)
+        {
+            d.map_first = true;
+            d.mapscrollx = px / 8 - 64; // TODO
+            d.mapscrolly = py / 8 - PAUSE_MAP_PIXELS_H - 32; // TODO
+        }
+        if(!d.back_to_menu && (d.mapfade += FADE_SPEED) >= 32)
+            d.mapfade = 32;
+        if(d.back_to_menu && (d.mapfade -= FADE_SPEED) == 0)
+            d.back_to_menu = false, d.state = OS_MENU;
+        if(d.mapfade >= 16)
+        {
+            if(btns_pressed & BTN_A)
+                d.allow_obj = true;
+            else if(!(btns_down & BTN_A))
+                d.allow_obj = false;
+            if(btns_pressed & BTN_B)
+                d.back_to_menu = true;
+            if(btns_down & BTN_UP   ) d.mapscrolly -= 1;
+            if(btns_down & BTN_DOWN ) d.mapscrolly += 1;
+            if(btns_down & BTN_LEFT ) d.mapscrollx -= 1;
+            if(btns_down & BTN_RIGHT) d.mapscrollx += 1;
+        }
+        if(d.mapscrollx < 0) d.mapscrollx = 0;
+        if(d.mapscrolly < 0) d.mapscrolly = 0;
+        if(d.mapscrollx >= PAUSE_MAP_PIXELS_W - 128)
+            d.mapscrollx = PAUSE_MAP_PIXELS_W - 128;
+        if(d.mapscrolly >= PAUSE_MAP_PIXELS_H - 64)
+            d.mapscrolly = PAUSE_MAP_PIXELS_H - 64;
     }
     else if(d.state == OS_OPTIONS)
     {
@@ -160,20 +198,20 @@ void update_pause()
     {
         update_pause_party();
     }
+    {
+        uint8_t const* ptr = &OPTION_X[uint8_t(d.menui * 2)];
+        uint8_t ax = pgm_read_byte_inc(ptr);
+        uint8_t bx = pgm_read_byte(ptr);
+        if(d.menuy == 0) d.ax = ax, d.bx = bx;
+        adjust(d.ax, ax);
+        adjust(d.bx, bx);
+    }
     adjust(d.menuy, d.state == OS_MENU ? 16 : 0);
     adjust(d.optionsy, d.state == OS_OPTIONS ? 64 : 0);
     adjust(d.quity, d.state == OS_QUIT ? 64 : 0);
     adjust(d.quitf, d.quitft);
     adjust(d.savey, d.state == OS_SAVE ? 64 : 0);
     adjust(d.partyy, d.state == OS_PARTY ? 64 : 0);
-    {
-        uint8_t const* ptr = &OPTION_X[uint8_t(d.menui * 2)];
-        uint8_t ax = pgm_read_byte_inc(ptr);
-        uint8_t bx = pgm_read_byte(ptr);
-        if(d.ax == 0) d.ax = ax, d.bx = bx;
-        adjust(d.ax, ax);
-        adjust(d.bx, bx);
-    }
     adjust(d.optionsiy, d.optionsi * 12);
     adjust(d.quitiy, d.quiti * 13);
     adjust(d.brightnessx, savefile.settings.brightness * 16);
@@ -185,8 +223,7 @@ void render_pause()
 {
     auto const& d = sdata.pause;
     // render darkened map (exclude plane 0)
-    if((d.optionsy | d.quity | d.savey | d.partyy) < 64 &&
-        (d.state == OS_RESUMING || plane() > 0))
+    if(d.ally < 64 && d.mapfade < 16 / FADE_SPEED && (d.state == OS_RESUMING || plane() > 0))
         render_map();
     if(d.menuy > 0)
     {
@@ -234,4 +271,37 @@ void render_pause()
     {
         render_pause_party();
     }
+    if(d.mapfade >= 16)
+    {
+        uint8_t mx = uint16_t(d.mapscrollx) / 128;
+        uint8_t my = uint16_t(d.mapscrolly) / 64;
+        int16_t ox = -(uint8_t(d.mapscrollx) & 127);
+        int16_t oy = -(uint8_t(d.mapscrolly) & 63);
+        uint8_t f = my * PAUSE_MAP_FRAMES_W + mx;
+        platform_fade(d.mapfade - 16);
+        platform_fx_drawoverwrite(ox, oy, WORLD_IMG, f + 0);
+        platform_fx_drawoverwrite(ox + 128, oy, WORLD_IMG, f + 1);
+        platform_fx_drawoverwrite(ox, oy + 64, WORLD_IMG, f + 0 + PAUSE_MAP_FRAMES_W);
+        platform_fx_drawoverwrite(ox + 128, oy + 64, WORLD_IMG, f + 1 + PAUSE_MAP_FRAMES_W);
+        if(d.allow_obj && (btns_down & BTN_A))
+        {
+            uint8_t objx = savefile.objx;
+            uint8_t objy = savefile.objy;
+            if((objx | objy) != 0)
+            {
+                objy -= MAP_CHUNK_H / 2 * 4;
+                int16_t diffx = objx * 2 - d.mapscrollx - 64;
+                int16_t diffy = objy * 2 - d.mapscrolly - 20;
+                draw_objective(diffx, diffy);
+            }
+        }
+        if((rframe & 63) < 48)
+        {
+            int16_t sx = px / 8 - d.mapscrollx - 8;
+            int16_t sy = py / 8 - PAUSE_MAP_PIXELS_H - d.mapscrolly - 12;
+            platform_fx_drawplusmask(sx, sy, PLAYER_IMG, 0, 16, 16);
+        }
+    }
+    else if(d.state == OS_MAP)
+        platform_fade(16 - d.mapfade);
 }

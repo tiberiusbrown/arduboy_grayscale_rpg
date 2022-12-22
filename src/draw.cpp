@@ -22,22 +22,10 @@ static int8_t fmulshi(int8_t x, int8_t y)
 
 inline int8_t i8abs(int8_t x) { return x < 0 ? -x : x; }
 
-void draw_objective()
+void draw_objective(int16_t diffx, int16_t diffy)
 {
-    if(py < 128 * 16) return;
-
-    uint8_t objx = savefile.objx;
-    uint8_t objy = savefile.objy;
-    if((objx | objy) == 0) return;
-
-    if(rframe & 16) return;
-
-    static_assert(MAP_CHUNK_W <= 32, "expand calculations to 16-bit");
-    static_assert(MAP_CHUNK_H <= 64, "expand calculations to 16-bit");
-
-    // direction to objective
-    int8_t dx = objx - div16_u16(px);
-    int8_t dy = objy - div16_u16(py);
+    int8_t dx = diffx >> 4;
+    int8_t dy = diffy >> 4;
 
     // rotate by 22.5 degrees
     constexpr int8_t M00 = int8_t(+0.9239 * 127);
@@ -54,8 +42,8 @@ void draw_objective()
     {
         // objective in view
         f = 3;
-        x = objx * 16 - px + 56;
-        y = objy * 16 - py + 8;
+        x = diffx + 58;
+        y = diffy + 8;
     }
     else
     {
@@ -67,8 +55,8 @@ void draw_objective()
 
         constexpr int16_t XC = 56;
         constexpr int16_t YC = 24;
-        x = objx * 16 - px;
-        y = objy * 16 - py;
+        x = diffx;
+        y = diffy;
 
         // project arrow image to screen edges
         if(x < -XC)
@@ -96,7 +84,7 @@ void draw_objective()
         y += YC;
     }
 
-#if 0
+#if 1
     // animate arrow
     static int8_t const DIRS[16] PROGMEM =
     {
@@ -107,8 +95,8 @@ void draw_objective()
     int8_t ay = (int8_t)pgm_read_byte(ptr);
     uint8_t af = (rframe >> 2) & 7;
     if(af >= 4) af = 7 - af;
-    x += ax * af;
-    y += ay * af;
+    x -= ax * af;
+    y -= ay * af;
 #endif
 
     platform_fx_drawplusmask(x, y, OBJECTIVE_ARROWS_IMG, f, 16, 16);

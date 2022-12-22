@@ -148,7 +148,9 @@ static void update_map()
 
     selx = sely = uint16_t(-1);
     if(!(btns_down & BTN_A))
-        sdata.map.a_pressed = false;
+        sdata.map.a_pressed = 0;
+    else if(sdata.map.a_pressed != 0 && sdata.map.a_pressed < 32)
+        ++sdata.map.a_pressed;
     if(btns_pressed & BTN_A)
     {
         int8_t const* ptr = &DIRS[pdir * 2];
@@ -156,7 +158,7 @@ static void update_map()
         int8_t dy = (int8_t)pgm_read_byte(ptr) * 8;
         selx = (px + 8 + dx);
         sely = (py + 8 + dy);
-        sdata.map.a_pressed = true;
+        sdata.map.a_pressed = 1;
     }
 
     int8_t dx = 0, dy = 0;

@@ -329,10 +329,10 @@ void use_consumable(uint8_t user, uint8_t i)
     switch(i)
     {
     case CIT_Healing_Salve:
-        u.battle.hp += 10;
+        u.battle.hp += 5;
         break;
     case CIT_Elixir_of_Health:
-        u.battle.hp += 25;
+        u.battle.hp += 10;
         break;
     default:
         break;

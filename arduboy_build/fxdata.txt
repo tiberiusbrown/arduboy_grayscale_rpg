@@ -31,6 +31,7 @@ raw_t GOT_ITEM_IMG = "got_item_img.bin"
 raw_t TITLE_MASKED_IMG = "title_masked_img.bin"
 raw_t PRESS_A_IMG = "press_a_img.bin"
 raw_t OBJECTIVE_ARROWS_IMG = "objective_arrows_img.bin"
+raw_t WORLD_IMG = "world_img.bin"
 
 raw_t SONG_PEACEFUL = "song_peaceful.bin"
 raw_t SONG_VICTORY = "song_victory.bin"

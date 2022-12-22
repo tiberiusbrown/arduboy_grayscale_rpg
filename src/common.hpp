@@ -297,7 +297,15 @@ struct sdata_pause
     sdata_items items;
     uint8_t itemsy;
     uint8_t itemsyt;
+
+    uint8_t mapfade;
+    bool map_first;
+    bool back_to_menu;
+    bool allow_obj;
+    int16_t mapscrollx;
+    int16_t mapscrolly;
 };
+constexpr auto SIZEOF_PAUSE_SDATA = sizeof(sdata_pause);
 
 struct battle_member_t
 {
@@ -409,7 +417,7 @@ struct sdata_game_over
 };
 struct sdata_map
 {
-    bool a_pressed;
+    uint8_t a_pressed;
 };
 struct sdata_die
 {
@@ -533,6 +541,7 @@ enum
     OS_QUIT,
     OS_SAVE,
     OS_PARTY,
+    OS_MAP,
 };
 void update_pause();
 void render_pause();
@@ -600,7 +609,7 @@ void platform_set_game_speed_default();
 void platform_set_game_speed_saved();
 
 // draw.cpp
-void draw_objective();
+void draw_objective(int16_t diffx, int16_t diffy);
 void draw_tile(int16_t x, int16_t y, uint8_t t);
 void draw_text(int16_t x, int16_t y, char const* str);      // str in RAM
 void draw_text_prog(int16_t x, int16_t y, char const* str); // str in PROGMEM

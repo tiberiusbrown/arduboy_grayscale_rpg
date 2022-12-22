@@ -84,6 +84,11 @@ static int8_t sample_channel(audio_channel& c)
             c.ptr++;
             c.volume_slide = int8_t(*c.ptr++);
         }
+        else if(cmd == 149)
+        {
+            c.delay = uint16_t(*c.ptr++) << 8;
+            c.delay += *c.ptr++;
+        }
         else if(cmd == 161)
         {
             c.ptr++;

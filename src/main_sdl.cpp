@@ -61,7 +61,7 @@ static void send_gif_frame(int ds = 3)
 #endif
         }
         gif_ds += ds;
-        if(gif_ds == 0 || 0 != memcmp(gif_prev, gif->frame, sizeof(gif_prev)))
+        //if(gif_ds == 0 || 0 != memcmp(gif_prev, gif->frame, sizeof(gif_prev)))
         {
             ge_add_frame(gif, gif_ds);
             memcpy(gif_prev, gif->frame, sizeof(gif_prev));
