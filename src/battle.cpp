@@ -181,6 +181,11 @@ static void take_damage(uint8_t i, int8_t dam)
     int8_t new_hp = hp - dam;
     if(new_hp < 0) new_hp = 0;
     if(new_hp > mhp) new_hp = mhp;
+
+    // tutorial fight: ensure player doesn't die
+    if(new_hp == 0 && i < 4 && d.flag == SFLAG_first_cave_guard2)
+        new_hp = 1;
+
     hp = new_hp;
     s.hpt = calc_hp_bar_width(hp, mhp);
     if(dam > 0)

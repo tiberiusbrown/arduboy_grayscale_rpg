@@ -17,6 +17,7 @@ Optional Configuration Macros (define before including ArduboyG.h):
         the 64th row, at the expense of slight glitches on the park row.
 
     Timer used for the frame ISR. Choices are one of:
+    - ABG_TIMER1
     - ABG_TIMER3 (default)
     - ABG_TIMER4
 

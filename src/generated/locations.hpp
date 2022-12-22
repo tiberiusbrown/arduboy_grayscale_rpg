@@ -16,3 +16,5 @@ inline void LOC_catherine_quest                 () { px =   944; py =  2960; }
 inline void LOC_story_first_cave                () { px =   624; py =  2800; }
 inline void LOC_first_cave_outside              () { px =   624; py =  2816; }
 inline void LOC_first_cave_inside               () { px =  2320; py =   208; }
+inline void LOC_first_cave_ladder               () { px =  2576; py =    64; }
+inline void LOC_first_cave_exit                 () { px =   704; py =  2704; }
