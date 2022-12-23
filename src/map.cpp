@@ -28,7 +28,7 @@ static bool run_chunk()
         chunk_sprite_defined = false;
     auto& c = ac.chunk;
     {
-        uint16_t ci = ac.cy * MAP_CHUNK_W + ac.cx;
+        uint16_t ci = ac.cy * MAP_CHUNK_COLS + ac.cx;
         uint24_t addr = MAPDATA + uint24_t(ci) * sizeof(map_chunk_t);
         platform_fx_read_data_bytes(addr, c.tiles_flat, 32);
     }
@@ -36,8 +36,8 @@ static bool run_chunk()
     uint8_t sel_tile = 255;
     bool sel_sprite = false;
     {
-        static_assert(MAP_CHUNK_W <= 32, "expand tx to 16-bit");
-        static_assert(MAP_CHUNK_H <= 64, "expand ty to 16-bit");
+        static_assert(MAP_CHUNK_COLS <= 32, "expand tx to 16-bit");
+        static_assert(MAP_CHUNK_ROWS <= 64, "expand ty to 16-bit");
         uint8_t tx = ac.cx * 8;
         uint8_t ty = ac.cy * 4;
         uint8_t dx, dy;
@@ -139,8 +139,8 @@ static bool run_chunk()
         {
             uint8_t t;
             if(instr != CMD_TP) t = deref_inc(instr_ptr);
-            static_assert(MAP_CHUNK_W <= 32, "expand to 16-bit");
-            static_assert(MAP_CHUNK_H <= 64, "expand to 16-bit");
+            static_assert(MAP_CHUNK_COLS <= 32, "expand to 16-bit");
+            static_assert(MAP_CHUNK_ROWS <= 64, "expand to 16-bit");
             uint8_t tx, ty;
             tx = deref_inc(instr_ptr);
             //tx |= uint16_t(deref_inc(instr_ptr)) << 8;
@@ -470,7 +470,7 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
 {
     active_chunk_t& active_chunk = active_chunks[index];
     map_chunk_t* chunk = &active_chunk.chunk;
-    uint16_t ci = cy * MAP_CHUNK_W + cx;
+    uint16_t ci = cy * MAP_CHUNK_COLS + cx;
     uint24_t addr = MAPDATA + uint24_t(ci) * sizeof(map_chunk_t);
     if(active_chunk.cx != cx || active_chunk.cy != cy)
     {

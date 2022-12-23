@@ -149,6 +149,11 @@ void adjust(uint8_t& rx, uint8_t tx)
     rx = x;
 }
 
+bool player_is_outside()
+{
+    return py < MAP_CHUNK_ROWS / 2 * 4 * 16;
+}
+
 uint16_t rand_seed;
 
 uint8_t state;

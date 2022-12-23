@@ -7,8 +7,8 @@ static uint8_t const OPTION_X[] PROGMEM =
     0, 20, 25, 47, 52, 69, 73, 106, 111, 127,
 };
 
-constexpr int16_t PAUSE_MAP_PIXELS_W = MAP_CHUNK_W * 8 * 2;
-constexpr int16_t PAUSE_MAP_PIXELS_H = MAP_CHUNK_H * 4 * 2 / 2;
+constexpr int16_t PAUSE_MAP_PIXELS_W = MAP_CHUNK_COLS * 8 * EXPLORED_SCALE;
+constexpr int16_t PAUSE_MAP_PIXELS_H = MAP_CHUNK_ROWS * 4 * EXPLORED_SCALE / 2;
 
 constexpr uint8_t PAUSE_MAP_FRAMES_W = PAUSE_MAP_PIXELS_W / 128;
 constexpr uint8_t PAUSE_MAP_FRAMES_H = PAUSE_MAP_PIXELS_H / 64;
@@ -42,7 +42,7 @@ void update_pause()
             {
                 if(menui == 0) d.state = OS_SAVE;
                 if(menui == 1) d.state = OS_PARTY;
-                if(menui == 2) d.state = OS_MAP;
+                if(menui == 2 && player_is_outside()) d.state = OS_MAP;
                 if(menui == 3) d.state = OS_OPTIONS;
                 if(menui == 4) d.state = OS_QUIT;
             }
@@ -54,8 +54,8 @@ void update_pause()
         if(!d.map_first)
         {
             d.map_first = true;
-            d.mapscrollx = px / 8 - 64; // TODO
-            d.mapscrolly = py / 8 - PAUSE_MAP_PIXELS_H - 32; // TODO
+            d.mapscrollx = px / 8 - 64;
+            d.mapscrolly = py / 8 - 32;
         }
         if(!d.back_to_menu && (d.mapfade += FADE_SPEED) >= 32)
             d.mapfade = 32;
@@ -220,32 +220,40 @@ void update_pause()
     d.ally = d.optionsy | d.quity | d.savey | d.partyy;
 }
 
+static inline uint8_t explored_rotate8(uint8_t x, uint8_t const*& ptr)
+{
+    x <<= 1;
+    if(x == 0)
+        return ++ptr, 1;
+    return x;
+}
+
 static void render_map_quad(int16_t x, int16_t y, uint8_t mx, uint8_t my)
 {
     uint8_t f = my * PAUSE_MAP_FRAMES_W + mx;
     platform_fx_drawoverwrite(x, y, WORLD_IMG, f + 0);
     constexpr uint8_t SCALE =
-        (EXPLORED_W / PAUSE_MAP_FRAMES_W) *
-        (EXPLORED_H / PAUSE_MAP_FRAMES_H) / 8;
-    constexpr uint8_t ESIZE = EXPLORED_TILES * 2;
-    constexpr uint8_t ISTEP = (EXPLORED_W - EXPLORED_W / PAUSE_MAP_FRAMES_W) / 8;
-    uint8_t i = my * (EXPLORED_W / 8 * EXPLORED_H / PAUSE_MAP_FRAMES_H);
-    i += mx * (EXPLORED_W / PAUSE_MAP_FRAMES_W / 8);
+        (EXPLORED_COLS / PAUSE_MAP_FRAMES_W) *
+        (EXPLORED_ROWS / PAUSE_MAP_FRAMES_H) / 8;
+    constexpr uint8_t ESIZE = EXPLORED_PIXELS;
+    constexpr uint8_t ISTEP = (EXPLORED_COLS - EXPLORED_COLS / PAUSE_MAP_FRAMES_W) / 8;
+    uint8_t i = my * (EXPLORED_COLS / 8 * EXPLORED_ROWS / PAUSE_MAP_FRAMES_H);
+    i += mx * (EXPLORED_COLS / PAUSE_MAP_FRAMES_W / 8);
     uint8_t m = 1;
     int16_t bx = x;
-    for(uint8_t r = 0; r < (EXPLORED_H / PAUSE_MAP_FRAMES_H); i += ISTEP, ++r, y += ESIZE)
+    for(uint8_t r = 0; r < (EXPLORED_ROWS / PAUSE_MAP_FRAMES_H); i += ISTEP, ++r, y += ESIZE)
     {
         x = bx;
         if(y <= -16)
         {
-            i += EXPLORED_W / PAUSE_MAP_FRAMES_W / 8;
+            i += EXPLORED_COLS / PAUSE_MAP_FRAMES_W / 8;
             continue;
         }
         if(y >= 64) break;
-        for(uint8_t c = 0; c < (EXPLORED_W / PAUSE_MAP_FRAMES_W); ++c, x += ESIZE)
+        for(uint8_t c = 0; c < (EXPLORED_COLS / PAUSE_MAP_FRAMES_W); ++c, x += ESIZE)
         {
             if(!(x <= -ESIZE || x >= 128) && !(savefile.explored[i] & m))
-                platform_fillrect_i8(x, y, ESIZE, ESIZE, BLACK);
+                platform_fillrect_i8((int8_t)x, (int8_t)y, ESIZE, ESIZE, BLACK);
             if((m <<= 1) == 0)
                 m = 1, i += 1;
         }
@@ -261,6 +269,8 @@ void render_pause()
     if(d.menuy > 0)
     {
         platform_fx_drawoverwrite(0, d.menuy - 16, PAUSE_MENU_IMG);
+        if(plane() == 0 && !player_is_outside())
+            platform_fillrect_i8(52, int8_t(d.menuy - 16), 18, 10, BLACK);
         platform_fillrect_i8(d.ax, d.menuy - 5, (d.bx - d.ax + 1), 2, WHITE);
     }
     if(d.optionsy > 0)
@@ -318,23 +328,26 @@ void render_pause()
         render_map_quad(ox      , oy + 64, mx    , my + 1);
         render_map_quad(ox + 128, oy + 64, mx + 1, my + 1);
 
-        if(d.allow_obj && (btns_down & BTN_A))
+        if(player_is_outside())
         {
-            uint8_t objx = savefile.objx;
-            uint8_t objy = savefile.objy;
-            if((objx | objy) != 0)
+            if(d.allow_obj && (btns_down & BTN_A))
             {
-                objy -= MAP_CHUNK_H / 2 * 4;
-                int16_t diffx = objx * 2 - d.mapscrollx - 64;
-                int16_t diffy = objy * 2 - d.mapscrolly - 20;
-                draw_objective(diffx, diffy);
+                uint8_t objx = savefile.objx;
+                uint8_t objy = savefile.objy;
+                if((objx | objy) != 0)
+                {
+                    objy -= MAP_CHUNK_ROWS / 2 * 4;
+                    int16_t diffx = objx * 2 - d.mapscrollx - 64;
+                    int16_t diffy = objy * 2 - d.mapscrolly - 20;
+                    draw_objective(diffx, diffy);
+                }
             }
-        }
-        if((rframe & 63) < 48)
-        {
-            int16_t sx = px / 8 - d.mapscrollx - 8;
-            int16_t sy = py / 8 - PAUSE_MAP_PIXELS_H - d.mapscrolly - 12;
-            platform_fx_drawplusmask(sx, sy, PLAYER_IMG, 0, 16, 16);
+            if((rframe & 63) < 48)
+            {
+                int16_t sx = px / 8 - d.mapscrollx - 8;
+                int16_t sy = py / 8 - d.mapscrolly - 12;
+                platform_fx_drawplusmask(sx, sy, PLAYER_IMG, 0, 16, 16);
+            }
         }
     }
     else if(d.state == OS_MAP)

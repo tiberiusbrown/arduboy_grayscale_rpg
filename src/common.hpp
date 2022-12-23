@@ -8,15 +8,22 @@ constexpr uint16_t VERSION = 1;
 constexpr uint8_t TELEPORT_TRANSITION_FRAMES = 16;
 constexpr uint8_t FADE_SPEED = 2;
 
-constexpr uint8_t MAP_CHUNK_W = 32;
-constexpr uint8_t MAP_CHUNK_H = 64;
+constexpr uint8_t MAP_CHUNK_COLS = 32;
+constexpr uint8_t MAP_CHUNK_ROWS = 64;
 constexpr uint8_t CHUNK_SCRIPT_SIZE = 80;
 constexpr uint8_t CHUNK_SPRITE_PATH_SIZE = 8;
 
-constexpr uint8_t EXPLORED_TILES = 8;
-constexpr uint8_t EXPLORED_W = MAP_CHUNK_W * 8 / EXPLORED_TILES;
-constexpr uint8_t EXPLORED_H = MAP_CHUNK_H / 2 * 4 / EXPLORED_TILES;
-constexpr uint8_t EXPLORED_BYTES = EXPLORED_W * EXPLORED_H / 8;
+constexpr uint8_t EXPLORED_SCALE = 2; // pixels per tile
+constexpr uint8_t EXPLORED_TILES = 8; // tiles per explored square
+constexpr uint8_t EXPLORED_COLS = MAP_CHUNK_COLS * 8 / EXPLORED_TILES;     // squares wide
+constexpr uint8_t EXPLORED_ROWS = MAP_CHUNK_ROWS / 2 * 4 / EXPLORED_TILES; // squares high
+constexpr uint8_t EXPLORED_PIXELS = EXPLORED_SCALE * EXPLORED_TILES;
+constexpr uint8_t EXPLORED_CHUNK_W = 128 / EXPLORED_PIXELS;
+constexpr uint8_t EXPLORED_CHUNK_H = 64 / EXPLORED_PIXELS;
+constexpr uint8_t EXPLORED_CHUNK_COLS = EXPLORED_COLS / EXPLORED_CHUNK_W;
+constexpr uint8_t EXPLORED_CHUNK_ROWS = EXPLORED_ROWS / EXPLORED_CHUNK_H;
+constexpr uint8_t EXPLORED_BYTES = EXPLORED_COLS * EXPLORED_ROWS / 8; // bytes to store all squares
+constexpr uint8_t EXPLORED_CHUNK_BYTES = EXPLORED_BYTES / (EXPLORED_CHUNK_COLS * EXPLORED_CHUNK_ROWS);
 
 constexpr uint8_t NUM_SCORE_CHANNELS = 2;
 
@@ -221,8 +228,8 @@ struct sdata_dialog
 };
 struct sdata_tp
 {
-    static_assert(MAP_CHUNK_W <= 32, "expand to 16-bit");
-    static_assert(MAP_CHUNK_H <= 64, "expand to 16-bit");
+    static_assert(MAP_CHUNK_COLS <= 32, "expand to 16-bit");
+    static_assert(MAP_CHUNK_ROWS <= 64, "expand to 16-bit");
     uint8_t tx, ty;
     uint8_t frame;
 };
@@ -515,6 +522,8 @@ static auto& chunk_sprites = savefile.chunk_sprites;
 constexpr auto* consumables = &savefile.chunk_regs[8];
 
 constexpr auto SIZEOF_SAVEFILE = sizeof(savefile);
+
+bool player_is_outside();
 
 void story_flag_set(uint16_t index);
 void story_flag_clr(uint16_t index);

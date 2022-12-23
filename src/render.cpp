@@ -13,14 +13,14 @@ static void render_map_and_objective()
     render_map();
     if(sdata.map.a_pressed >= 32 && (btns_down & BTN_A))
     {
-        if(py < 128 * 16) return;
+        if(!player_is_outside()) return;
 
         uint8_t objx = savefile.objx;
         uint8_t objy = savefile.objy;
         if((objx | objy) == 0) return;
 
-        static_assert(MAP_CHUNK_W <= 32, "expand calculations to 16-bit");
-        static_assert(MAP_CHUNK_H <= 64, "expand calculations to 16-bit");
+        static_assert(MAP_CHUNK_COLS <= 32, "expand calculations to 16-bit");
+        static_assert(MAP_CHUNK_ROWS <= 64, "expand calculations to 16-bit");
 
         // direction to objective
         draw_objective(objx * 16 - px, objy * 16 - py);

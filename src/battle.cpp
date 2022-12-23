@@ -592,7 +592,7 @@ void update_battle()
 static void draw_battle_background()
 {
     auto const& d = sdata.battle;
-    if(py >= 128 * 16)
+    if(player_is_outside())
     {
         // outdoor background
         static constexpr uint8_t TS[] PROGMEM = { 10, 11, 26, 27 };

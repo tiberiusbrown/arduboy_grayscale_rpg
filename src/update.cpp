@@ -135,6 +135,21 @@ static uint8_t solid_mask()
     return m;
 }
 
+static void check_explored(int16_t x, int16_t y)
+{
+    if(x < 0) return;
+    if(y < 0) return;
+    if(x >= MAP_CHUNK_COLS * 128) return;
+    if(y >= MAP_CHUNK_ROWS / 2 * 64) return;
+    uint8_t ex = x / (EXPLORED_TILES * 16);
+    uint8_t ey = y / (EXPLORED_TILES * 16);
+    uint16_t n = ey * EXPLORED_COLS + ex;
+    uint8_t i = n >> 3;
+    uint8_t m = bitmask((uint8_t)n);
+    MY_ASSERT(i < EXPLORED_BYTES);
+    savefile.explored[i] |= m;
+}
+
 static void update_map()
 {
     if(chunks_are_running && run_chunks())
@@ -259,15 +274,25 @@ static void update_map()
     }
 
     // update explored
+#if 1
+    {
+        constexpr uint8_t D = 16 * 4;
+        check_explored(px - D, py - D);
+        check_explored(px + D, py - D);
+        check_explored(px - D, py + D);
+        check_explored(px + D, py + D);
+    }
+#else
     {
         uint8_t ex = px / (EXPLORED_TILES * 16);
-        uint8_t ey = py / (EXPLORED_TILES * 16) - EXPLORED_H;
-        uint16_t n = ey * EXPLORED_W + ex;
+        uint8_t ey = py / (EXPLORED_TILES * 16);
+        uint16_t n = ey * EXPLORED_COLS + ex;
         uint8_t i = n >> 3;
         uint8_t m = bitmask((uint8_t)n);
         MY_ASSERT(i < EXPLORED_BYTES);
         savefile.explored[i] |= m;
     }
+#endif
 
     load_chunks();
     run_chunks();
@@ -470,7 +495,7 @@ static uint8_t const TITLE_PATH[] PROGMEM =
     2, 100, 3, 24, 2, 24,
 };
 constexpr uint16_t PATH_START_X = 930;
-constexpr uint16_t PATH_START_Y = 2803;
+constexpr uint16_t PATH_START_Y = 755;
 
 static void title_advance_path()
 {
