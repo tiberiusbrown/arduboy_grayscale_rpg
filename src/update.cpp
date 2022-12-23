@@ -258,6 +258,17 @@ static void update_map()
 #endif
     }
 
+    // update explored
+    {
+        uint8_t ex = px / (EXPLORED_TILES * 16);
+        uint8_t ey = py / (EXPLORED_TILES * 16) - EXPLORED_H;
+        uint16_t n = ey * EXPLORED_W + ex;
+        uint8_t i = n >> 3;
+        uint8_t m = bitmask((uint8_t)n);
+        MY_ASSERT(i < EXPLORED_BYTES);
+        savefile.explored[i] |= m;
+    }
+
     load_chunks();
     run_chunks();
     update_sprites();

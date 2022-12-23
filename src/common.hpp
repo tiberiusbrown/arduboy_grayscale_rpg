@@ -13,6 +13,11 @@ constexpr uint8_t MAP_CHUNK_H = 64;
 constexpr uint8_t CHUNK_SCRIPT_SIZE = 80;
 constexpr uint8_t CHUNK_SPRITE_PATH_SIZE = 8;
 
+constexpr uint8_t EXPLORED_TILES = 8;
+constexpr uint8_t EXPLORED_W = MAP_CHUNK_W * 8 / EXPLORED_TILES;
+constexpr uint8_t EXPLORED_H = MAP_CHUNK_H / 2 * 4 / EXPLORED_TILES;
+constexpr uint8_t EXPLORED_BYTES = EXPLORED_W * EXPLORED_H / 8;
+
 constexpr uint8_t NUM_SCORE_CHANNELS = 2;
 
 #define DEBUG_LIPO_DISCHARGE 0
@@ -495,6 +500,7 @@ struct savefile_t
     settings_t settings;
     int8_t chunk_regs[8 + NUM_CONSUMABLES];
     sprite_t chunk_sprites[4];
+    uint8_t explored[EXPLORED_BYTES];
 };
 extern savefile_t savefile;
 static_assert(sizeof(savefile.chunk_regs) <= 16, "revisit reg command encoding");

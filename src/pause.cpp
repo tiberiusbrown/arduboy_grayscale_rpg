@@ -11,6 +11,7 @@ constexpr int16_t PAUSE_MAP_PIXELS_W = MAP_CHUNK_W * 8 * 2;
 constexpr int16_t PAUSE_MAP_PIXELS_H = MAP_CHUNK_H * 4 * 2 / 2;
 
 constexpr uint8_t PAUSE_MAP_FRAMES_W = PAUSE_MAP_PIXELS_W / 128;
+constexpr uint8_t PAUSE_MAP_FRAMES_H = PAUSE_MAP_PIXELS_H / 64;
 
 void update_pause()
 {
@@ -219,6 +220,38 @@ void update_pause()
     d.ally = d.optionsy | d.quity | d.savey | d.partyy;
 }
 
+static void render_map_quad(int16_t x, int16_t y, uint8_t mx, uint8_t my)
+{
+    uint8_t f = my * PAUSE_MAP_FRAMES_W + mx;
+    platform_fx_drawoverwrite(x, y, WORLD_IMG, f + 0);
+    constexpr uint8_t SCALE =
+        (EXPLORED_W / PAUSE_MAP_FRAMES_W) *
+        (EXPLORED_H / PAUSE_MAP_FRAMES_H) / 8;
+    constexpr uint8_t ESIZE = EXPLORED_TILES * 2;
+    constexpr uint8_t ISTEP = (EXPLORED_W - EXPLORED_W / PAUSE_MAP_FRAMES_W) / 8;
+    uint8_t i = my * (EXPLORED_W / 8 * EXPLORED_H / PAUSE_MAP_FRAMES_H);
+    i += mx * (EXPLORED_W / PAUSE_MAP_FRAMES_W / 8);
+    uint8_t m = 1;
+    int16_t bx = x;
+    for(uint8_t r = 0; r < (EXPLORED_H / PAUSE_MAP_FRAMES_H); i += ISTEP, ++r, y += ESIZE)
+    {
+        x = bx;
+        if(y <= -16)
+        {
+            i += EXPLORED_W / PAUSE_MAP_FRAMES_W / 8;
+            continue;
+        }
+        if(y >= 64) break;
+        for(uint8_t c = 0; c < (EXPLORED_W / PAUSE_MAP_FRAMES_W); ++c, x += ESIZE)
+        {
+            if(!(x <= -ESIZE || x >= 128) && !(savefile.explored[i] & m))
+                platform_fillrect_i8(x, y, ESIZE, ESIZE, BLACK);
+            if((m <<= 1) == 0)
+                m = 1, i += 1;
+        }
+    }
+}
+
 void render_pause()
 {
     auto const& d = sdata.pause;
@@ -279,10 +312,12 @@ void render_pause()
         int16_t oy = -(uint8_t(d.mapscrolly) & 63);
         uint8_t f = my * PAUSE_MAP_FRAMES_W + mx;
         platform_fade(d.mapfade - 16);
-        platform_fx_drawoverwrite(ox, oy, WORLD_IMG, f + 0);
-        platform_fx_drawoverwrite(ox + 128, oy, WORLD_IMG, f + 1);
-        platform_fx_drawoverwrite(ox, oy + 64, WORLD_IMG, f + 0 + PAUSE_MAP_FRAMES_W);
-        platform_fx_drawoverwrite(ox + 128, oy + 64, WORLD_IMG, f + 1 + PAUSE_MAP_FRAMES_W);
+
+        render_map_quad(ox      , oy     , mx    , my    );
+        render_map_quad(ox + 128, oy     , mx + 1, my    );
+        render_map_quad(ox      , oy + 64, mx    , my + 1);
+        render_map_quad(ox + 128, oy + 64, mx + 1, my + 1);
+
         if(d.allow_obj && (btns_down & BTN_A))
         {
             uint8_t objx = savefile.objx;
