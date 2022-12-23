@@ -74,15 +74,16 @@ void SpritesU::drawBasic(
     
     uint16_t w_and_h = (uint16_t(h) << 8) | w;
     
-    //if(frame != 0)
-    //{
-    //    uint8_t tmp = h >> 3;
-    //    if(mode & 1) tmp *= 2;
-    //    uint16_t tmp2 = tmp * w;
-    //    tmp2 = tmp2 * frame;
-    //    image += tmp2;
-    //}
-    
+#if 0
+    if(frame != 0)
+    {
+        uint8_t tmp = h >> 3;
+        if(mode & 1) tmp *= 2;
+        uint16_t tmp2 = tmp * w;
+        tmp2 = tmp2 * frame;
+        image += tmp2;
+    }
+#else
     uint16_t tmp, tmp2;
     asm volatile(R"ASM(
             cp   %A[frame], __zero_reg__
@@ -119,6 +120,7 @@ void SpritesU::drawBasic(
         [mode]  "r"   (mode),
         [w]     "r"   (w)
         );
+#endif
 
     drawBasicNoChecks(w_and_h, image, mode, x, y);
 }

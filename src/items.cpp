@@ -253,6 +253,7 @@ static inline void render_consumable_row(
     draw_text_noclip(x + 2, rowy + 1, d.str);
     {
         char buf[5];
+        char* ptr = buf;
         buf[0] = 'x';
         dec_to_str(&buf[1], consumables[ni]);
         uint8_t w = text_width(buf);

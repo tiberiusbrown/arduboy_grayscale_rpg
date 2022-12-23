@@ -184,9 +184,9 @@ static bool run_chunk()
                     change_state(STATE_DIALOG);
                     sdata.dialog.name[0] = (char)254;
                     char* ptr = sdata.dialog.message;
-                    *ptr++ = 'x';
+                    store_inc(ptr, 'x');
                     ptr += dec_to_str(ptr, (uint8_t)diff);
-                    *ptr++ = ' ';
+                    store_inc(ptr, ' ');
                     platform_fx_read_data_bytes(
                         ITEM_STRINGS + ITEM_TOTAL_LEN * NUM_ITEMS + ITEM_TOTAL_LEN * (dst - 8),
                         ptr, ITEM_TOTAL_LEN);

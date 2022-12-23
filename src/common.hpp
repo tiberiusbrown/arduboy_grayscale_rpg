@@ -80,6 +80,11 @@ FORCE_INLINE inline uint8_t deref_inc(T const*& p)
     asm volatile("ld %[r], %a[p]+\n" : [p] "+&e" (p), [r] "=&r" (r) :: "memory");
     return r;
 }
+template<class T>
+FORCE_INLINE inline void store_inc(T*& p, uint8_t x)
+{
+    asm volatile("st %a[p]+, %[x]\n" : [p] "+&e" (p) : [x] "r" (x) : "memory");
+}
 FORCE_INLINE inline uint8_t bitmask(uint8_t x) { return FX::bitShiftLeftUInt8(x); }
 FORCE_INLINE inline int16_t fmuls(int8_t x, int8_t y) { return __builtin_avr_fmuls(x, y); }
 FORCE_INLINE inline uint8_t nibswap(uint8_t x) { return __builtin_avr_swap(x); }
@@ -108,6 +113,12 @@ inline uint8_t deref_inc(T const*& p)
     uint8_t r = *(uint8_t const*)p;
     p = (T const*)((uint8_t const*)p + 1);
     return r;
+}
+template<class T>
+inline void store_inc(T*& p, uint8_t x)
+{
+    *(uint8_t*)p = x;
+    p = (T*)((uint8_t*)p + 1);
 }
 inline uint16_t pgm_read_word(void const* p)
 {
@@ -523,7 +534,7 @@ constexpr auto* consumables = &savefile.chunk_regs[8];
 
 constexpr auto SIZEOF_SAVEFILE = sizeof(savefile);
 
-bool player_is_outside();
+bool player_is_outside() FORCE_NOINLINE;
 
 void story_flag_set(uint16_t index);
 void story_flag_clr(uint16_t index);

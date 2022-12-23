@@ -527,20 +527,20 @@ uint8_t dec_to_str(char* dst, uint8_t val)
 
     uint8_t val_orig = val;
     if(val >= 200)
-        *t++ = '2', val -= 200;
+        store_inc(t, '2'), val -= 200;
     if(val >= 100)
-        *t++ = '1', val -= 100;
+        store_inc(t, '1'), val -= 100;
     if(val_orig >= 100 || val >= 10)
     {
         char n = '0';
         while(val >= 10)
             ++n, val -= 10;
-        *t++ = n;
+        store_inc(t, (uint8_t)n);
     }
-    *t++ = '0' + val;
-    *t++ = '\0';
+    store_inc(t, uint8_t('0' + val));
+    *t = '\0';
 
-    return (uint8_t)(uintptr_t)(t - dst - 1);
+    return (uint8_t)(uintptr_t)(t - dst);
 }
 
 void draw_dec(int8_t x, int8_t y, uint8_t val)

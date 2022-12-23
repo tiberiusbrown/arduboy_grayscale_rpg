@@ -74,7 +74,7 @@ static void render_pause_party_offset(int8_t x, int8_t y, uint8_t i)
         char buf[8];
         char* t = buf;
         t += dec_to_str(t, b.hp);
-        *t++ = '/';
+        store_inc(t, '/');
         (void)dec_to_str(t, party_mhp(i));
         draw_text_noclip(x + 90, y + 6, buf);
     }

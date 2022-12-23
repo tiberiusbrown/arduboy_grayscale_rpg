@@ -336,7 +336,6 @@ void render_pause()
                 uint8_t objy = savefile.objy;
                 if((objx | objy) != 0)
                 {
-                    objy -= MAP_CHUNK_ROWS / 2 * 4;
                     int16_t diffx = objx * 2 - d.mapscrollx - 64;
                     int16_t diffy = objy * 2 - d.mapscrolly - 20;
                     draw_objective(diffx, diffy);
@@ -348,6 +347,18 @@ void render_pause()
                 int16_t sy = py / 8 - d.mapscrolly - 12;
                 platform_fx_drawplusmask(sx, sy, PLAYER_IMG, 0, 16, 16);
             }
+        }
+
+        {
+            uint8_t x = uint16_t(d.mapscrollx + (PAUSE_MAP_PIXELS_W / 16 / 2)) /
+                (PAUSE_MAP_PIXELS_W / 16);
+            uint8_t y = uint16_t(d.mapscrolly + (PAUSE_MAP_PIXELS_H / 8 / 2)) /
+                (PAUSE_MAP_PIXELS_H / 8);
+            platform_fillrect_i8(104, 48, 16, 8, LIGHT_GRAY);
+            platform_fillrect_i8(104 + x, 48 + y, 4, 2, BLACK);
+            platform_drawrect_i8(103, 47, 18, 10, DARK_GRAY);
+            //platform_fillrect_i8((int8_t)x, 0, 128 / EXPLORED_CHUNK_COLS, 2, WHITE);
+            //platform_fillrect_i8(0, (int8_t)y, 2, 64 / EXPLORED_CHUNK_ROWS, WHITE);
         }
     }
     else if(d.state == OS_MAP)
