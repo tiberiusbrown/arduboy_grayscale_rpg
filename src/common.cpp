@@ -151,7 +151,17 @@ void adjust(uint8_t& rx, uint8_t tx)
 
 bool player_is_outside()
 {
-    return py < MAP_CHUNK_ROWS / 2 * 4 * 16;
+    constexpr uint16_t MAP_HALF_Y = MAP_CHUNK_ROWS / 2 * 4 * 16;
+    static_assert(MAP_HALF_Y == 2048, "revert");
+
+#ifdef ARDUINO
+    uint8_t t;
+    asm volatile("lds  %[t], %[py]+1\n" : [t] "=&r" (t) : [py] "i" (&py));
+    return (t & 0xf8) == 0;
+#else
+    return (py & 0xf800) == 0;
+#endif
+    //return py < MAP_HALF_Y;
 }
 
 uint16_t rand_seed;

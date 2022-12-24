@@ -534,7 +534,7 @@ constexpr auto* consumables = &savefile.chunk_regs[8];
 
 constexpr auto SIZEOF_SAVEFILE = sizeof(savefile);
 
-bool player_is_outside() FORCE_NOINLINE;
+bool player_is_outside() FORCE_INLINE;
 
 void story_flag_set(uint16_t index);
 void story_flag_clr(uint16_t index);
@@ -745,5 +745,20 @@ FORCE_INLINE inline uint8_t div8(uint8_t x)
     return x;
 #else
     return x >> 3;
+#endif
+}
+
+FORCE_INLINE inline uint8_t div4(uint8_t x)
+{
+#ifdef ARDUINO
+    asm volatile(R"ASM(
+        lsr %[x]
+        lsr %[x]
+        )ASM"
+        : [x] "+&r" (x)
+        );
+    return x;
+#else
+    return x >> 2;
 #endif
 }

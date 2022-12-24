@@ -55,11 +55,13 @@ void update_pause()
     }
     else if(state == OS_MAP)
     {
+        int16_t msx = d.mapscrollx;
+        int16_t msy = d.mapscrolly;
         if(!d.map_first)
         {
             d.map_first = true;
-            d.mapscrollx = px / 8 - 64;
-            d.mapscrolly = py / 8 - 32;
+            msx = px / 8 - 64;
+            msy = py / 8 - 32;
         }
         if(!d.back_to_menu && (d.mapfade += FADE_SPEED) >= 32)
             d.mapfade = 32;
@@ -73,17 +75,19 @@ void update_pause()
                 d.allow_obj = false;
             if(btns_pressed & BTN_B)
                 d.back_to_menu = true;
-            if(btns_down & BTN_UP   ) d.mapscrolly -= 1;
-            if(btns_down & BTN_DOWN ) d.mapscrolly += 1;
-            if(btns_down & BTN_LEFT ) d.mapscrollx -= 1;
-            if(btns_down & BTN_RIGHT) d.mapscrollx += 1;
+            if(btns_down & BTN_UP   ) msy -= 1;
+            if(btns_down & BTN_DOWN ) msy += 1;
+            if(btns_down & BTN_LEFT ) msx -= 1;
+            if(btns_down & BTN_RIGHT) msx += 1;
         }
-        if(d.mapscrollx < 0) d.mapscrollx = 0;
-        if(d.mapscrolly < 0) d.mapscrolly = 0;
-        if(d.mapscrollx >= PAUSE_MAP_PIXELS_W - 128)
-            d.mapscrollx = PAUSE_MAP_PIXELS_W - 128;
-        if(d.mapscrolly >= PAUSE_MAP_PIXELS_H - 64)
-            d.mapscrolly = PAUSE_MAP_PIXELS_H - 64;
+        if(msx < 0) msx = 0;
+        if(msy < 0) msy = 0;
+        if(msx >= PAUSE_MAP_PIXELS_W - 128)
+            msx = PAUSE_MAP_PIXELS_W - 128;
+        if(msy >= PAUSE_MAP_PIXELS_H - 64)
+            msy = PAUSE_MAP_PIXELS_H - 64;
+        d.mapscrollx = msx;
+        d.mapscrolly = msy;
     }
     else if(state == OS_OPTIONS)
     {
@@ -136,23 +140,31 @@ void update_pause()
             d.quitfade += FADE_SPEED;
             if(d.quitfade >= 16 * FADE_SPEED + 16)
             {
-                d.quitfade = d.quitf = d.quitft = 0;
+                uint8_t qi = d.quiti;
 #ifdef ARDUINO
-                    if(d.quiti == 0) a.exitToBootloader();
+                if(qi == 0) a.exitToBootloader();
 #else
-                    if(d.quiti == 0) d.quiti = 1;
+                if(qi == 0) qi = 1;
 #endif
-                    if(d.quiti == 1)
-                    {
-                        change_state(STATE_TITLE);
-                        return;
-                    }
-                    if(d.quiti == 2)
-                    {
-                        change_state(STATE_RESUME);
-                        new_game();
-                        return;
-                    }
+                static_assert(0 == STATE_TITLE, "");
+                static_assert(1 == STATE_RESUME, "");
+
+                if(qi == 2)
+                    new_game();
+                change_state(qi - 1);
+                return;
+
+                //if(d.quiti == 1)
+                //{
+                //    change_state(STATE_TITLE);
+                //    return;
+                //}
+                //if(d.quiti == 2)
+                //{
+                //    change_state(STATE_RESUME);
+                //    new_game();
+                //    return;
+                //}
             }
         }
         else if(d.quity >= 64)

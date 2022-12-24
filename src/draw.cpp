@@ -27,14 +27,6 @@ void draw_objective(int16_t diffx, int16_t diffy)
     int8_t dx = diffx >> 4;
     int8_t dy = diffy >> 4;
 
-    // rotate by 22.5 degrees
-    constexpr int8_t M00 = int8_t(+0.9239 * 127);
-    constexpr int8_t M01 = int8_t(-0.3827 * 127);
-    constexpr int8_t M10 = int8_t(+0.3827 * 127);
-    constexpr int8_t M11 = int8_t(+0.9239 * 127);
-    int8_t rx = fmulshi(M00, dx) + fmulshi(M01, dy);
-    int8_t ry = fmulshi(M10, dx) + fmulshi(M11, dy);
-
     uint8_t f;
     int16_t x, y;
 
@@ -47,6 +39,14 @@ void draw_objective(int16_t diffx, int16_t diffy)
     }
     else
     {
+        // rotate by 22.5 degrees
+        constexpr int8_t M00 = int8_t(+0.9239 * 127);
+        constexpr int8_t M01 = int8_t(-0.3827 * 127);
+        constexpr int8_t M10 = int8_t(+0.3827 * 127);
+        constexpr int8_t M11 = int8_t(+0.9239 * 127);
+        int8_t rx = fmulshi(M00, dx) + fmulshi(M01, dy);
+        int8_t ry = fmulshi(M10, dx) + fmulshi(M11, dy);
+
         // calculate arrow image frame
         f = 0;
         if(rx < 0) f |= 2, rx = -rx;
@@ -93,20 +93,47 @@ void draw_objective(int16_t diffx, int16_t diffy)
     uint8_t const* ptr = (uint8_t const*)(&DIRS[f * 2]);
     int8_t ax = (int8_t)pgm_read_byte_inc(ptr);
     int8_t ay = (int8_t)pgm_read_byte(ptr);
-    uint8_t af = (rframe >> 2) & 7;
-    if(af >= 4) af = 7 - af;
+    uint8_t af;
+#ifdef ARDUINO
+    asm volatile(R"ASM(
+        lds  %[af], %[rframe]
+        lsr  %[af]
+        lsr  %[af]
+        sbrc %[af], 2
+        com  %[af]
+        andi %[af], 7
+        muls %[af], %[ax]
+        sub  %A[x], r0
+        sbc  %B[x], r1
+        muls %[af], %[ay]
+        sub  %A[y], r0
+        sbc  %B[y], r1
+        clr __zero_reg__
+        )ASM"
+        : [af]     "=&d" (af),
+          [x]      "+&r" (x),
+          [y]      "+&r" (y)
+        : [rframe] "i"   (&rframe),
+          [ax]     "d"   (ax),
+          [ay]     "d"   (ay)
+        );
+#else
+    af = rframe >> 2;
+    if(af & 4) af = ~af;
+    af &= 7;
     x -= ax * af;
     y -= ay * af;
+#endif
 #endif
 
     platform_fx_drawplusmask(x, y, OBJECTIVE_ARROWS_IMG, f, 16, 16);
 }
 
-static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
+static bool add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
                                       int16_t ox, int16_t oy)
 {
     auto const& e = chunk_sprites[ci];
-    if(!e.active) return 0;
+    if(!e.active) return false;
     uint8_t f = e.type * 16;
     uint8_t d = e.dir;
     bool walking = e.walking;
@@ -128,7 +155,7 @@ static uint8_t add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     entry->frame = f;
     entry->x = ox + e.x;
     entry->y = oy + e.y - 2;
-    return 1;
+    return true;
 }
 
 void sort_sprites(draw_sprite_entry* entries, uint8_t n)
@@ -160,13 +187,7 @@ void draw_sprites()
     draw_sprite_entry entries[5]; // increase as necessary
     uint8_t n = 0;
 
-    // player sprite
-    if(state != STATE_DIE || ((nframe & 2) && sdata.die.frame < 24))
-    {
-        uint8_t f = pdir * 4;
-        if(pmoving) f += (div8(nframe) & 3);
-        entries[n++] = {PLAYER_IMG, f, 64 - 8, 32 - 8 - 4};
-    }
+    draw_sprite_entry* ptr = &entries[0];
 
     // chunk enemies
     {
@@ -176,12 +197,22 @@ void draw_sprites()
         uint8_t cy = uint8_t(ty >> 6);
         int16_t ox = -int16_t(tx & 0x7f);
         int16_t oy = -int16_t(ty & 0x3f);
-        for(uint8_t i = 0; i < 4; ++i)
+        for(uint8_t i = 0, dox = 0, doy = 0; i < 4; ++i, doy += (dox >> 1), dox ^= 128)
         {
-            uint8_t dox = (i &  1) * 128;
-            uint8_t doy = (i >> 1) * 64;
-            n += add_sprite_entry(&entries[n], i, ox + dox, oy + doy);
+            //uint8_t dox = (i &  1) * 128;
+            //uint8_t doy = (i >> 1) * 64;
+            if(add_sprite_entry(ptr, i, ox + dox, oy + doy))
+                ++n, ++ptr;
         }
+    }
+
+    // player sprite
+    if(state != STATE_DIE || ((nframe & 2) && sdata.die.frame < 24))
+    {
+        uint8_t f = pdir * 4;
+        if(pmoving) f += (div8(nframe) & 3);
+        *ptr = {PLAYER_IMG, f, 64 - 8, 32 - 8 - 4};
+        ++n;
     }
 
     sort_and_draw_sprites(entries, n);
@@ -190,7 +221,7 @@ void draw_sprites()
 void draw_player()
 {
     uint8_t f = pdir * 4;
-    if(pmoving) f += (((uint8_t)nframe >> 2) & 3);
+    if(pmoving) f += (div4(nframe) & 3);
     platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, PLAYER_IMG, f, 16, 16);
 }
 

@@ -157,20 +157,23 @@ static void render_title()
         return;
     }
 #endif
+
+    uint8_t ff = d.fade_frame;
+
     if(d.going_to_resume)
     {
-        if(d.fade_frame < 16)
-        {
-            render_title_graphics();
-            platform_fade(15 - d.fade_frame);
-        }
+        if(ff >= 16)
+            return;
+        ff = 15 - ff;
     }
     else
     {
         if(d.fade_frame < 8) return;
-        render_title_graphics();
-        platform_fade(d.fade_frame - 8);
+        ff -= 8;
     }
+
+    render_title_graphics();
+    platform_fade(ff);
 }
 
 static void render_resume()
