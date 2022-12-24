@@ -16,17 +16,18 @@ bool update_pause_party()
     }
     else if(d.itemsy == 0 && d.partyx == d.partyxt)
     {
+        uint8_t partyi = d.partyi;
         if(btns_pressed & BTN_B)
             return true;
-        else if(d.partyi > 0 && (btns_pressed & BTN_LEFT))
+        else if(partyi > 0 && (btns_pressed & BTN_LEFT))
         {
-            --d.partyi;
+            --partyi;
             d.partyx = 0;
             d.partyxt = 128;
         }
-        else if(d.partyi < nparty - 1 && (btns_pressed & BTN_RIGHT))
+        else if(partyi < nparty - 1 && (btns_pressed & BTN_RIGHT))
         {
-            ++d.partyi;
+            ++partyi;
             d.partyx = 128;
             d.partyxt = 0;
         }
@@ -35,8 +36,9 @@ bool update_pause_party()
             update_items_numcat(d.items);
             d.items.cat = IT_CONSUMABLE;
             d.itemsyt = 64;
-            d.items.user_index = d.partyi;
+            d.items.user_index = partyi;
         }
+        d.partyi = partyi;
     }
     else
     {

@@ -114,17 +114,21 @@ void update_pause()
                 }
                 else if(optionsi == 2)
                 {
-                    if(savefile.settings.game_speed < 6 && (btns_pressed & (BTN_A | BTN_RIGHT)))
-                        ++savefile.settings.game_speed;
-                    if(savefile.settings.game_speed > 0 && (btns_pressed & BTN_LEFT))
-                        --savefile.settings.game_speed;
+                    uint8_t game_speed = savefile.settings.game_speed;
+                    if(game_speed < 6 && (btns_pressed & (BTN_A | BTN_RIGHT)))
+                        ++game_speed;
+                    if(game_speed > 0 && (btns_pressed & BTN_LEFT))
+                        --game_speed;
+                    savefile.settings.game_speed = game_speed;
                 }
                 else if(optionsi == 3)
                 {
-                    if(savefile.settings.brightness < 3 && (btns_pressed & (BTN_A | BTN_RIGHT)))
-                        ++savefile.settings.brightness;
-                    if(savefile.settings.brightness > 0 && (btns_pressed & BTN_LEFT))
-                        --savefile.settings.brightness;
+                    uint8_t brightness = savefile.settings.brightness;
+                    if(brightness < 3 && (btns_pressed & (BTN_A | BTN_RIGHT)))
+                        ++brightness;
+                    if(brightness > 0 && (btns_pressed & BTN_LEFT))
+                        --brightness;
+                    savefile.settings.brightness = brightness;
                     platform_fade(15);
                 }
                 else if(optionsi == 4)
@@ -169,26 +173,30 @@ void update_pause()
         }
         else if(d.quity >= 64)
         {
+            uint8_t quitft = d.quitft;
             if(btns_pressed & BTN_A)
                 d.quitp = true;
             if(d.quitp && (btns_down & BTN_A))
             {
-                if((d.quitft += 3) >= 96)
+                if((quitft += 3) >= 96)
                 {
-                    d.quitft = 96;
+                    quitft = 96;
                     d.quitfade = 1;
                 }
             }
             else
             {
-                d.quitft = 0;
+                uint8_t quiti = d.quiti;
+                quitft = 0;
                 if(btns_pressed & BTN_B)
-                    state = OS_MENU;
-                if((btns_pressed & BTN_UP) && d.quiti-- == 0)
-                    d.quiti = 2;
-                if((btns_pressed & BTN_DOWN) && d.quiti++ == 2)
-                    d.quiti = 0;
+                    d.quitp = false, state = OS_MENU;
+                if((btns_pressed & BTN_UP) && quiti-- == 0)
+                    quiti = 2;
+                if((btns_pressed & BTN_DOWN) && quiti++ == 2)
+                    quiti = 0;
+                d.quiti = quiti;
             }
+            d.quitft = quitft;
         }
     }
     else if(state == OS_SAVE)
@@ -246,17 +254,17 @@ static inline uint8_t explored_rotate8(uint8_t x, uint8_t const*& ptr)
     return x;
 }
 
-static void render_map_quad(int16_t x, int16_t y, uint8_t mx, uint8_t my)
+static void render_map_quad(int16_t x, int16_t y, uint8_t f)
 {
-    uint8_t f = my * PAUSE_MAP_FRAMES_W + mx;
     platform_fx_drawoverwrite(x, y, WORLD_IMG, f + 0);
     constexpr uint8_t SCALE =
         (EXPLORED_COLS / PAUSE_MAP_FRAMES_W) *
         (EXPLORED_ROWS / PAUSE_MAP_FRAMES_H) / 8;
     constexpr uint8_t ESIZE = EXPLORED_PIXELS;
     constexpr uint8_t ISTEP = (EXPLORED_COLS - EXPLORED_COLS / PAUSE_MAP_FRAMES_W) / 8;
-    uint8_t i = my * (EXPLORED_COLS / 8 * EXPLORED_ROWS / PAUSE_MAP_FRAMES_H);
-    i += mx * (EXPLORED_COLS / PAUSE_MAP_FRAMES_W / 8);
+
+    uint8_t i = (f / PAUSE_MAP_FRAMES_W) * (EXPLORED_COLS / 8 * EXPLORED_ROWS / PAUSE_MAP_FRAMES_H);
+    i += (f & (PAUSE_MAP_FRAMES_W - 1)) * (EXPLORED_COLS / PAUSE_MAP_FRAMES_W / 8);
     uint8_t m = 1;
     int16_t bx = x;
     for(uint8_t r = 0; r < (EXPLORED_ROWS / PAUSE_MAP_FRAMES_H); i += ISTEP, ++r, y += ESIZE)
@@ -341,37 +349,57 @@ void render_pause()
         uint8_t f = my * PAUSE_MAP_FRAMES_W + mx;
         platform_fade(d.mapfade - 16);
 
-        render_map_quad(ox      , oy     , mx    , my    );
-        render_map_quad(ox + 128, oy     , mx + 1, my    );
-        render_map_quad(ox      , oy + 64, mx    , my + 1);
-        render_map_quad(ox + 128, oy + 64, mx + 1, my + 1);
+        render_map_quad(ox      , oy     , f);
+        render_map_quad(ox + 128, oy     , f + 1);
+        render_map_quad(ox      , oy + 64, f + PAUSE_MAP_FRAMES_W);
+        render_map_quad(ox + 128, oy + 64, f + PAUSE_MAP_FRAMES_W + 1);
 
         if(player_is_outside())
         {
+            int16_t msx = d.mapscrollx;
+            int16_t msy = d.mapscrolly;
             if(d.allow_obj && (btns_down & BTN_A))
             {
                 uint8_t objx = savefile.objx;
                 uint8_t objy = savefile.objy;
                 if((objx | objy) != 0)
                 {
-                    int16_t diffx = objx * 2 - d.mapscrollx - 64;
-                    int16_t diffy = objy * 2 - d.mapscrolly - 20;
+                    int16_t diffx = objx * 2 - msx - 64;
+                    int16_t diffy = objy * 2 - msy - 20;
                     draw_objective(diffx, diffy);
                 }
             }
             if((rframe & 63) < 48)
             {
-                int16_t sx = px / 8 - d.mapscrollx - 8;
-                int16_t sy = py / 8 - d.mapscrolly - 12;
+                int16_t sx, sy;
+                {
+                    uint16_t tpx = px;
+                    uint16_t tpy = py;
+                    dual_shift_u16<3>(tpx, tpy);
+                    sx = (int16_t)tpx - msx - 8;
+                    sy = (int16_t)tpy - msy - 12;
+                }
+                //int16_t sx = px / 8 - msx - 8;
+                //int16_t sy = py / 8 - msy - 12;
                 platform_fx_drawplusmask(sx, sy, PLAYER_IMG, 0, 16, 16);
             }
         }
 
         {
-            uint8_t x = uint16_t(d.mapscrollx + (PAUSE_MAP_PIXELS_W / 16 / 2)) /
-                (PAUSE_MAP_PIXELS_W / 16);
-            uint8_t y = uint16_t(d.mapscrolly + (PAUSE_MAP_PIXELS_H / 8 / 2)) /
-                (PAUSE_MAP_PIXELS_H / 8);
+            static_assert(32 == PAUSE_MAP_PIXELS_W / 16, "");
+            static_assert(32 == PAUSE_MAP_PIXELS_H / 8, "");
+            uint8_t x, y;
+            {
+                uint16_t tx = uint16_t(d.mapscrollx + (PAUSE_MAP_PIXELS_W / 16 / 2));
+                uint16_t ty = uint16_t(d.mapscrolly + (PAUSE_MAP_PIXELS_H / 8 / 2));
+                dual_shift_u16<5>(tx, ty);
+                x = (uint8_t)tx;
+                y = (uint8_t)ty;
+            }
+            //uint8_t x = uint16_t(d.mapscrollx + (PAUSE_MAP_PIXELS_W / 16 / 2)) /
+            //    (PAUSE_MAP_PIXELS_W / 16);
+            //uint8_t y = uint16_t(d.mapscrolly + (PAUSE_MAP_PIXELS_H / 8 / 2)) /
+            //    (PAUSE_MAP_PIXELS_H / 8);
             platform_fillrect_i8(104, 48, 16, 8, LIGHT_GRAY);
             platform_fillrect_i8(104 + x, 48 + y, 4, 2, BLACK);
             platform_drawrect_i8(103, 47, 18, 10, DARK_GRAY);

@@ -20,12 +20,33 @@ static int8_t fmulshi(int8_t x, int8_t y)
     return int8_t(fmuls(x, y) >> 8);
 }
 
-inline int8_t i8abs(int8_t x) { return x < 0 ? -x : x; }
+inline int8_t i8abs(int8_t x)
+{
+#ifdef ARDUINO
+    asm volatile(R"ASM(
+            sbrc %[x], 7
+            neg  %[x]
+        )ASM"
+        : [x] "+&r" (x)
+        );
+    return x;
+#else
+    return x < 0 ? -x : x;
+#endif
+}
 
 void draw_objective(int16_t diffx, int16_t diffy)
 {
-    int8_t dx = diffx >> 4;
-    int8_t dy = diffy >> 4;
+    int8_t dx, dy;
+    {
+        int16_t tx = diffx;
+        int16_t ty = diffy;
+        dual_shift_s16<4>(tx, ty);
+        dx = (int8_t)tx;
+        dy = (int8_t)ty;
+    }
+    //int8_t dx = diffx >> 4;
+    //int8_t dy = diffy >> 4;
 
     uint8_t f;
     int16_t x, y;

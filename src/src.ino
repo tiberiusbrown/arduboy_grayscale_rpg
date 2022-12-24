@@ -57,7 +57,9 @@ static void custom_init()
 #endif
 #endif
 	
-#if defined(ADCSRA)
+    ADCSRA = (_BV(ADPS0) | _BV(ADPS1) | _BV(ADPS2) | _BV(ADEN));
+    
+#if 0
 	// set a2d prescaler so we are inside the desired 50-200 KHz range.
 	#if F_CPU >= 16000000 // 16 MHz / 128 = 125 KHz
 		sbi(ADCSRA, ADPS2);
@@ -137,12 +139,14 @@ static void handle_buttons_and_update()
     btns_down = a.buttonsState();
     btns_pressed = btns_down & ~b;
 #ifdef REMOVE_TIMER0
+    uint8_t updown = updown_frames;
     if((btns_down & (BTN_UP | BTN_DOWN)) == (BTN_UP | BTN_DOWN))
-        ++updown_frames;
+        ++updown;
     else
-        updown_frames = 0;
-    if(updown_frames == 45)
+        updown = 0;
+    if(updown == 45)
         a.exitToBootloader();
+    updown_frames = updown;
 #endif
     update();
 }

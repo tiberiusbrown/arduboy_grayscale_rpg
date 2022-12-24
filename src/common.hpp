@@ -600,15 +600,15 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h);
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame);
-void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr) FORCE_NOINLINE;
+void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr);
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h);
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame);
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
-void platform_fillrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c) FORCE_NOINLINE;
+void platform_fillrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_drawrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);
-void platform_drawrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c) FORCE_NOINLINE;
+void platform_drawrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_fx_erase_save_sector();
 void platform_fx_write_save_page(uint16_t page, void const* data, size_t num);
 void platform_fx_read_save_bytes(uint24_t addr, void* data, size_t num);
@@ -760,5 +760,49 @@ FORCE_INLINE inline uint8_t div4(uint8_t x)
     return x;
 #else
     return x >> 2;
+#endif
+}
+
+template<uint8_t N>
+FORCE_INLINE inline void dual_shift_u16(uint16_t& x, uint16_t& y)
+{
+#ifdef ARDUINO
+    uint8_t t = N;
+    asm volatile(R"ASM(
+        1:  lsr  %B[x]
+            ror  %A[x]
+            lsr  %B[y]
+            ror  %A[y]
+            dec  %[t]
+            brne 1b
+        )ASM"
+        : [x] "+&r" (x),
+          [y] "+&r" (y),
+          [t] "+&r" (t));
+#else
+    x >>= N;
+    y >>= N;
+#endif
+}
+
+template<uint8_t N>
+FORCE_INLINE inline void dual_shift_s16(int16_t& x, int16_t& y)
+{
+#ifdef ARDUINO
+    uint8_t t = N;
+    asm volatile(R"ASM(
+        1:  asr  %B[x]
+            ror  %A[x]
+            asr  %B[y]
+            ror  %A[y]
+            dec  %[t]
+            brne 1b
+        )ASM"
+        : [x] "+&r" (x),
+          [y] "+&r" (y),
+          [t] "+&r" (t));
+#else
+    x >>= N;
+    y >>= N;
 #endif
 }

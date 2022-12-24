@@ -41,11 +41,25 @@ static bool run_chunk()
         uint8_t tx = ac.cx * 8;
         uint8_t ty = ac.cy * 4;
         uint8_t dx, dy;
-        dx = div16_u16(px + 8) - tx;
-        dy = div16_u16(py + 8) - ty;
+        {
+            uint16_t tpx = px + 8;
+            uint16_t tpy = py + 8;
+            dual_shift_u16<4>(tpx, tpy);
+            dx = (uint8_t)tpx - tx;
+            dy = (uint8_t)tpy - ty;
+        }
+        //dx = div16_u16(px + 8) - tx;
+        //dy = div16_u16(py + 8) - ty;
         if((dx | dy) < 8) walk_tile = dy * 8 + dx;
-        dx = div16_u16(selx) - tx;
-        dy = div16_u16(sely) - ty;
+        {
+            uint16_t tpx = selx;
+            uint16_t tpy = sely;
+            dual_shift_u16<4>(tpx, tpy);
+            dx = (uint8_t)tpx - tx;
+            dy = (uint8_t)tpy - ty;
+        }
+        //dx = div16_u16(selx) - tx;
+        //dy = div16_u16(sely) - ty;
         if((dx | dy) < 8)
         {
             sel_tile = dy * 8 + dx;
