@@ -21,7 +21,8 @@ void update_pause()
         if(d.state == OS_MENU) d.state = OS_RESUMING;
         else if(d.state == OS_OPTIONS) d.state = OS_MENU;
     }
-    if(d.state == OS_RESUMING)
+    uint8_t state = d.state;
+    if(state == OS_RESUMING)
     {
         if((d.ally | d.menuy) == 0)
         {
@@ -29,7 +30,7 @@ void update_pause()
             return;
         }
     }
-    else if(d.state == OS_MENU)
+    else if(state == OS_MENU)
     {
         if(d.menuy >= 16 && d.ally == 0)
         {
@@ -40,16 +41,19 @@ void update_pause()
                 menui = 0;
             if(btns_pressed & BTN_A)
             {
-                if(menui == 0) d.state = OS_SAVE;
-                if(menui == 1) d.state = OS_PARTY;
-                if(menui == 2 && player_is_outside()) d.state = OS_MAP;
-                if(menui == 3) d.state = OS_OPTIONS;
-                if(menui == 4) d.state = OS_QUIT;
+                static_assert(1 == OS_SAVE, "");
+                static_assert(2 == OS_PARTY, "");
+                static_assert(3 == OS_MAP, "");
+                static_assert(4 == OS_OPTIONS, "");
+                static_assert(5 == OS_QUIT, "");
+                state = menui + 1;
+                if(menui == 2 && !player_is_outside())
+                    state = OS_MENU;
             }
             d.menui = menui;
         }
     }
-    else if(d.state == OS_MAP)
+    else if(state == OS_MAP)
     {
         if(!d.map_first)
         {
@@ -60,7 +64,7 @@ void update_pause()
         if(!d.back_to_menu && (d.mapfade += FADE_SPEED) >= 32)
             d.mapfade = 32;
         if(d.back_to_menu && (d.mapfade -= FADE_SPEED) == 0)
-            d.back_to_menu = false, d.state = OS_MENU;
+            d.back_to_menu = false, state = OS_MENU;
         if(d.mapfade >= 16)
         {
             if(btns_pressed & BTN_A)
@@ -81,13 +85,13 @@ void update_pause()
         if(d.mapscrolly >= PAUSE_MAP_PIXELS_H - 64)
             d.mapscrolly = PAUSE_MAP_PIXELS_H - 64;
     }
-    else if(d.state == OS_OPTIONS)
+    else if(state == OS_OPTIONS)
     {
         if(d.optionsy >= 64)
         {
             uint8_t optionsi = d.optionsi;
             if(btns_pressed & BTN_B)
-                d.state = OS_MENU;
+                state = OS_MENU;
             else if((btns_pressed & BTN_UP) && optionsi-- == 0)
                 optionsi = 4;
             else if((btns_pressed & BTN_DOWN) && optionsi++ == 4)
@@ -125,7 +129,7 @@ void update_pause()
             d.optionsi = optionsi;
         }
     }
-    else if(d.state == OS_QUIT)
+    else if(state == OS_QUIT)
     {
         if(d.quitfade > 0)
         {
@@ -167,7 +171,7 @@ void update_pause()
             {
                 d.quitft = 0;
                 if(btns_pressed & BTN_B)
-                    d.state = OS_MENU;
+                    state = OS_MENU;
                 if((btns_pressed & BTN_UP) && d.quiti-- == 0)
                     d.quiti = 2;
                 if((btns_pressed & BTN_DOWN) && d.quiti++ == 2)
@@ -175,14 +179,14 @@ void update_pause()
             }
         }
     }
-    else if(d.state == OS_SAVE)
+    else if(state == OS_SAVE)
     {
         if(d.savey >= 64)
         {
             if(d.save_wait > 0)
             {
                 if(++d.save_wait == 16)
-                    d.state = OS_RESUMING;
+                    state = OS_RESUMING;
             }
             else if(is_saving())
             {
@@ -195,9 +199,10 @@ void update_pause()
             }
         }
     }
-    else if(d.state == OS_PARTY)
+    else if(state == OS_PARTY)
     {
-        update_pause_party();
+        if(update_pause_party())
+            state = OS_MENU;
     }
     {
         uint8_t const* ptr = &OPTION_X[uint8_t(d.menui * 2)];
@@ -207,17 +212,18 @@ void update_pause()
         adjust(d.ax, ax);
         adjust(d.bx, bx);
     }
-    adjust(d.menuy, d.state == OS_MENU ? 16 : 0);
-    adjust(d.optionsy, d.state == OS_OPTIONS ? 64 : 0);
-    adjust(d.quity, d.state == OS_QUIT ? 64 : 0);
+    adjust(d.menuy, state == OS_MENU ? 16 : 0);
+    adjust(d.optionsy, state == OS_OPTIONS ? 64 : 0);
+    adjust(d.quity, state == OS_QUIT ? 64 : 0);
     adjust(d.quitf, d.quitft);
-    adjust(d.savey, d.state == OS_SAVE ? 64 : 0);
-    adjust(d.partyy, d.state == OS_PARTY ? 64 : 0);
+    adjust(d.savey, state == OS_SAVE ? 64 : 0);
+    adjust(d.partyy, state == OS_PARTY ? 64 : 0);
     adjust(d.optionsiy, d.optionsi * 12);
     adjust(d.quitiy, d.quiti * 13);
     adjust(d.brightnessx, savefile.settings.brightness * 16);
     adjust(d.speedx, savefile.settings.game_speed * 8);
     d.ally = d.optionsy | d.quity | d.savey | d.partyy;
+    d.state = state;
 }
 
 static inline uint8_t explored_rotate8(uint8_t x, uint8_t const*& ptr)

@@ -401,13 +401,14 @@ void update_battle()
     //if(++d.selframe >= 7) d.selframe = 0;
     if(d.itemsy == 0)
         update_battle_sprites();
-    switch(d.phase)
+    battle_phase_t phase = d.phase;
+    switch(phase)
     {
     case BPHASE_ALERT:
         if(d.frame == 24)
         {
             d.frame = 0;
-            d.phase = BPHASE_INTRO;
+            phase = BPHASE_INTRO;
         }
         break;
     case BPHASE_INTRO:
@@ -423,11 +424,12 @@ void update_battle()
             d.frame = 0;
             d.attacker_index = d.num_attackers;
             d.attacker_id = INVALID;
-            d.phase = BPHASE_NEXT;
+            phase = BPHASE_NEXT;
         }
         break;
     case BPHASE_NEXT:
         battle_next_turn();
+        phase = d.phase;
         break;
     case BPHASE_MENU:
         d.menuy_target = 32;
@@ -439,18 +441,18 @@ void update_battle()
                 d.prev_phase = BPHASE_MENU;
                 d.next_phase = BPHASE_ATTACK1;
                 if(d.edef != INVALID) d.esel = d.edef;
-                d.phase = BPHASE_ESEL;
+                phase = BPHASE_ESEL;
             }
             else if(d.msel == 1)
             {
                 if(d.pdef != d.attacker_id)
-                    d.phase = BPHASE_DEFEND;
+                    phase = BPHASE_DEFEND;
             }
             else
             {
                 d.items.cat = IT_CONSUMABLE;
                 d.items.battle = true;
-                d.phase = BPHASE_ITEM;
+                phase = BPHASE_ITEM;
                 update_items_numcat(d.items);
             }
             if(d.msel != BPHASE_MENU)
@@ -469,12 +471,12 @@ void update_battle()
         if(btns_pressed & BTN_DOWN) esel |= 1;
         if(btns_pressed & BTN_LEFT) esel &= ~2;
         if(btns_pressed & BTN_RIGHT) esel |= 2;
-        if(btns_pressed & BTN_B) d.phase = d.prev_phase;
+        if(btns_pressed & BTN_B) phase = d.prev_phase;
         if(d.edef != INVALID) esel = d.edef;
         auto const& e = d.enemies[esel - 4];
         if(e.id != INVALID && e.hp > 0) d.esel = esel;
         if((btns_pressed & BTN_A) && d.enemies[d.esel - 4].id != INVALID)
-            d.defender_id = d.esel, d.frame = 0, d.phase = d.next_phase;
+            d.defender_id = d.esel, d.frame = 0, phase = d.next_phase;
         break;
     }
     case BPHASE_ATTACK1:
@@ -487,14 +489,14 @@ void update_battle()
             tx = DEFEND_X1 + 18;
         ty = d.sprites[d.defender_id].ty;
         move_sprite(i, tx, ty);
-        d.phase = BPHASE_SPRITES;
+        phase = BPHASE_SPRITES;
         d.next_phase = BPHASE_ATTACK2;
         break;
     }
     case BPHASE_ATTACK2:
     {
         d.frame = -24;
-        d.phase = BPHASE_DELAY;
+        phase = BPHASE_DELAY;
         d.next_phase = BPHASE_ATTACK3;
         uint8_t attacker = d.attacker_id;
         uint8_t defender = d.defender_id;
@@ -537,7 +539,7 @@ void update_battle()
             move_sprite(d.attacker_id, DEFEND_X1, DEFEND_Y);
         else
             move_sprite_to_base(d.attacker_id);
-        d.phase = BPHASE_SPRITES;
+        phase = BPHASE_SPRITES;
         d.next_phase = BPHASE_NEXT;
         break;
     }
@@ -552,13 +554,13 @@ void update_battle()
         move_sprite(d.attacker_id, tx, DEFEND_Y);
         if(di != INVALID && di != d.attacker_id)
             move_sprite_to_base(di);
-        d.phase = BPHASE_SPRITES;
+        phase = BPHASE_SPRITES;
         d.next_phase = BPHASE_NEXT;
         break;
     }
     case BPHASE_ITEM:
         if(btns_pressed & BTN_B)
-            d.phase = BPHASE_MENU, d.msel = 2;
+            phase = BPHASE_MENU, d.msel = 2;
         if(d.itemsy == 64)
         {
             bool consumed = update_items(d.items);
@@ -566,27 +568,32 @@ void update_battle()
             {
                 init_hp_bars();
                 battle_next_turn();
+                phase = d.phase;
             }
         }
         break;
     case BPHASE_SPRITES:
         if(d.sprites_done)
-            d.phase = d.next_phase;
+            phase = d.next_phase;
         break;
     case BPHASE_DELAY:
         if(d.frame == 0)
-            d.phase = d.next_phase;
+            phase = d.next_phase;
         break;
     case BPHASE_DEFEAT:
         change_state(STATE_GAME_OVER);
-        break;
+        return;
     case BPHASE_OUTRO:
         if(d.frame == 33)
+        {
             back_to_map();
+            return;
+        }
         break;
     default: break;
     }
-    adjust(d.itemsy, d.phase == BPHASE_ITEM ? 64 : 0);
+    adjust(d.itemsy, phase == BPHASE_ITEM ? 64 : 0);
+    d.phase = phase;
 }
 
 static void draw_battle_background()
@@ -596,9 +603,8 @@ static void draw_battle_background()
     {
         // outdoor background
         static constexpr uint8_t TS[] PROGMEM = { 10, 11, 26, 27 };
-        for(uint8_t r = 0, t = 0x23; r < 4; ++r)
+        for(uint8_t y = 0, t = 0x23; y < 64; y += 16)
         {
-            uint8_t y = r * 16;
             if(y + d.itemsy >= 64) break;
             for(uint8_t c = 0; c < 8; ++c, t ^= (t >> 3) ^ (t << 1))
                 draw_tile(c * 16, y, pgm_read_byte(&TS[t & 3]));
@@ -609,7 +615,7 @@ static void draw_battle_background()
         // dungeon background
         for(uint8_t x = 0; x < 128; x += 16)
             draw_tile(x, 0, 12);
-        for(uint8_t y = 16; y < 64; y += 16)
+        for(uint8_t y = 0; y < 64; y += 16)
         {
             if(y + d.itemsy >= 64) break;
             for(uint8_t x = 0; x < 128; x += 16)

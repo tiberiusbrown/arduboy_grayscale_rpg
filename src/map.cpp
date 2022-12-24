@@ -551,18 +551,10 @@ bool check_solid(uint16_t tx, uint16_t ty)
     uint8_t cy = uint8_t(ty >> 6);
     cx -= active_chunks[0].cx;
     cy -= active_chunks[0].cy;
-    if(cx > 1 || cy > 1) return true;
+    if((cx | cy) > 1) return true;
     uint8_t ctx = uint8_t(tx) & 127;
     uint8_t cty = uint8_t(ty) & 63;
     uint8_t ci = cy * 2 + cx;
-    auto const& c = active_chunks[ci];
-    uint8_t t = c.chunk.tiles[cty / 16][ctx / 16];
-    t = pgm_read_byte(&TILE_SOLID[t]);
-    // identify quarter tiles
-    uint8_t q = 1;
-    if(ty & 0x08) q <<= 2;
-    if(tx & 0x08) q <<= 1;
-    if((t & q) != 0) return true;
     // check sprite
     auto const& e = chunk_sprites[ci];
     if(e.active)
@@ -572,5 +564,38 @@ bool check_solid(uint16_t tx, uint16_t ty)
         if(uint8_t(ctx - ex - 2) < 12 && uint8_t(cty - ey - 4) < 12)
             return true;
     }
+    auto const& c = active_chunks[ci];
+#ifndef ARDUINO
+    uint8_t t = c.chunk.tiles[cty / 16][ctx / 16];
+#else
+    uint8_t t;
+    {
+        uint8_t tmpx = ctx;
+        uint8_t tmpy = cty;
+        uint8_t const* ptr = c.chunk.tiles_flat;
+        asm volatile(R"ASM(
+                lsr  %[tmpy]
+                andi %[tmpy], 0xf8
+                swap %[tmpx]
+                andi %[tmpx], 0x0f
+                add  %[tmpx], %[tmpy]
+                add  %A[ptr], %[tmpx]
+                adc  %B[ptr], __zero_reg__
+                ld   %[t], %a[ptr]
+            )ASM"
+            :
+            [tmpx] "+&d" (tmpx),
+            [tmpy] "+&d" (tmpy),
+            [t]    "=&r" (t),
+            [ptr]  "+&e" (ptr)
+            );
+    }
+#endif
+    t = pgm_read_byte(&TILE_SOLID[t]);
+    // identify quarter tiles
+    uint8_t q = 1;
+    if(ty & 0x08) q <<= 2;
+    if(tx & 0x08) q <<= 1;
+    if((t & q) != 0) return true;
     return false;
 }

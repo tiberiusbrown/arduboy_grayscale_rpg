@@ -68,54 +68,54 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
         e.y += (int8_t)pgm_read_byte(ptr);
     }
 
-    if(--e.frames_rem == 0)
+    if(--e.frames_rem != 0)
+        return;
+
+    if(!(e.dir & 0x80))
     {
-        if(!(e.dir & 0x80))
-        {
-            uint8_t t = e.path[e.path_index];
-            if(t & 0xe0)
-            {
-                // delay
-                e.frames_rem = (t >> 5) * 16;
-                e.dir = 0x80;
-                return;
-            }
-        }
-        if(e.path_dir == 0)
-        {
-            if(++e.path_index == e.path_num)
-                e.path_index = 0;
-        }
-        else if(e.path_dir == 1)
-        {
-            if(++e.path_index == e.path_num)
-                e.path_index -= 2, e.path_dir = 2;
-        }
-        else if(e.path_dir == 2)
-        {
-            if(e.path_index-- == 0)
-                e.path_index = 1, e.path_dir = 1;
-        }
         uint8_t t = e.path[e.path_index];
-        uint8_t x = (t & 7) * 16;
-        uint8_t y = ((t >> 3) & 3) * 16;
-        if(x < e.x)
+        if(t & 0xe0)
         {
-            e.dir = 2;
-            e.frames_rem = e.x - x;
+            // delay
+            e.frames_rem = (t >> 5) * 16;
+            e.dir = 0x80;
+            return;
         }
-        else if(x > e.x) {
-            e.dir = 6;
-            e.frames_rem = x - e.x;
-        }
-        else if(y < e.y) {
-            e.dir = 4;
-            e.frames_rem = e.y - y;
-        }
-        else {
-            e.dir = 0;
-            e.frames_rem = y - e.y;
-        }
+    }
+    if(e.path_dir == 0)
+    {
+        if(++e.path_index == e.path_num)
+            e.path_index = 0;
+    }
+    else if(e.path_dir == 1)
+    {
+        if(++e.path_index == e.path_num)
+            e.path_index -= 2, e.path_dir = 2;
+    }
+    else if(e.path_dir == 2)
+    {
+        if(e.path_index-- == 0)
+            e.path_index = 1, e.path_dir = 1;
+    }
+    uint8_t t = e.path[e.path_index];
+    uint8_t x = (t & 7) * 16;
+    uint8_t y = ((t >> 3) & 3) * 16;
+    if(x < e.x)
+    {
+        e.dir = 2;
+        e.frames_rem = e.x - x;
+    }
+    else if(x > e.x) {
+        e.dir = 6;
+        e.frames_rem = x - e.x;
+    }
+    else if(y < e.y) {
+        e.dir = 4;
+        e.frames_rem = e.y - y;
+    }
+    else {
+        e.dir = 0;
+        e.frames_rem = y - e.y;
     }
 }
 
@@ -127,11 +127,68 @@ static void update_sprites()
 
 static uint8_t solid_mask()
 {
+#ifdef ARDUINO
+    uint16_t tpx, tpy;
+    uint8_t m;
+    asm volatile(R"ASM(
+        clr  %[m]
+        lds  r24, %[ppx]+0
+        lds  r25, %[ppx]+1
+        adiw r24, 5
+        movw %A[px], r24
+
+        lds  r22, %[ppy]+0
+        lds  r23, %[ppy]+1
+        subi r22, lo8(-5)
+        sbci r23, hi8(-5)
+        movw %A[py], r22
+
+        %~call %x[cs]
+        cpse r24, __zero_reg__
+        ori  %[m], 1
+
+        movw r24, %[px]
+        adiw r24, 5
+        movw r22, %[py]
+        %~call %x[cs]
+        cpse r24, __zero_reg__
+        ori  %[m], 2
+
+        movw r24, %[px]
+        movw r22, %[py]
+        subi r22, lo8(-5)
+        sbci r23, hi8(-5)
+        movw %[py], r22
+        %~call %x[cs]
+        cpse r24, __zero_reg__
+        ori  %[m], 4
+
+        movw r24, %[px]
+        adiw r24, 5
+        movw r22, %[py]
+        %~call %x[cs]
+        cpse r24, __zero_reg__
+        ori  %[m], 8
+        )ASM"
+        :
+        [m]   "=&d" (m),
+        [px]  "=&r" (tpx),
+        [py]  "=&r" (tpy)
+        :
+        [ppx] ""    (&px),
+        [ppy] ""    (&py),
+        [cs]  "i"   (&check_solid)
+        :
+        "r18", "r19", "r20", "r21", "r22", "r23", "r24", "r25",
+        "r26", "r27", "r30", "r31", "memory"
+        );
+#else
     uint8_t m = 0;
     if(check_solid(px +  5, py +  5)) m |= 1;
     if(check_solid(px + 10, py +  5)) m |= 2;
     if(check_solid(px +  5, py + 10)) m |= 4;
     if(check_solid(px + 10, py + 10)) m |= 8;
+#endif
     return m;
 }
 

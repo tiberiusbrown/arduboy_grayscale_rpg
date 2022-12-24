@@ -562,18 +562,18 @@ void update_battery();
 enum
 {
     OS_MENU,
-    OS_RESUMING,
-    OS_OPTIONS,
-    OS_QUIT,
     OS_SAVE,
     OS_PARTY,
     OS_MAP,
+    OS_OPTIONS,
+    OS_QUIT,
+    OS_RESUMING,
 };
 void update_pause();
 void render_pause();
 
 // pause_party.cpp
-void update_pause_party();
+bool update_pause_party();
 void render_pause_party();
 
 // save.cpp

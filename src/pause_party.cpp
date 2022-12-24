@@ -2,11 +2,11 @@
 
 #include "generated/fxdata.h"
 
-void update_pause_party()
+bool update_pause_party()
 {
     auto& d = sdata.pause;
 
-    if(d.partyy < 64) return;
+    if(d.partyy < 64) return false;
 
     if(d.itemsy == 64)
     {
@@ -17,7 +17,7 @@ void update_pause_party()
     else if(d.itemsy == 0 && d.partyx == d.partyxt)
     {
         if(btns_pressed & BTN_B)
-            d.state = OS_MENU;
+            return true;
         else if(d.partyi > 0 && (btns_pressed & BTN_LEFT))
         {
             --d.partyi;
@@ -43,6 +43,7 @@ void update_pause_party()
         adjust(d.partyx, d.partyxt);
     }
     adjust(d.itemsy, d.itemsyt);
+    return false;
 }
 
 static void render_pause_party_offset(int8_t x, int8_t y, uint8_t i)
