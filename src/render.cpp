@@ -138,9 +138,9 @@ static void render_title_graphics()
     //platform_fx_drawoverwrite(0, 0, TITLE_IMG);
     auto const& d = sdata.title;
     render_map();
-    platform_fx_drawplusmask(7, 0, TITLE_MASKED_IMG, 0, 114, 16);
+    platform_fx_drawplusmask(7, 0, 114, 16, TITLE_MASKED_IMG, 0);
     if(!d.going_to_resume && (nframe & 0x3f) < 0x30)
-        platform_fx_drawplusmask(47, 48, PRESS_A_IMG, 0, 34, 16);
+        platform_fx_drawplusmask(47, 48, 34, 16, PRESS_A_IMG, 0);
 }
 
 static void render_title()
@@ -235,7 +235,7 @@ static void render_battery()
     if(!savefile.settings.no_battery_alert && battery.low)
     {
         uint8_t f = (rframe & 0x20) ? 0 : 1;
-        platform_fx_drawplusmask(118, 0, BATTERY_IMG, f, 10, 8);
+        platform_fx_drawplusmask(118, 0, 10, 8, BATTERY_IMG, f);
     }
 }
 

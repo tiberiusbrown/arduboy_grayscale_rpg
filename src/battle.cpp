@@ -628,7 +628,7 @@ static void draw_battle_background()
         auto const& s = d.sprites[i];
         if(s.damaged > 0 || member(i).hp > 0) continue;
         if(plane() > 1)
-            platform_fx_drawplusmask(s.bx, s.by, SPRITES_IMG, s.frame_base, 16, 16);
+            platform_fx_drawplusmask(s.bx, s.by, 16, 16, SPRITES_IMG, s.frame_base);
     }
     //platform_fillrect_i8(DEFEND_X1 + 1, DEFEND_Y + 7, 14, 12, WHITE);
     platform_drawrect_i8(DEFEND_X1 + 3, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
@@ -656,14 +656,14 @@ static void draw_selection_arrow(uint8_t x, uint8_t y)
 #endif
     if(f >= 4) f ^= 7;
     //f = (f < 4 ? f : 7 - f);
-    platform_fx_drawplusmask(x + 4, y - 12 + f, BATTLE_ARROW_IMG, 0, 9, 8);
+    platform_fx_drawplusmask(x + 4, y - 12 + f, 9, 8, BATTLE_ARROW_IMG, 0);
 }
 
 static void draw_selection_outline(uint8_t x, uint8_t y)
 {
     //auto const& d = sdata.battle;
-    //platform_fx_drawplusmask(x - 3, y - 3, BATTLE_SELECT_IMG, d.selframe, 22, 24);
-    platform_fx_drawplusmask(x + 4, y - 12, BATTLE_ATTACKER_IMG, 0, 9, 8);
+    //platform_fx_drawplusmask(x - 3, y - 3, 22, 24, BATTLE_SELECT_IMG, d.selframe);
+    platform_fx_drawplusmask(x + 4, y - 12, 9, 8, BATTLE_ATTACKER_IMG, 0);
 }
 
 static void draw_health(uint8_t i)
@@ -727,7 +727,7 @@ void render_battle()
         render_map();
         uint8_t f = d.frame;
         if(f > 7) f = 7;
-        platform_fx_drawplusmask(58, 10, BATTLE_ALERT_IMG, f, 13, 16);
+        platform_fx_drawplusmask(58, 10, 13, 16, BATTLE_ALERT_IMG, f);
         return;
     }
     if(phase == BPHASE_INTRO || phase == BPHASE_OUTRO)
@@ -761,8 +761,8 @@ void render_battle()
     if(menuy > 0)
     {
         int16_t y = d.menuy - 32;
-        platform_fx_drawplusmask(51, y, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
-        platform_fx_drawplusmask(74, y, BATTLE_MENU_CHAIN_IMG, 0, 3, 8);
+        platform_fx_drawplusmask(51, y, 3, 8, BATTLE_MENU_CHAIN_IMG, 0);
+        platform_fx_drawplusmask(74, y, 3, 8, BATTLE_MENU_CHAIN_IMG, 0);
         platform_fx_drawoverwrite(48, y + 8, BATTLE_MENU_IMG);
         draw_text_noclip(50, y + 9 + d.msely, PSTR("\x7f"), NOCLIPFLAG_PROG);
     }

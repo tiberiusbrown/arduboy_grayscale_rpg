@@ -147,7 +147,7 @@ void draw_objective(int16_t diffx, int16_t diffy)
 #endif
 #endif
 
-    platform_fx_drawplusmask(x, y, OBJECTIVE_ARROWS_IMG, f, 16, 16);
+    platform_fx_drawplusmask(x, y, 16, 16, OBJECTIVE_ARROWS_IMG, f);
 }
 
 static bool add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
@@ -198,8 +198,8 @@ void sort_and_draw_sprites(draw_sprite_entry* entries, uint8_t n)
 
     for(uint8_t i = 0; i < n; ++i)
     {
-        platform_fx_drawplusmask(entries[i].x, entries[i].y, entries[i].addr,
-                                 entries[i].frame, 16, 16);
+        platform_fx_drawplusmask(entries[i].x, entries[i].y, 16, 16,
+            entries[i].addr, entries[i].frame);
     }
 }
 
@@ -243,7 +243,7 @@ void draw_player()
 {
     uint8_t f = pdir * 4;
     if(pmoving) f += (div4(nframe) & 3);
-    platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, PLAYER_IMG, f, 16, 16);
+    platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, 16, 16, PLAYER_IMG, f);
 }
 
 void draw_tile(int16_t x, int16_t y, uint8_t t)

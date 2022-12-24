@@ -381,7 +381,7 @@ void render_pause()
                 }
                 //int16_t sx = px / 8 - msx - 8;
                 //int16_t sy = py / 8 - msy - 12;
-                platform_fx_drawplusmask(sx, sy, PLAYER_IMG, 0, 16, 16);
+                platform_fx_drawplusmask(sx, sy, 16, 16, PLAYER_IMG, 0);
             }
         }
 

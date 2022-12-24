@@ -601,8 +601,8 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame);
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr);
-void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
-    uint16_t frame, uint8_t w, uint8_t h);
+void platform_fx_drawplusmask(int16_t x, int16_t y, uint8_t w, uint8_t h,
+    uint24_t addr, uint16_t frame);
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame);
 void platform_fillrect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t c);

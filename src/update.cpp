@@ -71,9 +71,10 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
     if(--e.frames_rem != 0)
         return;
 
+    uint8_t path_index = e.path_index;
     if(!(e.dir & 0x80))
     {
-        uint8_t t = e.path[e.path_index];
+        uint8_t t = e.path[path_index];
         if(t & 0xe0)
         {
             // delay
@@ -84,39 +85,44 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
     }
     if(e.path_dir == 0)
     {
-        if(++e.path_index == e.path_num)
-            e.path_index = 0;
+        if(++path_index == e.path_num)
+            path_index = 0;
     }
     else if(e.path_dir == 1)
     {
-        if(++e.path_index == e.path_num)
-            e.path_index -= 2, e.path_dir = 2;
+        if(++path_index == e.path_num)
+            path_index -= 2, e.path_dir = 2;
     }
     else if(e.path_dir == 2)
     {
-        if(e.path_index-- == 0)
-            e.path_index = 1, e.path_dir = 1;
+        if(path_index-- == 0)
+            path_index = 1, e.path_dir = 1;
     }
-    uint8_t t = e.path[e.path_index];
+    e.path_index = path_index;
+    uint8_t t = e.path[path_index];
     uint8_t x = (t & 7) * 16;
     uint8_t y = ((t >> 3) & 3) * 16;
-    if(x < e.x)
+    uint8_t frames_rem, dir;
+    uint8_t ex = e.x, ey = e.y;
+    if(x < ex)
     {
-        e.dir = 2;
-        e.frames_rem = e.x - x;
+        dir = 2;
+        frames_rem = ex - x;
     }
-    else if(x > e.x) {
-        e.dir = 6;
-        e.frames_rem = x - e.x;
+    else if(x > ex) {
+        dir = 6;
+        frames_rem = x - ex;
     }
-    else if(y < e.y) {
-        e.dir = 4;
-        e.frames_rem = e.y - y;
+    else if(y < ey) {
+        dir = 4;
+        frames_rem = ey - y;
     }
     else {
-        e.dir = 0;
-        e.frames_rem = y - e.y;
+        dir = 0;
+        frames_rem = y - ey;
     }
+    e.dir = dir;
+    e.frames_rem = frames_rem;
 }
 
 static void update_sprites()
@@ -333,11 +339,13 @@ static void update_map()
     // update explored
 #if 1
     {
-        constexpr uint8_t D = 16 * 4;
-        check_explored(px - D, py - D);
-        check_explored(px + D, py - D);
-        check_explored(px - D, py + D);
-        check_explored(px + D, py + D);
+        constexpr uint8_t D = 63; // allows adiw/sbiw
+        uint16_t tpx = px;
+        uint16_t tpy = py;
+        check_explored(tpx - D, tpy - D);
+        check_explored(tpx + D, tpy - D);
+        check_explored(tpx - D, tpy + D);
+        check_explored(tpx + D, tpy + D);
     }
 #else
     {
@@ -360,25 +368,28 @@ static void skip_dialog_animation(uint8_t third_newline)
 {
     auto& d = sdata.dialog;
     uint8_t i;
-    for(i = 0; d.message[i] != '\0' && d.message[i] != '|' && i != third_newline; ++i) {}
+    char c;
+    for(i = 0; (c = d.message[i]) != '\0' && c != '|' && i != third_newline; ++i)
+    {}
     d.char_progress = i;
 }
 
 static void advance_dialog_animation()
 {
     auto& d = sdata.dialog;
+    uint8_t char_progress = d.char_progress;
     for(uint8_t i = 0; i < 2; ++i)
     {
-        char c = d.message[d.char_progress];
-        if(c != '\0') ++d.char_progress;
+        char c = d.message[char_progress];
+        if(c != '\0') ++char_progress;
         if(c == '|')
         {
             MY_ASSERT(!d.question);
             // replace pipe char
-            d.message[d.char_progress - 1] = '\0';
+            d.message[char_progress - 1] = '\0';
             // skip following newline
-            MY_ASSERT(d.message[d.char_progress] == '\n');
-            d.question_msg = ++d.char_progress;
+            MY_ASSERT(d.message[char_progress] == '\n');
+            d.question_msg = ++char_progress;
             d.question = true;
             // count number of questions
             uint8_t n = 0, j = d.question_msg;
@@ -386,9 +397,11 @@ static void advance_dialog_animation()
                 if(c == '\n') ++n;
             d.numquestions = n;
             MY_ASSERT(n + 1 <= 3);
-            return;
+            goto done;
         }
     }
+done:
+    d.char_progress = char_progress;
 }
 
 static void update_dialog()
@@ -419,39 +432,43 @@ static void update_dialog()
         else if(message_done)
         {
             d.questiondone = true;
+            uint8_t questionfill = d.questionfill;
             if(d.questionpause)
             {
-                if(++d.questionfill >= 48)
+                if(++questionfill >= 48)
                 {
-                    savefile.chunk_regs[0] = 0;
                     savefile.chunk_regs[1] = 0;
                     savefile.chunk_regs[2] = 0;
+                    savefile.chunk_regs[3] = 0;
                     savefile.chunk_regs[d.questioni + 1] = 1;
                     back_to_map();
                 }
             }
             else if(btns_down & BTN_A)
             {
-                if(d.questionfill >= 32)
+                if(questionfill >= 32)
                     d.questionpause = true;
                 else
-                    ++d.questionfill;
+                    ++questionfill;
             }
             else
             {
-                d.questionfill = 0;
+                questionfill = 0;
+                uint8_t questioni = d.questioni;
                 if(btns_pressed & BTN_UP)
                 {
-                    if(d.questioni > 0)
-                        --d.questioni;
+                    if(questioni > 0)
+                        --questioni;
                 }
                 else if(btns_pressed & BTN_DOWN)
                 {
-                    if(d.questioni < d.numquestions)
-                        ++d.questioni;
+                    if(questioni < d.numquestions)
+                        ++questioni;
                 }
+                d.questioni = questioni;
             }
-            uint8_t t = (d.questionfill >= 32 ? 255 : d.questionfill * 8);
+            uint8_t t = (questionfill >= 32 ? 255 : questionfill * 8);
+            d.questionfill = questionfill;
             adjust(d.questionfillw, t);
         }
         else
