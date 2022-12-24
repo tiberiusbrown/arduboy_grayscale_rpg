@@ -392,8 +392,8 @@ static void advance_dialog_animation()
             d.question_msg = ++char_progress;
             d.question = true;
             // count number of questions
-            uint8_t n = 0, j = d.question_msg;
-            for(uint8_t j = d.question_msg; (c = d.message[j]) != '\0'; ++j)
+            uint8_t n = 0;
+            for(uint8_t j = char_progress; (c = d.message[j]) != '\0'; ++j)
                 if(c == '\n') ++n;
             d.numquestions = n;
             MY_ASSERT(n + 1 <= 3);
@@ -511,8 +511,8 @@ static void update_dialog()
 static void update_tp()
 {
     auto& d = sdata.tp;
-    ++d.frame;
-    if(d.frame == TELEPORT_TRANSITION_FRAMES)
+    uint8_t frame = ++d.frame;
+    if(frame == TELEPORT_TRANSITION_FRAMES)
     {
         px = d.tx * 16;
         py = d.ty * 16;
@@ -521,7 +521,7 @@ static void update_tp()
         load_chunks();
         run_chunks();
     }
-    if(d.frame == TELEPORT_TRANSITION_FRAMES * 2) change_state(STATE_MAP);
+    if(frame == TELEPORT_TRANSITION_FRAMES * 2) change_state(STATE_MAP);
 }
 
 static void update_game_over()

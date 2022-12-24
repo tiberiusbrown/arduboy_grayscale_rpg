@@ -32,8 +32,8 @@ static bool run_chunk()
         uint24_t addr = MAPDATA + uint24_t(ci) * sizeof(map_chunk_t);
         platform_fx_read_data_bytes(addr, c.tiles_flat, 32);
     }
-    uint8_t walk_tile = 255;
-    uint8_t sel_tile = 255;
+    uint8_t walk_tile = INVALID;
+    uint8_t sel_tile = INVALID;
     bool sel_sprite = false;
     {
         static_assert(MAP_CHUNK_COLS <= 32, "expand tx to 16-bit");
@@ -65,8 +65,8 @@ static bool run_chunk()
             sel_tile = dy * 8 + dx;
             uint8_t ex = sprite.x;
             uint8_t ey = sprite.y;
-            dx = uint8_t((selx & 127) - ex);
-            dy = uint8_t((sely &  63) - ey);
+            dx = uint8_t(uint8_t(selx & 127) - ex);
+            dy = uint8_t(uint8_t(sely &  63) - ey);
             if((dx | dy) < 16)
                 sel_sprite = true;
         }
@@ -130,7 +130,7 @@ static bool run_chunk()
             if(story_flag_get(f)) break;
             change_state(STATE_BATTLE);
             sdata.battle.remove_enemy = (instr == CMD_EBAT);
-            sdata.battle.enemy_chunk = running_chunk;
+            //sdata.battle.enemy_chunk = running_chunk;
             for(uint8_t i = 0; i < 4; ++i)
             {
                 auto& enemy = sdata.battle.enemies[i];

@@ -414,7 +414,7 @@ void update_battle()
     case BPHASE_INTRO:
         if(d.frame == 8 && d.remove_enemy)
         {
-            chunk_sprites[d.enemy_chunk].active = false;
+            chunk_sprites[running_chunk].active = false;
             init_sprites();
         }
         if(d.frame == 33)

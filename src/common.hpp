@@ -403,7 +403,7 @@ struct sdata_battle
     //uint8_t selframe;
     uint16_t flag;
     bool remove_enemy;
-    uint8_t enemy_chunk;
+    //uint8_t enemy_chunk;
     battle_member_t enemies[4];
     uint8_t pdef, edef; // party/enemy defender (-1 for none)
 
