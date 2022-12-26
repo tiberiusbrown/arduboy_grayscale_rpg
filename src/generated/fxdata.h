@@ -11,8 +11,8 @@ using uint24_t = uint32_t;
 
 // Initialize FX hardware using  FX::begin(FX_DATA_PAGE); in the setup() function.
 
-constexpr uint16_t FX_DATA_PAGE  = 0xf9e8;
-constexpr uint24_t FX_DATA_BYTES = 399184;
+constexpr uint16_t FX_DATA_PAGE  = 0xf9e6;
+constexpr uint24_t FX_DATA_BYTES = 399712;
 
 constexpr uint24_t MAPDATA = 0x000000;
 constexpr uint24_t PORTRAIT_IMG = 0x038000;
@@ -49,6 +49,6 @@ constexpr uint24_t SONG_DEFEAT = 0x05F8D3;
 constexpr uint24_t SFX_HIT = 0x05F9CC;
 constexpr uint24_t SFX_SOLVED = 0x05F9D6;
 constexpr uint24_t ITEM_STRINGS = 0x05F9E7;
-constexpr uint24_t PORTRAIT_STRINGS = 0x060227;
-constexpr uint24_t GAME_OVER_MESSAGES = 0x060353;
-constexpr uint24_t STRINGDATA = 0x06071F;
+constexpr uint24_t PORTRAIT_STRINGS = 0x060437;
+constexpr uint24_t GAME_OVER_MESSAGES = 0x060563;
+constexpr uint24_t STRINGDATA = 0x06092F;

@@ -87,7 +87,7 @@ def convert_path(obj):
             tiles[0] += (tiles[-1] & 0xe0)
             tiles.pop(-1)
         if len(tiles) > CHUNK_ENEMY_PATH_SIZE:
-            print('Path too long in chunk %d' % chunk)
+            print('Path too long at %d,%d' % (obj.x, obj.y))
             sys.exit(1)
     else:
         #TODO: point shapes

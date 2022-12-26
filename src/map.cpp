@@ -543,14 +543,14 @@ void load_chunks()
         }
     }
     // diagonal shifts
-    if(cx == pcx + 1 && cy == pcy + 1)
-        shift_chunk(3, 0);
-    if(cx + 1 == pcx && cy + 1 == pcy)
+    if(cx == uint8_t(pcx + 1) && cy == uint8_t(pcy + 1)) // SE
         shift_chunk(0, 3);
-    if(cx == pcx + 1 && cy + 1 == pcy)
-        shift_chunk(1, 2);
-    if(cx + 1 == pcx && cy == pcy + 1)
+    if(uint8_t(cx + 1) == pcx && uint8_t(cy + 1) == pcy) // SW
+        shift_chunk(3, 0);
+    if(cx == uint8_t(pcx + 1) && uint8_t(cy + 1) == pcy) // NE
         shift_chunk(2, 1);
+    if(uint8_t(cx + 1) == pcx && cy == uint8_t(pcy + 1)) // SW
+        shift_chunk(1, 2);
 
     load_chunk(0, cx + 0, cy + 0);
     load_chunk(1, cx + 1, cy + 0);

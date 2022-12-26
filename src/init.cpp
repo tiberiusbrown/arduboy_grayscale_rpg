@@ -36,6 +36,8 @@ void new_game()
     story_flag_set(SFLAG_charlie_raptor);
     story_flag_set(SFLAG_story_got_fish);
     story_flag_set(SFLAG_story_fish_delivered);
+    px = 500;
+    py = 1300;
 }
 
 void initialize()

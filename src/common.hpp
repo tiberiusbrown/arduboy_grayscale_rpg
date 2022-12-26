@@ -411,7 +411,7 @@ struct sdata_battle
     uint8_t psel;       // party member select
     uint8_t msel;       // menu select
     uint8_t msely;
-    uint8_t menuy;       // menu position
+    uint8_t menuy;      // menu position
     uint8_t menuy_target;
 
     battle_phase_t phase;
@@ -685,7 +685,7 @@ void render_battle();
 
 // items.cpp
 void use_consumable(uint8_t user, uint8_t i);
-bool user_is_wearing(uint8_t user, item_t i);
+bool user_is_wearing(uint8_t user, item_t i) FORCE_NOINLINE;
 int8_t items_att(uint8_t user);
 int8_t items_def(uint8_t user);
 int8_t items_spd(uint8_t user);

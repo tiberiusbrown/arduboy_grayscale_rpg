@@ -13,7 +13,7 @@ void back_to_map()
         change_state(STATE_MAP);
 }
 
-static inline bool rect_intersect(
+static bool rect_intersect(
     uint16_t x0, uint16_t y0, uint8_t w0, uint8_t h0,
     uint16_t x1, uint16_t y1, uint8_t w1, uint8_t h1)
 {

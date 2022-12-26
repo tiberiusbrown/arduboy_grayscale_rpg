@@ -13,6 +13,7 @@ Att,Def,Spd,MHP,Type,Name,Description,Location
 1,1,,,shoes,Fighter’s Boots,"+1 attack, +1 defense.",
 1,,,,ring,Fighter’s Ring,+1 attack.,
 1,2,,,armor,Fighter’s Tunic,"+1 attack, +2 defense.",
+2,,1,,weapon,Katana,"+1 attack, +1 speed.",
 ,2,,,armor,Leather Tunic,Rough yet tough. +2 defense.,
 ,2,1,,armor,Ninja Gi,"+1 speed, +2 defense.",
 ,1,1,,helm,Ninja Mask,"+1 speed, +1 defense.",
@@ -20,4 +21,9 @@ Att,Def,Spd,MHP,Type,Name,Description,Location
 ,1,,,helm,Simple Cloth Hat,If only it covered the ears. +1 defense.,village north chest
 ,2,,1,armor,Studded Leather Tunic,"Rough yet tough. +2 defense, +1 max health.",chest north of first cave exit
 ,,5,,ring,Tempus Ring,It hums and vibrates unnaturally. +5 speed.,
-2,,1,,weapon,Katana,"+1 attack, +1 speed.",
+,,,,ring,Dryad Ring,+5 max health if using at least three Dryad items.,
+,,,,amulet,Dryad Amulet,+5 max health if using at least three Dryad items.,
+,,,,shield,Dryad Shield,+5 max health if using at least three Dryad items.,
+,,,,armor,Dryad Armor,+5 max health if using at least three Dryad items.,
+,,,,shoes,Dryad Shoes,+5 max health if using at least three Dryad items.,
+,,,,helm,Dryad Helm,+5 max health if using at least three Dryad items.,

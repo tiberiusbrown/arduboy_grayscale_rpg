@@ -55,6 +55,25 @@ uint8_t party_mhp(uint8_t i)
     uint8_t id = party[i].battle.id;
     int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_mhp);
     r += items_mhp(i);
+    {
+        // Dryad items
+        uint8_t n = 0;
+        static item_t const DRYAD_ITEMS[] PROGMEM =
+        {
+            SFLAG_ITEM_Dryad_Amulet,
+            SFLAG_ITEM_Dryad_Ring,
+            SFLAG_ITEM_Dryad_Armor,
+            SFLAG_ITEM_Dryad_Shoes,
+            SFLAG_ITEM_Dryad_Shield,
+            SFLAG_ITEM_Dryad_Helm,
+        };
+        uint8_t const* ptr = DRYAD_ITEMS;
+        for(uint8_t j = 0; j < 6; ++j)
+            if(user_is_wearing(i, pgm_read_byte_inc(ptr)))
+                n += 5;
+        if(n >= 3 * 5)
+            r += n;
+    }
     if(r < 1) r = 1;
     if(r > 99) r = 99;
     return r;
