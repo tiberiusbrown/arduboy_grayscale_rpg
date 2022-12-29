@@ -8,13 +8,15 @@ static char const EN_DARK_GUARD[] PROGMEM = "Dark Guard";
 static char const EN_DARK_WIZARD[] PROGMEM = "Dark Wizard";
 static char const EN_SKELETON[] PROGMEM = "Skeleton";
 static char const EN_PSY_RAPTOR[] PROGMEM = "Psy-Raptor";
+static char const EN_DARK_RAPTOR[] PROGMEM = "Dark Raptor";
 
 enemy_info_t const ENEMY_INFO[] PROGMEM =
 {
-    {  4, 4, 0, 4, 10,  64, 128, EN_DARK_GUARD },
-    {  5, 4, 0, 4,  6,   0, 255, EN_DARK_WIZARD },
-    { 10, 1, 0, 1,  6,   0,   0, EN_SKELETON },
-    { 13, 1, 0, 3,  3,   0,   0, EN_PSY_RAPTOR },
+    {  4, 4, 2, 4, 10,  64, 128, }, //EN_DARK_GUARD },
+    {  5, 4, 0, 4,  6,   0, 255, }, //EN_DARK_WIZARD },
+    { 10, 1, 0, 1,  6,   0,   0, }, //EN_SKELETON },
+    { 13, 1, 0, 3,  3,   0,   0, }, //EN_PSY_RAPTOR },
+    { 15, 3, 1, 5,  5,   0, 128, }, //EN_DARK_RAPTOR },
 };
 
 static char const PN_MATTHIAS[] PROGMEM = "Matthias";

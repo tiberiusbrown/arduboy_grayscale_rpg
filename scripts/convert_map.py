@@ -59,30 +59,30 @@ def convert_path(obj):
         chunks = [pixel_to_chunk(pt.x, pt.y) for pt in obj.points]
         for c in chunks:
             if c != chunk:
-                print('Path between two chunks: chunk %d' % chunk)
+                print('Path between two chunks at %d,%d' % (obj.x, obj.y))
                 sys.exit(1)
         i = 1
         openpath = 0 if obj.closed else 1
         if not openpath and not(
                 ((tiles[0] & 0x07) == (tiles[-1] & 0x07)) or
                 ((tiles[0] & 0x18) == (tiles[-1] & 0x18))):
-            print('Non orthogonal path: chunk %d' % chunk)
+            print('Non orthogonal path at %d,%d' % chunk)
         while i < len(tiles):
             if not(
                     ((tiles[i] & 0x07) == (tiles[i-1] & 0x07)) or
                     ((tiles[i] & 0x18) == (tiles[i-1] & 0x18))):
-                print('Non orthogonal path: chunk %d' % chunk)
+                print('Non orthogonal path at %d,%d' % (obj.x, obj.y))
             if tiles[i] == tiles[i-1] & 0x1f:
                 tiles[i-1] += 0x20
                 if tiles[i-1] & 0xe0 == 0:
-                    print('Too many path delays: chunk %d' % chunk)
+                    print('Too many path delays at %d,%d' % (obj.x, obj.y))
                     sys.exit(1)
                 tiles.pop(i)
             else:
                 i += 1
         if tiles[0] == tiles[-1] & 0x1f:
             if (tiles[0] >> 5) + (tiles[-1] >> 5) > 7:
-                print('Too many path delays: chunk %d' % chunk)
+                print('Too many path delays: chunk %d' % (obj.x, obj.y))
                 sys.exit(1)
             tiles[0] += (tiles[-1] & 0xe0)
             tiles.pop(-1)

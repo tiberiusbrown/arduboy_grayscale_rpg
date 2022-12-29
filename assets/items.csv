@@ -1,29 +1,35 @@
 Att,Def,Spd,MHP,Type,Name,Description,Location
 ,,,,amulet,Amulet of Zhar-Tul,The wearer may attack twice per turn.,
-1,,,,weapon,Brass Knuckles,Is that tarnish or old blood? +1 attack.,chest outside of southwest village fence
-,1,,3,shoes,Brawler’s Boots,"+1 defense, +3 max health.",
-,1,,3,helm,Brawler’s Cowl,"+1 defense, +3 max health.",
-,,,4,ring,Brawler’s Ring,+4 max health.,
-,2,,3,armor,Brawler’s Tunic,"+2 defense, +3 max health.",
-,1,,,shoes,Cloth Shoes,"Better than barefoot, but not by much! +1 defense.",east bridge chest
+,,,,amulet,Dryad Amulet,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
+,2,,3,armor,Brawler’s Tunic,"+2 defense, +3 max health.",raptor forest ne beach chest
 ,1,,,armor,Cloth Tunic,"Worn and scruffy, but warm enough. +1 defense.",Matthias’s dresser
 ,4,,,armor,Defender’s Breastplate,+4 defense. The wearer does not stop defending at start of turn.,
-,4,-4,,ring,Dreamer’s Ring,"Where did this come from? +4 defense, -4 speed.",chest in dream
-,,,1,helm,Fancy Cloth Hat,It looks completely ridiculous. +1 max health.,light’s out dungeon
-1,1,,,shoes,Fighter’s Boots,"+1 attack, +1 defense.",
-1,,,,ring,Fighter’s Ring,+1 attack.,
-1,2,,,armor,Fighter’s Tunic,"+1 attack, +2 defense.",
-2,,1,,weapon,Katana,"+1 attack, +1 speed.",
-,2,,,armor,Leather Tunic,Rough yet tough. +2 defense.,
+,,,,armor,Dryad Armor,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
+1,2,,,armor,Fighter’s Tunic,"+1 attack, +2 defense.",raptor forest ne beach chest
+,2,,,armor,Leather Tunic,Rough yet tough. +2 defense.,raptor forest nw beach chest
 ,2,1,,armor,Ninja Gi,"+1 speed, +2 defense.",
-,1,1,,helm,Ninja Mask,"+1 speed, +1 defense.",
-,1,1,,shoes,Ninja Shoes,"+1 speed, +1 defense.",
-,1,,,helm,Simple Cloth Hat,If only it covered the ears. +1 defense.,village north chest
 ,2,,1,armor,Studded Leather Tunic,"Rough yet tough. +2 defense, +1 max health.",chest north of first cave exit
-,,5,,ring,Tempus Ring,It hums and vibrates unnaturally. +5 speed.,
-,,,,ring,Dryad Ring,+5 max health if using at least three Dryad items.,
-,,,,amulet,Dryad Amulet,+5 max health if using at least three Dryad items.,
-,,,,shield,Dryad Shield,+5 max health if using at least three Dryad items.,
-,,,,armor,Dryad Armor,+5 max health if using at least three Dryad items.,
-,,,,shoes,Dryad Shoes,+5 max health if using at least three Dryad items.,
-,,,,helm,Dryad Helm,+5 max health if using at least three Dryad items.,
+,1,,3,helm,Brawler’s Cowl,"+1 defense, +3 max health.",
+,,,,helm,Dryad Helm,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
+,,,1,helm,Fancy Cloth Hat,It looks completely ridiculous. +1 max health.,light’s out dungeon
+,1,1,,helm,Ninja Mask,"+1 speed, +1 defense.",raptor forest n beach chest
+,1,,,helm,Simple Cloth Hat,If only it covered the ears. +1 defense.,village north chest
+,,,4,ring,Brawler’s Ring,+4 max health.,double tree in NW raptor forest
+,4,-4,,ring,Dreamer’s Ring,"Where did this come from? +4 defense, -4 speed.",chest in dream
+,,,,ring,Dryad Ring,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
+1,,,,ring,Fighter’s Ring,+1 attack.,raptor forest n beach chest
+,,5,,ring,Tempus Ring,It hums and vibrates unnaturally. +5 speed.,raptor forest e beach chest
+,,,,shield,Dryad Shield,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
+1,3,,,shield,Spiked Shield,"+1 attack, +3 defense.",
+,2,,,shield,Leather Shield,Not too shabby. +2 defense.,raptor forest n beach chest
+,3,,1,shield,Studded Leather Shield,"+3 defense, +1 max health.",
+,6,-2,,shield,Iron Shield,"A bit heavy but quite durable. +6 defense, -2 speed.",
+,1,,3,shoes,Brawler’s Boots,"+1 defense, +3 max health.",
+,1,,,shoes,Cloth Shoes,"Better than barefoot, but not by much! +1 defense.",east bridge chest
+,,,,shoes,Dryad Shoes,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
+1,1,,,shoes,Fighter’s Boots,"Hidden toe blades! +1 attack, +1 defense.",raptor forest peninsula chest
+,1,1,,shoes,Ninja Shoes,"So stealthy! Call them sneak-ers? +1 speed, +1 defense.",raptor forest ne beach chest
+1,,,,weapon,Brass Knuckles,Is that tarnish or old blood? +1 attack.,chest outside of southwest village fence
+2,,1,,weapon,Rusty Katana,"Once a fine weapon. +2 attack, +1 speed.",raptor forest nw beach chest
+4,,2,,weapon,Katana,"For those who have been studying the blade. +4 attack, +2 speed.",
+1,,1,,weapon,Crude Iron Dagger,"Probably could use some sharpening. +1 attack, +1 speed.",
