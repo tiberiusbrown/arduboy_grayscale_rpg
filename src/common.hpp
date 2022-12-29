@@ -257,13 +257,18 @@ enum {
     IT_CONSUMABLE,
     IT_NUM_CATS
 };
+
+
+
+
 struct item_info_t
 {
+    uint8_t type;
     // modifiers
     int8_t att, def, spd, mhp;
-    uint8_t type;
+    char name[ITEM_NAME_LEN];
+    char desc[ITEM_DESC_LEN];
 };
-extern item_info_t const ITEM_INFO[] PROGMEM;
 
 constexpr size_t ITEM_BYTES = (NUM_ITEMS + 7) / 8;
 static_assert(NUM_ITEMS <= 255, "revisit item_id");
@@ -284,7 +289,7 @@ struct sdata_items
     uint8_t consfill;
     uint8_t conspause;
     bool battle;         // whether we are in battle
-    char str[ITEM_TOTAL_LEN];
+    char str[ITEM_NAME_LEN + ITEM_DESC_LEN];
 };
 struct sdata_pause
 {
@@ -345,7 +350,7 @@ struct enemy_info_t
     uint8_t mhp;
     uint8_t defend;         // chance to defend
     uint8_t target_weakest; // chance to target lowest hp party member
-    char const* name;
+    //char const* name;
 };
 extern enemy_info_t const ENEMY_INFO[] PROGMEM;
 

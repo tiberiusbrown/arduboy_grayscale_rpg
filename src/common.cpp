@@ -2,8 +2,6 @@
 
 #include <string.h>
 
-#include "generated/item_info_prog.hpp"
-
 static char const EN_DARK_GUARD[] PROGMEM = "Dark Guard";
 static char const EN_DARK_WIZARD[] PROGMEM = "Dark Wizard";
 static char const EN_SKELETON[] PROGMEM = "Skeleton";

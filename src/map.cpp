@@ -202,8 +202,8 @@ static bool run_chunk()
                     ptr += dec_to_str(ptr, (uint8_t)diff);
                     store_inc(ptr, ' ');
                     platform_fx_read_data_bytes(
-                        ITEM_STRINGS + ITEM_TOTAL_LEN * NUM_ITEMS + ITEM_TOTAL_LEN * (dst - 8),
-                        ptr, ITEM_TOTAL_LEN);
+                        ITEM_INFO + 5 + sizeof(item_info_t) * (NUM_ITEMS + dst - 8),
+                        ptr, ITEM_NAME_LEN + ITEM_DESC_LEN);
                     for(uint8_t i = 0; i < ITEM_NAME_LEN - 1; ++i)
                     {
                         char& c = ptr[i];
@@ -239,9 +239,9 @@ static bool run_chunk()
                 static char const YOU_FOUND[] PROGMEM = "Item: ";
                 memcpy_P(sdata.dialog.message, YOU_FOUND, sizeof(YOU_FOUND));
                 platform_fx_read_data_bytes(
-                    ITEM_STRINGS + ITEM_TOTAL_LEN * f,
+                    ITEM_INFO + 5 + sizeof(item_info_t) * f,
                     &sdata.dialog.message[sizeof(YOU_FOUND) - 1],
-                    ITEM_TOTAL_LEN);
+                    ITEM_NAME_LEN + ITEM_DESC_LEN);
                 for(uint8_t i = 0; i < ITEM_NAME_LEN - 1; ++i)
                 {
                     char& c = sdata.dialog.message[sizeof(YOU_FOUND) - 1 + i];

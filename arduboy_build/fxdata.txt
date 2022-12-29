@@ -58,7 +58,8 @@ uint8_t SFX_SOLVED[] = {
 };
 
 // put string data last to avoid large diffs in git when scripts are updated
-raw_t ITEM_STRINGS = "item_strings.bin"
+raw_t ITEM_INFO = "item_info.bin"
+//raw_t ITEM_STRINGS = "item_strings.bin"
 raw_t PORTRAIT_STRINGS = "portrait_strings.bin"
 raw_t GAME_OVER_MESSAGES = "game_over_messages.bin"
 raw_t STRINGDATA = "stringdata.bin"

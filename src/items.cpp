@@ -28,12 +28,17 @@ void foreach_next_helper(
 
 static int8_t items_stat(uint8_t user, uint8_t offset)
 {
-    int8_t const* ptr = (int8_t const*)ITEM_INFO + offset;
     int16_t total = 0;
 
+    uint24_t addr = ITEM_INFO + offset;
     for(auto i : party[user].equipped_items)
-        if(i != INVALID_ITEM)
-            total += (int8_t)pgm_read_byte(ptr + sizeof(item_info_t) * i);
+    {
+        if(i == INVALID_ITEM) continue;
+        int8_t stat;
+        platform_fx_read_data_bytes(
+            addr + sizeof(item_info_t) * i, &stat, 1);
+        total += stat;
+    }
 
     if(total < -99) total = -99;
     if(total > +99) total = +99;
@@ -48,7 +53,9 @@ int8_t items_mhp(uint8_t user) { return items_stat(user, offsetof(item_info_t, m
 static uint8_t item_cat(item_t i) FORCE_NOINLINE;
 uint8_t item_cat(item_t i)
 {
-    return pgm_read_byte(&ITEM_INFO[i].type);
+    uint8_t cat;
+    platform_fx_read_data_bytes(ITEM_INFO + sizeof(item_info_t) * i, &cat, 1);
+    return cat;
 }
 
 bool user_is_wearing(uint8_t user, item_t i)
@@ -214,13 +221,13 @@ static inline void render_item_row(
     int8_t rowy = y + row * 10 + 13;
     if(d.n == pn)
     {
-        num = ITEM_TOTAL_LEN;
+        num = ITEM_NAME_LEN + ITEM_DESC_LEN;
         platform_drawrect_i8((int8_t)x, rowy, 128, 10, DARK_GRAY);
     }
     else
         num = ITEM_NAME_LEN;
     platform_fx_read_data_bytes(
-        ITEM_STRINGS + ITEM_TOTAL_LEN * i, d.str, num);
+        (ITEM_INFO + 5) + sizeof(item_info_t) * i, d.str, num);
     // find if there is a user who has the item equipped
     for(uint8_t user = 0; user < nparty; ++user)
     {
@@ -242,13 +249,13 @@ static inline void render_consumable_row(
     bool selected = (d.n == d.off + n);
     if(selected)
     {
-        num = ITEM_TOTAL_LEN;
+        num = ITEM_NAME_LEN + ITEM_DESC_LEN;
         platform_drawrect_i8(x, rowy, 128, 10, DARK_GRAY);
     }
     else
         num = ITEM_NAME_LEN;
     platform_fx_read_data_bytes(
-        ITEM_STRINGS + ITEM_TOTAL_LEN * NUM_ITEMS + ITEM_TOTAL_LEN * ni,
+        ITEM_INFO + 5 + sizeof(item_info_t) * NUM_ITEMS + sizeof(item_info_t) * ni,
         d.str, num);
     draw_text_noclip(x + 2, rowy + 1, d.str);
     {
