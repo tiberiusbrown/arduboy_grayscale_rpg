@@ -2,6 +2,27 @@
 
 #include <string.h>
 
+uint8_t const SPRITE_FLAGS[] PROGMEM =
+{
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    SF_ALWAYS_ANIM | SF_FAST_ANIM, // psy raptor
+    SF_DONT_STOP | SF_ALWAYS_ANIM | SF_FAST_ANIM |
+    SF_FAST_ANIM2 | SF_FAST | SF_SMALL_RECT, // spike ball
+    SF_ALWAYS_ANIM | SF_FAST_ANIM, // dark raptor
+};
+
 static char const EN_DARK_GUARD[] PROGMEM = "Dark Guard";
 static char const EN_DARK_WIZARD[] PROGMEM = "Dark Wizard";
 static char const EN_SKELETON[] PROGMEM = "Skeleton";
@@ -30,11 +51,33 @@ party_info_t const PARTY_INFO[4] PROGMEM =
     { 3, 3, 6, 1, 0, 1, PN_DISMAS },
 };
 
+static uint8_t user_item_count(uint8_t i, item_t const* items, uint8_t count)
+{
+    uint8_t n = 0;
+    do
+    {
+        if(user_is_wearing(i, pgm_read_byte_inc(items)))
+            ++n;
+    } while(--count != 0);
+    return n;
+}
+
 uint8_t party_att(uint8_t i)
 {
     uint8_t id = party[i].battle.id;
     int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_att);
     r += items_att(i);
+    if(party[i].equipped_items[IT_ARMOR] == INVALID)
+    {
+        // barbarian items
+        static item_t const BARBARIAN_ITEMS[] PROGMEM =
+        {
+            SFLAG_ITEM_Barbarian_s_Axe,
+            SFLAG_ITEM_Barbarian_s_Helm,
+            SFLAG_ITEM_Barbarian_s_Footwraps,
+        };
+        r += user_item_count(i, BARBARIAN_ITEMS, 3) * 2;
+    }
     if(r < 1) r = 1;
     if(r > 99) r = 99;
     return (uint8_t)r;
@@ -57,7 +100,6 @@ uint8_t party_mhp(uint8_t i)
     r += items_mhp(i);
     {
         // Dryad items
-        uint8_t n = 0;
         static item_t const DRYAD_ITEMS[] PROGMEM =
         {
             SFLAG_ITEM_Dryad_Amulet,
@@ -67,12 +109,9 @@ uint8_t party_mhp(uint8_t i)
             SFLAG_ITEM_Dryad_Shield,
             SFLAG_ITEM_Dryad_Helm,
         };
-        uint8_t const* ptr = DRYAD_ITEMS;
-        for(uint8_t j = 0; j < 6; ++j)
-            if(user_is_wearing(i, pgm_read_byte_inc(ptr)))
-                n += 5;
-        if(n >= 3 * 5)
-            r += n;
+        uint8_t n = user_item_count(i, DRYAD_ITEMS, 6);
+        if(n >= 3)
+            r += n * 5;
     }
     if(r < 1) r = 1;
     if(r > 99) r = 99;

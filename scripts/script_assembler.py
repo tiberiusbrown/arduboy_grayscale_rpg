@@ -23,6 +23,10 @@ tiles = {
     'T_DungeonButtonOff'  : 56,
     'T_DungeonButtonOn'   : 55,
     'T_OutdoorRock'       : 141,
+    'T_Grass1'            : 10,
+    'T_Grass2'            : 11,
+    'T_Grass3'            : 26,
+    'T_Grass4'            : 27,
     }
 
 def id_helper(x):

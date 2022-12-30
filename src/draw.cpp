@@ -160,12 +160,13 @@ static bool add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     bool walking = e.walking;
     if(d & 0x80) walking = false;
     uint8_t nf = nframe >> 1;
-    if(e.type == 13)
-        walking = true, nf >>= 1;
-    else if(e.type == 14)
-        /* walking = true */;
-    else
-        nf >>= 2;
+    uint8_t flags = pgm_read_byte(&SPRITE_FLAGS[e.type]);
+    if(flags & SF_ALWAYS_ANIM)
+        walking = true;
+    if(!(flags & SF_FAST_ANIM))
+        nf >>= 1;
+    if(!(flags & SF_FAST_ANIM2))
+        nf >>= 1;
     if(walking)
     {
         f += (d & 7) * 2;

@@ -48,7 +48,8 @@ bool sprite_contacts_player(active_chunk_t const& c, sprite_t const& e)
 static inline void update_sprite(active_chunk_t& c, sprite_t& e)
 {
     if(!e.active) return;
-    if(e.type != 14 && (nframe & 1)) return;
+    uint8_t flags = pgm_read_byte(&SPRITE_FLAGS[e.type]);
+    if(!(flags & SF_FAST) && (nframe & 1)) return;
 
     // no path or just waiting on a single tile
     if(e.path_num <= 1)
@@ -57,7 +58,7 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
     // check collision with player
     if(state == STATE_MAP || state == STATE_TITLE)
         e.walking = !sprite_contacts_player(c, e);
-    if(e.type == 14) e.walking = true;
+    if(flags & SF_DONT_STOP) e.walking = true;
     if(!e.walking)
         return;
 

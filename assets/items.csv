@@ -14,6 +14,7 @@ Att,Def,Spd,MHP,Type,Name,Description,Location
 ,,,1,helm,Fancy Cloth Hat,It looks completely ridiculous. +1 max health.,light’s out dungeon
 ,1,1,,helm,Ninja Mask,"+1 speed, +1 defense.",raptor forest n beach chest
 ,1,,,helm,Simple Cloth Hat,If only it covered the ears. +1 defense.,village north chest
+,1,,,helm,Barbarian’s Helm,+1 defense. +2 attack if not wearing armor.,
 ,,,4,ring,Brawler’s Ring,+4 max health.,double tree in NW raptor forest
 ,4,-4,,ring,Dreamer’s Ring,"Where did this come from? +4 defense, -4 speed.",chest in dream
 ,,,,ring,Dryad Ring,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
@@ -29,7 +30,10 @@ Att,Def,Spd,MHP,Type,Name,Description,Location
 ,,,,shoes,Dryad Shoes,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
 1,1,,,shoes,Fighter’s Boots,"Hidden toe blades! +1 attack, +1 defense.",raptor forest peninsula chest
 ,1,1,,shoes,Ninja Shoes,"So stealthy! Call them sneak-ers? +1 speed, +1 defense.",raptor forest ne beach chest
+,,1,,shoes,Barbarian’s Footwraps,+1 speed. +2 attack if not wearing armor.,
 1,,,,weapon,Brass Knuckles,Is that tarnish or old blood? +1 attack.,chest outside of southwest village fence
 2,,1,,weapon,Rusty Katana,"Once a fine weapon. +2 attack, +1 speed.",raptor forest nw beach chest
 4,,2,,weapon,Katana,"For those who have been studying the blade. +4 attack, +2 speed.",
 1,,1,,weapon,Crude Iron Dagger,"Probably could use some sharpening. +1 attack, +1 speed.",
+2,,,,weapon,Crude Iron Sword,+2 attack.,
+1,,,,weapon,Barbarian’s Axe,+1 attack. +2 additional attack if not wearing armor.,

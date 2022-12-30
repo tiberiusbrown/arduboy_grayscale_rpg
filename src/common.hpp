@@ -258,9 +258,6 @@ enum {
     IT_NUM_CATS
 };
 
-
-
-
 struct item_info_t
 {
     uint8_t type;
@@ -469,6 +466,15 @@ void change_state(uint8_t new_state);
 
 extern bool pmoving;        // whether player is moving
 extern uint16_t selx, sely; // selected tile
+
+// sprite flags
+constexpr uint8_t SF_FAST        = 1 << 0; // double move speed
+constexpr uint8_t SF_FAST_ANIM   = 1 << 1; // double frame speed
+constexpr uint8_t SF_FAST_ANIM2  = 1 << 2; // double frame speed again
+constexpr uint8_t SF_SMALL_RECT  = 1 << 3; // smaller collision size
+constexpr uint8_t SF_ALWAYS_ANIM = 1 << 4; // always animating
+constexpr uint8_t SF_DONT_STOP   = 1 << 5; // don't stop for player
+extern uint8_t const SPRITE_FLAGS[] PROGMEM;
 
 struct sprite_t
 {
