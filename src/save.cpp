@@ -14,10 +14,14 @@ static uint8_t const IDENTIFIER[8] PROGMEM =
 };
 
 enum { SS_IDLE, SS_ERASE, SS_PROGRAM, SS_DONE };
-static uint8_t save_stage = SS_IDLE;
-static uint8_t save_page = 0;
-static uint8_t save_sound;
-static bool save_sound_resume;
+//static uint8_t save_stage = SS_IDLE;
+//static uint8_t save_page = 0;
+//static uint8_t save_sound;
+//static bool save_sound_resume;
+static auto& save_stage = sdata.pause.save_stage;
+static auto& save_page = sdata.pause.save_page;
+static auto& save_sound = sdata.pause.save_sound;
+static auto& save_sound_resume = sdata.pause.save_sound_resume;
 
 void save_begin()
 {

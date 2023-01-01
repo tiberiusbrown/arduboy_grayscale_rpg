@@ -310,6 +310,10 @@ struct sdata_pause
 
     uint8_t savey;
     uint8_t save_wait;
+    uint8_t save_stage;
+    uint8_t save_page;
+    uint8_t save_sound;
+    bool save_sound_resume;
 
     uint8_t partyy;
     uint8_t partyi;
