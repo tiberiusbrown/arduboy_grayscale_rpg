@@ -30,6 +30,13 @@ void new_game()
     party[0].battle.id = 0;
     party[0].battle.hp = party_mhp(0);
 
+    for(int i = 0; i < 4; ++i)
+    {
+        party[i].battle.id = i;
+        party[i].battle.hp = party_mhp(i);
+    }
+    nparty = 4;
+
     LOC_home_outside();
     story_flag_set(SFLAG_story_charlie_job);
     story_flag_set(SFLAG_tip_objective);
@@ -38,6 +45,8 @@ void new_game()
     story_flag_set(SFLAG_story_fish_delivered);
     px = 500;
     py = 1300;
+    savefile.chunk_regs[8] = 3;
+    savefile.chunk_regs[9] = 3;
 }
 
 void initialize()

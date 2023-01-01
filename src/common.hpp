@@ -285,8 +285,7 @@ struct sdata_items
     uint8_t consw;
     uint8_t consfill;
     uint8_t conspause;
-    bool battle;         // whether we are in battle
-    char str[ITEM_NAME_LEN + ITEM_DESC_LEN];
+    char str[ITEM_NAME_LEN < ITEM_DESC_LEN ? ITEM_DESC_LEN : ITEM_NAME_LEN];
 };
 struct sdata_pause
 {

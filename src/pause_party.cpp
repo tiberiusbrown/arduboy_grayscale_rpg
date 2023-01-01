@@ -57,7 +57,7 @@ static void render_pause_party_offset(int8_t x, int8_t y, uint8_t i)
     char const* name = pgmptr(&pi->name);
 
 #if 1
-    platform_fx_drawoverwrite(x, y + 32, INNATES_IMG, i);
+    platform_fx_drawoverwrite(x, y, INNATES_IMG, i);
 #else
     {
         char t[] = "While defending, Dismas strikes his attacker at half damage.";
@@ -68,10 +68,10 @@ static void render_pause_party_offset(int8_t x, int8_t y, uint8_t i)
 
     uint8_t sprite = pgm_read_byte(&pi->sprite);
     uint8_t portrait = pgm_read_byte(&pi->portrait);
-    platform_drawrect_i8(x, y, 36, 36, LIGHT_GRAY);
-    platform_fillrect_i8(x + 36, y + 15, 92, 1, LIGHT_GRAY);
-    platform_fx_drawoverwrite(x + 2, y + 2, PORTRAIT_IMG, portrait);
-    draw_text_noclip(x + 38, y + 6, name, NOCLIPFLAG_PROG);
+    //platform_drawrect_i8(x, y, 36, 36, LIGHT_GRAY);
+    //platform_fillrect_i8(x + 36, y + 15, 92, 1, LIGHT_GRAY);
+    //platform_fx_drawoverwrite(x + 2, y + 2, PORTRAIT_IMG, portrait);
+    //draw_text_noclip(x + 38, y + 6, name, NOCLIPFLAG_PROG);
     {
         // health
         char buf[8];
@@ -85,14 +85,14 @@ static void render_pause_party_offset(int8_t x, int8_t y, uint8_t i)
         // health bar
         constexpr uint8_t W = 75;
         constexpr uint8_t H = 2;
-        platform_drawrect_i8(x + 38, y + 0, W + 2, H + 2, DARK_GRAY);
+        //platform_drawrect_i8(x + 38, y + 0, W + 2, H + 2, DARK_GRAY);
         uint8_t mhp = party_mhp(i);
         uint8_t f = (b.hp * W + mhp / 2) / mhp;
         platform_fillrect_i8(x + 39, y + 1, f, H, WHITE);
     }
-    draw_text_noclip(x + 44, y + 17, PSTR("Attack:"), NOCLIPFLAG_PROG);
-    draw_text_noclip(x + 38, y + 26, PSTR("Defense:"), NOCLIPFLAG_PROG);
-    draw_text_noclip(x + 88, y + 26, PSTR("Speed:"), NOCLIPFLAG_PROG);
+    //draw_text_noclip(x + 44, y + 17, PSTR("Attack:"), NOCLIPFLAG_PROG);
+    //draw_text_noclip(x + 38, y + 26, PSTR("Defense:"), NOCLIPFLAG_PROG);
+    //draw_text_noclip(x + 88, y + 26, PSTR("Speed:"), NOCLIPFLAG_PROG);
     draw_dec(x + 72, y + 17, party_att(i));
     draw_dec(x + 72, y + 26, party_def(i));
     draw_dec(x + 114, y + 26, party_spd(i));

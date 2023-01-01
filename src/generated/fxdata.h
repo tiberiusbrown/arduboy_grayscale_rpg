@@ -11,8 +11,8 @@ using uint24_t = uint32_t;
 
 // Initialize FX hardware using  FX::begin(FX_DATA_PAGE); in the setup() function.
 
-constexpr uint16_t FX_DATA_PAGE  = 0xf9d6;
-constexpr uint24_t FX_DATA_BYTES = 403854;
+constexpr uint16_t FX_DATA_PAGE  = 0xf9be;
+constexpr uint24_t FX_DATA_BYTES = 409998;
 
 constexpr uint24_t MAPDATA = 0x000000;
 constexpr uint24_t PORTRAIT_IMG = 0x038000;
@@ -36,19 +36,19 @@ constexpr uint24_t ARROWS_IMG = 0x050505;
 constexpr uint24_t A_ITEMS_IMG = 0x050567;
 constexpr uint24_t AP_IMG = 0x0505C3;
 constexpr uint24_t INNATES_IMG = 0x0505DD;
-constexpr uint24_t ITEM_CATS_IMG = 0x0517DF;
-constexpr uint24_t NO_ITEMS_IMG = 0x052381;
-constexpr uint24_t GOT_ITEM_IMG = 0x052F83;
-constexpr uint24_t TITLE_MASKED_IMG = 0x0530F9;
-constexpr uint24_t PRESS_A_IMG = 0x053653;
-constexpr uint24_t OBJECTIVE_ARROWS_IMG = 0x0537ED;
-constexpr uint24_t WORLD_IMG = 0x053DEF;
-constexpr uint24_t SONG_PEACEFUL = 0x05FDF1;
-constexpr uint24_t SONG_VICTORY = 0x0603A0;
-constexpr uint24_t SONG_DEFEAT = 0x0604D3;
-constexpr uint24_t SFX_HIT = 0x0605CC;
-constexpr uint24_t SFX_SOLVED = 0x0605D6;
-constexpr uint24_t ITEM_INFO = 0x0605E7;
-constexpr uint24_t PORTRAIT_STRINGS = 0x061465;
-constexpr uint24_t GAME_OVER_MESSAGES = 0x061591;
-constexpr uint24_t STRINGDATA = 0x06195D;
+constexpr uint24_t ITEM_CATS_IMG = 0x052FDF;
+constexpr uint24_t NO_ITEMS_IMG = 0x053B81;
+constexpr uint24_t GOT_ITEM_IMG = 0x054783;
+constexpr uint24_t TITLE_MASKED_IMG = 0x0548F9;
+constexpr uint24_t PRESS_A_IMG = 0x054E53;
+constexpr uint24_t OBJECTIVE_ARROWS_IMG = 0x054FED;
+constexpr uint24_t WORLD_IMG = 0x0555EF;
+constexpr uint24_t SONG_PEACEFUL = 0x0615F1;
+constexpr uint24_t SONG_VICTORY = 0x061BA0;
+constexpr uint24_t SONG_DEFEAT = 0x061CD3;
+constexpr uint24_t SFX_HIT = 0x061DCC;
+constexpr uint24_t SFX_SOLVED = 0x061DD6;
+constexpr uint24_t ITEM_INFO = 0x061DE7;
+constexpr uint24_t PORTRAIT_STRINGS = 0x062C65;
+constexpr uint24_t GAME_OVER_MESSAGES = 0x062D91;
+constexpr uint24_t STRINGDATA = 0x06315D;

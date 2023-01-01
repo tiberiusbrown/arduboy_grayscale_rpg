@@ -95,7 +95,7 @@ void update_items_numcat(sdata_items& d)
     d.item_count = 0;
 
     // restrict access to equippable items in battle
-    if(d.battle)
+    if(state == STATE_BATTLE)
         return;
 
     ROTA_FOREACH_ITEM(i, {
@@ -191,7 +191,7 @@ bool update_items(sdata_items& d)
                 }
             }
             d.consfill = d.consw = 0;
-            if(d.battle) return true;
+            if(state == STATE_BATTLE) return true;
         }
     }
     else if((btns_down & BTN_A) && d.cat == IT_CONSUMABLE)
@@ -217,17 +217,16 @@ static inline void render_item_row(
     uint8_t pn = n;
     ++n;
     if(row >= 3) return;
-    size_t num;
     int8_t rowy = y + row * 10 + 13;
     if(d.n == pn)
     {
-        num = ITEM_NAME_LEN + ITEM_DESC_LEN;
         platform_drawrect_i8((int8_t)x, rowy, 128, 10, DARK_GRAY);
+        platform_fx_read_data_bytes(
+            (ITEM_INFO + 5 + ITEM_NAME_LEN) + sizeof(item_info_t) * i, d.str, ITEM_DESC_LEN);
+        draw_text_noclip(x + 2, y + 46, d.str);
     }
-    else
-        num = ITEM_NAME_LEN;
     platform_fx_read_data_bytes(
-        (ITEM_INFO + 5) + sizeof(item_info_t) * i, d.str, num);
+        (ITEM_INFO + 5) + sizeof(item_info_t) * i, d.str, ITEM_NAME_LEN);
     // find if there is a user who has the item equipped
     for(uint8_t user = 0; user < nparty; ++user)
     {
@@ -237,26 +236,28 @@ static inline void render_item_row(
         draw_text_noclip(x + 127 - w, rowy + 1, name, NOCLIPFLAG_PROG);
     }
     draw_text_noclip(x + 2, rowy + 1, d.str);
-    if(d.n == pn)
-        draw_text_noclip(x + 2, y + 46, &d.str[ITEM_NAME_LEN]);
 }
 
 static inline void render_consumable_row(
     int8_t x, int8_t y, sdata_items& d, int8_t n, uint8_t ni)
 {
     int8_t rowy = y + n * 10 + 13;
-    size_t num;
     bool selected = (d.n == d.off + n);
     if(selected)
     {
-        num = ITEM_NAME_LEN + ITEM_DESC_LEN;
         platform_drawrect_i8(x, rowy, 128, 10, DARK_GRAY);
+        platform_fx_read_data_bytes(
+            (ITEM_INFO + sizeof(item_info_t) * NUM_ITEMS + ITEM_NAME_LEN) +
+            (ITEM_NAME_LEN + ITEM_DESC_LEN) * ni,
+            d.str, ITEM_DESC_LEN);
+        draw_text_noclip(x + 2, y + 46, d.str);
+        if(plane() == 0)
+            platform_fillrect_i8(int8_t(x), int8_t(rowy + 1), d.consw, 8, DARK_GRAY);
     }
-    else
-        num = ITEM_NAME_LEN;
     platform_fx_read_data_bytes(
-        ITEM_INFO + 5 + sizeof(item_info_t) * NUM_ITEMS + sizeof(item_info_t) * ni,
-        d.str, num);
+        ITEM_INFO + sizeof(item_info_t) * NUM_ITEMS +
+        (ITEM_NAME_LEN + ITEM_DESC_LEN) * ni,
+        d.str, ITEM_NAME_LEN);
     draw_text_noclip(x + 2, rowy + 1, d.str);
     {
         char buf[5];
@@ -265,12 +266,6 @@ static inline void render_consumable_row(
         dec_to_str(&buf[1], consumables[ni]);
         uint8_t w = text_width(buf);
         draw_text_noclip(x + 126 - w, rowy + 1, buf);
-    }
-    if(selected)
-    {
-        draw_text_noclip(x + 2, y + 46, &d.str[ITEM_NAME_LEN]);
-        if(plane() == 0)
-            platform_fillrect_i8(int8_t(x), int8_t(rowy + 1), d.consw, 8, DARK_GRAY);
     }
 }
 

@@ -461,7 +461,6 @@ void update_battle()
             else
             {
                 d.items.cat = IT_CONSUMABLE;
-                d.items.battle = true;
                 phase = BPHASE_ITEM;
                 update_items_numcat(d.items);
             }
