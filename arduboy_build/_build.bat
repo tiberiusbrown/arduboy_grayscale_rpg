@@ -14,7 +14,7 @@ cd ..\src
 set dir=%temp%/arduboy_grayscale_rpg_build
 if not exist "%dir%" mkdir %dir%
 arduino-cli.exe compile -v --log-level info ^
-    -b arduboy:avr:arduboy . ^
+    -b arduboy-homemade:avr:arduboy-fx . ^
     --output-dir "%dir%" ^
     --build-property compiler.c.elf.extra_flags="-Wl,--relax" ^
     --build-property compiler.c.extra_flags="-fshort-enums -frename-registers -fno-tree-scev-cprop -mcall-prologues -mstrict-X %remove_timer0%" ^
