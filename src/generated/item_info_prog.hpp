@@ -40,4 +40,6 @@ item_info_t const ITEM_INFO[] PROGMEM =
     { 1, 0, 1, 0, IT_WEAPON },
     { 2, 0, 0, 0, IT_WEAPON },
     { 1, 0, 0, 0, IT_WEAPON },
+    { 0, 1, 0, 0, IT_SHIELD },
+    { -1, 0, 0, 0, IT_WEAPON },
 };

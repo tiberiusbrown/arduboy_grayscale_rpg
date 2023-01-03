@@ -51,9 +51,10 @@ party_info_t const PARTY_INFO[4] PROGMEM =
     { 3, 3, 6, 1, 0, 1, PN_DISMAS },
 };
 
-static uint8_t user_item_count(uint8_t i, item_t const* items, uint8_t count)
+uint8_t user_item_count(uint8_t i, item_t const* items, uint8_t count)
 {
     uint8_t n = 0;
+    static_assert(sizeof(item_t) == 1, "change pgm_read_byte call below");
     do
     {
         if(user_is_wearing(i, pgm_read_byte_inc(items)))
@@ -67,7 +68,7 @@ uint8_t party_att(uint8_t i)
     uint8_t id = party[i].battle.id;
     int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_att);
     r += items_att(i);
-    if(party[i].equipped_items[IT_ARMOR] == INVALID)
+    if(party[i].equipped_items[IT_ARMOR] == INVALID_ITEM)
     {
         // barbarian items
         static item_t const BARBARIAN_ITEMS[] PROGMEM =

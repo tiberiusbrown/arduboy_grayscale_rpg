@@ -14,7 +14,7 @@ Att,Def,Spd,MHP,Type,Name,Description,Location
 ,,,1,helm,Fancy Cloth Hat,It looks completely ridiculous. +1 max health.,light’s out dungeon
 ,1,1,,helm,Ninja Mask,"+1 speed, +1 defense.",raptor forest n beach chest
 ,1,,,helm,Simple Cloth Hat,If only it covered the ears. +1 defense.,village north chest
-,1,,,helm,Barbarian’s Helm,+1 defense. +2 attack if not wearing armor.,
+,1,,,helm,Barbarian’s Helm,+1 defense. +2 attack if not wearing armor.,raptor forest central enclosure chest
 ,,,4,ring,Brawler’s Ring,+4 max health.,double tree in NW raptor forest
 ,4,-4,,ring,Dreamer’s Ring,"Where did this come from? +4 defense, -4 speed.",chest in dream
 ,,,,ring,Dryad Ring,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
@@ -25,7 +25,7 @@ Att,Def,Spd,MHP,Type,Name,Description,Location
 ,2,,,shield,Leather Shield,Not too shabby. +2 defense.,raptor forest n beach chest
 ,3,,1,shield,Studded Leather Shield,"+3 defense, +1 max health.",
 ,6,-2,,shield,Iron Shield,"A bit heavy but quite durable. +6 defense, -2 speed.",
-,1,,3,shoes,Brawler’s Boots,"+1 defense, +3 max health.",
+,1,,3,shoes,Brawler’s Boots,"+1 defense, +3 max health.",raptor forest n chest
 ,1,,,shoes,Cloth Shoes,"Better than barefoot, but not by much! +1 defense.",east bridge chest
 ,,,,shoes,Dryad Shoes,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
 1,1,,,shoes,Fighter’s Boots,"Hidden toe blades! +1 attack, +1 defense.",raptor forest peninsula chest
@@ -37,3 +37,5 @@ Att,Def,Spd,MHP,Type,Name,Description,Location
 1,,1,,weapon,Crude Iron Dagger,"Probably could use some sharpening. +1 attack, +1 speed.",
 2,,,,weapon,Crude Iron Sword,+2 attack.,
 1,,,,weapon,Barbarian’s Axe,+1 attack. +2 additional attack if not wearing armor.,
+,1,,,shield,Wooden Shield,"Old and worn, but better than nothing. +1 defense.",west of village chest
+-1,,,,weapon,Boxing Gloves,-1 attack. Stuns target.,

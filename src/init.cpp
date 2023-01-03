@@ -30,6 +30,7 @@ void new_game()
     party[0].battle.id = 0;
     party[0].battle.hp = party_mhp(0);
 
+#ifndef ARDUINO
     for(int i = 0; i < 4; ++i)
     {
         party[i].battle.id = i;
@@ -47,6 +48,10 @@ void new_game()
     py = 1300;
     savefile.chunk_regs[8] = 3;
     savefile.chunk_regs[9] = 3;
+
+    story_flag_set(SFLAG_ITEM_Barbarian_s_Helm);
+    story_flag_set(SFLAG_ITEM_Boxing_Gloves);
+#endif
 }
 
 void initialize()

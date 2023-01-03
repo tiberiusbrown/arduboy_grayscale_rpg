@@ -265,7 +265,10 @@ static void battle_next_turn()
             attacker_index = 0;
         id = d.attacker_id = d.attack_order[attacker_index];
         d.attacker_index = attacker_index;
-        if(member(id).hp > 0)
+        auto& s = d.sprites[id];
+        if(s.flags & BFLAG_STUNNED)
+            s.flags &= ~BFLAG_STUNNED; // unset flag and skip turn
+        else if(member(id).hp > 0)
             break;
     }
     if(id < 4)
@@ -520,6 +523,7 @@ void update_battle()
             uint8_t hp = 0;
             for(uint8_t i = 1; i < nparty; ++i)
             {
+                if(!d.sprites[i].active) continue;
                 uint8_t uhp = party_mhp(i) - party[i].battle.hp;
                 if(uhp > hp)
                     ally = i, hp = uhp;
@@ -528,6 +532,19 @@ void update_battle()
             ++catherine_heal;
             catherine_heal /= 2;
             take_damage(ally, -int8_t(catherine_heal));
+        }
+
+        // check for stun item
+        {
+            static item_t const STUN_ITEMS[] PROGMEM =
+            {
+                SFLAG_ITEM_Boxing_Gloves,
+            };
+            item_t const* ptr = STUN_ITEMS;
+            uint8_t n = user_item_count(
+                attacker, STUN_ITEMS, sizeof(STUN_ITEMS) / sizeof(item_t));
+            if(n > 0)
+                d.sprites[defender].flags |= BFLAG_STUNNED;
         }
 
         break;
@@ -669,11 +686,15 @@ static void draw_health(uint8_t i)
 {
     auto const& d = sdata.battle;
     auto const& s = d.sprites[i];
+    if(!s.active) return;
     uint8_t x = uint8_t(s.x);
     uint8_t y = uint8_t(s.y - 5);
     constexpr uint8_t w = HP_BAR_WIDTH + 2;
     constexpr uint8_t h = 4;
     platform_drawrect_i8(x, y + 1, w, h, DARK_GRAY);
+
+    if(s.flags & BFLAG_STUNNED)
+        platform_fx_drawoverwrite(x, y - 4, BATTLE_ZZ_IMG);
 
     uint8_t hp = s.hp, hpt = s.hpt;
     if(hpt < hp) tswap(hpt, hp);
@@ -711,8 +732,7 @@ static void draw_battle_sprites()
     sort_and_draw_sprites(entries, n);
 
     for(uint8_t i = 0; i < 8; ++i)
-        if(d.sprites[i].active)
-            draw_health(i);
+        draw_health(i);
 }
 
 void render_battle()

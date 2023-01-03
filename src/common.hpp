@@ -366,6 +366,7 @@ struct party_info_t
 };
 extern party_info_t const PARTY_INFO[4] PROGMEM;
 
+uint8_t user_item_count(uint8_t i, item_t const* items, uint8_t count);
 uint8_t party_att(uint8_t i);
 uint8_t party_def(uint8_t i);
 uint8_t party_mhp(uint8_t i);
@@ -389,6 +390,8 @@ enum battle_phase_t
     BPHASE_DEFEAT,
     BPHASE_OUTRO,
 };
+// battle flags
+constexpr uint8_t BFLAG_STUNNED = 1 << 0;
 struct battle_sprite_t
 {
     bool active;
@@ -398,6 +401,7 @@ struct battle_sprite_t
     uint8_t bx, by; // base pos
     uint8_t sprite;
     uint8_t frame_dir;
+    uint8_t flags;
     uint8_t hp;     // health bar width
     uint8_t hpt;    // health bar width target
 };
