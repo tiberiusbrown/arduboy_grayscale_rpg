@@ -9,7 +9,7 @@ constexpr uint8_t DEFEND_X2 = 77;
 constexpr uint8_t ASLEEP_FRAMES = 24;
 constexpr uint8_t DAMAGED_FRAMES = 16;
 
-static battle_member_t& member(uint8_t id)
+static FORCE_NOINLINE battle_member_t& member(uint8_t id)
 {
     auto& d = sdata.battle;
     return id < 4 ? party[id].battle : d.enemies[id - 4];
@@ -21,21 +21,12 @@ static uint8_t const BATTLE_POS[] PROGMEM =
     94, 20, 94, 45, 111, 12, 111, 34,
 };
 
-static void move_sprite(uint8_t i, uint8_t x, uint8_t y)
+static FORCE_NOINLINE void move_sprite(uint8_t i, uint8_t x, uint8_t y)
 {
     auto& d = sdata.battle;
     auto& s = d.sprites[i];
     s.tx = x;
     s.ty = y;
-    int8_t dx = s.x - x;
-    int8_t dy = s.y - y;
-    if(dx < 0) dx = -dx;
-    if(dy < 0) dy = -dy;
-    uint8_t dd = uint8_t(dx < dy ? dy : dx);
-    if(dd < 32)
-        s.move_speed = 2;
-    else
-        s.move_speed = 3;
 }
 
 static void move_sprite_to_base(uint8_t i)
@@ -147,8 +138,8 @@ static void init_sprites()
         uint8_t const* ptr = &BATTLE_POS[uint8_t(i * 2)];
         s.bx = s.tx = s.x = pgm_read_byte_inc(ptr);
         s.by = s.ty = s.y = pgm_read_byte(ptr);
-        s.frame_base = pgm_read_byte(i < 4 ?
-            &PARTY_INFO[id].sprite : &ENEMY_INFO[id].sprite) * 16;
+        s.sprite = pgm_read_byte(i < 4 ?
+            &PARTY_INFO[id].sprite : &ENEMY_INFO[id].sprite);
     }
     init_hp_bars();
 }
@@ -338,7 +329,6 @@ static void remove_enemy(uint8_t i)
 static void update_battle_sprites()
 {
     auto& d = sdata.battle;
-    uint8_t nf = (nframe / 4) & 3;
     d.sprites_done = true;
     for(uint8_t i = 0; i < 8; ++i)
     {
@@ -354,49 +344,46 @@ static void update_battle_sprites()
             if(i >= 4) remove_enemy(i--);
             continue;
         }
-        uint8_t shp = s.hp;
-        if(shp > s.hpt) shp -= uint8_t(shp - s.hpt + 3) / 4;
-        if(shp < s.hpt) shp += uint8_t(s.hpt - shp + 3) / 4;
+        uint8_t shp = s.hp, shpt = s.hpt;
+        if(shp > shpt) shp -= uint8_t(shp - shpt + 3) / 4;
+        if(shp < shpt) shp += uint8_t(shpt - shp + 3) / 4;
         s.hp = shp;
-        if((uint8_t)s.x == s.tx && (uint8_t)s.y == s.ty)
+        int8_t sx = s.x;
+        int8_t sy = s.y;
+        if((uint8_t)sx == s.tx && (uint8_t)sy == s.ty)
         {
             s.frame_dir = 0;
-            if(s.frame_base == 13 * 16) // Psy-Bat
-                s.frame_dir += nf;
             continue;
         }
         d.sprites_done = false;
 
-        uint8_t move_speed = s.move_speed;
-        uint8_t sy = s.y;
+        constexpr uint8_t move_speed = 2;
         if(s.ty < sy)
         {
             s.frame_dir = 8;
             sy -= move_speed;
-            if(sy < s.ty) sy = s.ty;
+            if(sy < (int8_t)s.ty) sy = (int8_t)s.ty;
         }
         else if(s.ty > sy)
         {
             s.frame_dir = 0;
             sy += move_speed;
-            if(sy > s.ty) sy = s.ty;
+            if(sy > (int8_t)s.ty) sy = (int8_t)s.ty;
         }
         s.y = sy;
-        uint8_t sx = s.x;
         if(s.tx < sx)
         {
             s.frame_dir = 4;
             sx -= move_speed;
-            if(sx < s.tx) sx = s.tx;
+            if(sx < (int8_t)s.tx) sx = (int8_t)s.tx;
         }
         else if(s.tx > sx)
         {
             s.frame_dir = 12;
             sx += move_speed;
-            if(sx > s.tx) sx = s.tx;
+            if(sx > (int8_t)s.tx) sx = (int8_t)s.tx;
         }
         s.x = sx;
-        s.frame_dir += nf;
     }
 }
 
@@ -641,7 +628,7 @@ static void draw_battle_background()
         auto const& s = d.sprites[i];
         if(s.damaged > 0 || member(i).hp > 0) continue;
         if(plane() > 1)
-            platform_fx_drawplusmask(s.bx, s.by, 16, 16, SPRITES_IMG, s.frame_base);
+            platform_fx_drawplusmask(s.bx, s.by, 16, 16, SPRITES_IMG, s.sprite * 16);
     }
     //platform_fillrect_i8(DEFEND_X1 + 1, DEFEND_Y + 7, 14, 12, WHITE);
     platform_drawrect_i8(DEFEND_X1 + 3, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
@@ -712,7 +699,13 @@ static void draw_battle_sprites()
         e.x = (uint8_t)s.x;
         e.y = (uint8_t)s.y;
         e.addr = SPRITES_IMG;
-        e.frame = s.frame_base + s.frame_dir;
+
+        uint8_t flags = pgm_read_byte(&SPRITE_FLAGS[s.sprite]);
+        uint8_t nf = (nframe / 4) & 3;
+        if(!(flags & SF_ALWAYS_ANIM) && (uint8_t)s.x == s.tx && (uint8_t)s.y == s.ty)
+            nf = 0;
+
+        e.frame = s.sprite * 16 + s.frame_dir + nf;
     }
 
     sort_and_draw_sprites(entries, n);

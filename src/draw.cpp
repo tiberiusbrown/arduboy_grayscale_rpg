@@ -155,7 +155,7 @@ static bool add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
 {
     auto const& e = chunk_sprites[ci];
     if(!e.active) return false;
-    uint8_t f = e.type * 16;
+    uint16_t f = e.type * 16;
     uint8_t d = e.dir;
     bool walking = e.walking;
     if(d & 0x80) walking = false;

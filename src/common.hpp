@@ -396,8 +396,7 @@ struct battle_sprite_t
     int8_t x, y;   // current pos
     uint8_t tx, ty; // target pos
     uint8_t bx, by; // base pos
-    uint8_t move_speed;
-    uint16_t frame_base;
+    uint8_t sprite;
     uint8_t frame_dir;
     uint8_t hp;     // health bar width
     uint8_t hpt;    // health bar width target
@@ -463,6 +462,13 @@ extern union sdata_t
     sdata_game_over game_over;
     sdata_pause pause;
 } sdata;
+constexpr auto SIZEOF_SDATA_0 = sizeof(sdata_map);
+constexpr auto SIZEOF_SDATA_1 = sizeof(sdata_title);
+constexpr auto SIZEOF_SDATA_2 = sizeof(sdata_dialog);
+constexpr auto SIZEOF_SDATA_3 = sizeof(sdata_tp);
+constexpr auto SIZEOF_SDATA_4 = sizeof(sdata_die);
+constexpr auto SIZEOF_SDATA_5 = sizeof(sdata_game_over);
+constexpr auto SIZEOF_SDATA_6 = sizeof(sdata_pause);
 constexpr auto SIZEOF_SDATA = sizeof(sdata);
 //static_assert(SIZEOF_SDATA <= 256, "state data too large");
 void change_state(uint8_t new_state);
@@ -673,7 +679,7 @@ void draw_sprites();
 struct draw_sprite_entry
 {
     uint24_t addr;
-    uint8_t frame;
+    uint16_t frame;
     int16_t x, y;
 };
 void sort_sprites(draw_sprite_entry* entries, uint8_t n);
