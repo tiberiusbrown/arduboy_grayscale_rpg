@@ -735,6 +735,25 @@ static void draw_battle_sprites()
         draw_health(i);
 }
 
+static void draw_order_numbers()
+{
+    auto const& d = sdata.battle;
+    uint8_t iend = d.attacker_index;
+    uint8_t i = iend;
+    uint8_t pid = INVALID;
+    uint8_t f = 0;
+    for(;;)
+    {
+        if(++i >= d.num_attackers) i = 0;
+        if(i == iend) break;
+        uint8_t id = d.attack_order[i];
+        if(id == pid) continue;
+        pid = id;
+        auto const& s = d.sprites[id];
+        platform_fx_drawoverwrite(s.x + 5, s.y - 6, BATTLE_ORDER_IMG, f++, 6, 8);
+    }
+}
+
 void render_battle()
 {
     auto& d = sdata.battle;
@@ -792,6 +811,10 @@ void render_battle()
     {
         auto const& s = d.sprites[d.attacker_id];
         draw_selection_outline(s.x, s.y);
+        if(phase == BPHASE_MENU && (btns_down & BTN_B))
+        {
+            draw_order_numbers();
+        }
     }
     if(phase == BPHASE_ESEL)
     {
