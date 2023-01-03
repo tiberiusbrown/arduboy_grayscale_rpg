@@ -2,9 +2,9 @@
 
 cd /d %~dp0
 
-python ..\scripts\convert_sprites.py
-if NOT %errorlevel%==0 goto error
 python ..\scripts\convert_map.py
+if NOT %errorlevel%==0 goto error
+python ..\scripts\convert_sprites.py
 if NOT %errorlevel%==0 goto error
 python ..\scripts\convert_game_over_messages.py
 if NOT %errorlevel%==0 goto error

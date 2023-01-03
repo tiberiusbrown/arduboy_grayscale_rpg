@@ -1,6 +1,7 @@
-export from tiled to 1/4 scale
-crop top half
+export from tiled to 25% scale
+crop to top half
 scale (linear filter) by 0.5x (to 1/8 scale)
 colors > levels > set black to 128
 change to 4-color palette
+remove alpha channel
 export

@@ -3,6 +3,8 @@ import script_assembler
 from pathlib import Path
 import sys
 import re
+from PIL import Image
+import os
 
 import pytmx
 tm = pytmx.TiledMap('world.tmx')
@@ -27,6 +29,19 @@ def get_tile_id(x, y):
 
 chunks = [[0] * CHUNK_BYTES for i in range(CHUNKS_W * CHUNKS_H)]
 
+# map image
+renew_map_image = True
+if os.path.exists('world.png'):
+    imgtime = os.path.getmtime('world.tmx')
+    outtime = os.path.getmtime('world.png')
+    tilestime = os.path.getmtime('tiles_small.png')
+    if outtime > imgtime and outtime > tilestime:
+        renew_map_image = False
+
+if renew_map_image:
+    tiles_small = Image.open('tiles_small.png').convert('RGB')
+    map_image = Image.new(mode="RGB", size=(TILES_W*2, TILES_H*2//2))
+
 for y in range(TILES_H):
     cy = y // 4
     ty = y % 4
@@ -37,6 +52,18 @@ for y in range(TILES_H):
         t = ty * 8 + tx
         id = get_tile_id(x, y)
         chunks[c][t] = id
+        
+        if not renew_map_image:
+            continue
+        ox = (id %  16) * 2
+        oy = (id // 16) * 2
+        if oy < TILES_H*2//2:
+            map_image.paste(
+                tiles_small.copy().crop(box=(ox, oy, ox + 2, oy + 2)),
+                box=(x * 2, y * 2))
+
+if renew_map_image:
+    map_image.save('world.png')
         
 bytes = bytearray(itertools.chain.from_iterable(chunks))
 
