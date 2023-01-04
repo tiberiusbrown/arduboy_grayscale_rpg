@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr int STORY_FLAG_BYTES = 16;
+constexpr int STORY_FLAG_BYTES = 17;
 
 constexpr uint16_t SFLAG_ITEM_Amulet_of_Zhar_Tul = 0;
 constexpr uint16_t SFLAG_ITEM_Dryad_Amulet = 1;
@@ -126,3 +126,13 @@ constexpr uint16_t SFLAG_party_catherine = 120;
 constexpr uint16_t SFLAG_cave_gate_open = 121;
 constexpr uint16_t SFLAG_ITEM_Old_Katana = 122;
 constexpr uint16_t SFLAG_dryad_lever = 123;
+constexpr uint16_t SFLAG_pot0 = 124;
+constexpr uint16_t SFLAG_pot1 = 125;
+constexpr uint16_t SFLAG_pot2 = 126;
+constexpr uint16_t SFLAG_pot3 = 127;
+constexpr uint16_t SFLAG_pot4 = 128;
+constexpr uint16_t SFLAG_pot5 = 129;
+constexpr uint16_t SFLAG_pot6 = 130;
+constexpr uint16_t SFLAG_pot7 = 131;
+constexpr uint16_t SFLAG_pot8 = 132;
+constexpr uint16_t SFLAG_pot9 = 133;
