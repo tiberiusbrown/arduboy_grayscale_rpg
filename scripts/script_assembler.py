@@ -67,7 +67,7 @@ with open('items.csv', newline='') as f:
     items = [row[5] for row in reader]
     items = items[1:]
 for i in range(len(items)):
-    items[i] = re.sub('[^a-zA-Z]+', '_', items[i].split('|')[0].strip())
+    items[i] = re.sub('[^a-zA-Z0-9]+', '_', items[i].split('|')[0].strip())
 for i in items:
     flags['!ITEM_' + i] = len(flags)
 

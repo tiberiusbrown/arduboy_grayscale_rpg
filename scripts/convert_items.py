@@ -9,6 +9,9 @@ def pnum(x):
     x = num(x)
     return x + 256 if x < 0 else x
 
+def to_name(x):
+    return x.split('#')[0]
+
 def to_ascii(x):
     return x.replace(chr(8217), "'")
 def to_ascii_row(row):
@@ -29,7 +32,7 @@ names = []
 NNAME = 0
 NMSG = 0
 for t in rows:
-    n = len(t[5]) + 1
+    n = len(to_name(t[5])) + 1
     if n > NNAME: NNAME = n
     n = len(t[6]) + 1
     if n > NMSG: NMSG = n
@@ -94,7 +97,7 @@ with open('../arduboy_build/item_info.bin', 'wb') as f:
         bytes[2] = pnum(t[1])
         bytes[3] = pnum(t[2])
         bytes[4] = pnum(t[3])
-        name = t[5]
+        name = to_name(t[5])
         check_wrap(name, 90, 1)
         for n in range(len(name)):
             bytes[5+n] = ord(name[n])
@@ -115,11 +118,11 @@ with open('../arduboy_build/item_info.bin', 'wb') as f:
             bytes[NNAME + i] = ord(msg[i])
         f.write(bytes)
 
-with open('../src/generated/item_info_prog.hpp', 'w') as f:
-    f.write('#pragma once\n\n')
-    f.write('item_info_t const ITEM_INFO[] PROGMEM =\n{\n')
-    for t in rows:
-        f.write('    { %d, %d, %d, %d, IT_%s },\n' %
-            (num(t[0]), num(t[1]), num(t[2]), num(t[3]), t[4].upper()))
-    f.write('};\n')
+#with open('../src/generated/item_info_prog.hpp', 'w') as f:
+#    f.write('#pragma once\n\n')
+#    f.write('item_info_t const ITEM_INFO[] PROGMEM =\n{\n')
+#    for t in rows:
+#        f.write('    { %d, %d, %d, %d, IT_%s },\n' %
+#            (num(t[0]), num(t[1]), num(t[2]), num(t[3]), t[4].upper()))
+#    f.write('};\n')
 
