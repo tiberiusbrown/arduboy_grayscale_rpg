@@ -202,7 +202,8 @@ static bool run_chunk()
                     ptr += dec_to_str(ptr, (uint8_t)diff);
                     store_inc(ptr, ' ');
                     platform_fx_read_data_bytes(
-                        ITEM_INFO + 5 + sizeof(item_info_t) * (NUM_ITEMS + dst - 8),
+                        ITEM_INFO + sizeof(item_info_t) * NUM_ITEMS +
+                        (ITEM_NAME_LEN + ITEM_DESC_LEN) * (dst - 8),
                         ptr, ITEM_NAME_LEN + ITEM_DESC_LEN);
                     for(uint8_t i = 0; i < ITEM_NAME_LEN - 1; ++i)
                     {

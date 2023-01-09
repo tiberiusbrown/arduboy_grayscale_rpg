@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
-  "title": "arduboy_grayscale_rpg",
-  "description": "arduboy_grayscale_rpg",
+  "title": "Return of the Ardu",
+  "description": "Return of the Ardu",
   "author": "brow1067",
   "version": "1.0",
   "genre": "RPG",
@@ -15,8 +15,8 @@
   ],
   "binaries": [
     {
-      "title": "arduboy_grayscale_rpg",
-      "filename": "arduboy_grayscale_rpg.hex",
+      "title": "Return of the Ardu",
+      "filename": "ReturnOfTheArdu.hex",
       "flashdata": "fxdata.bin",
       "flashsave": "fxsave.bin",
       "device": "ArduboyFX"

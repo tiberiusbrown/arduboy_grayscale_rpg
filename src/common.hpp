@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#define TITLE_ONLY_DEMO 0
+
 constexpr uint16_t VERSION = 1;
 
 constexpr uint8_t TELEPORT_TRANSITION_FRAMES = 16;

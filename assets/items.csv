@@ -3,7 +3,7 @@ Att,Def,Spd,MHP,Type,Name,Description,Location
 ,,,,amulet,Dryad Amulet,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
 ,2,,3,armor,Brawler’s Tunic,"+2 defense, +3 max health.",raptor forest ne beach chest
 ,1,,,armor,Cloth Tunic,"Worn and scruffy, but warm enough. +1 defense.",Matthias’s dresser
-,1,,,armor,Cloth Tunic#2,"Worn and scruffy, but warm enough. +1 defense.",Matthias’s dresser
+,1,,,armor,Cloth Tunic#2,"Worn and scruffy, but warm enough. +1 defense.",
 ,4,,,armor,Defender’s Breastplate,+4 defense. The wearer does not stop defending at start of turn.,
 ,,,,armor,Dryad Armor,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
 1,2,,,armor,Fighter’s Tunic,"+1 attack, +2 defense.",raptor forest ne beach chest
@@ -40,3 +40,4 @@ Att,Def,Spd,MHP,Type,Name,Description,Location
 2,,,,weapon,Crude Iron Sword,+2 attack.,
 4,,2,,weapon,Katana,"For those who have been studying the blade. +4 attack, +2 speed.",
 2,,1,,weapon,Rusty Katana,"Once a fine weapon. +2 attack, +1 speed.",raptor forest nw beach chest
+,,,1,ring,Ancient Ardu Ring,+1 max health. Ardu: +2 additional max health.,first dungeon chest

@@ -23,7 +23,7 @@ if NOT %errorlevel%==0 goto error
 
 rem copy hex file to dir
 cd ..\arduboy_build
-echo F|xcopy /S /Q /Y /F "%dir%/src.ino.hex" "arduboy_grayscale_rpg.hex" > nul
+echo F|xcopy /S /Q /Y /F "%dir%/src.ino.hex" "ReturnOfTheArdu.hex" > nul
 if NOT %errorlevel%==0 goto error
 
 rem create _asm.txt file
@@ -41,9 +41,9 @@ findstr /c:" b " /c:" B " /c:" d " /c:" D " _map2.txt > _map.txt
 del _map2.txt
 
 rem create arduboy file
-tar -a -cf arduboy_grayscale_rpg.zip arduboy_grayscale_rpg.hex fxdata.bin fxsave.bin info.json LICENSE.txt banner_700x192.png banner_128x64.png
+tar -a -cf ReturnOfTheArdu.zip ReturnOfTheArdu.hex fxdata.bin fxsave.bin info.json LICENSE.txt banner_700x192.png banner_128x64.png
 if NOT %errorlevel%==0 goto error
-move /y arduboy_grayscale_rpg.zip ..\arduboy_grayscale_rpg.arduboy > nul
+move /y ReturnOfTheArdu.zip ..\ReturnOfTheArdu.arduboy > nul
 if NOT %errorlevel%==0 goto error
 
 python flashcart-builder.py flashcart-index.csv

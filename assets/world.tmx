@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="343">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="388">
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer id="1" name="Tiles" width="256" height="256">
   <data encoding="csv">
@@ -134,7 +134,7 @@
 35,118,187,7,135,34,33,3,46,125,140,15,16,43,28,43,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 6,187,135,2,1,54,54,35,62,46,47,125,140,15,16,11,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 154,135,1,18,35,12,11,70,27,62,63,46,47,125,32,28,31,31,31,106,8,8,8,107,106,8,8,8,8,8,8,107,106,8,8,8,107,31,31,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,106,13,13,13,107,106,13,107,31,31,31,31,106,13,13,13,13,13,13,13,107,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-38,17,18,18,19,59,17,19,27,17,19,62,63,46,48,27,31,31,31,23,97,98,132,92,93,24,24,24,24,24,24,25,23,132,24,24,25,31,31,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,23,149,148,29,108,109,87,25,31,31,31,31,23,87,29,29,29,29,29,148,25,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+38,17,18,18,19,59,17,19,27,17,19,62,63,46,48,27,31,31,31,23,97,98,132,92,93,24,24,24,24,24,24,25,23,132,24,24,25,31,31,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,23,149,148,29,108,109,87,25,31,31,31,31,23,87,29,29,29,148,29,29,25,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 170,119,33,18,3,1,3,2,27,12,27,17,3,62,64,11,31,31,31,23,24,24,24,24,24,24,24,24,24,24,24,92,93,24,24,80,25,31,31,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,31,31,31,31,106,13,13,13,13,13,107,31,31,31,31,31,31,31,31,31,23,29,29,29,29,29,29,25,31,31,31,31,23,29,29,29,29,29,29,29,25,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 37,170,119,34,33,18,18,18,19,27,28,1,35,70,12,43,31,31,31,23,80,24,24,76,77,24,24,24,24,24,24,24,24,24,24,96,25,31,31,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,31,31,31,31,23,149,29,148,29,149,25,31,31,31,31,31,31,31,31,31,122,40,40,40,40,40,40,123,31,31,31,31,23,29,29,29,29,29,29,29,25,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 37,37,38,17,19,33,35,34,27,11,12,34,118,6,6,6,31,31,31,23,96,24,24,25,23,24,24,24,97,98,24,76,77,24,24,24,25,31,31,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,31,31,31,31,23,29,29,29,29,29,25,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,23,29,76,40,40,40,77,29,25,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -274,13 +274,14 @@ end:</property>
   <object id="78" x="406.75" y="2186.17">
    <properties>
     <property name="script">$bnwt end
-bfs !tunic_tutorial_done teleport
+bfs !tunic_tutorial_done teleport_out
 bfs !ITEM_Cloth_Tunic equip_check
 dlg P_Mother {It's rather cold outside. Why don't you get your tunic out of your dresser first?}
 jmp teleport
 equip_check:
 bni !ITEM_Cloth_Tunic no_tunic
 fs !tunic_tutorial_done
+teleport_out:
 tp @home_outside
 jmp end
 no_tunic:
@@ -682,7 +683,7 @@ end:</property>
   <object id="156" x="898.98" y="1163.08">
    <properties>
     <property name="script">bnwe end
-ebat !raptor1 E_Psy_Raptor E_Psy_Raptor - -
+ebat !raptor1 E_Psy_Raptor - - -
 end:</property>
    </properties>
    <point/>
@@ -1075,14 +1076,6 @@ skip2:
   <object id="242" x="2614.75" y="2119.67">
    <properties>
     <property name="script">bnwe end
-ebat !first_cave_guard6 E_Dark_Guard - - -
-end:</property>
-   </properties>
-   <point/>
-  </object>
-  <object id="243" x="2664.75" y="2098.17">
-   <properties>
-    <property name="script">bnwe end
 ebat !first_cave_guard5 E_Dark_Guard - - -
 end:</property>
    </properties>
@@ -1429,10 +1422,354 @@ end:</property>
    </properties>
    <point/>
   </object>
-  <object id="341" x="2680.5" y="2104">
+  <object id="341" x="2648.5" y="2104.67">
    <properties>
     <property name="script">$bnst end
-fs !ITEM_Cloth_Tunic_2
+fs !ITEM_Ancient_Ardu_Ring
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="343" x="839.5" y="1175.75">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor6 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="344" x="711.455" y="1205.45">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor5 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="345" x="599.818" y="1175.09">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor4 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="346" x="600.545" y="1113.64">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor3 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="347" x="728.909" y="1143.27">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor2 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="348" x="503.667" y="1238.67">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor22 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="349" x="471.333" y="1191.33">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor21 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="350" x="503.333" y="1127.33">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor18 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="351" x="489.333" y="1320">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor46 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="352" x="504" y="1384">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor42 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="353" x="424.667" y="1562.67">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor43 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="354" x="584" y="1497.33">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor41 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="355" x="600.667" y="1449.33">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor40 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="356" x="552.5" y="1384">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor39 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="357" x="729.5" y="1400.5">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor15 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="358" x="758.5" y="1320.5">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor16 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="359" x="872" y="1335.25">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor9 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="360" x="856.5" y="1383.75">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor13 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="361" x="839.5" y="1417.25">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor12 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="362" x="951.25" y="1352">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor11 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="363" x="1095.25" y="1255.5">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor19 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="364" x="1081.5" y="1191.25">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor20 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="365" x="1206.75" y="1111.5">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor21 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="366" x="1384.5" y="1320">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor44 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="367" x="1350" y="1366">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor45 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="368" x="1066" y="1369.27">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor14 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="370" x="953.364" y="1302.91">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor10 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="371" x="279.25" y="1369.63">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor23 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="372" x="167.091" y="1417.45">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor28 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="373" x="152.545" y="1400.55">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor31 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="374" x="118.182" y="1430.91">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor32 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="375" x="88" y="1399.09">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor30 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="376" x="103.75" y="1495.5">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor29 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="377" x="199.75" y="1495">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor27 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="378" x="121.5" y="1656">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor33 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="379" x="214.5" y="1705">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor37 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="380" x="280.25" y="1640">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor35 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="381" x="343.75" y="1687.75">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor34 E_Psy_Raptor E_Psy_Raptor E_Dark_Raptor -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="382" x="392.25" y="1638.75">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor36 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="383" x="392" y="1688">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor38 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="384" x="1175.25" y="1879.5">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor24 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="385" x="1095.5" y="1816.25">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor25 E_Psy_Raptor - - -
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="387" x="1048.5" y="1891">
+   <properties>
+    <property name="script">bnwe end
+ebat !raptor26 E_Psy_Raptor - - -
 end:</property>
    </properties>
    <point/>
@@ -1523,11 +1860,8 @@ end:</property>
   <object id="230" name="!first_cave_guard3" class="S_Dark_Guard" x="2647.64" y="2232.42">
    <polygon points="0,0 -64.1818,0.363636 -63.2727,-17.8182 -48.5455,-17.0909 -48.1818,-2.54545"/>
   </object>
-  <object id="239" name="!first_cave_guard5" class="S_Dark_Guard" x="2599" y="2104.08">
-   <polyline points="0,0 68,0.75"/>
-  </object>
-  <object id="241" name="!first_cave_guard6" class="S_Dark_Guard" x="2578" y="2165.58">
-   <polyline points="0,0 4,-2.5 1.5,5.75 9.5,-0.5 4.25,-30.75 100.75,-30 96.5,1.25 101.25,-2.25 98.5,6 107.25,-1.25"/>
+  <object id="241" name="!first_cave_guard5" class="S_Dark_Guard" x="2578" y="2165.58">
+   <polyline points="0,0 4,-2.5 1.5,5.75 9.5,-0.5 3.91667,-45.4167 100.417,-44.6667 96.5,1.25 101.25,-2.25 98.5,6 107.25,-1.25"/>
   </object>
   <object id="244" name="!raptor2" class="S_Psy_Raptor" x="710" y="1127.67">
    <polyline points="0,0 4.66667,-3.33333 34,2.29167 36.6667,-1.70833"/>
@@ -1595,7 +1929,7 @@ end:</property>
   <object id="278" name="!raptor22" class="S_Psy_Raptor" x="442" y="1254.67">
    <polygon points="0,0 -1.66667,19.3333 60.3333,20.3333 62,0.333333"/>
   </object>
-  <object id="281" name="!raptor22" class="S_Psy_Raptor" x="501.5" y="1291.25">
+  <object id="281" name="!raptor46" class="S_Psy_Raptor" x="501.5" y="1291.25">
    <polygon points="0,0 6,-5 4.75,46.5 -111.75,46 -111.75,28.25 -92.25,28.25 -92,40.5 -1,41"/>
   </object>
   <object id="282" name="!raptor23" class="S_Psy_Raptor" x="296" y="1355.5">

@@ -100,7 +100,9 @@ void load(bool first)
     if(first)
     {
 #ifdef ARDUINO
+#if !TITLE_ONLY_DEMO
         Arduboy2Audio::begin();
+#endif
         if(!Arduboy2Audio::enabled())
             savefile.settings.sound = 0;
 #endif

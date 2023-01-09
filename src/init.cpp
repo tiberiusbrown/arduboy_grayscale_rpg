@@ -10,7 +10,7 @@ void new_game()
     memset(&savefile, 0, sizeof(savefile));
     savefile.settings = old_settings;
     px = 170;
-    py = 71;
+    py = 71 + 2048;
     pdir = 0;
     pmoving = false;
     for(auto& f : story_flags) f = 0;
@@ -30,7 +30,7 @@ void new_game()
     party[0].battle.id = 0;
     party[0].battle.hp = party_mhp(0);
 
-#ifndef ARDUINO
+#if 0
     for(int i = 0; i < 4; ++i)
     {
         party[i].battle.id = i;
@@ -58,6 +58,8 @@ void initialize()
 {
     nframe = 0;
     rand_seed = 0xcafe;
+#if !TITLE_ONLY_DEMO
     platform_audio_init();
+#endif
     change_state(STATE_TITLE);
 }

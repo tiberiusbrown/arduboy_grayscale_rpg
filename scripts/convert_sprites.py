@@ -61,10 +61,11 @@ def convert(fout, sym, fname, sw, sh, num = 0, start = 0):
 
 BASE = '../src/generated/'
 BINBASE = '../arduboy_build/'
+DEMO_BASE = '../demo/'
 
 convert(BASE + 'font_img.hpp', 'FONT_IMG', 'font.png', 8, 8);
 
-#convert(BASE + 'tile_img.hpp', 'TILE_IMG_PROG', 'tiles.png', 16, 16, 64, 0)
+convert(DEMO_BASE + 'tile_img.hpp', 'TILE_IMG', 'tiles.png', 16, 16, 224)
 #convert(BINBASE + 'tile_img.bin', '', 'tiles.png', 16, 16, 192, 64)
 convert(BINBASE + 'tile_img.bin', '', 'tiles.png', 16, 16)
 

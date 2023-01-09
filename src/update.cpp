@@ -660,11 +660,13 @@ static void update_title()
             d.fade_frame += FADE_SPEED;
         else
         {
+#if !TITLE_ONLY_DEMO
             if(btns_pressed & BTN_A)
             {
                 d.fade_frame = 0;
                 d.going_to_resume = true;
             }
+#endif
         }
     }
 

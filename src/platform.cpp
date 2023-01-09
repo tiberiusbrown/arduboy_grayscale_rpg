@@ -463,7 +463,9 @@ void platform_audio_init()
 
 void platform_audio_on()
 {
+#if !TITLE_ONLY_DEMO
     Arduboy2Audio::on();
+#endif
 }
 
 void platform_audio_off()
