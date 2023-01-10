@@ -22,6 +22,8 @@ tiles = {
     'T_DungeonBarsClosed' : 41,
     'T_DungeonButtonOff'  : 56,
     'T_DungeonButtonOn'   : 55,
+    'T_OutdoorButtonOff'  : 164,
+    'T_OutdoorButtonOn'   : 163,
     'T_OutdoorRock'       : 141,
     'T_Grass1'            : 10,
     'T_Grass2'            : 11,

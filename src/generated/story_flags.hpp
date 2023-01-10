@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr int STORY_FLAG_BYTES = 18;
+constexpr int STORY_FLAG_BYTES = 19;
 
 constexpr uint16_t SFLAG_ITEM_Amulet_of_Zhar_Tul = 0;
 constexpr uint16_t SFLAG_ITEM_Dryad_Amulet = 1;
@@ -99,7 +99,7 @@ constexpr uint16_t SFLAG_raptor40 = 93;
 constexpr uint16_t SFLAG_raptor41 = 94;
 constexpr uint16_t SFLAG_raptor42 = 95;
 constexpr uint16_t SFLAG_raptor43 = 96;
-constexpr uint16_t SFLAG_rapter44 = 97;
+constexpr uint16_t SFLAG_raptor47 = 97;
 constexpr uint16_t SFLAG_raptor45 = 98;
 constexpr uint16_t SFLAG_tunic_tutorial_done = 99;
 constexpr uint16_t SFLAG_PostDream = 100;
@@ -141,4 +141,9 @@ constexpr uint16_t SFLAG_pot9 = 135;
 constexpr uint16_t SFLAG_pot10 = 136;
 constexpr uint16_t SFLAG_pot11 = 137;
 constexpr uint16_t SFLAG_pot_first_dungeon = 138;
-constexpr uint16_t SFLAG_raptor44 = 139;
+constexpr uint16_t SFLAG_dryadpuz5 = 139;
+constexpr uint16_t SFLAG_dryadpuz1 = 140;
+constexpr uint16_t SFLAG_dryadpuz2 = 141;
+constexpr uint16_t SFLAG_dryadpuz3 = 142;
+constexpr uint16_t SFLAG_dryadpuz4 = 143;
+constexpr uint16_t SFLAG_pot12 = 144;

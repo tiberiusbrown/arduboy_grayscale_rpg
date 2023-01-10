@@ -30,7 +30,7 @@ void new_game()
     party[0].battle.id = 0;
     party[0].battle.hp = party_mhp(0);
 
-#if 0
+#if 1
     for(int i = 0; i < 4; ++i)
     {
         party[i].battle.id = i;
@@ -52,6 +52,8 @@ void new_game()
     story_flag_set(SFLAG_ITEM_Barbarian_s_Helm);
     story_flag_set(SFLAG_ITEM_Boxing_Gloves);
 #endif
+    px = 213;
+    py = 1912;
 }
 
 void initialize()
