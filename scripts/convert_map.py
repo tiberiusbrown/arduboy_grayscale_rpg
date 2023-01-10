@@ -178,7 +178,7 @@ for obj in tm.layers[1]:
             t = re.sub('|'.join(r'@\b%s\b' % re.escape(loc[1:]) for loc in locations), 
                 locreplace, t)
             s = s + t + '\n'
-    b = script_assembler.assemble(s, epaths[chunk])
+    b = script_assembler.assemble(s, epaths[chunk], (x, y))
     bs[chunk] += b
     if len(bs[chunk]) > CHUNK_SCRIPT_SIZE:
         print('Script too large at chunk: %d,%d' %(obj.x, obj.y))

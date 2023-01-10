@@ -10,6 +10,9 @@ portraits = {}
 sprites = {}
 enemies = {}
 
+# battle flags used
+bats = {}
+
 tiles = {
     'T_OutdoorSwitchOff'  : 59,
     'T_OutdoorSwitchOn'   : 43,
@@ -186,6 +189,14 @@ def flag(s):
 def addflag(b, s):
     append16(b, flag(s))
 
+def batflag(b, s, chunk):
+    f = flag(s)
+    if f in bats:
+        print('Duplicate battle flags: "%s" at %s and %s' % (s, str(bats[f]), str(chunk)))
+        sys.exit(1)
+    bats[f] = chunk
+    addflag(b, s)
+
 def addpath(b, s, eps):
     if s not in eps:
         print('Path "%s" not found' % s)
@@ -225,7 +236,7 @@ def enemy(s):
 def addenemy(b, s):
     b.append(enemy(s))
 
-def assemble(s, eps):
+def assemble(s, eps, chunk):
     b = []
     s = [x for x in re.findall('\{[^}]*}|\S+', s)]
     i = 0
@@ -258,7 +269,7 @@ def assemble(s, eps):
             
         elif s[i] == 'bat':
             b.append(CMD.BAT); i += 1
-            addflag(b, s[i]); i += 1
+            batflag(b, s[i], chunk); i += 1
             addenemy(b, s[i]); i += 1
             addenemy(b, s[i]); i += 1
             addenemy(b, s[i]); i += 1
@@ -266,7 +277,7 @@ def assemble(s, eps):
             
         elif s[i] == 'ebat':
             b.append(CMD.EBAT); i += 1
-            addflag(b, s[i]); i += 1
+            batflag(b, s[i], chunk); i += 1
             addenemy(b, s[i]); i += 1
             addenemy(b, s[i]); i += 1
             addenemy(b, s[i]); i += 1
