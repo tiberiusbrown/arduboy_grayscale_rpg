@@ -228,7 +228,7 @@ static void update_map()
     selx = sely = uint16_t(-1);
     if(!(btns_down & BTN_A))
         sdata.map.a_pressed = 0;
-    else if(sdata.map.a_pressed != 0 && sdata.map.a_pressed < 32)
+    else if(sdata.map.a_pressed != 0 && sdata.map.a_pressed < 16)
         ++sdata.map.a_pressed;
     if(btns_pressed & BTN_A)
     {

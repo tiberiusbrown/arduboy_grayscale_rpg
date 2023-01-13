@@ -11,7 +11,7 @@ void render_map()
 static void render_map_and_objective()
 {
     render_map();
-    if(sdata.map.a_pressed >= 32 && (btns_down & BTN_A))
+    if(sdata.map.a_pressed >= 16 && (btns_down & BTN_A))
     {
         if(!player_is_outside()) return;
 

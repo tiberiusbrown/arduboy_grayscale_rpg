@@ -1,6 +1,7 @@
 #include "common.hpp"
 
 #include <string.h>
+#include <stddef.h>
 
 uint8_t const SPRITE_FLAGS[] PROGMEM =
 {
@@ -63,10 +64,17 @@ uint8_t user_item_count(uint8_t i, item_t const* items, uint8_t count)
     return n;
 }
 
-uint8_t party_att(uint8_t i)
+static FORCE_NOINLINE int8_t party_stat(uint8_t i, uint8_t offset)
 {
     uint8_t id = party[i].battle.id;
-    int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_att);
+    return (int8_t)pgm_read_byte((uint8_t const*)&PARTY_INFO[id] + offset);
+}
+
+uint8_t party_att(uint8_t i)
+{
+    //uint8_t id = party[i].battle.id;
+    //int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_att);
+    int8_t r = party_stat(i, offsetof(party_info_t, base_att));
     r += items_att(i);
     if(party[i].equipped_items[IT_ARMOR] == INVALID_ITEM)
     {
@@ -86,9 +94,12 @@ uint8_t party_att(uint8_t i)
 
 uint8_t party_def(uint8_t i)
 {
-    uint8_t id = party[i].battle.id;
-    int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_def);
+    //uint8_t id = party[i].battle.id;
+    //int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_def);
+    int8_t r = party_stat(i, offsetof(party_info_t, base_def));
     r += items_def(i);
+    if(user_is_wearing(i, SFLAG_ITEM_Amulet_of_Peace))
+        r *= 2;
     if(r < 0) r = 0;
     if(r > 99) r = 99;
     return r;
@@ -96,8 +107,9 @@ uint8_t party_def(uint8_t i)
 
 uint8_t party_mhp(uint8_t i)
 {
-    uint8_t id = party[i].battle.id;
-    int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_mhp);
+    //uint8_t id = party[i].battle.id;
+    //int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_mhp);
+    int8_t r = party_stat(i, offsetof(party_info_t, base_mhp));
     r += items_mhp(i);
     {
         // Dryad items
@@ -121,8 +133,9 @@ uint8_t party_mhp(uint8_t i)
 
 uint8_t party_spd(uint8_t i)
 {
-    uint8_t id = party[i].battle.id;
-    int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_spd);
+    //uint8_t id = party[i].battle.id;
+    //int8_t r = (int8_t)pgm_read_byte(&PARTY_INFO[id].base_spd);
+    int8_t r = party_stat(i, offsetof(party_info_t, base_spd));
     r += items_spd(i);
     if(r < 0) r = 0;
     if(r > 99) r = 99;
