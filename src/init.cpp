@@ -9,8 +9,7 @@ void new_game()
     auto old_settings = savefile.settings;
     memset(&savefile, 0, sizeof(savefile));
     savefile.settings = old_settings;
-    px = 170;
-    py = 71 + 2048;
+    LOC_new_game();
     pdir = 0;
     pmoving = false;
     for(auto& f : story_flags) f = 0;

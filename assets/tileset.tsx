@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.9" tiledversion="1.9.2" name="tileset" tilewidth="16" tileheight="16" tilecount="512" columns="16">
+<tileset version="1.9" tiledversion="1.9.2" name="tileset" tilewidth="16" tileheight="16" tilecount="256" columns="16">
  <transformations hflip="0" vflip="0" rotate="0" preferuntransformed="1"/>
- <image source="tiles.png" width="256" height="512"/>
+ <image source="tiles.png" width="256" height="256"/>
  <wangsets>
   <wangset name="Terrains" type="mixed" tile="-1">
    <wangcolor name="Trees" color="#00aa00" tile="-1" probability="1"/>

@@ -256,8 +256,6 @@ static inline void render_consumable_row(
             (ITEM_NAME_LEN + ITEM_DESC_LEN) * ni,
             d.str, ITEM_DESC_LEN);
         draw_text_noclip(x + 2, y + 46, d.str);
-        if(plane() == 0)
-            platform_fillrect_i8(int8_t(x), int8_t(rowy + 1), d.consw, 8, DARK_GRAY);
     }
     platform_fx_read_data_bytes(
         ITEM_INFO + sizeof(item_info_t) * NUM_ITEMS +
@@ -272,6 +270,8 @@ static inline void render_consumable_row(
         uint8_t w = text_width(buf);
         draw_text_noclip(x + 126 - w, rowy + 1, buf);
     }
+    if(selected && plane() == 0)
+        platform_fillrect_i8(int8_t(x), int8_t(rowy + 1), d.consw, 8, DARK_GRAY);
 }
 
 static void render_items_page(
