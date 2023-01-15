@@ -53,11 +53,12 @@ static void render_pause_party_offset(int8_t x, int8_t y, uint8_t i)
     auto const& d = sdata.pause;
     auto const& p = savefile.party[i];
     auto const& b = p.battle;
-    auto const* pi = &PARTY_INFO[b.id];
+    uint8_t id = b.id;
+    auto const* pi = &PARTY_INFO[id];
     char const* name = pgmptr(&pi->name);
 
 #if 1
-    platform_fx_drawoverwrite(x, y, INNATES_IMG, i);
+    platform_fx_drawoverwrite(x, y, INNATES_IMG, id);
 #else
     {
         char t[] = "While defending, Dismas strikes his attacker at half damage.";

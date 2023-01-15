@@ -10,7 +10,7 @@ constexpr int SAMPLES = 1024;
 constexpr int FREQ = 16000;
 constexpr float SAMPLE_TIME = 1.f / FREQ;
 
-constexpr int BPS = 7;
+constexpr int BPS = 14;
 constexpr float BEAT_TIME = 1.f / BPS;
 constexpr int BEAT_PERIOD = int(BEAT_TIME / SAMPLE_TIME + 0.5f);
 

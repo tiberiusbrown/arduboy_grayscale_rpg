@@ -1,6 +1,7 @@
 Att,Def,Spd,MHP,Type,Name,Description,Location
 ,,,,amulet,Amulet of Zhar-Tul,The wearer may take two actions per turn in battle.,
 ,,,,amulet,Dryad Amulet,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
+,,,,amulet,Amulet of Peace,Doubles defense when not wielding a weapon.,
 ,2,,3,armor,Brawler’s Tunic,"+2 defense, +3 max health.",raptor forest ne beach chest
 ,1,,,armor,Cloth Tunic,"Worn and scruffy, but warm enough. +1 defense.",Matthias’s dresser
 ,1,,,armor,Cloth Tunic#2,"Worn and scruffy, but warm enough. +1 defense.",raptor forest near path and water
@@ -41,4 +42,5 @@ Att,Def,Spd,MHP,Type,Name,Description,Location
 2,,,,weapon,Crude Iron Sword,+2 attack.,raptor forest defeat skeleton at grave
 4,,2,,weapon,Katana,"For those who have been studying the blade. +4 attack, +2 speed.",
 2,,1,,weapon,Rusty Katana,"Once a fine weapon. +2 attack, +1 speed.",raptor forest nw beach chest
-,,,,amulet,Amulet of Peace,Doubles defense when not wielding a weapon.,
+2,,,,weapon,Large Wooden Club,+2 attack.,raptor forest e chest near path
+1,1,1,,ring,Agatha’s Ring,"+1 attack, +1 defense, +1 speed.",

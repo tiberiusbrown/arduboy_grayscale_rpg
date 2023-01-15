@@ -2,7 +2,7 @@ from mido import MidiFile
 import sys
 
 NUM_CHANNELS = 2
-QUARTER_NOTE_BEATS = 4
+QUARTER_NOTE_BEATS = 8
 END_VOLUME = 0.0
 
 def delay_cmd(beats):
@@ -113,5 +113,5 @@ def convert(
         f.write(bytearray(bytes))
 
 convert('song_peaceful', ev = 0.5)
-convert('song_victory')
-convert('song_defeat', qnb = 6)
+convert('song_victory', qnb = 2)
+convert('song_defeat', qnb = 8)

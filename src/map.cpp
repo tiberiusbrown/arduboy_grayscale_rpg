@@ -71,6 +71,7 @@ static bool run_chunk()
                 sel_sprite = true;
         }
     }
+    // TODO: optimize no_state_actions line below
     bool no_state_actions = (
         state == STATE_RESUME ||
         state == STATE_TITLE || 
@@ -429,6 +430,12 @@ static bool run_chunk()
             }
             if(jmp) instr_ptr += t;
             break;
+        }
+        case CMD_BPF:
+        {
+            int8_t t = (int8_t)deref_inc(instr_ptr);
+            if(nparty >= 4)
+                instr_ptr += t;
         }
 
         default: break;

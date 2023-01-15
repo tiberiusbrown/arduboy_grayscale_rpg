@@ -127,6 +127,9 @@ Control Instructions
     bnai <item flag> label
         If Matthias has not equipped <item flag>, jmp label
 
+    bpf label
+        If the party is full, jmp label
+
 Other Assembly Syntax
 
     Shortcut          Meaning
@@ -220,4 +223,5 @@ enum script_command_t
     CMD_BNSE,
     CMD_BNI,
     CMD_BNAI,
+    CMD_BPF,
 };

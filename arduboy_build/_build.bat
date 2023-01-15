@@ -5,7 +5,9 @@ cd /d %~dp0
 call ..\assets\_update_generated.bat subcall
 if NOT %errorlevel%==0 goto error
 
+rem old hack
 rem set "remove_timer0=-D__vector_23=__attribute__((naked,weak))remove_timer0 -DREMOVE_TIMER0"
+
 set "remove_timer0=-DREMOVE_TIMER0"
 rem set "remove_timer0=-DDEBUG_BUILD"
 rem set "remove_timer0=-DDEBUG_MONOCHROME"
