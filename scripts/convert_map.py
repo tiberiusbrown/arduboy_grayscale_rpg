@@ -25,7 +25,7 @@ CHUNK_SCRIPT_OFFSET = 32
 def get_tile_id(x, y):
     im = tm.get_tile_image(x, y, 0)
     if im is None: return 30
-    return im[1][0] // 16 + im[1][1]
+    return (im[1][0] // 16 + im[1][1]) & 0xff
 
 chunks = [[0] * CHUNK_BYTES for i in range(CHUNKS_W * CHUNKS_H)]
 

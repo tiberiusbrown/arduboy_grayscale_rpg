@@ -631,12 +631,12 @@ static void draw_battle_background()
     {
         // dungeon background
         for(uint8_t x = 0; x < 128; x += 16)
-            draw_tile(x, 0, 12);
+            draw_tile(x, 0, 514);
         for(uint8_t y = 0; y < 64; y += 16)
         {
             if(y + d.itemsy >= 64) break;
             for(uint8_t x = 0; x < 128; x += 16)
-                draw_tile(x, y, 28);
+                draw_tile(x, y, 530);
         }
     }
     // sleeping sprites

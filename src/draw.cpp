@@ -247,7 +247,7 @@ void draw_player()
     platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, 16, 16, PLAYER_IMG, f);
 }
 
-void draw_tile(int16_t x, int16_t y, uint8_t t)
+void draw_tile(int16_t x, int16_t y, uint16_t t)
 {
 #if TILES_IN_PROG > 0
     if(t < TILES_IN_PROG)
@@ -265,6 +265,12 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
     uint8_t ny;
     uint8_t t;
     uint24_t tile_img = TILE_IMG + 2;
+    if(py >= MAP_CHUNK_ROWS / 2 * 64)
+    {
+        tile_img += (256 * 32 * 3);
+        if(px >= MAP_CHUNK_COLS / 2 * 128)
+            tile_img += (256 * 32 * 3);
+    }
     int16_t x;
 #ifdef ARDUINO
 //#if 0
@@ -365,7 +371,9 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
         ny = div16(uint8_t(64 + 15 - oy));
     if(ny == 0) return;
     tiles += t;
+#ifdef ARDUINO
     tile_img += 32 * plane();
+#endif
 #endif
 //#ifdef ARDUINO
 #if 0
@@ -448,7 +456,10 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
                 SpritesU::MODE_OVERWRITEFX,
                 x, oy);
 #else
-            draw_tile(x, oy, *tiles++);
+            platform_fx_drawoverwrite(
+                x, oy,
+                tile_img - 2 + (PLANES * 32) * deref_inc(tiles),
+                0, 16, 16);
 #endif
             x += 16;
         } while(--t != 0);

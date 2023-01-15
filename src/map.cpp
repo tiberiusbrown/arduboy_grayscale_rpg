@@ -23,14 +23,14 @@ static bool run_chunk()
 {
     auto& ac = active_chunks[running_chunk];
     auto& sprite = chunk_sprites[running_chunk];
-    // reset sprite at the beginning of chunk script
-    if(!chunks_are_running)
-        chunk_sprite_defined = false;
     auto& c = ac.chunk;
+    // reset tiles and sprite at the beginning of chunk script
+    if(!chunks_are_running)
     {
         uint16_t ci = ac.cy * MAP_CHUNK_COLS + ac.cx;
         uint24_t addr = MAPDATA + uint24_t(ci) * sizeof(map_chunk_t);
         platform_fx_read_data_bytes(addr, c.tiles_flat, 32);
+        chunk_sprite_defined = false;
     }
     uint8_t walk_tile = INVALID;
     uint8_t sel_tile = INVALID;
@@ -613,7 +613,14 @@ bool check_solid(uint16_t tx, uint16_t ty)
             );
     }
 #endif
-    t = pgm_read_byte(&TILE_SOLID[t]);
+    uint8_t const* ptr = &TILE_SOLID[0];
+    if(ty >= MAP_CHUNK_ROWS / 2 * 64)
+    {
+        ptr += 256;
+        if(tx >= MAP_CHUNK_COLS / 2 * 128)
+            ptr += 256;
+    }
+    t = pgm_read_byte(ptr + t);
     // identify quarter tiles
     uint8_t q = 1;
     if(ty & 0x08) q <<= 2;
