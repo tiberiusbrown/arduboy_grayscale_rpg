@@ -77,7 +77,7 @@ with open('../src/generated/tile_solid.hpp', 'w') as f:
             f.write('   ')
         a = TILE_SOLID[n + 0]
         b = TILE_SOLID[n + 1]
-        f.write(' %3d,' % ((a & 15) + (a << 4)))
+        f.write(' %3d,' % ((a & 15) + (b << 4)))
         if n % 32 >= 30:
             f.write('\n')
     f.write('};\n')
