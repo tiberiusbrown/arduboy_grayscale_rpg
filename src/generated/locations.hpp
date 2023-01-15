@@ -18,6 +18,6 @@ inline void LOC_first_cave_outside              () { px =   624; py =   768; }
 inline void LOC_first_cave_inside               () { px =  2320; py =  2256; }
 inline void LOC_first_cave_ladder               () { px =  2576; py =  2112; }
 inline void LOC_first_cave_exit                 () { px =   704; py =   656; }
-inline void LOC_new_game                        () { px =   160; py =  2096; }
+inline void LOC_new_game                        () { px =  2208; py =  2416; }
 inline void LOC_dismas_house_inside             () { px =   704; py =  2144; }
 inline void LOC_dismas_house_outside            () { px =   272; py =  1584; }
