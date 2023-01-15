@@ -14,6 +14,8 @@ python ..\scripts\convert_midi.py
 if NOT %errorlevel%==0 goto error
 python ..\scripts\font.py
 if NOT %errorlevel%==0 goto error
+python ..\scripts\save_tile_solid.py
+if NOT %errorlevel%==0 goto error
 
 cd ..\arduboy_build
 python ..\scripts\gen_fxsave.py

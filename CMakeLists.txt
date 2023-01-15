@@ -45,7 +45,6 @@ add_executable(arduboy_grayscale_rpg ${EXEFLAG}
     src/render.cpp
     src/save.cpp
     src/script_commands.hpp
-    src/tile_solid.hpp
     src/update.cpp
     )
 target_link_libraries(arduboy_grayscale_rpg SDL2-static SDL2main)

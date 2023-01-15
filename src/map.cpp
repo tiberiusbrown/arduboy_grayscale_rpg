@@ -4,7 +4,8 @@
 
 #include "generated/fxdata.h"
 #include "script_commands.hpp"
-#include "tile_solid.hpp"
+
+#include "generated/tile_solid.hpp"
 
 static void reset_sprite(sprite_t& e)
 {
@@ -616,15 +617,16 @@ bool check_solid(uint16_t tx, uint16_t ty)
     uint8_t const* ptr = &TILE_SOLID[0];
     if(ty >= MAP_CHUNK_ROWS / 2 * 64)
     {
-        ptr += 256;
+        ptr += 128;
         if(tx >= MAP_CHUNK_COLS / 2 * 128)
-            ptr += 256;
+            ptr += 128;
     }
-    t = pgm_read_byte(ptr + t);
+    uint8_t f = pgm_read_byte(ptr + (t >> 1));
+    if(t & 1) f = nibswap(f);
     // identify quarter tiles
     uint8_t q = 1;
     if(ty & 0x08) q <<= 2;
     if(tx & 0x08) q <<= 1;
-    if((t & q) != 0) return true;
+    if((f & q) != 0) return true;
     return false;
 }
