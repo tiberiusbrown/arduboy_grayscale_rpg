@@ -14,24 +14,24 @@ enemies = {}
 bats = {}
 
 tiles = {
-    'T_OutdoorSwitchOff'  : 59  & 255,
-    'T_OutdoorSwitchOn'   : 43  & 255,
+    'T_OutdoorSwitchOff'  : 51  & 255,
+    'T_OutdoorSwitchOn'   : 50  & 255,
     'T_DungeonSwitchOff'  : 544 & 255,
     'T_DungeonSwitchOn'   : 528 & 255,
-    'T_OutdoorStairs'     : 114 & 255,
+    'T_OutdoorStairs'     : 58  & 255,
     'T_IndoorStairs'      : 279 & 255,
     'T_DungeonStairs'     : 535 & 255,
     'T_DungeonBarsOpen'   : 550 & 255,
     'T_DungeonBarsClosed' : 551 & 255,
     'T_DungeonButtonOff'  : 549 & 255,
     'T_DungeonButtonOn'   : 548 & 255,
-    'T_OutdoorButtonOff'  : 164 & 255,
-    'T_OutdoorButtonOn'   : 163 & 255,
-    'T_OutdoorRock'       : 141 & 255,
-    'T_Grass1'            : 10  & 255,
-    'T_Grass2'            : 11  & 255,
-    'T_Grass3'            : 26  & 255,
-    'T_Grass4'            : 27  & 255,
+    'T_OutdoorButtonOff'  : 49  & 255,
+    'T_OutdoorButtonOn'   : 48  & 255,
+    'T_OutdoorRock'       : 55  & 255,
+    'T_Grass1'            : 6   & 255,
+    'T_Grass2'            : 7   & 255,
+    'T_Grass3'            : 22  & 255,
+    'T_Grass4'            : 23  & 255,
     }
 
 def id_helper(x):
