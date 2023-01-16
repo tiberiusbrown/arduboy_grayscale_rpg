@@ -107,6 +107,12 @@ Control Instructions
     bnz <reg> label
         If <reg> is nonzero, jmp label
 
+    bneq <reg> <imm> label
+        If <reg> != <imm>, jmp label
+
+    bgeq <reg> <imm> label
+        if <reg> >= <imm>, jmp label
+
     bfs <flag> label
         If <flag> is set, jmp label
 
@@ -220,6 +226,8 @@ enum script_command_t
     CMD_JMP,
     CMD_BZ,
     CMD_BNZ,
+    CMD_BNEQ,
+    CMD_BGEQ,
     CMD_BFS,
     CMD_BFC,
     CMD_BNST,

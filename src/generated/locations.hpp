@@ -21,3 +21,9 @@ inline void LOC_first_cave_exit                 () { px =   704; py =   656; }
 inline void LOC_new_game                        () { px =  2208; py =  2416; }
 inline void LOC_dismas_house_inside             () { px =   704; py =  2144; }
 inline void LOC_dismas_house_outside            () { px =   272; py =  1584; }
+inline void LOC_out_portal_raptor               () { px =  1168; py =  1584; }
+inline void LOC_portal_raptor                   () { px =  2880; py =  2240; }
+inline void LOC_portal_village                  () { px =  2880; py =  2176; }
+inline void LOC_out_portal_village              () { px =   368; py =   784; }
+inline void LOC_puzright_inside                 () { px =  2384; py =  2432; }
+inline void LOC_puzright_outside                () { px =   544; py =  1712; }

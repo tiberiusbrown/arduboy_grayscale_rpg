@@ -384,6 +384,24 @@ static bool run_chunk()
             if(savefile.chunk_regs[t] < 0) instr_ptr += i;
             break;
         }
+        case CMD_BNEQ:
+        {
+            uint8_t t = deref_inc(instr_ptr);
+            uint8_t imm = deref_inc(instr_ptr);
+            int8_t i = (int8_t)deref_inc(instr_ptr);
+            if(savefile.chunk_regs[t] != imm)
+                instr_ptr += i;
+            break;
+        }
+        case CMD_BGEQ:
+        {
+            uint8_t t = deref_inc(instr_ptr);
+            uint8_t imm = deref_inc(instr_ptr);
+            int8_t i = (int8_t)deref_inc(instr_ptr);
+            if(savefile.chunk_regs[t] >= imm)
+                instr_ptr += i;
+            break;
+        }
         case CMD_BFS:
         case CMD_BFC:
         {

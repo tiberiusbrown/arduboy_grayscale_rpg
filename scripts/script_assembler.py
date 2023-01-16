@@ -119,6 +119,8 @@ class CMD(AutoNumber):
     JMP  = ()
     BZ   = ()
     BNZ  = ()
+    BNEQ = ()
+    BGEQ = ()
     BFS  = ()
     BFC  = ()
     BNST = ()
@@ -391,6 +393,18 @@ def assemble(s, eps, chunk):
         elif s[i] == 'bnz':
             b.append(CMD.BNZ); i += 1
             b.append(reg(s[i])); i += 1
+            b.append(s[i]); i += 1
+            
+        elif s[i] == 'bneq':
+            b.append(CMD.BNEQ); i += 1
+            b.append(reg(s[i])); i += 1
+            b.append(int(s[i])); i += 1
+            b.append(s[i]); i += 1
+            
+        elif s[i] == 'bgeq':
+            b.append(CMD.BGEQ); i += 1
+            b.append(reg(s[i])); i += 1
+            b.append(int(s[i])); i += 1
             b.append(s[i]); i += 1
             
         elif s[i] == 'bfs':
