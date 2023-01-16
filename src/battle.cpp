@@ -167,8 +167,11 @@ static void take_damage(uint8_t i, int8_t dam)
     auto& d = sdata.battle;
     auto& s = d.sprites[i];
     uint8_t& hp = member(i).hp;
+
+    // defenders take half damage
     if(dam > 0 && (i == d.pdef || i == d.edef))
         dam = (dam + 1) / 2;
+
     int8_t new_hp = hp - dam;
     if(new_hp < 0) new_hp = 0;
     if(new_hp > mhp) new_hp = mhp;
@@ -545,6 +548,18 @@ void update_battle()
                 attacker, STUN_ITEMS, sizeof(STUN_ITEMS) / sizeof(item_t));
             if(n > 0)
                 d.sprites[defender].flags |= BFLAG_STUNNED;
+        }
+
+        // check for Vampiric item (heals 1 health after each attack)
+        {
+            static item_t const VAMPIRIC_ITEMS[] PROGMEM =
+            {
+                SFLAG_ITEM_Small_Vampiric_Dagger,
+                SFLAG_ITEM_Lifedrain_Amulet,
+            };
+            uint8_t v = user_item_count(attacker, VAMPIRIC_ITEMS,
+                sizeof(VAMPIRIC_ITEMS) / sizeof(item_t));
+            take_damage(attacker, -(int8_t)v);
         }
 
         break;

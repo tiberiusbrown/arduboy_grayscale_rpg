@@ -57,6 +57,10 @@ ALU Instructions
     sub <rdst> <rsrc>
         <rdst> = <rdst> + <rsrc>
 
+    andi <rdst> <rsrc> <imm>
+        <rdst> = <rsrc> & <imm>
+        This can be used to move and mask a read-only reg: andi r1 r4 0x80
+
 Game Manipulation
 
     fs <flag>
@@ -168,14 +172,14 @@ Registers:
 
     Register   Use
     ==========================================================================
-    r0         Always zero
-    r1         Nonzero if the first response to a question was selected
-    r2         Nonzero if the second response to a question was selected
-    r3         Nonzero if the third response to a question was selected
-    r4
-    r5
+    r0         [READ ONLY] Always zero
+    r1         Nonzero if response 1 to a question was selected
+    r2         Nonzero if response 2 to a question was selected
+    r3         Nonzero if response 3 to a question was selected
+    r4         [READ ONLY] nframe counter
+    r5         [READ ONLY] pdir (0-7): S SW W NW N NE E SE
     r6
-    r7
+    r7         
     r8+        Number of consumable items
 
 */
@@ -200,6 +204,7 @@ enum script_command_t
     CMD_ADD,
     CMD_ADDI,
     CMD_SUB,
+    CMD_ANDI,
 
     CMD_FS,
     CMD_FC,

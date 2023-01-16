@@ -25,7 +25,7 @@ static bool run_chunk()
     auto& ac = active_chunks[running_chunk];
     auto& sprite = chunk_sprites[running_chunk];
     auto& c = ac.chunk;
-    // reset tiles and sprite at the beginning of chunk script
+    // reset tiles and sprite, and set regs at the beginning of chunk script
     if(!chunks_are_running)
     {
         uint16_t ci = ac.cy * MAP_CHUNK_COLS + ac.cx;
@@ -179,7 +179,7 @@ static bool run_chunk()
         {
             uint8_t t = deref_inc(instr_ptr);
             uint8_t dst = t & 0xf;
-            uint8_t src = div16(t);
+            uint8_t src = nibswap(t) & 0xf;
             savefile.chunk_regs[dst] += savefile.chunk_regs[src];
             break;
         }
@@ -188,10 +188,10 @@ static bool run_chunk()
             uint8_t t = deref_inc(instr_ptr);
             int8_t imm = (int8_t)deref_inc(instr_ptr);
             uint8_t dst = t & 0xf;
-            uint8_t src = div16(t);
-            int8_t newdst = savefile.chunk_regs[src] + imm;
-            int8_t diff = newdst - savefile.chunk_regs[dst];
-            savefile.chunk_regs[dst] = newdst;
+            uint8_t src = nibswap(t) & 0xf;
+            int8_t newdst = (int8_t)savefile.chunk_regs[src] + imm;
+            int8_t diff = newdst - (int8_t)savefile.chunk_regs[dst];
+            savefile.chunk_regs[dst] = (uint8_t)newdst;
             if(!no_state_actions && dst >= 8)
             {
                 if(diff > 0)
@@ -222,8 +222,17 @@ static bool run_chunk()
         {
             uint8_t t = deref_inc(instr_ptr);
             uint8_t dst = t & 0xf;
-            uint8_t src = div16(t);
+            uint8_t src = nibswap(t) & 0xf;
             savefile.chunk_regs[dst] -= savefile.chunk_regs[src];
+            break;
+        }
+        case CMD_ANDI:
+        {
+            uint8_t t = deref_inc(instr_ptr);
+            uint8_t imm = deref_inc(instr_ptr);
+            uint8_t dst = t & 0xf;
+            uint8_t src = nibswap(t) & 0xf;
+            savefile.chunk_regs[dst] = savefile.chunk_regs[src] & imm;
             break;
         }
 
@@ -458,11 +467,11 @@ static void clamp_regs()
     savefile.chunk_regs[0] = 0;
     for(uint8_t i = 0; i < NUM_CONSUMABLES; ++i)
     {
-        int8_t* xp = &savefile.chunk_regs[8 + i];
-        int8_t x = *xp;
+        uint8_t* xp = &consumables[8 + i];
+        int8_t x = int8_t(*xp);
         if(x < 0) x = 0;
         if(x > 99) x = 99;
-        *xp = x;
+        *xp = (uint8_t)x;
     }
 }
 

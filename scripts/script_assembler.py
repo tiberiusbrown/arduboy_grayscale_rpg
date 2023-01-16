@@ -103,6 +103,7 @@ class CMD(AutoNumber):
     ADD  = ()
     ADDI = ()
     SUB  = ()
+    ANDI = ()
 
     FS   = ()
     FC   = ()
@@ -317,11 +318,16 @@ def assemble(s, eps, chunk):
         elif s[i] == 'addi':
             b.append(CMD.ADDI); i += 1
             b.append(dstreg(s[i]) + (reg(s[i+1])<<4)); i += 2
-            b.append(int(s[i])); i += 1
+            b.append(int(s[i], 0)); i += 1
             
         elif s[i] == 'sub':
             b.append(CMD.SUB); i += 1
             b.append(dstreg(s[i]) + (reg(s[i+1])<<4)); i += 2
+            
+        elif s[i] == 'andi':
+            b.append(CMD.ANDI); i += 1
+            b.append(dstreg(s[i]) + (reg(s[i+1])<<4)); i += 2
+            b.append(int(s[i], 0)); i += 1
             
         elif s[i] == 'fs':
             b.append(CMD.FS); i += 1

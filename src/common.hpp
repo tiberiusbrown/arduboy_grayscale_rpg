@@ -187,9 +187,6 @@ struct map_chunk_t
     uint8_t script[CHUNK_SCRIPT_SIZE];
 };
 
-extern uint8_t nframe; // update frame
-extern uint8_t rframe; // render frame
-
 enum
 {
     STATE_TITLE,
@@ -537,12 +534,12 @@ struct savefile_t
     bool loaded;
     uint8_t objx, objy;  // objective marker position
     uint16_t px, py;     // player position (in pixels)
-    uint8_t pdir;        // player direction
+    //uint8_t pdir;        // player direction
     uint8_t nparty;
     party_member_t party[4];
     uint8_t story_flags[STORY_FLAG_BYTES];
     settings_t settings;
-    int8_t chunk_regs[8 + NUM_CONSUMABLES];
+    uint8_t chunk_regs[8 + NUM_CONSUMABLES];
     sprite_t chunk_sprites[4];
     uint8_t explored[EXPLORED_BYTES];
 };
@@ -551,12 +548,16 @@ static_assert(sizeof(savefile.chunk_regs) <= 16, "revisit reg command encoding")
 
 static auto& px = savefile.px;
 static auto& py = savefile.py;
-static auto& pdir = savefile.pdir;
+static auto& pdir = savefile.chunk_regs[5];
 static auto& party = savefile.party;
 static auto& nparty = savefile.nparty;
 static auto& story_flags = savefile.story_flags;
 static auto& chunk_sprites = savefile.chunk_sprites;
 constexpr auto* consumables = &savefile.chunk_regs[8];
+
+//extern uint8_t nframe; // update frame
+static uint8_t& nframe = savefile.chunk_regs[4];
+extern uint8_t rframe; // render frame
 
 constexpr auto SIZEOF_SAVEFILE = sizeof(savefile);
 

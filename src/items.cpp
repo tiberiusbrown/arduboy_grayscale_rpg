@@ -93,7 +93,7 @@ void update_items_numcat(sdata_items& d)
 {
     for(auto& n : d.cat_nums) n = 0;
     for(uint8_t i = 0; i < NUM_CONSUMABLES; ++i)
-        if(savefile.chunk_regs[8 + i] != 0)
+        if(consumables[i] != 0)
             ++d.cat_nums[IT_CONSUMABLE];
     if(d.cat_nums[IT_CONSUMABLE] == 0)
         d.cat_nums[IT_CONSUMABLE] = 1;

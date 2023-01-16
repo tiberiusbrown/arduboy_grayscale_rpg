@@ -109,7 +109,7 @@ def convert_path(obj):
                 i += 1
         if tiles[0] == tiles[-1] & 0x1f:
             if (tiles[0] >> 5) + (tiles[-1] >> 5) > 7:
-                print('Too many path delays: chunk %d' % (obj.x, obj.y))
+                print('Too many path delays at %d,%d' % (obj.x, obj.y))
                 sys.exit(1)
             tiles[0] += (tiles[-1] & 0xe0)
             tiles.pop(-1)
