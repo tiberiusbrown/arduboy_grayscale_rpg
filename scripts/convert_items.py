@@ -37,9 +37,9 @@ for t in rows:
     n = len(t[6]) + 1
     if n > NMSG: NMSG = n
 for t in consumables:
-    n = len(t[0]) + 1
+    n = len(t[2]) + 1
     if n > NNAME: NNAME = n
-    n = len(t[1]) + 1
+    n = len(t[3]) + 1
     if n > NMSG: NMSG = n
 N = NNAME + NMSG
 #with open('../arduboy_build/item_strings.bin', 'wb') as f:
@@ -75,9 +75,21 @@ with open('../src/generated/num_items.hpp', 'w') as f:
     f.write('constexpr uint8_t NUM_CONSUMABLES = %d;\n' % len(consumables))
     f.write('enum\n{\n')
     for r in consumables:
-        x = 'CIT_' + re.sub('[^a-zA-Z]+', '_', r[0])
+        x = 'CIT_' + re.sub('[^a-zA-Z]+', '_', r[2])
         f.write('    %s,\n' % x)
     f.write('};\n')
+    t = 0
+    for i in range(len(consumables)):
+        r = consumables[i]
+        if int(r[0]) != 0:
+            t += (1 << i)
+    f.write('constexpr uint8_t CIT_BATTLE_ONLY = %d;\n' % t)
+    t = 0
+    for i in range(len(consumables)):
+        r = consumables[i]
+        if int(r[1]) != 0:
+            t += (1 << i)
+    f.write('constexpr uint8_t CIT_ARDU_ONLY = %d;\n' % t)
 
 TYPES = {
     'weapon' : 0,
@@ -107,8 +119,8 @@ with open('../arduboy_build/item_info.bin', 'wb') as f:
             bytes[5+NNAME+n] = ord(desc[n])
         f.write(bytearray(bytes))
     for t in consumables:
-        name = t[0]
-        msg = t[1]
+        name = t[2]
+        msg = t[3]
         check_wrap(name, 90, 1)
         msg = '\n'.join(check_wrap(msg, 124, 2))
         bytes = bytearray([0 for x in range(N)])

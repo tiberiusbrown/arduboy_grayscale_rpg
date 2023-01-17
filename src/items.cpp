@@ -132,6 +132,18 @@ static uint8_t selected_consumable(sdata_items const& d)
     return INVALID_ITEM;
 }
 
+static bool consumable_usable(sdata_items const& d, uint8_t ni)
+{
+    if(d.cat != IT_CONSUMABLE)
+        return true;
+    uint8_t f = (1 << ni);
+    if(d.user_index != 0 && (f & CIT_ARDU_ONLY))
+        return false;
+    if(state != STATE_BATTLE && (f & CIT_BATTLE_ONLY))
+        return false;
+    return true;
+}
+
 bool update_items(sdata_items& d)
 {
     if(d.x != d.xt)
@@ -196,10 +208,12 @@ bool update_items(sdata_items& d)
                 }
             }
             d.consfill = d.consw = 0;
-            if(state == STATE_BATTLE) return true;
+            if(state == STATE_BATTLE)
+                return (d.consumed = selitem), true;
         }
     }
-    else if((btns_down & BTN_A) && d.cat == IT_CONSUMABLE)
+    else if((btns_down & BTN_A) && d.cat == IT_CONSUMABLE &&
+        consumable_usable(d, selected_consumable(d)))
     {
         if(d.consfill >= 128)
             d.conspause = 16;
@@ -261,7 +275,8 @@ static inline void render_consumable_row(
         ITEM_INFO + sizeof(item_info_t) * NUM_ITEMS +
         (ITEM_NAME_LEN + ITEM_DESC_LEN) * ni,
         d.str, ITEM_NAME_LEN);
-    draw_text_noclip(x + 2, rowy + 1, d.str);
+    if(plane() != 0 || consumable_usable(d, ni))
+        draw_text_noclip(x + 2, rowy + 1, d.str);
     {
         char buf[5];
         char* ptr = buf;
@@ -285,7 +300,11 @@ static void render_items_page(
         for(uint8_t ni = 0; ni < NUM_CONSUMABLES; ++ni)
         {
             if(consumables[ni] == 0) continue;
-            if(n < 0) continue;
+            if(n < 0)
+            {
+                ++n;
+                continue;
+            }
             if(n >= 3) break;
             render_consumable_row(x, y, d, n, ni);
             ++n;

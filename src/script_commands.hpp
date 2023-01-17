@@ -82,7 +82,7 @@ Game Manipulation
         Overwrite image at <tile> with <tile_img>
 
     stf <tile> <flag> <tile_img>
-        if <flag> is cleared, st <tile> <tile_img>
+        if <flag> is set, st <tile> <tile_img>
 
     pa <id>
         Add party member <id> to party
@@ -161,6 +161,7 @@ Other Assembly Syntax
     $bnwt             bnwt $T
     $st               st $T
     $stf              stf $T
+    $CHEST            CHEST $T
     label_name:       label the position of the following instruction
     !flag_name        unique flag identifier (auto-assigns to index)
     @location         <tx> <ty> - location for teleport

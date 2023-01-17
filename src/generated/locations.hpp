@@ -27,5 +27,7 @@ inline void LOC_portal_village                  () { px =  2880; py =  2176; }
 inline void LOC_out_portal_village              () { px =   368; py =   784; }
 inline void LOC_puzright_inside                 () { px =  2384; py =  2432; }
 inline void LOC_puzright_outside                () { px =   544; py =  1712; }
-inline void LOC_puzwait_inside                  () { px =  2784; py =  2528; }
+inline void LOC_puzwait_inside                  () { px =  2640; py =  2432; }
 inline void LOC_puzwait_outside                 () { px =   784; py =  1568; }
+inline void LOC_spike_inside                    () { px =  2992; py =  2416; }
+inline void LOC_spike_outside                   () { px =   608; py =  1664; }

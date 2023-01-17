@@ -284,6 +284,7 @@ struct sdata_items
     uint8_t consw;
     uint8_t consfill;
     uint8_t conspause;
+    uint8_t consumed;
     char str[ITEM_NAME_LEN < ITEM_DESC_LEN ? ITEM_DESC_LEN : ITEM_NAME_LEN];
 };
 struct sdata_pause
@@ -413,6 +414,8 @@ struct sdata_battle
     //uint8_t enemy_chunk;
     battle_member_t enemies[4];
     uint8_t pdef, edef; // party/enemy defender (-1 for none)
+    uint8_t special_attack;
+    uint8_t att_bonus[4];
 
     uint8_t esel;       // enemy select
     uint8_t psel;       // party member select

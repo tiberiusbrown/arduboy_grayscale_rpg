@@ -40,7 +40,10 @@ static uint8_t get_att(uint8_t id)
 {
     auto const& d = sdata.battle;
     if(id < 4)
-        return party_att(id);
+    {
+        uint16_t r = party_att(id) + d.att_bonus[id];
+        return r > 99 ? 99 : (uint8_t)r;
+    }
     return pgm_read_byte(&ENEMY_INFO[d.enemies[id - 4].id].att);
 }
 
@@ -150,15 +153,24 @@ static uint8_t calc_attack_damage(uint8_t attacker, uint8_t defender)
     uint8_t att = get_att(attacker);
     uint8_t def = get_def(defender);
 
-    int16_t dam = (att * att + (uint8_t(att + def) / 2)) / uint8_t(att + def);
+    // initial damage, scaled up 16x
+    int16_t dam = (att * att * 16) / uint8_t(att + def);
     
     // test if attacker is Lucy (double damage to back row)
     if(attacker < 4 && party[attacker].battle.id == 2 && defender >= 6)
         dam *= 2;
 
-    if(dam <= 0) dam = 1;
-    if(dam > 99) dam = 99;
-    return (uint8_t)dam;
+    // Ardu's Fury does double damage
+    if(d.special_attack == CIT_Ardu_s_Fury)
+        dam *= 2;
+
+    // scale back down 16x
+    dam >>= 4;
+
+    uint8_t rdam = (uint8_t)dam;
+    if(rdam <= 0) rdam = 1;
+    if(rdam > 99) rdam = 99;
+    return rdam;
 }
 
 static void take_damage(uint8_t i, int8_t dam)
@@ -400,6 +412,7 @@ void update_battle()
     adjust(d.msely, d.msel * 8);
     ++d.frame;
     //if(++d.selframe >= 7) d.selframe = 0;
+    d.sprites_done = false;
     if(d.itemsy == 0)
         update_battle_sprites();
     battle_phase_t phase = d.phase;
@@ -505,8 +518,21 @@ void update_battle()
         d.next_phase = BPHASE_ATTACK3;
         uint8_t attacker = d.attacker_id;
         uint8_t defender = d.defender_id;
-        uint8_t dam = calc_attack_damage(attacker, defender);
-        take_damage(defender, (int8_t)dam);
+        uint8_t dam;
+        if(d.special_attack == CIT_Ardu_s_Frenzy)
+        {
+            dam = get_att(attacker);
+            ++dam;
+            dam >>= 1;
+            for(uint8_t i = 4; i < 8; ++i)
+                if(d.sprites[i].active)
+                    take_damage(i, (int8_t)dam);
+        }
+        else
+        {
+            dam = calc_attack_damage(attacker, defender);
+            take_damage(defender, (int8_t)dam);
+        }
         platform_audio_play_sfx(SFX_HIT, 1);
 
         // Dismas innate: strike back at 50% damage when defending
@@ -547,7 +573,14 @@ void update_battle()
             uint8_t n = user_item_count(
                 attacker, STUN_ITEMS, sizeof(STUN_ITEMS) / sizeof(item_t));
             if(n > 0)
-                d.sprites[defender].flags |= BFLAG_STUNNED;
+            {
+                if(d.special_attack == CIT_Ardu_s_Frenzy)
+                {
+                    for(uint8_t i = 4; i < 8; ++i)
+                        d.sprites[i].flags |= BFLAG_STUNNED;
+                }
+                else d.sprites[defender].flags |= BFLAG_STUNNED;
+            }
         }
 
         // check for Vampiric item (heals 1 health after each attack)
@@ -561,6 +594,8 @@ void update_battle()
                 sizeof(VAMPIRIC_ITEMS) / sizeof(item_t));
             take_damage(attacker, -(int8_t)v);
         }
+
+        d.special_attack = 0;
 
         break;
     } 
@@ -591,19 +626,51 @@ void update_battle()
         break;
     }
     case BPHASE_ITEM:
+    {
         if(btns_pressed & BTN_B)
             phase = BPHASE_MENU, d.msel = 2;
-        if(d.itemsy == 64)
+        if(d.itemsy != 64)
+            break;
+        if(!update_items(d.items))
+            break;
+        uint8_t consumed = d.items.consumed;
+        if(consumed == CIT_Ardu_s_Frenzy)
         {
-            bool consumed = update_items(d.items);
-            if(consumed)
-            {
-                init_hp_bars();
-                battle_next_turn();
-                phase = d.phase;
-            }
+            uint8_t i = d.attacker_id;
+            uint8_t tx = DEFEND_X2 - 18;
+            uint8_t ty = 24;
+            move_sprite(i, tx, ty);
+            phase = BPHASE_SPRITES;
+            d.next_phase = BPHASE_ATTACK2;
+            d.special_attack = CIT_Ardu_s_Frenzy;
+            break;
         }
+        if(consumed == CIT_Ardu_s_Fury)
+        {
+            d.special_attack = CIT_Ardu_s_Fury;
+            // target highest health enemy
+            uint8_t defender = 4;
+            uint8_t dhp = d.enemies[0].hp;
+            for(uint8_t i = 1; i < 4; ++i)
+                if(d.enemies[i].hp > dhp)
+                    dhp = d.enemies[i].hp, defender = i + 4;
+            d.esel = defender;
+            phase = BPHASE_ATTACK1;
+            break;
+        }
+        if(consumed == CIT_Potion_of_Attack)
+        {
+            uint8_t i = d.attacker_id;
+            uint8_t b = d.att_bonus[i];
+            if(b <= 100)
+                b += 5;
+            d.att_bonus[i] = b;
+        }
+        init_hp_bars();
+        battle_next_turn();
+        phase = d.phase;
         break;
+    }
     case BPHASE_SPRITES:
         if(d.sprites_done)
             phase = d.next_phase;

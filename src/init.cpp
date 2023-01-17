@@ -52,17 +52,21 @@ void new_game()
     story_flag_set(SFLAG_ITEM_Boxing_Gloves);
 #endif
 
-#if 0
+#if 1
     LOC_dismas_house_outside();
     story_flag_set(SFLAG_ITEM_Barbarian_s_Helm);
     story_flag_set(SFLAG_ITEM_Barbarian_s_Footwraps);
     story_flag_set(SFLAG_ITEM_Barbarian_s_Axe);
     story_flag_set(SFLAG_ITEM_Spiked_Shield);
     story_flag_set(SFLAG_ITEM_Brawler_s_Ring);
-    savefile.chunk_regs[8] = 3;
+    story_flag_set(SFLAG_ITEM_Boxing_Gloves);
+    consumables[CIT_Healing_Salve] = 3;
+    consumables[CIT_Ardu_s_Fury] = 3;
+    consumables[CIT_Ardu_s_Frenzy] = 3;
+    consumables[CIT_Potion_of_Attack] = 3;
 #endif
 
-    //LOC_puzwait_outside();
+    //LOC_spike_outside();
 
 }
 
