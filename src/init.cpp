@@ -62,7 +62,7 @@ void new_game()
     savefile.chunk_regs[8] = 3;
 #endif
 
-    LOC_puzright_outside();
+    LOC_puzwait_outside();
 
 }
 

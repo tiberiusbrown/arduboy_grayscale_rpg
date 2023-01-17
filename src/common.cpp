@@ -85,7 +85,8 @@ uint8_t party_att(uint8_t i)
             SFLAG_ITEM_Barbarian_s_Helm,
             SFLAG_ITEM_Barbarian_s_Footwraps,
         };
-        r += user_item_count(i, BARBARIAN_ITEMS, 3) * 2;
+        r += user_item_count(i, BARBARIAN_ITEMS,
+            sizeof(BARBARIAN_ITEMS) / sizeof(item_t));
     }
     if(r < 1) r = 1;
     if(r > 99) r = 99;

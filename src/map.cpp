@@ -381,7 +381,7 @@ static bool run_chunk()
         {
             uint8_t t = deref_inc(instr_ptr);
             int8_t i = (int8_t)deref_inc(instr_ptr);
-            if(savefile.chunk_regs[t] < 0) instr_ptr += i;
+            if(savefile.chunk_regs[t] != 0) instr_ptr += i;
             break;
         }
         case CMD_BNEQ:
@@ -499,6 +499,9 @@ bool run_chunks()
     {
         running_chunk = 0;
         chunk_instr = 0;
+        uint8_t t = savefile.chunk_regs[6];
+        if(t > 0) t -= 1;
+        savefile.chunk_regs[6] = t;
     }
     while(running_chunk < 4)
     {

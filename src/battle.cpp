@@ -634,7 +634,7 @@ static void draw_battle_background()
     if(player_is_outside())
     {
         // outdoor background
-        static constexpr uint8_t TS[] PROGMEM = { 10, 11, 26, 27 };
+        static constexpr uint8_t TS[] PROGMEM = { 6, 7, 22, 23 };
         for(uint8_t y = 0, t = 0x23; y < 64; y += 16)
         {
             if(y + d.itemsy >= 64) break;

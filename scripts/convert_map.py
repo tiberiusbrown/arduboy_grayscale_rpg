@@ -192,15 +192,21 @@ for chunk in range(CHUNKS_W * CHUNKS_H):
     for i in range(len(b)):
         bytes[index + i] = b[i]
 
+def atoi(text):
+    return int(text) if text.isdigit() else text
+def natural_keys(text):
+    return [ atoi(c) for c in re.split(r'(\d+)', text) ]
+
 # write story_flags.hpp
 with open('../src/generated/story_flags.hpp', 'w') as f:
     f.write('#pragma once\n\n')
     n = len(script_assembler.flags)
     n = 1 if n == 0 else (n + 7) / 8
     f.write('constexpr int STORY_FLAG_BYTES = %d;\n\n' % n)
-    for k, v in script_assembler.flags.items():
+    for k in sorted(script_assembler.flags, key=natural_keys):
         if k[0] != '!': continue
-        f.write('constexpr uint16_t SFLAG_%s = %d;\n' % (k[1:], v))
+        f.write('constexpr uint16_t SFLAG_%s = %d;\n' %
+            (k[1:], script_assembler.flags[k]))
 
 # write mapdata.bin
 with open('../arduboy_build/mapdata.bin', 'wb') as f:

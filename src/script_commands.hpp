@@ -184,7 +184,7 @@ Registers:
     r3         Nonzero if response 3 to a question was selected
     r4         [READ ONLY] nframe counter
     r5         [READ ONLY] pdir (0-7): S SW W NW N NE E SE
-    r6
+    r6         frame timer (decrements every frame)
     r7         
     r8+        Number of consumable items
 
