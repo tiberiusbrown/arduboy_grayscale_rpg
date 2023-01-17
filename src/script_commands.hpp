@@ -140,6 +140,14 @@ Control Instructions
     bpf label
         If the party is full, jmp label
 
+Macros
+
+    CHEST <tile> <flag>
+        bnst <tile> 3
+        fs <flag>
+        bfc <flag> 3
+        st <tile> 82
+
 Other Assembly Syntax
 
     Shortcut          Meaning

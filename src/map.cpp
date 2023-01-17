@@ -303,9 +303,10 @@ static bool run_chunk()
             sprite.type = id;
             for(uint8_t j = 0; j < n; ++j)
             {
-                if(sprite.path[j] != *instr_ptr)
+                uint8_t p = deref_inc(instr_ptr);
+                if(sprite.path[j] != p)
                     reset = true;
-                sprite.path[j] = deref_inc(instr_ptr);
+                sprite.path[j] = p;
             }
             sprite.path_num = n;
             sprite.active = (n > 0);
@@ -313,14 +314,15 @@ static bool run_chunk()
                 sprite.path_dir = 0;
             else if(sprite.path_dir == 0)
                 sprite.path_dir = 1;
-            if(reset) reset_sprite(sprite);
+            if(reset)
+                reset_sprite(sprite);
             chunk_sprite_defined = true;
             break;
         }
         case CMD_ST:
-        case CMD_STF:
         {
             uint8_t t = deref_inc(instr_ptr);
+            MY_ASSERT(t < 32);
             uint16_t f;
             if(instr == CMD_STF)
             {
@@ -485,7 +487,7 @@ static void clamp_regs()
     savefile.chunk_regs[0] = 0;
     for(uint8_t i = 0; i < NUM_CONSUMABLES; ++i)
     {
-        uint8_t* xp = &consumables[8 + i];
+        uint8_t* xp = &consumables[i];
         int8_t x = int8_t(*xp);
         if(x < 0) x = 0;
         if(x > 99) x = 99;

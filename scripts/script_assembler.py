@@ -342,7 +342,7 @@ def assemble(s, eps, chunk):
         elif s[i] == 'ft':
             b.append(CMD.FT); i += 1
             addflag(b, s[i]); i += 1
-            
+        
         elif s[i] == 'ep':
             b.append(CMD.EP); i += 1
             addsprite(b, s[i]); i += 1
@@ -448,6 +448,22 @@ def assemble(s, eps, chunk):
         elif s[i] == 'bpf':
             b.append(CMD.BPF); i += 1
             b.append(s[i]); i += 1
+            
+        elif s[i] == 'CHEST':
+            i += 1
+            t = int(s[i]); i += 1
+            f = s[i]; i += 1
+            b.append(CMD.BNST)
+            b.append(t)
+            b.append(3)
+            b.append(CMD.FS)
+            addflag(b, f)
+            b.append(CMD.BFC)
+            addflag(b, f)
+            b.append(3)
+            b.append(CMD.ST)
+            b.append(t)
+            b.append(82)
             
         elif s[i][-1] == ':':
             b.append(s[i]); i += 1 # hold onto label for now

@@ -295,8 +295,8 @@ end:</property>
   </object>
   <object id="79" x="360.25" y="2103.67">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Cloth_Tunic
+    <property name="script">$CHEST !ITEM_Cloth_Tunic
+$bnst end
 msg {Press B to access the Party menu and equip items.}
 end:</property>
    </properties>
@@ -380,9 +380,7 @@ end:
   </object>
   <object id="102" x="1046.33" y="645">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Simple_Cloth_Hat
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Simple_Cloth_Hat"/>
    </properties>
    <point/>
   </object>
@@ -566,9 +564,7 @@ end:</property>
   </object>
   <object id="126" x="2166.59" y="2134.99">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Fancy_Cloth_Hat
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Fancy_Cloth_Hat"/>
    </properties>
    <point/>
   </object>
@@ -894,17 +890,13 @@ end:</property>
   </object>
   <object id="194" x="726.75" y="583.75">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Studded_Leather_Tunic
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Studded_Leather_Tunic"/>
    </properties>
    <point/>
   </object>
   <object id="195" x="823" y="1078">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Brass_Knuckles
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Brass_Knuckles"/>
    </properties>
    <point/>
   </object>
@@ -1138,73 +1130,55 @@ end:</property>
   </object>
   <object id="285" x="360.5" y="1320.5">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Fighter_s_Boots
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Fighter_s_Boots"/>
    </properties>
    <point/>
   </object>
   <object id="286" x="409.5" y="1176">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Old_Katana
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Old_Katana"/>
    </properties>
    <point/>
   </object>
   <object id="287" x="487.5" y="1128.5">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Leather_Tunic
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Leather_Tunic"/>
    </properties>
    <point/>
   </object>
   <object id="290" x="1001" y="1161">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Ninja_Mask
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Ninja_Mask"/>
    </properties>
    <point/>
   </object>
   <object id="291" x="1240.5" y="1112">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Brawler_s_Tunic
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Brawler_s_Tunic"/>
    </properties>
    <point/>
   </object>
   <object id="292" x="1305" y="1190.5">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Ninja_Shoes
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Ninja_Shoes"/>
    </properties>
    <point/>
   </object>
   <object id="294" x="777" y="1160">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Leather_Shield
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Leather_Shield"/>
    </properties>
    <point/>
   </object>
   <object id="296" x="760" y="696.667">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Wooden_Shield
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Wooden_Shield"/>
    </properties>
    <point/>
   </object>
   <object id="297" x="968" y="1223.33">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Brawler_s_Boots
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Brawler_s_Boots"/>
    </properties>
    <point/>
   </object>
@@ -1372,10 +1346,15 @@ end:</property>
    <properties>
     <property name="script">$bnst end
 bfs !ITEM_Crude_Iron_Dagger end
+$st 82
 fs !ITEM_Crude_Iron_Dagger
 bfc !party_catherine end
 dlg P_Catherine {Cool! We found some real treasure!}
-end:</property>
+end:
+
+bfc !ITEM_Crude_Iron_Dagger skip
+$st 82
+skip:</property>
    </properties>
    <point/>
   </object>
@@ -1391,9 +1370,8 @@ end:</property>
   </object>
   <object id="341" x="2648.5" y="2104.67">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Ancient_Ardu_Ring
-end:</property>
+    <property name="script">$CHEST !ITEM_Ancient_Ardu_Ring
+</property>
    </properties>
    <point/>
   </object>
@@ -1930,9 +1908,7 @@ end:</property>
   </object>
   <object id="414" x="743" y="1513.33">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Iron_Shield
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Iron_Shield"/>
    </properties>
    <point/>
   </object>
@@ -1949,17 +1925,13 @@ end:</property>
   </object>
   <object id="416" x="408.5" y="1384.5">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Cloth_Tunic_2
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Cloth_Tunic_2"/>
    </properties>
    <point/>
   </object>
   <object id="417" x="297.333" y="1992.67">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Brawler_s_Cowl
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Brawler_s_Cowl"/>
    </properties>
    <point/>
   </object>
@@ -1999,9 +1971,7 @@ end:</property>
   </object>
   <object id="427" x="1368" y="1543">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Large_Wooden_Club
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Large_Wooden_Club"/>
    </properties>
    <point/>
   </object>
@@ -2090,9 +2060,7 @@ end:</property>
   </object>
   <object id="458" x="520.5" y="1816">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Wooden_Spear
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Wooden_Spear"/>
    </properties>
    <point/>
   </object>
@@ -2394,9 +2362,7 @@ end:</property>
   </object>
   <object id="517" x="2504.25" y="2391.5">
    <properties>
-    <property name="script">$bnst end
-fs !ITEM_Barbarian_s_Helm
-end:</property>
+    <property name="script" value="$CHEST !ITEM_Barbarian_s_Helm"/>
    </properties>
    <point/>
   </object>
