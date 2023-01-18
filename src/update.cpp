@@ -219,6 +219,17 @@ static void update_map()
     if(chunks_are_running && run_chunks())
         return;
 
+    {
+        // check if died by falling into pit when magic floor disappears
+        // or by standing on spikes
+        uint8_t t = tile_at(px + 8, py + 8);
+        if(t == 0 || t == 6 || t == 55)
+        {
+            change_state(STATE_DIE);
+            return;
+        }
+    }
+
     if(btns_pressed & BTN_B)
     {
         change_state(STATE_PAUSE);

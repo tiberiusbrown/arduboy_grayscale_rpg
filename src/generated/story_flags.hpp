@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr int STORY_FLAG_BYTES = 25;
+constexpr int STORY_FLAG_BYTES = 26;
 
 constexpr uint16_t SFLAG_Hooded_Figure_Dream = 49;
 constexpr uint16_t SFLAG_ITEM_Agatha_s_Ring = 3;
@@ -118,12 +118,14 @@ constexpr uint16_t SFLAG_puzright2 = 184;
 constexpr uint16_t SFLAG_puzright3 = 187;
 constexpr uint16_t SFLAG_puzright4 = 188;
 constexpr uint16_t SFLAG_puzright_solved = 185;
+constexpr uint16_t SFLAG_puzspike_done = 200;
 constexpr uint16_t SFLAG_puzwait_done = 197;
 constexpr uint16_t SFLAG_puzwait_ne = 195;
 constexpr uint16_t SFLAG_puzwait_nw = 194;
 constexpr uint16_t SFLAG_puzwait_se = 196;
 constexpr uint16_t SFLAG_puzwait_sw = 193;
 constexpr uint16_t SFLAG_puzwait_timer = 198;
+constexpr uint16_t SFLAG_puzwalk_done = 201;
 constexpr uint16_t SFLAG_raptor1 = 50;
 constexpr uint16_t SFLAG_raptor2 = 58;
 constexpr uint16_t SFLAG_raptor3 = 59;

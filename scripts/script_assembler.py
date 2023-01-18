@@ -18,6 +18,8 @@ tiles = {
     'T_OutdoorSwitchOn'   : 50  & 255,
     'T_DungeonSwitchOff'  : 544 & 255,
     'T_DungeonSwitchOn'   : 528 & 255,
+    'T_DungeonFloor'      : 530 & 255,
+    'T_DungeonMagicFloor' : 564 & 255,
     'T_OutdoorStairs'     : 58  & 255,
     'T_IndoorStairs'      : 279 & 255,
     'T_DungeonStairs'     : 535 & 255,
@@ -398,13 +400,13 @@ def assemble(s, eps, chunk):
         elif s[i] == 'bneq':
             b.append(CMD.BNEQ); i += 1
             b.append(reg(s[i])); i += 1
-            b.append(int(s[i])); i += 1
+            b.append(int(s[i], 0)); i += 1
             b.append(s[i]); i += 1
             
         elif s[i] == 'bgeq':
             b.append(CMD.BGEQ); i += 1
             b.append(reg(s[i])); i += 1
-            b.append(int(s[i])); i += 1
+            b.append(int(s[i], 0)); i += 1
             b.append(s[i]); i += 1
             
         elif s[i] == 'bfs':

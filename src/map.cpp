@@ -320,6 +320,7 @@ static bool run_chunk()
             break;
         }
         case CMD_ST:
+        case CMD_STF:
         {
             uint8_t t = deref_inc(instr_ptr);
             MY_ASSERT(t < 32);
@@ -330,7 +331,7 @@ static bool run_chunk()
                 f |= (uint16_t(deref_inc(instr_ptr)) << 8);
             }
             uint8_t i = deref_inc(instr_ptr);
-            if(instr != CMD_STF || !story_flag_get(f))
+            if(instr != CMD_STF || story_flag_get(f))
                 c.tiles_flat[t] = i;
             break;
         }
@@ -599,7 +600,14 @@ void load_chunks()
     load_chunk(3, cx + 1, cy + 1);
 }
 
-bool check_solid(uint16_t tx, uint16_t ty)
+uint8_t tile_at(uint16_t tx, uint16_t ty)
+{
+    uint8_t t = 0;
+    check_solid(tx, ty, &t);
+    return t;
+}
+
+bool check_solid(uint16_t tx, uint16_t ty, uint8_t* tp)
 {
     // check tile
     uint8_t cx = uint8_t(tx >> 7);
@@ -610,15 +618,8 @@ bool check_solid(uint16_t tx, uint16_t ty)
     uint8_t ctx = uint8_t(tx) & 127;
     uint8_t cty = uint8_t(ty) & 63;
     uint8_t ci = cy * 2 + cx;
-    // check sprite
-    auto const& e = chunk_sprites[ci];
-    if(e.active)
-    {
-        uint8_t ex = e.x;
-        uint8_t ey = e.y;
-        if(uint8_t(ctx - ex - 2) < 12 && uint8_t(cty - ey - 4) < 12)
-            return true;
-    }
+
+    // fetch tile
     auto const& c = active_chunks[ci];
 #ifndef ARDUINO
     uint8_t t = c.chunk.tiles[cty / 16][ctx / 16];
@@ -646,6 +647,17 @@ bool check_solid(uint16_t tx, uint16_t ty)
             );
     }
 #endif
+    if(tp) *tp = t;
+
+    // check sprite
+    auto const& e = chunk_sprites[ci];
+    if(e.active)
+    {
+        uint8_t ex = e.x;
+        uint8_t ey = e.y;
+        if(uint8_t(ctx - ex - 2) < 12 && uint8_t(cty - ey - 4) < 12)
+            return true;
+    }
     uint8_t const* ptr = &TILE_SOLID[0];
     if(ty >= MAP_CHUNK_ROWS / 2 * 64)
     {

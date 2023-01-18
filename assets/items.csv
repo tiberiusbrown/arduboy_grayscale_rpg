@@ -10,7 +10,7 @@ Att,Def,Spd,MHP,Type,Name,Description,Location
 ,,,1,helm,Fancy Cloth Hat,It looks completely ridiculous. +1 max health.,light’s out dungeon
 ,1,,,armor,Cloth Tunic,"Worn and scruffy, but warm enough. +1 defense.",Matthias’s dresser
 ,1,,,helm,Barbarian’s Helm,+1 defense. +1 attack if not wearing armor.,move right puzzle dungeon
-,2,1,,armor,Ninja Gi,"+1 speed, +2 defense.",raptor forest behind mansion
+,1,1,,armor,Ninja Gi,"+1 speed, +1 defense.",raptor forest behind mansion
 1,1,,,weapon,Wooden Spear,"+1 attack, +1 defense.",raptor forest chest se of island
 2,,,,weapon,Crude Iron Sword,+2 attack.,raptor forest defeat skeleton at grave
 2,,,,weapon,Large Wooden Club,+2 attack.,raptor forest e chest near path
