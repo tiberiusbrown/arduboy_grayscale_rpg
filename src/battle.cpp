@@ -588,7 +588,7 @@ void update_battle()
             static item_t const VAMPIRIC_ITEMS[] PROGMEM =
             {
                 SFLAG_ITEM_Small_Vampiric_Dagger,
-                SFLAG_ITEM_Lifedrain_Amulet,
+                SFLAG_ITEM_Lifedrain_Necklace,
             };
             uint8_t v = user_item_count(attacker, VAMPIRIC_ITEMS,
                 sizeof(VAMPIRIC_ITEMS) / sizeof(item_t));

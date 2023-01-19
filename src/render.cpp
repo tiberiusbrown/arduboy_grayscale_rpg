@@ -268,6 +268,8 @@ void render()
     update_battery();
     render_battery();
 
+    platform_audio_update();
+
     if(plane() == 0)
         ++rframe;
 }

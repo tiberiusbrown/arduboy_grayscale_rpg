@@ -766,8 +766,6 @@ void update()
     //process_repeat(2, BTN_LEFT );
     //process_repeat(3, BTN_RIGHT);
 
-    platform_audio_update();
-
     pmoving = false;
     (pgmptr(&FUNCS[state]))();
 

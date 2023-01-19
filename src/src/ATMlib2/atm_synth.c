@@ -297,7 +297,13 @@ static void process_channel(const uint8_t ch_index, struct atm_player_state *pla
 {
 	process_fx(player_state, ch);
 
+    uint8_t start = ch->pstack[0].prev_cmd_ptr;
 	while (ch->delay == 0) {
+        uint8_t p = ch->pstack[0].next_cmd_ptr;
+        if((p - start) & (ATM_CMD_BUF_SIZE - 1) < 4) {
+            ++ch->delay;
+            break;
+        }
 		struct atm_cmd_data cmd;
 		/*
 		Reading the command first and then its parameters
@@ -306,7 +312,6 @@ static void process_channel(const uint8_t ch_index, struct atm_player_state *pla
 		*/
 		//memcpy(&cmd, pattern_cmd_ptr(ch), sizeof(struct atm_cmd_data));
         uint8_t* dst = (uint8_t*)&cmd;
-        uint8_t p = ch->pstack[0].next_cmd_ptr;
         for(uint8_t i = 0; i < 4; ++i)
         {
             *dst++ = ch->pstack[0].cmds[p];

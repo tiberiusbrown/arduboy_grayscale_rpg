@@ -102,8 +102,8 @@ struct atm_slide_params {
 
 struct atm_pattern_state {
     uint8_t cmds[ATM_CMD_BUF_SIZE];
-	uint8_t next_cmd_ptr;
-    uint8_t prev_cmd_ptr;
+    volatile uint8_t next_cmd_ptr;
+    volatile uint8_t prev_cmd_ptr;
     __uint24 addr;
 };
 

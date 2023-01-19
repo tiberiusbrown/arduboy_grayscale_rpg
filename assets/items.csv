@@ -36,14 +36,14 @@ Att,Def,Spd,MHP,Type,Name,Description,Location
 ,,,,amulet,Amulet of Peace,Doubles defense when not wielding a weapon.,
 ,,,,amulet,Amulet of Zhar-Tul,The wearer may take two actions per turn in battle.,
 2,,,,weapon,Barbarian’s Axe,+2 attack. +1 additional attack if not wearing armor.,
-,,1,,shoes,Barbarian’s Footwraps,+1 speed. +1 attack if not wearing armor.,
+,,1,,shoes,Barbarian’s Footwraps,+1 speed. +1 attack if not wearing armor.,magic floor walk puzzle in raptor forest
 -1,,,,weapon,Boxing Gloves,-1 attack. Stuns target.,
 ,4,,,armor,Defender’s Breastplate,+4 defense. The wearer does not stop defending at start of turn.,
 1,,,,ring,Fighter’s Ring,+1 attack.,
 1,1,,,armor,Fighter’s Tunic,"+1 attack, +1 defense.",
 4,,2,,weapon,Katana,"For those who have been studying the blade. +4 attack, +2 speed.",
-,,,,amulet,Lifedrain Amulet,Heals 1 health after each attack.,
+,,,,amulet,Lifedrain Necklace,Heals 1 health after each attack.,
 1,,,,weapon,Small Vampiric Dagger,+1 attack. Heals 1 health after each attack.,wait puzzle in raptor forest
-1,3,,,shield,Spiked Shield,"+1 attack, +3 defense.",
+1,3,,,shield,Spiked Shield,"+1 attack, +3 defense.",spike dungeon in raptor forest
 ,3,,1,shield,Studded Leather Shield,"+3 defense, +1 max health.",
-,,5,,ring,Tempus Ring,It hums and vibrates unnaturally. +5 speed.,
+,,5,,ring,Tempus Ring,It hums and vibrates unnaturally. +5 speed.,puzspike dungeon in raptor forest

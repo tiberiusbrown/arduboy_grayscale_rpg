@@ -167,7 +167,7 @@ void loop()
         delay(30 - diff);
     prev = curr;
 #else
-    a.waitForNextFrame();
+    a.waitForNextPlane();
     FX::disableOLED();
     if(a.needsUpdate())
         handle_buttons_and_update();
