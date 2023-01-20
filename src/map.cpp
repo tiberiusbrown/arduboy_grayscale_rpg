@@ -533,12 +533,15 @@ bool run_chunks()
 static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
 {
     active_chunk_t& active_chunk = active_chunks[index];
-    map_chunk_t* chunk = &active_chunk.chunk;
-    uint16_t ci = cy * MAP_CHUNK_COLS + cx;
-    uint24_t addr = MAPDATA + uint24_t(ci) * sizeof(map_chunk_t);
     if(active_chunk.cx != cx || active_chunk.cy != cy)
     {
-        memset(&active_chunk, 0, sizeof(active_chunk));
+        map_chunk_t* chunk = &active_chunk.chunk;
+        uint16_t ci = cy * MAP_CHUNK_COLS + cx;
+        uint24_t addr = MAPDATA + uint24_t(ci) * sizeof(map_chunk_t);
+        static_assert(sizeof(active_chunk) ==
+            sizeof(map_chunk_t) + sizeof(active_chunk.cx) + sizeof(active_chunk.cy),
+            "revisit commented line below");
+        //memset(&active_chunk, 0, sizeof(active_chunk));
         if(!savefile.loaded)
             memset(&chunk_sprites[index], 0, sizeof(sprite_t));
         active_chunk.cx = cx;
@@ -602,10 +605,8 @@ void load_chunks()
     if(uint8_t(cx + 1) == pcx && cy == uint8_t(pcy + 1)) // SW
         shift_chunk(1, 2);
 
-    load_chunk(0, cx + 0, cy + 0);
-    load_chunk(1, cx + 1, cy + 0);
-    load_chunk(2, cx + 0, cy + 1);
-    load_chunk(3, cx + 1, cy + 1);
+    for(uint8_t i = 0; i < 4; ++i)
+        load_chunk(i, cx + (i & 1), cy + lsr(i));
 }
 
 uint8_t tile_at(uint16_t tx, uint16_t ty)

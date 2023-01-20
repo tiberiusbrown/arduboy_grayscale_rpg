@@ -157,7 +157,7 @@ static bool add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
     uint8_t d = e.dir;
     bool walking = e.walking;
     if(d & 0x80) walking = false;
-    uint8_t nf = nframe >> 1;
+    uint8_t nf = lsr(nframe);
     uint8_t flags = pgm_read_byte(&SPRITE_FLAGS[e.type]);
     if(flags & SF_ALWAYS_ANIM)
         walking = true;

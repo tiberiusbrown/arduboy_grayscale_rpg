@@ -90,6 +90,11 @@ FORCE_INLINE inline void store_inc(T*& p, uint8_t x)
 FORCE_INLINE inline uint8_t bitmask(uint8_t x) { return FX::bitShiftLeftUInt8(x); }
 FORCE_INLINE inline int16_t fmuls(int8_t x, int8_t y) { return __builtin_avr_fmuls(x, y); }
 FORCE_INLINE inline uint8_t nibswap(uint8_t x) { return __builtin_avr_swap(x); }
+FORCE_INLINE inline uint8_t lsr(uint8_t x)
+{
+    asm volatile("lsr %[x]\n" : [x] "+&r" (x));
+    return x;
+}
 #else
 #include <assert.h>
 #define MY_ASSERT(cond__) assert(cond__)
@@ -150,6 +155,7 @@ inline void* memcpy_P(void* dst, void const* src, size_t num)
 }
 inline int16_t fmuls(int8_t x, int8_t y) { return (x * y) << 1; }
 inline uint8_t nibswap(uint8_t x) { return (x >> 4) | (x << 4); }
+inline uint8_t lsr(uint8_t x) { return x >> 1; }
 #endif
 
 constexpr uint8_t PLANES = 3;
