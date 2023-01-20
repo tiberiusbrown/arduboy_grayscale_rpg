@@ -217,7 +217,7 @@ void draw_sprites()
         uint8_t cy = uint8_t(ty >> 6);
         int16_t ox = -int16_t(tx & 0x7f);
         int16_t oy = -int16_t(ty & 0x3f);
-        for(uint8_t i = 0, dox = 0, doy = 0; i < 4; ++i, doy += (dox >> 1), dox ^= 128)
+        for(uint8_t i = 0, dox = 0, doy = 0; i < 4; ++i, doy += lsr(dox), dox ^= 128)
         {
             //uint8_t dox = (i &  1) * 128;
             //uint8_t doy = (i >> 1) * 64;

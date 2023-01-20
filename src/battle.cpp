@@ -522,8 +522,7 @@ void update_battle()
         if(d.special_attack == CIT_Ardu_s_Frenzy)
         {
             dam = get_att(attacker);
-            ++dam;
-            dam >>= 1;
+            dam = lsr(dam + 1);
             for(uint8_t i = 4; i < 8; ++i)
                 if(d.sprites[i].active)
                     take_damage(i, (int8_t)dam);
@@ -540,8 +539,7 @@ void update_battle()
             party[defender].battle.id == 3)
         {
             uint8_t dismas_dam = calc_attack_damage(defender, attacker);
-            ++dismas_dam;
-            dismas_dam /= 2;
+            dismas_dam = lsr(dismas_dam + 1);
             take_damage(attacker, (int8_t)dismas_dam);
         }
 
@@ -557,9 +555,7 @@ void update_battle()
                 if(uhp > hp)
                     ally = i, hp = uhp;
             }
-            uint8_t catherine_heal = dam;
-            ++catherine_heal;
-            catherine_heal /= 2;
+            uint8_t catherine_heal = lsr(dam + 1);
             take_damage(ally, -int8_t(catherine_heal));
         }
 

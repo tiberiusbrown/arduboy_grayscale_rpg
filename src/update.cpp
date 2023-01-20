@@ -101,8 +101,9 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
     }
     e.path_index = path_index;
     uint8_t t = e.path[path_index];
-    uint8_t x = (t & 7) * 16;
+    uint8_t x = nibswap(t & 7); // (t & 7) * 16
     uint8_t y = ((t >> 3) & 3) * 16;
+    //uint8_t y = nibswap((nibswap(t) << 1) & 3);
     uint8_t frames_rem, dir;
     uint8_t ex = e.x, ey = e.y;
     if(x < ex)
