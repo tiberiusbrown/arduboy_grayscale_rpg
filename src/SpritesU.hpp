@@ -644,6 +644,10 @@ void SpritesU::drawBasicNoChecks(
 #if ARDUINO_ARCH_AVR
         asm volatile(R"ASM(
 
+                lds r0, %[page]+0            ; 2
+                add %B[image], r0            ; 1
+                lds r0, %[page]+1            ; 2
+                adc %C[image], r0            ; 1
                 rjmp L%=_begin
 
             L%=_seek:
@@ -652,19 +656,14 @@ void SpritesU::drawBasicNoChecks(
                 cbi %[fxport], %[fxbit]
                 ldi %[sfc_read], %[SFC_READ]
                 out %[spdr], %[sfc_read]
-                lds r0, %[page]+0            ; 2
-                add %B[image], r0            ; 1
-                lds r0, %[page]+1            ; 2
-                adc %C[image], r0            ; 1
-                add %A[image], %A[image_adv] ; 1
-                adc %B[image], %B[image_adv] ; 1
-                adc %C[image], __zero_reg__  ; 1
-                clr %[reseek]                ; 1
-                cp  %[w], %[cols]            ; 1
-                breq .+4                     ; 1
-                inc %[reseek]                ; 1
-                rjmp .+2                     ; 2
-                rjmp .+2                     ; 2
+                add %A[image], %A[image_adv] ;  1
+                adc %B[image], %B[image_adv] ;  1
+                adc %C[image], __zero_reg__  ;  1
+                clr %[reseek]                ;  1
+                cp  %[w], %[cols]            ;  1
+                breq .+4                     ;  1
+                inc %[reseek]                ;  1
+                rcall L%=_delay_10           ; 10
                 out %[spdr], %C[image]
                 rcall L%=_delay_17
                 out %[spdr], %B[image]
