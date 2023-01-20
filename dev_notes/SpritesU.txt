@@ -1,0 +1,181 @@
+#if ARDUINO_ARCH_AVR
+
+/*
+    Arguments
+    ==============================
+        w_and_h     r24, r25
+        image       r20, r21, r22
+        mode        r18
+        x           r16, r17
+        y           r14, r15
+        
+    Outputs
+    ==============================
+        image_adv   r6, r7
+        shift_mask  r8, r9
+        cols        r10
+        bottom      r11
+        x           r12, r13
+        y           r14, r15
+        buf_adv     r16
+        col_start   r17
+        mode        r18
+        shift_coef  r19
+        image       r20, r21, r22
+        page_start  r23
+        w           r24
+        pages       r25
+        buf         r26, r27
+
+    Saved
+    ==============================
+        r6 - r17
+*/
+
+__attribute__((naked, noinline, used))
+static void SpritesU_draw_basic_prologue()
+{
+    asm volatile(R"ASM(
+    
+            push r6
+            push r7
+            push r8
+            push r9
+            push r10
+            push r11
+            push r12
+            push r13
+            push r14
+            push r15
+            push r16
+            push r17
+            
+            movw r12, r16
+            
+            mov  r17, r12 ; col_start = A(x);
+            clr  r11      ; bottom = false;
+            mov  r10, r24 ; cols = w;
+            
+            lsr  r25      ; pages = h >> 3;
+            lsr  r25
+            lsr  r25
+            
+            ; precompute shift_coef (r19) and shift_mask (r8,r9) from A(y) (r14)
+            ldi  r19, 1
+            sbrc r14, 1
+            ldi  r19, 4
+            sbrc r14, 0
+            lsl  r19
+            sbrc r14, 2
+            swap r19
+            ldi  r16, 0xff
+            mul  r16, r19
+            movw r8, r0
+            com  r8
+            com  r9
+            
+            asr  r15      ; y >>= 3
+            ror  r14
+            asr  r15
+            ror  r14
+            asr  r15
+            ror  r14
+
+            ; clip against top edge
+            mov  r23, r14
+            cpi  r23, 0xff
+            brge 2f
+            com  r23
+            sub  r25, r23
+            sbrc r18, 0
+            lsl  r23
+            mul  r23, r24
+            add  r20, r0
+            adc  r21, r1
+            adc  r22, r11
+            ldi  r23, 0xff
+        2:
+            ; clip against left edge
+            sbrs r13, 7
+            rjmp 4f
+            add r10, r12
+            sbrs r18, 0
+            rjmp 3f
+            lsl  r12
+            rol  r13
+        3:
+            sub  r20, r12
+            sbc  r21, r13
+            sbc  r22, r11
+            sbrc r13, 7
+            inc  r22
+            clr  r17
+        4:
+            ; compute buffer start address
+            ldi  r16, 128
+            mulsu r23, r16
+            add  r0, r17
+            ldi  r26, lo8(%[sBuffer])
+            ldi  r27, hi8(%[sBuffer])
+            add  r26, r0
+            adc  r27, r1
+            
+            ; clip against right edge
+            sub  r16, r17
+            cp   r10, r16
+            brlo 5f
+            mov  r10, r16
+        5:
+            ; clip against bottom edge
+            ldi  r16, 7
+            sub  r16, r23
+            cp   r16, r25
+            brge 6f
+            mov  r25, r16
+            inc  r11
+        6:
+            ldi  r16, 128
+            sub  r16, r10
+            mov  r6, r24
+            clr  r7
+            sbrc r18, 1
+            rjmp 7f
+            sub  r6, r10
+            sbc  r7, r7
+        7:
+            sbrs r18, 0
+            rjmp 8f
+            lsl  r6
+            rol  r7
+        8:
+            clr __zero_reg__
+        )ASM"
+        :
+        : [sBuffer] "" (&Arduboy2Base::sBuffer)
+        );
+}
+
+__attribute__((naked, noinline))
+static void SpritesU_draw_basic_epilogue()
+{
+    asm volatile(R"ASM(
+    
+            pop r17
+            pop r16
+            pop r15
+            pop r14
+            pop r13
+            pop r12
+            pop r11
+            pop r10
+            pop r9
+            pop r8
+            pop r7
+            pop r6
+            ret
+    
+        )ASM"
+        );
+}
+
+#endif

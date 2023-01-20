@@ -638,9 +638,9 @@ void SpritesU::drawBasicNoChecks(
 #endif
 #ifdef SPRITESU_FX
     {
+        uint8_t sfc_read;
         uint8_t* bufn;
-        uint8_t reseek = (w != cols);
-        image += ((uint24_t)FX::programDataPage << 8);
+        uint8_t reseek;
 #if ARDUINO_ARCH_AVR
         asm volatile(R"ASM(
 
@@ -650,12 +650,21 @@ void SpritesU::drawBasicNoChecks(
 
                 ; seek subroutine
                 cbi %[fxport], %[fxbit]
-                nop
+                ldi %[sfc_read], %[SFC_READ]
                 out %[spdr], %[sfc_read]
-                add %A[image], %A[image_adv]
-                adc %B[image], %B[image_adv]
-                adc %C[image], __zero_reg__
-                rcall L%=_delay_14
+                lds r0, %[page]+0            ; 2
+                add %B[image], r0            ; 1
+                lds r0, %[page]+1            ; 2
+                adc %C[image], r0            ; 1
+                add %A[image], %A[image_adv] ; 1
+                adc %B[image], %B[image_adv] ; 1
+                adc %C[image], __zero_reg__  ; 1
+                clr %[reseek]                ; 1
+                cp  %[w], %[cols]            ; 1
+                breq .+4                     ; 1
+                inc %[reseek]                ; 1
+                rjmp .+2                     ; 2
+                rjmp .+2                     ; 2
                 out %[spdr], %C[image]
                 rcall L%=_delay_17
                 out %[spdr], %B[image]
@@ -903,23 +912,26 @@ void SpritesU::drawBasicNoChecks(
             [pages]      "+&r" (pages),
             [count]      "=&r" (count),
             [buf_data]   "=&r" (buf_data),
-            [image_data] "=&r" (image_data)
+            [image_data] "=&r" (image_data),
+            [reseek]     "=&r" (reseek),
+            [sfc_read]   "=&d" (sfc_read)
             :
             [cols]       "r"   (cols),
+            [w]          "r"   (w),
             [buf_adv]    "r"   (buf_adv),
             [image_adv]  "r"   (image_adv),
             [shift_coef] "r"   (shift_coef),
             [shift_mask] "r"   (shift_mask),
             [bottom]     "r"   (bottom),
             [page_start] "r"   (page_start),
-            [reseek]     "r"   (reseek),
             [mode]       "r"   (mode),
-            [sfc_read]   "r"   (SFC_READ),
+            [SFC_READ]   "I"   (SFC_READ),
             [fxport]     "I"   (_SFR_IO_ADDR(FX_PORT)),
             [fxbit]      "I"   (FX_BIT),
             [spdr]       "I"   (_SFR_IO_ADDR(SPDR)),
             [spsr]       "I"   (_SFR_IO_ADDR(SPSR)),
-            [spif]       "I"   (SPIF)
+            [spif]       "I"   (SPIF),
+            [page]       "i"   (&FX::programDataPage)
             :
             "memory"
             );
