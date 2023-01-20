@@ -134,9 +134,10 @@ static void update_sprites()
 
 static uint8_t solid_mask()
 {
-#ifdef ARDUINO
+#if ARDUINO_ARCH_AVR
     uint16_t tpx, tpy;
     uint8_t m;
+    uint16_t zero = 0;
     asm volatile(R"ASM(
         clr  %[m]
         lds  r24, %[ppx]+0
@@ -149,6 +150,7 @@ static uint8_t solid_mask()
         subi r22, lo8(-5)
         sbci r23, hi8(-5)
         movw %A[py], r22
+        movw r20, %[z]
 
         %~call %x[cs]
         cpse r24, __zero_reg__
@@ -157,6 +159,7 @@ static uint8_t solid_mask()
         movw r24, %[px]
         adiw r24, 5
         movw r22, %[py]
+        movw r20, %[z]
         %~call %x[cs]
         cpse r24, __zero_reg__
         ori  %[m], 2
@@ -166,6 +169,7 @@ static uint8_t solid_mask()
         subi r22, lo8(-5)
         sbci r23, hi8(-5)
         movw %[py], r22
+        movw r20, %[z]
         %~call %x[cs]
         cpse r24, __zero_reg__
         ori  %[m], 4
@@ -173,6 +177,7 @@ static uint8_t solid_mask()
         movw r24, %[px]
         adiw r24, 5
         movw r22, %[py]
+        movw r20, %[z]
         %~call %x[cs]
         cpse r24, __zero_reg__
         ori  %[m], 8
@@ -184,7 +189,8 @@ static uint8_t solid_mask()
         :
         [ppx] ""    (&px),
         [ppy] ""    (&py),
-        [cs]  "i"   (&check_solid)
+        [cs]  "i"   (&check_solid),
+        [z]   "r"   (zero)
         :
         "r18", "r19", "r20", "r21", "r22", "r23", "r24", "r25",
         "r26", "r27", "r30", "r31", "memory"
@@ -219,6 +225,7 @@ static void update_map()
     if(chunks_are_running && run_chunks())
         return;
 
+    if(tilesheet() == 2)
     {
         // check if died by falling into pit when magic floor disappears
         // or by standing on spikes

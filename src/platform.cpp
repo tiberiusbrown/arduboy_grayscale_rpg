@@ -16,6 +16,75 @@ static uint8_t SAVE_BLOCK[4096];
 static uint64_t ticks_when_ready = 0;
 #endif
 
+#if defined(ARDUINO_ARCH_AVR)
+static __attribute__((naked)) FORCE_NOINLINE
+void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num)
+{
+    // addr: r22,r23,r24
+    // dst:  r20,r21
+    // num:  r18,r19
+    asm volatile(R"ASM(
+            cbi   %[fxport], %[fxbit]
+            ldi   r25, %[sfc_read]
+            out   %[spdr], r25
+            lds   r0, %[page]+0         ;  2
+            add   r23, r0               ;  1
+            lds   r0, %[page]+1         ;  2
+            adc   r24, r0               ;  1
+            rcall L%=_delay_11          ; 11
+            out   %[spdr], r24
+            rcall L%=_delay_17          ; 17
+            out   %[spdr], r23
+            rcall L%=_delay_17          ; 17
+            out   %[spdr], r22
+            rcall L%=_delay_17          ; 17
+            out   %[spdr], r1
+
+            ; skip straight to final read if num == 1
+            movw  r26, r20              ;  1
+            subi  r18, 1                ;  1
+            sbci  r19, 0                ;  1
+            breq  2f                    ;  1 (2)
+            adiw  r30, 0                ;  2
+
+            ; intermediate reads
+        1:  rcall L%=_delay_10          ; 10
+            in    r0, %[spdr]           ;  1
+            out   %[spdr], r1
+            st    X+, r0                ;  2
+            subi  r18, 1                ;  1
+            sbci  r19, 0                ;  1
+            brne  1b                    ;  2 (1)
+
+            ; final read
+        2:  rcall L%=_delay_11          ; 11
+            in    r0, %[spdr]
+            st    X, r0
+            sbi   %[fxport], %[fxbit]
+            in    r0, %[spsr]
+            ret
+
+        L%=_delay_17:
+            lpm
+        L%=_delay_14:
+            lpm
+        L%=_delay_11:
+            nop
+        L%=_delay_10:
+            lpm
+        L%=_delay_7:
+            ret       ; rcall is 3, ret is 4 cycles
+        )ASM"
+        :
+        : [page]     ""  (&FX::programDataPage)
+        , [sfc_read] "I" (SFC_READ)
+        , [spdr]     "I" (_SFR_IO_ADDR(SPDR))
+        , [spsr]     "I" (_SFR_IO_ADDR(SPSR))
+        , [fxport]   "I" (_SFR_IO_ADDR(FX_PORT))
+        , [fxbit]    "I" (FX_BIT)
+        );
+}
+#else
 void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num)
 {
 #ifdef ARDUINO
@@ -25,6 +94,7 @@ void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num)
     memcpy(dst, &FXDATA[addr], num);
 #endif
 }
+#endif
 
 #ifndef ARDUINO
 extern int gplane;
@@ -427,6 +497,8 @@ void platform_audio_play_song_now(uint24_t song)
 static void update_song_buffer(atm_pattern_state& p)
 {
     uint8_t buf[ATM_CMD_BUF_SIZE];
+    uint8_t sreg = SREG;
+    cli();
     uint8_t curr = p.next_cmd_ptr;
     uint8_t prev = p.prev_cmd_ptr;
     uint8_t adv = (curr - prev) & (ATM_CMD_BUF_SIZE - 1);
@@ -436,6 +508,7 @@ static void update_song_buffer(atm_pattern_state& p)
         p.cmds[(curr + n) & (ATM_CMD_BUF_SIZE - 1)] = deref_inc(ptr);
     p.addr += adv;
     p.prev_cmd_ptr = curr;
+    SREG = sreg;
 }
 
 void update_score_channels()

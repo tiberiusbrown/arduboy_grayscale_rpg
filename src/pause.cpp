@@ -254,9 +254,10 @@ static inline uint8_t explored_rotate8(uint8_t x, uint8_t const*& ptr)
     return x;
 }
 
-static void render_map_quad(int16_t x, int16_t y, uint8_t f)
+// x is uint8_t to avoid UB when overflowing
+static void render_map_quad(uint8_t x, int8_t y, uint8_t f)
 {
-    platform_fx_drawoverwrite(x, y, WORLD_IMG, f + 0);
+    platform_fx_drawoverwrite((int8_t)x, y, WORLD_IMG, f + 0);
     constexpr uint8_t SCALE =
         (EXPLORED_COLS / PAUSE_MAP_FRAMES_W) *
         (EXPLORED_ROWS / PAUSE_MAP_FRAMES_H) / 8;
@@ -266,7 +267,7 @@ static void render_map_quad(int16_t x, int16_t y, uint8_t f)
     uint8_t i = (f / PAUSE_MAP_FRAMES_W) * (EXPLORED_COLS / 8 * EXPLORED_ROWS / PAUSE_MAP_FRAMES_H);
     i += (f & (PAUSE_MAP_FRAMES_W - 1)) * (EXPLORED_COLS / PAUSE_MAP_FRAMES_W / 8);
     uint8_t m = 1;
-    int16_t bx = x;
+    uint8_t bx = x;
     for(uint8_t r = 0; r < (EXPLORED_ROWS / PAUSE_MAP_FRAMES_H); i += ISTEP, ++r, y += ESIZE)
     {
         x = bx;
@@ -276,10 +277,10 @@ static void render_map_quad(int16_t x, int16_t y, uint8_t f)
             continue;
         }
         if(y >= 64) break;
-        for(uint8_t c = 0; c < (EXPLORED_COLS / PAUSE_MAP_FRAMES_W); ++c, x += ESIZE)
+        for(uint8_t c = 0; c < uint8_t(EXPLORED_COLS / PAUSE_MAP_FRAMES_W); ++c, x += ESIZE)
         {
-            if(!(x <= -ESIZE || x >= 128) && !(savefile.explored[i] & m))
-                platform_fillrect_i8((int8_t)x, (int8_t)y, ESIZE, ESIZE, BLACK);
+            if((int8_t)x > -ESIZE && (int8_t)x < 128 && !(savefile.explored[i] & m))
+                platform_fillrect_i8((int8_t)x, y, ESIZE, ESIZE, BLACK);
             if((m <<= 1) == 0)
                 m = 1, i += 1;
         }
@@ -342,22 +343,25 @@ void render_pause()
     }
     if(d.mapfade >= 16)
     {
-        uint8_t mx = uint16_t(d.mapscrollx) / 128;
-        uint8_t my = uint16_t(d.mapscrolly) / 64;
-        int16_t ox = -(uint8_t(d.mapscrollx) & 127);
-        int16_t oy = -(uint8_t(d.mapscrolly) & 63);
-        uint8_t f = my * PAUSE_MAP_FRAMES_W + mx;
         platform_fade(d.mapfade - 16);
 
-        render_map_quad(ox      , oy     , f);
-        render_map_quad(ox + 128, oy     , f + 1);
-        render_map_quad(ox      , oy + 64, f + PAUSE_MAP_FRAMES_W);
-        render_map_quad(ox + 128, oy + 64, f + PAUSE_MAP_FRAMES_W + 1);
+        int16_t msx = d.mapscrollx;
+        int16_t msy = d.mapscrolly;
+        {
+            uint8_t mx = uint16_t(msx) / 128;
+            uint8_t my = uint16_t(msy) / 64;
+            int8_t ox = -(uint8_t(d.mapscrollx) & 127);
+            int8_t oy = -(uint8_t(d.mapscrolly) & 63);
+            uint8_t f = my * PAUSE_MAP_FRAMES_W + mx;
+
+            render_map_quad(uint8_t(ox), int8_t(oy), f);
+            render_map_quad(uint8_t(ox + 128), int8_t(oy), f + 1);
+            render_map_quad(uint8_t(ox), int8_t(oy + 64), f + PAUSE_MAP_FRAMES_W);
+            render_map_quad(uint8_t(ox + 128), int8_t(oy + 64), f + PAUSE_MAP_FRAMES_W + 1);
+        }
 
         if(player_is_outside())
         {
-            int16_t msx = d.mapscrollx;
-            int16_t msy = d.mapscrolly;
             if(d.allow_obj && (btns_down & BTN_A))
             {
                 uint8_t objx = savefile.objx;

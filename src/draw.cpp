@@ -8,8 +8,6 @@
 #if TILES_IN_PROG > 0
 #include "generated/tile_img.hpp"
 #endif
-#include "generated/rounded_borders_white_img.hpp"
-#include "generated/rounded_borders_black_img.hpp"
 
 #ifdef ARDUINO
 #include "SpritesU.hpp"
@@ -22,7 +20,7 @@ static int8_t fmulshi(int8_t x, int8_t y)
 
 inline int8_t i8abs(int8_t x)
 {
-#ifdef ARDUINO
+#if ARDUINO_ARCH_AVR
     asm volatile(R"ASM(
             sbrc %[x], 7
             neg  %[x]
@@ -115,7 +113,7 @@ void draw_objective(int16_t diffx, int16_t diffy)
     int8_t ax = (int8_t)pgm_read_byte_inc(ptr);
     int8_t ay = (int8_t)pgm_read_byte(ptr);
     uint8_t af;
-#ifdef ARDUINO
+#if ARDUINO_ARCH_AVR
     asm volatile(R"ASM(
         lds  %[af], %[rframe]
         lsr  %[af]
@@ -265,15 +263,17 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
     uint8_t ny;
     uint8_t t;
     uint24_t tile_img = TILE_IMG + 2;
-    if(py >= MAP_CHUNK_ROWS / 2 * 64)
+#if 0
+    tile_img += (256 * 32 * 3) * tilesheet();
+#else
     {
-        tile_img += (256 * 32 * 3);
-        if(px >= MAP_CHUNK_COLS / 2 * 128)
-            tile_img += (256 * 32 * 3);
+        uint8_t t = tilesheet();
+        if(t & 1) tile_img += uint16_t(256 * 32 * 3);
+        if(t & 2) tile_img += uint16_t(256 * 32 * 3 * 2);
     }
+#endif
     int16_t x;
-#ifdef ARDUINO
-//#if 0
+#if ARDUINO_ARCH_AVR
     asm volatile(R"ASM(
             clr %[t]
             sbrs %B[ox], 7
@@ -375,7 +375,7 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
     tile_img += 32 * plane();
 #endif
 #endif
-//#ifdef ARDUINO
+//#if ARDUINO_ARCH_AVR
 #if 0
     register int16_t moved_x __asm__("r14");
     register int16_t moved_oy __asm__("r12") = oy;
@@ -469,7 +469,7 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
     } while(--ny != 0);
 #endif
 
-#ifdef ARDUINO
+#if ARDUINO_ARCH_AVR
     asm volatile("draw_chunk_tiles_return:\n");
 #endif
 }
@@ -493,7 +493,7 @@ void draw_text_noclip(int8_t x, int8_t y, char const* str, uint8_t f)
     uint8_t const* font_img = FONT_IMG + plane() * 8 - (' ' * (8 * PLANES)) + 2;
     uint8_t const* font_adv = FONT_ADV - ' ';
     uint8_t page = (uint8_t)y;
-#ifdef ARDUINO
+#if ARDUINO_ARCH_AVR
     //uint8_t shift_coef = FX::bitShiftLeftUInt8(y);
     uint8_t shift_coef = bitmask(page);
     asm volatile(
@@ -654,33 +654,4 @@ void wrap_text(char* str, uint8_t w)
             if(i != 0) str[i] = '\n';
         }
     }
-}
-
-void draw_frame_white(int16_t x, int16_t y, uint8_t w, uint8_t h)
-{
-    platform_fillrect(x, y, w, h, BLACK);
-    platform_drawrect(x, y, w, h, WHITE);
-}
-
-void draw_rounded_frame_white(int16_t x, int16_t y, uint8_t w, uint8_t h)
-{
-    draw_frame_white(x, y, w, h);
-    platform_drawoverwrite(x        , y        , ROUNDED_BORDERS_WHITE_IMG_PROG, 0);
-    platform_drawoverwrite(x + w - 3, y        , ROUNDED_BORDERS_WHITE_IMG_PROG, 1);
-    platform_drawoverwrite(x        , y + h - 8, ROUNDED_BORDERS_WHITE_IMG_PROG, 2);
-    platform_drawoverwrite(x + w - 3, y + h - 8, ROUNDED_BORDERS_WHITE_IMG_PROG, 3);
-}
-
-void draw_frame_black(int16_t x, int16_t y, uint8_t w, uint8_t h)
-{
-    platform_fillrect(x, y, w, h, BLACK);
-}
-
-void draw_rounded_frame_black(int16_t x, int16_t y, uint8_t w, uint8_t h)
-{
-    draw_frame_black(x, y, w, h);
-    platform_drawoverwrite(x        , y        , ROUNDED_BORDERS_BLACK_IMG_PROG, 0);
-    platform_drawoverwrite(x + w - 2, y        , ROUNDED_BORDERS_BLACK_IMG_PROG, 1);
-    platform_drawoverwrite(x        , y + h - 8, ROUNDED_BORDERS_BLACK_IMG_PROG, 2);
-    platform_drawoverwrite(x + w - 2, y + h - 8, ROUNDED_BORDERS_BLACK_IMG_PROG, 3);
 }

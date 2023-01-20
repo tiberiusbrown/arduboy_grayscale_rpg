@@ -222,19 +222,54 @@ void adjust(uint8_t& rx, uint8_t tx)
     rx = x;
 }
 
+#if ARDUINO_ARCH_AVR
+constexpr uint16_t TS_MAP_HALF_X = MAP_CHUNK_COLS / 2 * 8 * 16;
+constexpr uint16_t TS_MAP_HALF_Y = MAP_CHUNK_ROWS / 2 * 4 * 16;
+static_assert(TS_MAP_HALF_X % 256 == 0, "invalid below code");
+static_assert(TS_MAP_HALF_Y % 256 == 0, "invalid below code");
+constexpr uint8_t TS_MAP_HALF_X_HI = uint8_t(TS_MAP_HALF_X >> 8);
+constexpr uint8_t TS_MAP_HALF_Y_HI = uint8_t(TS_MAP_HALF_Y >> 8);
+__attribute__((naked)) uint8_t tilesheet()
+{
+    asm volatile(R"ASM(
+            lds  r24, %[py]+1
+            cpi  r24, %[CY]
+            brsh 1f
+            ldi  r24, 0
+            ret
+        1:
+            lds  r24, %[px]+1
+            cpi  r24, %[CX]
+            brsh 2f
+            ldi  r24, 1
+            ret
+        2:
+            ldi  r24, 2
+            ret
+        )ASM"
+        :
+        : [px] "i"   (&px),
+          [py] "i"   (&py),
+          [CX] ""    (TS_MAP_HALF_X_HI),
+          [CY] ""    (TS_MAP_HALF_Y_HI)
+        );
+}
+#else
+uint8_t tilesheet()
+{
+    if(py >= MAP_CHUNK_ROWS / 2 * 64)
+    {
+        if(px >= MAP_CHUNK_COLS / 2 * 128)
+            return 2;
+        return 1;
+    }
+    return 0;
+}
+#endif
+
 bool player_is_outside()
 {
-    constexpr uint16_t MAP_HALF_Y = MAP_CHUNK_ROWS / 2 * 4 * 16;
-    static_assert(MAP_HALF_Y == 2048, "revert");
-
-#ifdef ARDUINO
-    uint8_t t;
-    asm volatile("lds  %[t], %[py]+1\n" : [t] "=&r" (t) : [py] "i" (&py));
-    return (t & 0xf8) == 0;
-#else
-    return (py & 0xf800) == 0;
-#endif
-    //return py < MAP_HALF_Y;
+    return tilesheet() == 0;
 }
 
 uint16_t rand_seed;

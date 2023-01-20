@@ -564,6 +564,7 @@ extern uint8_t rframe; // render frame
 
 constexpr auto SIZEOF_SAVEFILE = sizeof(savefile);
 
+uint8_t tilesheet() FORCE_NOINLINE;
 bool player_is_outside() FORCE_INLINE;
 
 void story_flag_set(uint16_t index);
@@ -679,10 +680,6 @@ uint8_t dec_to_str(char* dst, uint8_t val);
 void wrap_text(char* str, uint8_t w); // replace ' ' with '\n' to wrap to width
 uint8_t text_width(char const* str);
 uint8_t text_width_prog(char const* str);
-void draw_frame_white(int16_t x, int16_t y, uint8_t w, uint8_t h);
-void draw_rounded_frame_white(int16_t x, int16_t y, uint8_t w, uint8_t h);
-void draw_frame_black(int16_t x, int16_t y, uint8_t w, uint8_t h);
-void draw_rounded_frame_black(int16_t x, int16_t y, uint8_t w, uint8_t h);
 void draw_tiles();
 void draw_player();
 void draw_sprites();

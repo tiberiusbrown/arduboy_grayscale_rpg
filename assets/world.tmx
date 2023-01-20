@@ -2676,7 +2676,9 @@ end:</property>
   <object id="575" x="3128.5" y="2392.75">
    <properties>
     <property name="script">bfc !puzwalk_done start
-st 28 T_DungeonMagicFloor
+st 12 T_DungeonMagicFloor
+st 13 T_DungeonMagicFloor
+st 21 T_DungeonMagicFloor
 st 29 T_DungeonMagicFloor
 st 30 T_DungeonMagicFloor
 jmp end

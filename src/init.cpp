@@ -52,7 +52,7 @@ void new_game()
     story_flag_set(SFLAG_ITEM_Boxing_Gloves);
 #endif
 
-#if 1
+#if 0
     LOC_dismas_house_outside();
     story_flag_set(SFLAG_ITEM_Barbarian_s_Helm);
     story_flag_set(SFLAG_ITEM_Barbarian_s_Footwraps);
@@ -66,7 +66,7 @@ void new_game()
     consumables[CIT_Potion_of_Attack] = 3;
 #endif
 
-    LOC_puzwalk_outside();
+    //LOC_puzwalk_outside();
 
 }
 

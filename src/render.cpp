@@ -122,7 +122,7 @@ static void render_game_over()
         uint8_t w = text_width(t);
         draw_text_noclip(64 - w / 2, y, t);
         y += 9;
-        while(*t++ != '\0')
+        while(deref_inc(t) != '\0')
             ;
         --n;
     }

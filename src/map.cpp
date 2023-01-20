@@ -92,20 +92,17 @@ static bool run_chunk()
         case CMD_DLG:
         case CMD_TDLG:
         {
-            uint8_t t0, t1;
-            if(instr != CMD_MSG) t0 = deref_inc(instr_ptr);
-            if(instr == CMD_TDLG) t1 = deref_inc(instr_ptr);
+            uint8_t t = sel_tile, portrait = INVALID;
+            static_assert(!((CMD_TMSG | CMD_TDLG) & 1), "change next line");
+            if(!(instr & 1)) t = deref_inc(instr_ptr);
+            if(instr >= CMD_DLG) portrait = deref_inc(instr_ptr);
             uint16_t stri = deref_inc(instr_ptr);
             stri |= uint16_t(deref_inc(instr_ptr)) << 8;
             if(no_state_actions) break;
-            static_assert(!((CMD_TMSG | CMD_TDLG) & 1), "");
-            if(!(instr & 1) && t0 != sel_tile)
+            if(t != sel_tile)
                 break;
             change_state(STATE_DIALOG);
             sdata.dialog.name[0] = (char)INVALID;
-            uint8_t portrait = INVALID;
-            if(instr == CMD_DLG) portrait = t0;
-            if(instr == CMD_TDLG) portrait = t1;
             if(portrait != INVALID)
             {
                 platform_fx_read_data_bytes(
@@ -123,20 +120,23 @@ static bool run_chunk()
         {
             uint8_t f = deref_inc(instr_ptr);
             f |= uint16_t(deref_inc(instr_ptr)) << 8;
+            if(no_state_actions || story_flag_get(f))
+            {
+                instr_ptr += 4;
+                break;
+            }
             uint8_t e[4];
             e[0] = deref_inc(instr_ptr);
             e[1] = deref_inc(instr_ptr);
             e[2] = deref_inc(instr_ptr);
             e[3] = deref_inc(instr_ptr);
-            if(no_state_actions) break;
-            if(story_flag_get(f)) break;
             change_state(STATE_BATTLE);
             sdata.battle.remove_enemy = (instr == CMD_EBAT);
-            //sdata.battle.enemy_chunk = running_chunk;
+            uint8_t const* eptr = &e[0];
             for(uint8_t i = 0; i < 4; ++i)
             {
                 auto& enemy = sdata.battle.enemies[i];
-                uint8_t id = e[i];
+                uint8_t id = deref_inc(eptr);
                 enemy.id = id;
                 enemy.hp = pgm_read_byte(&ENEMY_INFO[id].mhp);
             }
@@ -337,11 +337,17 @@ static bool run_chunk()
         }
         case CMD_PA:
         {
-            if(nparty >= 4) break;
             uint8_t id = deref_inc(instr_ptr);
+#if 0
+            if(nparty >= 4) break;
             for(uint8_t u = 0; u < nparty; ++u)
                 if(party[u].battle.id == id)
                     break;
+#else
+            MY_ASSERT(nparty < 4);
+            for(uint8_t u = 0; u < nparty; ++u)
+                MY_ASSERT(party[u].battle.id != id);
+#endif
             party[nparty].battle.id = id;
             party[nparty].battle.hp = party_mhp(nparty);
             ++nparty;
