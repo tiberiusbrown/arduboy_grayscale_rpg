@@ -113,7 +113,7 @@ static void render_game_over()
     auto const& d = sdata.game_over;
 
     if(d.fade_frame < 8) return;
-    platform_fx_drawoverwrite(uint8_t(0), uint8_t(0), GAME_OVER_IMG);
+    platform_fx_drawoverwrite_i8(0, 0, GAME_OVER_IMG);
 
     uint8_t n = d.msg_lines;
     uint8_t y = 39 - n * 4;

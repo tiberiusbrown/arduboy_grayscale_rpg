@@ -63,11 +63,13 @@ void update_pause()
             msx = px / 8 - 64;
             msy = py / 8 - 32;
         }
-        if(!d.back_to_menu && (d.mapfade += FADE_SPEED) >= 32)
-            d.mapfade = 32;
-        if(d.back_to_menu && (d.mapfade -= FADE_SPEED) == 0)
+        uint8_t mapfade = d.mapfade;
+        if(!d.back_to_menu && (mapfade += FADE_SPEED) >= 32)
+            mapfade = 32;
+        if(d.back_to_menu && (mapfade -= FADE_SPEED) == 0)
             d.back_to_menu = false, state = OS_MENU;
-        if(d.mapfade >= 16)
+        d.mapfade = mapfade;
+        if(mapfade >= 16)
         {
             if(btns_pressed & BTN_A)
                 d.allow_obj = true;
@@ -157,18 +159,6 @@ void update_pause()
                     new_game();
                 change_state(qi - 1);
                 return;
-
-                //if(d.quiti == 1)
-                //{
-                //    change_state(STATE_TITLE);
-                //    return;
-                //}
-                //if(d.quiti == 2)
-                //{
-                //    change_state(STATE_RESUME);
-                //    new_game();
-                //    return;
-                //}
             }
         }
         else if(d.quity >= 64)
@@ -203,20 +193,22 @@ void update_pause()
     {
         if(d.savey >= 64)
         {
-            if(d.save_wait > 0)
+            uint8_t save_wait = d.save_wait;
+            if(save_wait > 0)
             {
-                if(++d.save_wait == 16)
+                if(++save_wait == 16)
                     state = OS_RESUMING;
             }
             else if(is_saving())
             {
                 if(save_done())
-                    d.save_wait = 1;
+                    save_wait = 1;
             }
             else
             {
                 save_begin();
             }
+            d.save_wait = save_wait;
         }
     }
     else if(state == OS_PARTY)
@@ -244,14 +236,6 @@ void update_pause()
     adjust(d.speedx, savefile.settings.game_speed * 8);
     d.ally = d.optionsy | d.quity | d.savey | d.partyy;
     d.state = state;
-}
-
-static inline uint8_t explored_rotate8(uint8_t x, uint8_t const*& ptr)
-{
-    x <<= 1;
-    if(x == 0)
-        return ++ptr, 1;
-    return x;
 }
 
 // x is uint8_t to avoid UB when overflowing
@@ -287,6 +271,11 @@ static void render_map_quad(uint8_t x, int8_t y, uint8_t f)
     }
 }
 
+static FORCE_NOINLINE void draw_options_check(uint8_t y, uint8_t off)
+{
+    platform_fx_drawoverwrite_i8(71, int8_t(y + off), CHECK_IMG);
+}
+
 void render_pause()
 {
     auto const& d = sdata.pause;
@@ -295,7 +284,7 @@ void render_pause()
         render_map();
     if(d.menuy > 0)
     {
-        platform_fx_drawoverwrite(0, d.menuy - 16, PAUSE_MENU_IMG);
+        platform_fx_drawoverwrite_i8(0, d.menuy - 16, PAUSE_MENU_IMG);
         if(plane() == 0 && !player_is_outside())
             platform_fillrect_i8(52, int8_t(d.menuy - 16), 18, 10, BLACK);
         platform_fillrect_i8(d.ax, d.menuy - 5, (d.bx - d.ax + 1), 2, WHITE);
@@ -303,23 +292,23 @@ void render_pause()
     if(d.optionsy > 0)
     {
         uint8_t y = 64 - d.optionsy;
-        platform_fx_drawoverwrite(0, y, OPTIONS_IMG);
-        platform_fx_drawoverwrite(d.brightnessx + 70, y + 38, SLIDER_IMG);
-        platform_fx_drawoverwrite(d.speedx + 70, y + 26, SLIDER_IMG);
+        platform_fx_drawoverwrite_i8(0, y, OPTIONS_IMG);
+        platform_fx_drawoverwrite_i8(int8_t(d.brightnessx + 70), y + 38, SLIDER_IMG);
+        platform_fx_drawoverwrite_i8(int8_t(d.speedx + 70), y + 26, SLIDER_IMG);
 
         if(savefile.settings.sound & 2)
-            platform_fx_drawoverwrite(71, y + 4, CHECK_IMG);
+            draw_options_check(y, 4);
         if(savefile.settings.sound & 1)
-            platform_fx_drawoverwrite(71, y + 16, CHECK_IMG);
+            draw_options_check(y, 16);
         if(!savefile.settings.no_battery_alert)
-            platform_fx_drawoverwrite(71, y + 52, CHECK_IMG);
+            draw_options_check(y, 52);
         if(plane() == 0)
             platform_drawrect_i8(0, y + d.optionsiy + 2, 128, 12, DARK_GRAY);
     }
     if(d.quity > 0)
     {
         uint8_t y = 64 - d.quity;
-        platform_fx_drawoverwrite(0, y, QUIT_IMG);
+        platform_fx_drawoverwrite_i8(0, (int8_t)y, QUIT_IMG);
         if(plane() == 0)
         {
             int8_t qy = (int8_t)y + d.quitiy + 25;
@@ -350,8 +339,8 @@ void render_pause()
         {
             uint8_t mx = uint16_t(msx) / 128;
             uint8_t my = uint16_t(msy) / 64;
-            int8_t ox = -(uint8_t(d.mapscrollx) & 127);
-            int8_t oy = -(uint8_t(d.mapscrolly) & 63);
+            int8_t ox = -(uint8_t(msx) & 127);
+            int8_t oy = -(uint8_t(msy) & 63);
             uint8_t f = my * PAUSE_MAP_FRAMES_W + mx;
 
             render_map_quad(uint8_t(ox), int8_t(oy), f);
@@ -400,15 +389,9 @@ void render_pause()
                 x = (uint8_t)tx;
                 y = (uint8_t)ty;
             }
-            //uint8_t x = uint16_t(d.mapscrollx + (PAUSE_MAP_PIXELS_W / 16 / 2)) /
-            //    (PAUSE_MAP_PIXELS_W / 16);
-            //uint8_t y = uint16_t(d.mapscrolly + (PAUSE_MAP_PIXELS_H / 8 / 2)) /
-            //    (PAUSE_MAP_PIXELS_H / 8);
             platform_fillrect_i8(104, 48, 16, 8, LIGHT_GRAY);
             platform_fillrect_i8(104 + x, 48 + y, 4, 2, BLACK);
             platform_drawrect_i8(103, 47, 18, 10, DARK_GRAY);
-            //platform_fillrect_i8((int8_t)x, 0, 128 / EXPLORED_CHUNK_COLS, 2, WHITE);
-            //platform_fillrect_i8(0, (int8_t)y, 2, 64 / EXPLORED_CHUNK_ROWS, WHITE);
         }
     }
     else if(d.state == OS_MAP)

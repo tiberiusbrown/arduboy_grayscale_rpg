@@ -340,7 +340,7 @@ void render_items(int8_t y, sdata_items& d)
     {
         platform_fillrect_i8(0, 0, 8, 10, BLACK);
         platform_fillrect_i8(120, 0, 8, 10, BLACK);
-        platform_fx_drawoverwrite(0, y + 1, ARROWS_IMG);
+        platform_fx_drawoverwrite_i8(0, y + 1, ARROWS_IMG);
         platform_fx_drawoverwrite(120, y + 1, ARROWS_IMG, 1);
     }
 

@@ -95,6 +95,16 @@ FORCE_INLINE inline uint8_t lsr(uint8_t x)
     asm volatile("lsr %[x]\n" : [x] "+&r" (x));
     return x;
 }
+FORCE_INLINE inline uint8_t lsl(uint8_t x)
+{
+    asm volatile("lsl %[x]\n" : [x] "+&r" (x));
+    return x;
+}
+FORCE_INLINE inline int8_t asr(int8_t x)
+{
+    asm volatile("asr %[x]\n" : [x] "+&r" (x));
+    return x;
+}
 #else
 #include <assert.h>
 #define MY_ASSERT(cond__) assert(cond__)
@@ -156,6 +166,12 @@ inline void* memcpy_P(void* dst, void const* src, size_t num)
 inline int16_t fmuls(int8_t x, int8_t y) { return (x * y) << 1; }
 inline uint8_t nibswap(uint8_t x) { return (x >> 4) | (x << 4); }
 inline uint8_t lsr(uint8_t x) { return x >> 1; }
+inline uint8_t lsl(uint8_t x) { return x << 1; }
+inline int8_t asr(int8_t x)
+{
+    int8_t s = -((uint8_t)x >> 7);
+    return ((s ^ x) >> 1) ^ s;
+}
 #endif
 
 constexpr uint8_t PLANES = 3;
@@ -638,6 +654,7 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame);
 void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr);
+void platform_fx_drawoverwrite_i8(int8_t x, int8_t y, uint24_t addr);
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint8_t w, uint8_t h,
     uint24_t addr, uint16_t frame);
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,

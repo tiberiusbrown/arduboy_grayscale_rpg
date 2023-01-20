@@ -167,7 +167,7 @@ static bool add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
         nf >>= 1;
     if(walking)
     {
-        f += (d & 7) * 2;
+        f += lsl(d & 7);
         if(state == STATE_MAP || state == STATE_TITLE)
             f += (nf & 3);
     }

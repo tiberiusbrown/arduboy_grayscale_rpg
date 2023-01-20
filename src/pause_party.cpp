@@ -2,6 +2,8 @@
 
 #include "generated/fxdata.h"
 
+#include <stddef.h>
+
 bool update_pause_party()
 {
     auto& d = sdata.pause;
@@ -55,7 +57,7 @@ static void render_pause_party_offset(int8_t x, int8_t y, uint8_t i)
     auto const& b = p.battle;
     uint8_t id = b.id;
     auto const* pi = &PARTY_INFO[id];
-    char const* name = pgmptr(&pi->name);
+    //char const* name = pgmptr(&pi->name);
 
 #if 1
     platform_fx_drawoverwrite(x, y, INNATES_IMG, id);
@@ -67,12 +69,22 @@ static void render_pause_party_offset(int8_t x, int8_t y, uint8_t i)
     }
 #endif
 
+#if 1
+    static_assert(
+        offsetof(party_info_t, portrait) ==
+        offsetof(party_info_t, sprite) + 1,
+        "revisit following block");
+    uint8_t sprite, portrait;
+    {
+        uint8_t const* ptr = &pi->sprite;
+        sprite = pgm_read_byte_inc(ptr);
+        portrait = pgm_read_byte(ptr);
+    }
+#else
     uint8_t sprite = pgm_read_byte(&pi->sprite);
     uint8_t portrait = pgm_read_byte(&pi->portrait);
-    //platform_drawrect_i8(x, y, 36, 36, LIGHT_GRAY);
-    //platform_fillrect_i8(x + 36, y + 15, 92, 1, LIGHT_GRAY);
-    //platform_fx_drawoverwrite(x + 2, y + 2, PORTRAIT_IMG, portrait);
-    //draw_text_noclip(x + 38, y + 6, name, NOCLIPFLAG_PROG);
+#endif
+
     {
         // health
         char buf[8];
@@ -91,9 +103,6 @@ static void render_pause_party_offset(int8_t x, int8_t y, uint8_t i)
         uint8_t f = (b.hp * W + mhp / 2) / mhp;
         platform_fillrect_i8(x + 39, y + 1, f, H, WHITE);
     }
-    //draw_text_noclip(x + 44, y + 17, PSTR("Attack:"), NOCLIPFLAG_PROG);
-    //draw_text_noclip(x + 38, y + 26, PSTR("Defense:"), NOCLIPFLAG_PROG);
-    //draw_text_noclip(x + 88, y + 26, PSTR("Speed:"), NOCLIPFLAG_PROG);
     draw_dec(x + 72, y + 17, party_att(i));
     draw_dec(x + 72, y + 26, party_def(i));
     draw_dec(x + 114, y + 26, party_spd(i));
@@ -103,34 +112,37 @@ void render_pause_party()
 {
     auto& d = sdata.pause;
 
-    if(d.itemsy > 0)
-        render_items(64 - d.itemsy, d.items);
+    uint8_t itemsy = d.itemsy;
+    if(itemsy > 0)
+        render_items(64 - itemsy, d.items);
 
-    int8_t y = 64 - d.partyy - d.itemsy;
+    int8_t y = 64 - d.partyy - itemsy;
     if(y <= -64)
         return;
 
     //platform_fx_drawoverwrite(0, y, PARTY_MEMBERS_IMG, 0);
     platform_fillrect_i8(0, y, 128, 64, BLACK);
-    if(d.partyx < d.partyxt)
+    uint8_t partyx = d.partyx;
+    uint8_t partyi = d.partyi;
+    if(partyx < d.partyxt)
     {
-        render_pause_party_offset(d.partyx - 128, y, d.partyi);
-        render_pause_party_offset(d.partyx, y, d.partyi + 1);
+        render_pause_party_offset(partyx - 128, y, partyi);
+        render_pause_party_offset(partyx, y, partyi + 1);
     }
-    else if(d.partyx > d.partyxt)
+    else if(partyx > d.partyxt)
     {
-        render_pause_party_offset(d.partyx, y, d.partyi);
-        render_pause_party_offset(d.partyx - 128, y, d.partyi - 1);
+        render_pause_party_offset(partyx, y, partyi);
+        render_pause_party_offset(partyx - 128, y, partyi - 1);
     }
     else
     {
-        render_pause_party_offset(0, y, d.partyi);
+        render_pause_party_offset(0, y, partyi);
     }
-    platform_fx_drawoverwrite(49, y + 55, A_ITEMS_IMG);
+    platform_fx_drawoverwrite_i8(49, y + 55, A_ITEMS_IMG);
     platform_fillrect_i8(0, y + 35, 128, 1, LIGHT_GRAY);
 
-    if(d.partyi > 0)
-        platform_fx_drawoverwrite(0, y + 56, ARROWS_IMG);
-    if(d.partyi < nparty - 1)
+    if(partyi > 0)
+        platform_fx_drawoverwrite_i8(0, y + 56, ARROWS_IMG);
+    if(partyi < nparty - 1)
         platform_fx_drawoverwrite(120, y + 56, ARROWS_IMG, 1);
 }

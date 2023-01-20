@@ -182,7 +182,7 @@ static void take_damage(uint8_t i, int8_t dam)
 
     // defenders take half damage
     if(dam > 0 && (i == d.pdef || i == d.edef))
-        dam = (dam + 1) / 2;
+        dam = asr(dam + 1);
 
     int8_t new_hp = hp - dam;
     if(new_hp < 0) new_hp = 0;
@@ -772,7 +772,7 @@ static void draw_health(uint8_t i)
     platform_drawrect_i8(x, y + 1, w, h, DARK_GRAY);
 
     if(s.flags & BFLAG_STUNNED)
-        platform_fx_drawoverwrite(x, y - 4, BATTLE_ZZ_IMG);
+        platform_fx_drawoverwrite_i8(x, y - 4, BATTLE_ZZ_IMG);
 
     uint8_t hp = s.hp, hpt = s.hpt;
     if(hpt < hp) tswap(hpt, hp);
@@ -882,7 +882,7 @@ void render_battle()
         int16_t y = menuy - 32;
         platform_fx_drawplusmask(51, y, 3, 8, BATTLE_MENU_CHAIN_IMG, 0);
         platform_fx_drawplusmask(74, y, 3, 8, BATTLE_MENU_CHAIN_IMG, 0);
-        platform_fx_drawoverwrite(48, y + 8, BATTLE_MENU_IMG);
+        platform_fx_drawoverwrite_i8(48, y + 8, BATTLE_MENU_IMG);
         draw_text_noclip(50, y + 9 + d.msely, PSTR("\x7f"), NOCLIPFLAG_PROG);
     }
     if(phase == BPHASE_MENU || phase == BPHASE_ESEL)

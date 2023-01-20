@@ -319,6 +319,10 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr)
 {
     platform_fx_drawoverwrite(x, y, addr, 0);
 }
+FORCE_NOINLINE void platform_fx_drawoverwrite_i8(int8_t x, int8_t y, uint24_t addr)
+{
+    platform_fx_drawoverwrite(x, y, addr, 0);
+}
 
 void platform_fx_drawplusmask(int16_t x, int16_t y, uint8_t w, uint8_t h,
     uint24_t addr, uint16_t frame)
