@@ -42,10 +42,11 @@ static void render_dialog()
     else
     {
         uint8_t x = portrait ? 39 : 2;
-        c = d.message[d.char_progress];
-        d.message[d.char_progress] = '\0';
+        char* cp = &d.message[d.char_progress];
+        c = *cp;
+        *cp = '\0';
         draw_text_noclip(x, 2, &d.message[d.question_msg], NOCLIPFLAG_BIGLINES);
-        d.message[d.char_progress] = c;
+        *cp = c;
         if(d.questiondone && plane() == 0)
         {
             uint8_t w = 128 - x;
@@ -104,7 +105,7 @@ static void render_tp()
         platform_fillrect_i8(0, h, w, h2, BLACK);
         platform_fillrect_i8(128 - w, h, w, h2, BLACK);
     }
-    draw_player();
+    platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, 16, 16, PLAYER_IMG, pdir * 4);
 }
 
 static void render_game_over()

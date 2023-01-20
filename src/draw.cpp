@@ -241,7 +241,7 @@ void draw_sprites()
 void draw_player()
 {
     uint8_t f = pdir * 4;
-    if(pmoving) f += (div4(nframe) & 3);
+    //if(pmoving) f += (div4(nframe) & 3);
     platform_fx_drawplusmask(64 - 8, 32 - 8 - 4, 16, 16, PLAYER_IMG, f);
 }
 
@@ -263,15 +263,11 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
     uint8_t ny;
     uint8_t t;
     uint24_t tile_img = TILE_IMG + 2;
-#if 0
-    tile_img += (256 * 32 * 3) * tilesheet();
-#else
     {
         uint8_t t = tilesheet();
         if(t & 1) tile_img += uint16_t(256 * 32 * 3);
         if(t & 2) tile_img += uint16_t(256 * 32 * 3 * 2);
     }
-#endif
     int16_t x;
 #if ARDUINO_ARCH_AVR
     asm volatile(R"ASM(
@@ -375,71 +371,7 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
     tile_img += 32 * plane();
 #endif
 #endif
-//#if ARDUINO_ARCH_AVR
-#if 0
-    register int16_t moved_x __asm__("r14");
-    register int16_t moved_oy __asm__("r12") = oy;
-    // call to SpritesU::drawBasicNoChecks needs:
-    // ======== lo ======== hi ========
-    //     r24: 16          16
-    //     r22: C[tile_img]
-    //     r20: A[tile_img] B[tile_img]
-    //     r18: 0           0
-    //     r16: 2
-    //     r14: A[x]        B[x]        <-- already there
-    //     r12: A[oy]       B[oy]       <-- already there
 
-    asm volatile(R"ASM(
-            movw r28, %[tiles]
-        1:
-            mov  %[t], %[nx]
-            movw %[x], %[ox]
-        2:
-            ldi  r24, 16
-            ldi  r25, 16
-            ldi  r18, 32*3
-            ld   r19, Y+
-            mul  r19, r18
-            movw r20, %A[tile_img]
-            mov  r22, %C[tile_img]
-            add  r20, r0
-            adc  r21, r1
-            clr  __zero_reg__
-            adc  r22, __zero_reg__
-            ldi  r18, 0
-            ldi  r19, 0
-            ldi  r16, 2
-            %~call %x[drawfunc]
-            ldi  r18, 16
-            add  %A[x], r18
-            adc  %B[x], __zero_reg__
-            dec  %[t]
-            brne 2b
-            add  %A[oy], r18
-            adc  %B[oy], __zero_reg__
-            ldi  r18, 8
-            sub  r18, %[nx]
-            add  r28, r18
-            adc  r29, __zero_reg__
-            dec  %[ny]
-            brne 1b
-        )ASM"
-        : 
-        [ny]        "+&l" (ny),
-        [t]         "=&l" (t),
-        [x]         "=&l" (moved_x),
-        [oy]        "+&l" (moved_oy)
-        :
-        [nx]        "l"   (nx),
-        [ox]        "l"   (ox),
-        [tile_img]  "l"   (tile_img),
-        [tiles]     "r"   (tiles),
-        [drawfunc]  "i"   (SpritesU::drawBasicNoChecks)
-        :
-        "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
-        "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31"
-        );
-#else
     uint8_t maxy = 64;
     if(state == STATE_PAUSE) maxy -= sdata.pause.ally;
     else if(state == STATE_DIALOG) maxy = 35;
@@ -467,7 +399,6 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
         if(oy >= maxy) break;
         tiles += (8 - nx);
     } while(--ny != 0);
-#endif
 
 #if ARDUINO_ARCH_AVR
     asm volatile("draw_chunk_tiles_return:\n");
@@ -480,10 +411,42 @@ void draw_tiles()
     uint8_t ty = (py - 32 + 8) & 0x3f;
     int16_t ox = -int16_t(tx);
     int16_t oy = -int16_t(ty);
-    draw_chunk_tiles(active_chunks[0].chunk.tiles_flat, ox, oy);
-    draw_chunk_tiles(active_chunks[1].chunk.tiles_flat, ox + 128, oy);
-    draw_chunk_tiles(active_chunks[2].chunk.tiles_flat, ox, oy + 64);
-    draw_chunk_tiles(active_chunks[3].chunk.tiles_flat, ox + 128, oy + 64);
+    for(uint8_t i = 0; i < 4; ++i)
+    {
+        int16_t tox, toy;
+#if ARDUINO_ARCH_AVR
+        uint8_t ti;
+        asm volatile(R"ASM(
+                mov  %[ti], %[i]
+                andi %[ti], 1
+                mul  %[ti], %[c64]
+                lsl  r0
+                movw %A[tox], %A[ox]
+                add  %A[tox], r0
+                adc  %B[tox], r1
+                mov  %[ti], %[i]
+                lsr  %[ti]
+                mul  %[ti], %[c64]
+                movw %A[toy], %A[oy]
+                add  %A[toy], r0
+                adc  %B[toy], r1
+                ; r1 already cleared (products < 256)
+            )ASM"
+            : [tox] "=&r" (tox)
+            , [toy] "=&r" (toy)
+            , [ti]  "=&d" (ti)
+            : [i]   "r"   (i)
+            , [ox]  "r"   (ox)
+            , [oy]  "r"   (oy)
+            , [c64] "r"   (64)
+            );
+#else
+        tox = ox + (i & 1) * 128;
+        toy = oy + (i >> 1) * 64;
+#endif
+        draw_chunk_tiles(
+            active_chunks[i].chunk.tiles_flat, tox, toy);
+    }
 }
 
 void draw_text_noclip(int8_t x, int8_t y, char const* str, uint8_t f)

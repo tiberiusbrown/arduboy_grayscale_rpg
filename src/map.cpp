@@ -298,24 +298,26 @@ static bool run_chunk()
                 break;
             }
             bool reset = false;
-            if(sprite.type != id)
+            sprite_t s = sprite;
+            if(s.type != id)
                 reset = true;
-            sprite.type = id;
+            s.type = id;
             for(uint8_t j = 0; j < n; ++j)
             {
                 uint8_t p = deref_inc(instr_ptr);
-                if(sprite.path[j] != p)
+                if(s.path[j] != p)
                     reset = true;
-                sprite.path[j] = p;
+                s.path[j] = p;
             }
-            sprite.path_num = n;
-            sprite.active = (n > 0);
+            s.path_num = n;
+            s.active = (n > 0);
             if(!open)
-                sprite.path_dir = 0;
-            else if(sprite.path_dir == 0)
-                sprite.path_dir = 1;
+                s.path_dir = 0;
+            else if(s.path_dir == 0)
+                s.path_dir = 1;
             if(reset)
-                reset_sprite(sprite);
+                reset_sprite(s);
+            sprite = s;
             chunk_sprite_defined = true;
             break;
         }

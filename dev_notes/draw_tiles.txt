@@ -1,0 +1,68 @@
+    register int16_t moved_x __asm__("r14");
+    register int16_t moved_oy __asm__("r12") = oy;
+    // call to SpritesU::drawBasicNoChecks needs:
+    // ======== lo ======== hi ========
+    //     r24: 16          16
+    //     r22: C[tile_img]
+    //     r20: A[tile_img] B[tile_img]
+    //     r18: 0           0
+    //     r16: 2
+    //     r14: A[x]        B[x]        <-- already there
+    //     r12: A[oy]       B[oy]       <-- already there
+
+    asm volatile(R"ASM(
+            push r28
+            push r29
+
+            movw r28, %[tiles]
+        1:
+            mov  %[t], %[nx]
+            movw %[x], %[ox]
+        2:
+            ldi  r24, 16
+            ldi  r25, 16
+            ldi  r18, 32*3
+            ld   r19, Y+
+            mul  r19, r18
+            movw r20, %A[tile_img]
+            mov  r22, %C[tile_img]
+            add  r20, r0
+            adc  r21, r1
+            clr  __zero_reg__
+            adc  r22, __zero_reg__
+            ldi  r18, 0
+            ldi  r19, 0
+            ldi  r16, 2
+            %~call %x[drawfunc]
+            ldi  r18, 16
+            add  %A[x], r18
+            adc  %B[x], __zero_reg__
+            dec  %[t]
+            brne 2b
+            add  %A[oy], r18
+            adc  %B[oy], __zero_reg__
+            ldi  r18, 8
+            sub  r18, %[nx]
+            add  r28, r18
+            adc  r29, __zero_reg__
+            dec  %[ny]
+            brne 1b
+
+            pop  r29
+            pop  r28
+        )ASM"
+        : 
+        [ny]        "+&l" (ny),
+        [t]         "=&l" (t),
+        [x]         "=&l" (moved_x),
+        [oy]        "+&l" (moved_oy)
+        :
+        [nx]        "l"   (nx),
+        [ox]        "l"   (ox),
+        [tile_img]  "l"   (tile_img),
+        [tiles]     "r"   (tiles),
+        [drawfunc]  "i"   (SpritesU::drawBasicNoChecks)
+        :
+        "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
+        "r24", "r25", "r26", "r27", "r30", "r31"
+        );
