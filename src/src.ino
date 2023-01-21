@@ -236,8 +236,53 @@ void setup()
     Serial.begin(9600);
 #endif
     
-    FX::begin(FX_DATA_PAGE, 0);
-    FX::enableOLED();
+    //FX::begin(FX_DATA_PAGE, 0);
+    //FX::enableOLED();
+    
+    {
+        uint8_t t;
+        uint16_t p;
+        uint16_t ptr;
+        asm volatile(R"ASM(
+        
+                ldi  %A[ptr], 0x14
+                ldi  %B[ptr], 0x00
+                
+                ldi  %A[p], lo8(%[DATA_PAGE])
+                ldi  %B[p], hi8(%[DATA_PAGE])
+                lpm  %[t], %a[ptr]+
+                subi %[t], lo8(%[VECTOR_KEY])
+                lpm  %[t], %a[ptr]+
+                sbci %[t], hi8(%[VECTOR_KEY])
+                brne 1f
+                lpm  %B[p], %a[ptr]+
+                lpm  %A[p], %a[ptr]+
+            1:  sts  %[dataPage]+0, %A[p]
+                sts  %[dataPage]+1, %B[p]
+                
+                ldi  %A[p], 0
+                ldi  %B[p], 0
+                lpm  %[t], %a[ptr]+
+                subi %[t], lo8(%[VECTOR_KEY])
+                lpm  %[t], %a[ptr]+
+                sbci %[t], hi8(%[VECTOR_KEY])
+                brne 1f
+                lpm  %B[p], %a[ptr]+
+                lpm  %A[p], %a[ptr]+
+            1:  sts  %[savePage]+0, %A[p]
+                sts  %[savePage]+1, %B[p] 
+        
+            )ASM"
+            : [t]            "=&d" (t)
+            , [p]            "=&r" (p)
+            , [ptr]          "=&z" (ptr)
+            : [dataPage]     ""    (&FX::programDataPage)
+            , [savePage]     ""    (&FX::programSavePage)
+            , [DATA_PAGE]    "i"   (FX_DATA_PAGE)
+            , [VECTOR_KEY]   "i"   (FX_VECTOR_KEY_VALUE)
+            );
+    }
+    
     initialize();
 #ifndef DEBUG_MONOCHROME
     a.startGray();
