@@ -2676,8 +2676,8 @@ end:</property>
   <object id="575" x="3128.5" y="2392.75">
    <properties>
     <property name="script">bfc !puzwalk_done start
-st 12 T_DungeonMagicFloor
-st 13 T_DungeonMagicFloor
+st 12 T_DungeonMagicFloor2
+st 13 T_DungeonMagicFloor2
 st 21 T_DungeonMagicFloor
 st 29 T_DungeonMagicFloor
 st 30 T_DungeonMagicFloor
@@ -2688,13 +2688,13 @@ start:
 andi r1 r4 0x7f
 
 bgeq r1 0x20 skip
-st 12 T_DungeonMagicFloor
-st 13 T_DungeonMagicFloor
+st 12 T_DungeonMagicFloor2
+st 13 T_DungeonMagicFloor2
 jmp end
 
 skip:
 bgeq r1 0x40 skip2
-st 13 T_DungeonMagicFloor
+st 13 T_DungeonMagicFloor2
 st 21 T_DungeonMagicFloor
 st 29 T_DungeonMagicFloor
 jmp end
@@ -2710,10 +2710,13 @@ end:</property>
   </object>
   <object id="576" x="3192" y="2424.33">
    <properties>
-    <property name="script">$bnwt end
+    <property name="script">bfs !puzwalk_done skip
+$bnwt end
+solved
 fs !puzwalk_done
-end:
-$stf !puzwalk_done T_DungeonButtonOn</property>
+skip:
+$st T_DungeonButtonOn
+end:</property>
    </properties>
    <point/>
   </object>

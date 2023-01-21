@@ -260,6 +260,8 @@ void setup()
             1:  sts  %[dataPage]+0, %A[p]
                 sts  %[dataPage]+1, %B[p]
                 
+                ldi  %A[ptr], 0x18
+                ;    %B[ptr] still 0x00
                 ldi  %A[p], 0
                 ldi  %B[p], 0
                 lpm  %[t], %a[ptr]+
@@ -281,6 +283,14 @@ void setup()
             , [DATA_PAGE]    "i"   (FX_DATA_PAGE)
             , [VECTOR_KEY]   "i"   (FX_VECTOR_KEY_VALUE)
             );
+        
+        // unnecessary due to being woken up by the bootloader:
+        //
+        // https://github.com/MrBlinky/cathy3k/blob/e4e7ee7465f3d5fae11e53b55bd9e52a29cef328/cathy3k.asm#L2613-L2614
+        //
+        //FX::disableOLED();
+        //FX::wakeUp();
+        //FX::enableOLED();
     }
     
     initialize();
