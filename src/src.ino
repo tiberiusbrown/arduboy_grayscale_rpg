@@ -247,7 +247,6 @@ void setup()
         
                 ldi  %A[ptr], 0x14
                 ldi  %B[ptr], 0x00
-                
                 ldi  %A[p], lo8(%[DATA_PAGE])
                 ldi  %B[p], hi8(%[DATA_PAGE])
                 lpm  %[t], %a[ptr]+
@@ -268,10 +267,10 @@ void setup()
                 subi %[t], lo8(%[VECTOR_KEY])
                 lpm  %[t], %a[ptr]+
                 sbci %[t], hi8(%[VECTOR_KEY])
-                brne 1f
+                brne 2f
                 lpm  %B[p], %a[ptr]+
                 lpm  %A[p], %a[ptr]+
-            1:  sts  %[savePage]+0, %A[p]
+            2:  sts  %[savePage]+0, %A[p]
                 sts  %[savePage]+1, %B[p] 
         
             )ASM"
