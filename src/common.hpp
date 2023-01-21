@@ -212,14 +212,15 @@ struct map_chunk_t
 enum
 {
     STATE_TITLE,
-    STATE_RESUME,  // fading in to gameplay
-    STATE_MAP,     // moving around on the map
-    STATE_PAUSE,   // pause menu
-    STATE_DIALOG,  // message or dialog
-    STATE_TP,      // player is teleporting (e.g., entering building or cave)
+    STATE_RESUME,    // fading in to gameplay
+    STATE_MAP,       // moving around on the map
+    STATE_PAUSE,     // pause menu
+    STATE_DIALOG,    // message or dialog
+    STATE_TP,        // player is teleporting (e.g., entering building or cave)
     STATE_BATTLE,
     STATE_DIE,
     STATE_GAME_OVER,
+    STATE_BADFX,     // bad FX data detected
 };
 extern uint8_t state;
 
@@ -630,6 +631,7 @@ bool update_pause_party();
 void render_pause_party();
 
 // save.cpp
+extern uint8_t const IDENTIFIER[8] PROGMEM;
 void save_begin();
 bool save_done();
 bool is_saving();

@@ -735,6 +735,10 @@ static inline void process_repeat(uint8_t i, uint8_t btn)
     *r = c;
 }
 
+static void update_badfx()
+{
+}
+
 void update()
 {
     using update_func = void (*)();
@@ -748,6 +752,7 @@ void update()
         update_battle,
         update_die,
         update_game_over,
+        update_badfx,
     };
 
     // try to play music if no song is playing

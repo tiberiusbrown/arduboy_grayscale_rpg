@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "generated/locations.hpp"
+#include "generated/fxdata.h"
 
 void new_game()
 {
@@ -67,7 +68,6 @@ void new_game()
 #endif
 
     //LOC_puzwalk_outside();
-
 }
 
 void initialize()
@@ -77,5 +77,13 @@ void initialize()
 #if !TITLE_ONLY_DEMO
     platform_audio_init();
 #endif
-    change_state(STATE_TITLE);
+    uint8_t t = STATE_TITLE;
+    uint8_t b[8];
+    platform_fx_read_data_bytes(FX_IDENTIFIER, b, 8);
+    uint8_t const* ptr0 = b;
+    uint8_t const* ptr1 = IDENTIFIER;
+    for(uint8_t i = 0; i < 8; ++i)
+        if(deref_inc(ptr0) != pgm_read_byte_inc(ptr1))
+            t = STATE_BADFX;
+    change_state(t);
 }

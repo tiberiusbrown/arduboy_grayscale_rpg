@@ -65,3 +65,6 @@ raw_t ITEM_INFO = "item_info.bin"
 raw_t PORTRAIT_STRINGS = "portrait_strings.bin"
 raw_t GAME_OVER_MESSAGES = "game_over_messages.bin"
 raw_t STRINGDATA = "stringdata.bin"
+
+// "_RotA_XY" where XY is version (same as save IDENTIFIER)
+uint8_t FX_IDENTIFIER[] = { 95, 82, 111, 116, 65, 95, 0, 1 };

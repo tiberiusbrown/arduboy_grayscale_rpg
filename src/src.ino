@@ -282,17 +282,13 @@ void setup()
             , [DATA_PAGE]    "i"   (FX_DATA_PAGE)
             , [VECTOR_KEY]   "i"   (FX_VECTOR_KEY_VALUE)
             );
-        
-        // unnecessary due to being woken up by the bootloader:
-        //
-        // https://github.com/MrBlinky/cathy3k/blob/e4e7ee7465f3d5fae11e53b55bd9e52a29cef328/cathy3k.asm#L2613-L2614
-        //
-        //FX::disableOLED();
-        //FX::wakeUp();
-        //FX::enableOLED();
     }
     
+    FX::disableOLED();
+    FX::wakeUp();
     initialize();
+    FX::enableOLED();
+    
 #ifndef DEBUG_MONOCHROME
     a.startGray();
 #endif

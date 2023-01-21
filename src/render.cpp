@@ -249,6 +249,11 @@ static void render_die()
         platform_fade(16 + (48 - f) * FADE_SPEED);
 }
 
+static void render_badfx()
+{
+    draw_text_noclip(33, 28, PSTR("Missing FX data!"), NOCLIPFLAG_PROG);
+}
+
 void render()
 {
     using render_func = void (*)();
@@ -262,15 +267,19 @@ void render()
         render_battle,
         render_die,
         render_game_over,
+        render_badfx,
     };
 
+    if(plane() == 0)
+        ++rframe;
+
     (pgmptr(&FUNCS[state]))();
+
+    if(state == STATE_BADFX)
+        return;
 
     update_battery();
     render_battery();
 
     platform_audio_update();
-
-    if(plane() == 0)
-        ++rframe;
 }

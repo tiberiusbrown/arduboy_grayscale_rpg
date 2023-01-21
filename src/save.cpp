@@ -6,11 +6,11 @@
 #include <EEPROM.h>
 #endif
 
-static uint8_t const IDENTIFIER[8] PROGMEM =
+uint8_t const IDENTIFIER[8] PROGMEM =
 {
     '_', 'R', 'o', 't', 'A', '_',
-    uint8_t(VERSION >> 0),
     uint8_t(VERSION >> 8),
+    uint8_t(VERSION >> 0),
 };
 
 enum { SS_IDLE, SS_ERASE, SS_PROGRAM, SS_DONE };
