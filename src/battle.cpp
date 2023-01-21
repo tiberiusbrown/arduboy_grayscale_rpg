@@ -883,7 +883,7 @@ void render_battle()
         platform_fx_drawplusmask(51, y, 3, 8, BATTLE_MENU_CHAIN_IMG, 0);
         platform_fx_drawplusmask(74, y, 3, 8, BATTLE_MENU_CHAIN_IMG, 0);
         platform_fx_drawoverwrite_i8(48, y + 8, BATTLE_MENU_IMG);
-        draw_text_noclip(50, y + 9 + d.msely, PSTR("\x7f"), NOCLIPFLAG_PROG);
+        draw_text_noclip(50, y + 8 + d.msely, PSTR("\x7f"), NOCLIPFLAG_PROG);
     }
     if(phase == BPHASE_MENU || phase == BPHASE_ESEL)
     {

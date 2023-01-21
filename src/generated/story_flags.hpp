@@ -83,6 +83,7 @@ constexpr uint16_t SFLAG_first_cave_guard3 = 56;
 constexpr uint16_t SFLAG_first_cave_guard4 = 54;
 constexpr uint16_t SFLAG_first_cave_guard5 = 57;
 constexpr uint16_t SFLAG_grave_skeleton = 175;
+constexpr uint16_t SFLAG_hermit_simulation_dialog = 204;
 constexpr uint16_t SFLAG_lightsout_pot_a = 141;
 constexpr uint16_t SFLAG_lightsout_pot_b = 142;
 constexpr uint16_t SFLAG_party_catherine = 150;

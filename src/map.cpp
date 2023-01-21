@@ -371,6 +371,10 @@ static bool run_chunk()
             savefile.objy = deref_inc(instr_ptr);
             break;
         }
+        case CMD_HEAL:
+            for(uint8_t i = 0; i < nparty; ++i)
+                party[i].battle.hp = party_mhp(i);
+            break;
         case CMD_SOLVED:
             platform_audio_play_sfx(SFX_SOLVED, 0);
             break;

@@ -12,15 +12,31 @@ https://opengameart.org/content/gameboy-tileset
 
 GameBoy Style Home Interior Tileset
 MonkeyImage
-Public Domain / Unlicensed
+Public Domain
+    "yep thats fine all my assets are free to use"
+    "they are free to use for whatever"
 https://monkeyimage.itch.io/home-interior-tilesheet-gameboy-styled
 
 8-Directional Game Boy Character Template
 GibbonGL
-Public Domain / Unlicensed
+Creative Commons Zero v1.0 Universal
 https://gibbongl.itch.io/8-directional-gameboy-character-template
 
 GB Studio Character pack
 Parabellum Games
-Public Domain / Unlicensed
+Creative Commons Attribution v4.0 International
 https://parabellum-games.itch.io/gb-studio-character-pack
+
+GameBoy Emporium (GBstudio)
+Parabellum Games
+Creative Commons Attribution v4.0 International
+https://parabellum-games.itch.io/gameboy-emporium
+
+Game Boy Top-down RPG Fantasy Tileset
+Gumpy Function (gumpyfunction.itch.io)
+License: can used for anything not related to NFT/blockchain
+    "Assets can be used in non-commercial and commercial projects of
+    any kind, excluding those relating to or containing non-fungible
+    tokens (NFT) or blockchain related projects. Assets can be edited
+    to suit your own needs. Asset packs are not to be redistributed."
+https://gumpyfunction.itch.io/game-boy-rpg-fantasy-tileset-free

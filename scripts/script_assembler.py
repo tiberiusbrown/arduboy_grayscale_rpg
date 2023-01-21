@@ -117,6 +117,7 @@ class CMD(AutoNumber):
     STF  = ()
     PA   = ()
     OBJ  = ()
+    HEAL = ()
     SOLVED = ()
 
     JMP  = ()
@@ -380,6 +381,9 @@ def assemble(s, eps, chunk):
             #append16(b, s[i]); i += 1
             b.append(int(s[i])); i += 1
             b.append(int(s[i])); i += 1
+        
+        elif s[i] == 'heal':
+            b.append(CMD.HEAL); i += 1
         
         elif s[i] == 'solved':
             b.append(CMD.SOLVED); i += 1

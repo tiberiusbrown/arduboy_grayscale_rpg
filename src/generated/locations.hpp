@@ -1,7 +1,7 @@
 #pragma once
 
-inline void LOC_home_inside                     () { px =   400; py =  2160; }
-inline void LOC_home_bed                        () { px =   336; py =  2128; }
+inline void LOC_home_inside                     () { px =   160; py =  2160; }
+inline void LOC_home_bed                        () { px =    96; py =  2128; }
 inline void LOC_home_outside                    () { px =   880; py =   736; }
 inline void LOC_stairs_village_outside          () { px =  1200; py =   720; }
 inline void LOC_dungeon_lightsout               () { px =  2176; py =  2272; }
@@ -19,7 +19,7 @@ inline void LOC_first_cave_inside               () { px =  2320; py =  2256; }
 inline void LOC_first_cave_ladder               () { px =  2576; py =  2112; }
 inline void LOC_first_cave_exit                 () { px =   704; py =   656; }
 inline void LOC_new_game                        () { px =  2208; py =  2416; }
-inline void LOC_dismas_house_inside             () { px =   704; py =  2144; }
+inline void LOC_dismas_house_inside             () { px =   464; py =  2128; }
 inline void LOC_dismas_house_outside            () { px =   272; py =  1584; }
 inline void LOC_out_portal_raptor               () { px =  1168; py =  1584; }
 inline void LOC_portal_raptor                   () { px =  2880; py =  2240; }
@@ -37,3 +37,10 @@ inline void LOC_puzwalk_outside                 () { px =   576; py =  1136; }
 inline void LOC_puzwalk_inside                  () { px =  3104; py =  2400; }
 inline void LOC_puzcliff_outside                () { px =   608; py =  1840; }
 inline void LOC_puzcliff_inside                 () { px =  2848; py =  2560; }
+inline void LOC_inn_inside                      () { px =   256; py =  2368; }
+inline void LOC_inn_outside                     () { px =   720; py =  1728; }
+inline void LOC_inntunnel_outside_north         () { px =   784; py =  1488; }
+inline void LOC_inntunnel_outside_south         () { px =   448; py =  2304; }
+inline void LOC_inntunnel_inside_north          () { px =  3392; py =  2112; }
+inline void LOC_inntunnel_inside_south          () { px =  3376; py =  2352; }
+inline void LOC_inn_bedside                     () { px =    96; py =  2272; }

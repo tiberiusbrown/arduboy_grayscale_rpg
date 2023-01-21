@@ -67,7 +67,7 @@ void new_game()
     consumables[CIT_Potion_of_Attack] = 3;
 #endif
 
-    LOC_puzcliff_outside();
+    LOC_inn_outside();
 }
 
 void initialize()

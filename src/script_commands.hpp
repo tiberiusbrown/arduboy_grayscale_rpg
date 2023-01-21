@@ -90,6 +90,9 @@ Game Manipulation
     obj <tx> <ty>
         Set objective marker position to <tx> <ty>
 
+    heal
+        Fully heal all party members.
+
     solved
         Play "puzzle solved" sfx
 
@@ -230,6 +233,7 @@ enum script_command_t
     CMD_STF,
     CMD_PA,
     CMD_OBJ,
+    CMD_HEAL,
     CMD_SOLVED,
 
     CMD_JMP,
