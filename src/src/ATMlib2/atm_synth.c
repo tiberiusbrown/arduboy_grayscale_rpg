@@ -300,7 +300,7 @@ static void process_channel(const uint8_t ch_index, struct atm_player_state *pla
     uint8_t start = ch->pstack[0].prev_cmd_ptr;
 	while (ch->delay == 0) {
         uint8_t p = ch->pstack[0].next_cmd_ptr;
-        if((p - start) & (ATM_CMD_BUF_SIZE - 1) < 4) {
+        if((p - start) & (ATM_CMD_BUF_SIZE - 1) <= 4) {
             ++ch->delay;
             break;
         }

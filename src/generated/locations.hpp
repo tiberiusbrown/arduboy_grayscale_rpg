@@ -35,3 +35,5 @@ inline void LOC_puzspike_inside                 () { px =  3104; py =  2304; }
 inline void LOC_puzspike_outside                () { px =  1152; py =  1408; }
 inline void LOC_puzwalk_outside                 () { px =   576; py =  1136; }
 inline void LOC_puzwalk_inside                  () { px =  3104; py =  2400; }
+inline void LOC_puzcliff_outside                () { px =   608; py =  1840; }
+inline void LOC_puzcliff_inside                 () { px =  2848; py =  2560; }

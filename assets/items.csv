@@ -39,7 +39,7 @@ Att,Def,Spd,MHP,Type,Name,Description,Location
 ,,1,,shoes,Barbarian’s Footwraps,+1 speed. +1 attack if not wearing armor.,magic floor walk puzzle in raptor forest
 -1,,,,weapon,Boxing Gloves,-1 attack. Stuns target.,
 ,4,,,armor,Defender’s Breastplate,+4 defense. The wearer does not stop defending at start of turn.,
-1,,,,ring,Fighter’s Ring,+1 attack.,
+1,,,,ring,Fighter’s Ring,+1 attack.,puzcliff dungeon in raptor forest
 1,1,,,armor,Fighter’s Tunic,"+1 attack, +1 defense.",
 4,,2,,weapon,Katana,"For those who have been studying the blade. +4 attack, +2 speed.",
 ,,,,amulet,Lifedrain Necklace,Heals 1 health after each attack.,

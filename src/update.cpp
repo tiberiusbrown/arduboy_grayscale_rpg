@@ -382,6 +382,9 @@ static void update_map()
     load_chunks();
     run_chunks();
     update_sprites();
+
+    // nframe update
+    ++savefile.chunk_regs[4];
 }
 
 static void skip_dialog_animation(uint8_t third_newline)

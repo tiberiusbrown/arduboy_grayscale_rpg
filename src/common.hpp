@@ -582,7 +582,7 @@ static auto& chunk_sprites = savefile.chunk_sprites;
 constexpr auto* consumables = &savefile.chunk_regs[8];
 
 //extern uint8_t nframe; // update frame
-static uint8_t& nframe = savefile.chunk_regs[4];
+extern uint8_t nframe; // render frame
 extern uint8_t rframe; // render frame
 
 constexpr auto SIZEOF_SAVEFILE = sizeof(savefile);

@@ -262,7 +262,8 @@ static void process_cmd(const struct atm_cmd_data *cmd, struct atm_player_state 
 		*next_cmd_ptr += 1;
 		process_1p_cmd(cmd, player_state, ch);
 	} else {
-		const uint8_t csz = ((cmd->id >> 4) & 0x07) + 1;
+		//const uint8_t csz = ((cmd->id >> 4) & 0x07) + 1;
+		const uint8_t csz = ((cmd->id >> 4) & 0x03) + 1;
 		/* n parameter byte command */
 		*next_cmd_ptr += csz;
 		/* process_np_cmd() can modify next_cmd_ptr so increase it first */

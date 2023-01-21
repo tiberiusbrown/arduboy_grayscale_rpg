@@ -663,7 +663,7 @@ void SpritesU::drawBasicNoChecks(
                 cp  %[w], %[cols]            ;  1
                 breq .+2                     ;  1
                 inc %[reseek]                ;  1
-                rcall L%=_delay_14           ; 10
+                rcall L%=_delay_10           ; 10
                 out %[spdr], %C[image]
                 rcall L%=_delay_17
                 out %[spdr], %B[image]
@@ -680,6 +680,7 @@ void SpritesU::drawBasicNoChecks(
                 nop
             L%=_delay_13:
                 lpm
+            L%=_delay_10:
                 lpm
             L%=_delay_7:
                 ret
