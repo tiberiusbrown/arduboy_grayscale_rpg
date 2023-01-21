@@ -671,16 +671,15 @@ void SpritesU::drawBasicNoChecks(
                 out %[spdr], %A[image]
                 rcall L%=_delay_17
                 out %[spdr], __zero_reg__
-                rcall L%=_delay_10
+                rcall L%=_delay_13
                 ret
                 
             L%=_delay_17:
                 lpm
             L%=_delay_14:
-                lpm
-            L%=_delay_11:
                 nop
-            L%=_delay_10:
+            L%=_delay_13:
+                lpm
                 lpm
             L%=_delay_7:
                 ret
@@ -719,7 +718,7 @@ void SpritesU::drawBasicNoChecks(
                 or %[buf_data], r1
                 st %a[buf]+, %[buf_data]
                 lpm
-                adiw r24, 0
+                rjmp .+0
                 dec %[count]
                 brne L%=_top_loop
                 rjmp L%=_top_loop_done
@@ -730,11 +729,7 @@ void SpritesU::drawBasicNoChecks(
                 out %[spdr], __zero_reg__
                 mul %A[image_data], %[shift_coef]
                 movw %A[image_data], r0
-                lpm
-                lpm
-                lpm
-                lpm
-                nop
+                rcall L%=_delay_13
                 in %A[shift_mask], %[spdr]
                 out %[spdr], __zero_reg__
                 mul %A[shift_mask], %[shift_coef]
@@ -765,7 +760,6 @@ void SpritesU::drawBasicNoChecks(
                 breq L%=_middle_skip_reseek
                 in r0, %[spsr]
                 sbi %[fxport], %[fxbit]
-                lpm
                 rcall L%=_seek
 
             L%=_middle_skip_reseek:
@@ -809,9 +803,8 @@ void SpritesU::drawBasicNoChecks(
                 movw %A[image_data], r0
                 ld %[buf_data], %a[buf]
                 ld %B[shift_mask], %a[bufn]
-                lpm
-                lpm
-                lpm
+                rcall L%=_delay_7
+                rjmp .+0
                 in %A[shift_mask], %[spdr]
                 out %[spdr], __zero_reg__
                 mul %A[shift_mask], %[shift_coef]
@@ -846,8 +839,8 @@ void SpritesU::drawBasicNoChecks(
                 breq L%=_bottom_dispatch
                 in r0, %[spsr]
                 sbi %[fxport], %[fxbit]
-                lpm
                 rcall L%=_seek
+                lpm
 
             L%=_bottom_dispatch:
 
@@ -866,7 +859,7 @@ void SpritesU::drawBasicNoChecks(
                 or %[buf_data], r0
                 st %a[buf]+, %[buf_data]
                 lpm
-                adiw r24, 0
+                rjmp .+0
                 dec %[cols]
                 brne L%=_bottom_loop
                 rjmp L%=_finish
@@ -878,11 +871,7 @@ void SpritesU::drawBasicNoChecks(
                 out %[spdr], __zero_reg__
                 mul %A[image_data], %[shift_coef]
                 movw %A[image_data], r0
-                lpm
-                lpm
-                lpm
-                lpm
-                nop
+                rcall L%=_delay_13
                 in %[pages], %[spdr]
                 out %[spdr], __zero_reg__
                 mul %[pages], %[shift_coef]
