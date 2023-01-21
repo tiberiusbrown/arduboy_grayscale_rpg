@@ -131,7 +131,6 @@ void update_pause()
                     if(brightness > 0 && (btns_pressed & BTN_LEFT))
                         --brightness;
                     savefile.settings.brightness = brightness;
-                    platform_fade(15);
                 }
                 else if(optionsi == 4)
                     savefile.settings.no_battery_alert = !savefile.settings.no_battery_alert;
@@ -304,6 +303,7 @@ void render_pause()
             draw_options_check(y, 52);
         if(plane() == 0)
             platform_drawrect_i8(0, y + d.optionsiy + 2, 128, 12, DARK_GRAY);
+        platform_fade(15);
     }
     if(d.quity > 0)
     {
