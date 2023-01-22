@@ -72,6 +72,8 @@ static bool run_chunk()
                 sel_sprite = true;
         }
     }
+    savefile.chunk_regs[1] = sel_tile;
+    savefile.chunk_regs[2] = walk_tile;
     // TODO: optimize no_state_actions line below
     bool no_state_actions = (
         state == STATE_RESUME ||
@@ -323,8 +325,14 @@ static bool run_chunk()
         }
         case CMD_ST:
         case CMD_STF:
+        case CMD_STR:
         {
             uint8_t t = deref_inc(instr_ptr);
+            if(instr == CMD_STR)
+            {
+                MY_ASSERT(t < 8);
+                t = savefile.chunk_regs[t];
+            }
             MY_ASSERT(t < 32);
             uint16_t f;
             if(instr == CMD_STF)

@@ -66,8 +66,6 @@ void new_game()
     consumables[CIT_Ardu_s_Frenzy] = 3;
     consumables[CIT_Potion_of_Attack] = 3;
 #endif
-
-    LOC_inn_outside();
 }
 
 void initialize()

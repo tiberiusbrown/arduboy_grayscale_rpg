@@ -84,6 +84,9 @@ Game Manipulation
     stf <tile> <flag> <tile_img>
         if <flag> is set, st <tile> <tile_img>
 
+    str <reg> <tile_img>
+        Overwrite image at tile coord in <reg> with <tile_img>
+
     pa <id>
         Add party member <id> to party
 
@@ -148,8 +151,13 @@ Macros
     CHEST <tile> <flag>
         bnst <tile> 3
         fs <flag>
-        bfc <flag> 3
-        st <tile> 82
+        stf <tile> <flag> 82
+
+    POT <tile> <flag> <rdst> <imm>
+        bnst <tile> 6
+        fs <flag>
+        addi <rdst> <rdst> <imm>
+        stf <tile> <flag> 98
 
 Other Assembly Syntax
 
@@ -191,9 +199,9 @@ Registers:
     Register   Use
     ==========================================================================
     r0         [READ ONLY] Always zero
-    r1         Nonzero if response 1 to a question was selected
-    r2         Nonzero if response 2 to a question was selected
-    r3         Nonzero if response 3 to a question was selected
+    r1         [set to 1 if response 1 else 0] selected tile or 255
+    r2         [set to 1 if response 2 else 0] walked tile or 255
+    r3         [set to 1 if response 3 else 0]
     r4         [READ ONLY] nframe counter
     r5         [READ ONLY] pdir (0-7): S SW W NW N NE E SE
     r6         frame timer (decrements every frame)
@@ -231,6 +239,7 @@ enum script_command_t
     CMD_EPF,
     CMD_ST,
     CMD_STF,
+    CMD_STR,
     CMD_PA,
     CMD_OBJ,
     CMD_HEAL,

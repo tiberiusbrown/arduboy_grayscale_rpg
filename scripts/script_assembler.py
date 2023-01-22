@@ -27,6 +27,8 @@ tiles = {
     'T_DungeonBarsOpen'    : 550 & 255,
     'T_DungeonBarsClosed'  : 551 & 255,
     'T_DungeonButtonOff'   : 549 & 255,
+    'T_DungeonSpikes'      : 567 & 255,
+    'T_DungeonSpikesSafe'  : 566 & 255,
     'T_DungeonButtonOn'    : 548 & 255,
     'T_OutdoorButtonOff'   : 49  & 255,
     'T_OutdoorButtonOn'    : 48  & 255,
@@ -115,6 +117,7 @@ class CMD(AutoNumber):
     EPF  = ()
     ST   = ()
     STF  = ()
+    STR  = ()
     PA   = ()
     OBJ  = ()
     HEAL = ()
@@ -175,8 +178,8 @@ def reg(s):
 
 def dstreg(s):
     x = reg(s)
-    if x == 0:
-        print('r0 is not allowed to be written to')
+    if x in {0, 4, 5}:
+        print('Write to read only register: %s' % s)
         sys.exit(1)
     return x
     
@@ -371,6 +374,11 @@ def assemble(s, eps, chunk):
             addflag(b, s[i]); i += 1
             b.append(tile(s[i])); i += 1
             
+        elif s[i] == 'str':
+            b.append(CMD.STR); i += 1
+            b.append(reg(s[i])); i += 1
+            b.append(tile(s[i])); i += 1
+            
         elif s[i] == 'pa':
             b.append(CMD.PA); i += 1
             b.append(int(s[i])); i += 1
@@ -465,12 +473,29 @@ def assemble(s, eps, chunk):
             b.append(3)
             b.append(CMD.FS)
             addflag(b, f)
-            b.append(CMD.BFC)
-            addflag(b, f)
-            b.append(3)
-            b.append(CMD.ST)
+            b.append(CMD.STF)
             b.append(t)
+            addflag(b, f)
             b.append(82)
+            
+        elif s[i] == 'POT':
+            i += 1
+            t = int(s[i]); i += 1
+            f = s[i]; i += 1
+            r = s[i]; i += 1
+            n = int(s[i]); i += 1
+            b.append(CMD.BNST)
+            b.append(t)
+            b.append(6)
+            b.append(CMD.FS)
+            addflag(b, f)
+            b.append(CMD.ADDI)
+            b.append(dstreg(r) + (reg(r)<<4))
+            b.append(n)
+            b.append(CMD.STF)
+            b.append(t)
+            addflag(b, f)
+            b.append(98)
             
         elif s[i][-1] == ':':
             b.append(s[i]); i += 1 # hold onto label for now

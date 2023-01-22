@@ -22,15 +22,15 @@ inline void LOC_new_game                        () { px =  2208; py =  2416; }
 inline void LOC_dismas_house_inside             () { px =   464; py =  2128; }
 inline void LOC_dismas_house_outside            () { px =   272; py =  1584; }
 inline void LOC_out_portal_raptor               () { px =  1168; py =  1584; }
-inline void LOC_portal_raptor                   () { px =  2880; py =  2240; }
-inline void LOC_portal_village                  () { px =  2880; py =  2176; }
+inline void LOC_portal_raptor                   () { px =  2800; py =  2192; }
+inline void LOC_portal_village                  () { px =  2800; py =  2128; }
 inline void LOC_out_portal_village              () { px =   368; py =   784; }
 inline void LOC_puzright_inside                 () { px =  2384; py =  2432; }
 inline void LOC_puzright_outside                () { px =   544; py =  1712; }
-inline void LOC_puzwait_inside                  () { px =  2640; py =  2432; }
+inline void LOC_puzwait_inside                  () { px =  2640; py =  2416; }
 inline void LOC_puzwait_outside                 () { px =   784; py =  1568; }
 inline void LOC_spike_inside                    () { px =  2992; py =  2416; }
-inline void LOC_spike_outside                   () { px =   608; py =  1664; }
+inline void LOC_spike_outside                   () { px =   688; py =  1600; }
 inline void LOC_puzspike_inside                 () { px =  3104; py =  2304; }
 inline void LOC_puzspike_outside                () { px =  1152; py =  1408; }
 inline void LOC_puzwalk_outside                 () { px =   576; py =  1136; }
@@ -44,3 +44,7 @@ inline void LOC_inntunnel_outside_south         () { px =   448; py =  2304; }
 inline void LOC_inntunnel_inside_north          () { px =  3392; py =  2112; }
 inline void LOC_inntunnel_inside_south          () { px =  3376; py =  2352; }
 inline void LOC_inn_bedside                     () { px =    96; py =  2272; }
+inline void LOC_puzspikedir_inside              () { px =  3344; py =  2528; }
+inline void LOC_puzspikedir_outside             () { px =   896; py =  1280; }
+inline void LOC_puzwraith_inside                () { px =  2704; py =  2544; }
+inline void LOC_puzwraith_outside               () { px =   944; py =  1504; }

@@ -37,7 +37,7 @@ enemy_info_t const ENEMY_INFO[] PROGMEM =
     {  5, 4, 0, 4,  6,   0, 255, }, //EN_DARK_WIZARD },
     { 10, 1, 0, 1,  6,   0,   0, }, //EN_SKELETON },
     { 13, 1, 0, 3,  3,   0,   0, }, //EN_PSY_RAPTOR },
-    { 15, 3, 1, 5,  5,   0, 128, }, //EN_DARK_RAPTOR },
+    { 15, 3, 1, 5,  8,   0, 128, }, //EN_DARK_RAPTOR },
 };
 
 static char const PN_MATTHIAS[] PROGMEM = "Matthias";

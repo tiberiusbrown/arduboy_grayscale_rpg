@@ -175,6 +175,7 @@ for obj in tm.layers[1]:
             t = t.replace('$st ', 'st $T ')
             t = t.replace('$stf ', 'stf $T ')
             t = t.replace('$CHEST ', 'CHEST $T ')
+            t = t.replace('$POT ', 'POT $T ')
             t = t.replace('$T', str(tile))
             t = re.sub('|'.join(r'@\b%s\b' % re.escape(loc[1:]) for loc in locations), 
                 locreplace, t)
