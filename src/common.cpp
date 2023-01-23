@@ -80,14 +80,11 @@ uint8_t party_att(uint8_t i)
     if(party[i].equipped_items[IT_ARMOR] == INVALID_ITEM)
     {
         // barbarian items
-        static item_t const BARBARIAN_ITEMS[] PROGMEM =
-        {
+        r += user_item_count<
             SFLAG_ITEM_Barbarian_s_Axe,
             SFLAG_ITEM_Barbarian_s_Helm,
-            SFLAG_ITEM_Barbarian_s_Footwraps,
-        };
-        r += user_item_count(i, BARBARIAN_ITEMS,
-            sizeof(BARBARIAN_ITEMS) / sizeof(item_t));
+            SFLAG_ITEM_Barbarian_s_Footwraps>
+            (i);
     }
     if(r < 1) r = 1;
     if(r > 99) r = 99;
@@ -115,16 +112,14 @@ uint8_t party_mhp(uint8_t i)
     r += items_mhp(i);
     {
         // Dryad items
-        static item_t const DRYAD_ITEMS[] PROGMEM =
-        {
+        uint8_t n = user_item_count<
             SFLAG_ITEM_Dryad_Amulet,
             SFLAG_ITEM_Dryad_Ring,
             SFLAG_ITEM_Dryad_Armor,
             SFLAG_ITEM_Dryad_Shoes,
             SFLAG_ITEM_Dryad_Shield,
-            SFLAG_ITEM_Dryad_Helm,
-        };
-        uint8_t n = user_item_count(i, DRYAD_ITEMS, 6);
+            SFLAG_ITEM_Dryad_Helm>
+            (i);
         if(n >= 3)
             r += n * 5;
     }

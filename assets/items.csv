@@ -1,50 +1,55 @@
 Att,Def,Spd,MHP,Type,Name,Description,Location
-1,1,1,,ring,Agatha’s Ring,"+1 attack, +1 defense, +1 speed.",dark raptor south of dismas’s cottage
 ,,,,amulet,Amulet of Peace,Doubles defense when not wielding a weapon.,
 ,,,,amulet,Amulet of Zhar-Tul,The wearer may take two actions per turn in battle.,
-,,,1,ring,Ancient Ardu Ring,+1 max health. Ardu: +2 additional max health.,first dungeon chest
-2,,,,weapon,Barbarian’s Axe,+2 attack. +1 additional attack if not wearing armor.,
-,,1,,shoes,Barbarian’s Footwraps,+1 speed. +1 attack if not wearing armor.,magic floor walk puzzle in raptor forest
-,1,,,helm,Barbarian’s Helm,+1 defense. +1 attack if not wearing armor.,move right puzzle dungeon
--1,,,,weapon,Boxing Gloves,-1 attack. Stuns target.,
-1,,,,weapon,Brass Knuckles,Is that tarnish or old blood? +1 attack.,chest outside of southwest village fence
-,1,,2,shoes,Brawler’s Boots,"+1 defense, +2 max health.",raptor forest n chest
-,1,,2,helm,Brawler’s Cowl,"+1 defense, +2 max health.",raptor forest southern edge
-,,,2,ring,Brawler’s Ring,+2 max health.,double tree in NW raptor forest
+,,,,amulet,Dryad Amulet,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
+,,,,amulet,Lifedrain Necklace,Heals 1 health after each attack.,
+,,,2,amulet,Silver Chain,+2 max health.,puzspikedir dungeon in raptor forest
 ,1,,2,armor,Brawler’s Tunic,"+1 defense, +2 max health.",wraith puzzle dungeon in raptor forest
-,1,,,shoes,Cloth Shoes,"Better than barefoot, but not by much! +1 defense.",east bridge chest
 ,1,,,armor,Cloth Tunic,"Worn and scruffy, but warm enough. +1 defense.",Matthias’s dresser
 ,1,,,armor,Cloth Tunic#2,"Worn and scruffy, but warm enough. +1 defense.",raptor forest near path and water
-1,,1,,weapon,Crude Iron Dagger,"Probably could use some sharpening. +1 attack, +1 speed.",first dungeon chest
-2,,,,weapon,Crude Iron Sword,+2 attack.,raptor forest defeat skeleton at grave
 ,4,,,armor,Defender’s Breastplate,+4 defense. The wearer does not stop defending at start of turn.,
-,4,-4,,ring,Dreamer’s Ring,"Where did this come from? +4 defense, -4 speed.",chest in dream
-,,,,amulet,Dryad Amulet,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
 ,,,,armor,Dryad Armor,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
-,,,,helm,Dryad Helm,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
-,,,,ring,Dryad Ring,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
-,,,,shield,Dryad Shield,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
-,,,,shoes,Dryad Shoes,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
-,,,1,helm,Fancy Cloth Hat,It looks completely ridiculous. +1 max health.,light’s out dungeon
-1,1,,,shoes,Fighter’s Boots,"Hidden toe blades! +1 attack, +1 defense.",raptor forest peninsula chest
-1,,,,ring,Fighter’s Ring,+1 attack.,puzcliff dungeon in raptor forest
 1,1,,,armor,Fighter’s Tunic,"+1 attack, +1 defense.",
-,4,-2,,shield,Iron Shield,"A bit heavy but quite durable. +4 defense, -2 speed.",raptor forest hidden central enclosure chest
-4,,2,,weapon,Katana,"For those who have been studying the blade. +4 attack, +2 speed.",
-2,,,,weapon,Large Wooden Club,+2 attack.,raptor forest e chest near path
-,2,,,shield,Leather Shield,Not too shabby. +2 defense.,raptor forest n beach chest
 ,2,,,armor,Leather Tunic,Rough yet tough. +2 defense.,raptor forest nw beach chest
-,,,,amulet,Lifedrain Necklace,Heals 1 health after each attack.,
 ,1,1,,armor,Ninja Gi,"+1 speed, +1 defense.",raptor forest behind mansion
+,2,,1,armor,Studded Leather Tunic,"Rough yet tough. +2 defense, +1 max health.",chest north of first cave exit
+,1,,,helm,Barbarian’s Helm,+1 defense. +1 attack if not wearing armor.,move right puzzle dungeon
+,1,,2,helm,Brawler’s Cowl,"+1 defense, +2 max health.",raptor forest southern edge
+,,,,helm,Dryad Helm,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
+,,,1,helm,Fancy Cloth Hat,It looks completely ridiculous. +1 max health.,light’s out dungeon
 ,1,1,,helm,Ninja Mask,"+1 speed, +1 defense.",raptor forest n beach chest
-,1,1,,shoes,Ninja Shoes,"So stealthy! Call them sneak-ers? +1 speed, +1 defense.",raptor forest ne beach chest
-2,,1,,weapon,Rusty Katana,"Once a fine weapon. +2 attack, +1 speed.",raptor forest nw beach chest
-,,,2,amulet,Silver Chain,+2 max health.,puzspikedir dungeon in raptor forest
 ,1,,,helm,Simple Cloth Hat,If only it covered the ears. +1 defense.,village north chest
-1,,,,weapon,Small Vampiric Dagger,+1 attack. Heals 1 health after each attack.,wait puzzle in raptor forest
+1,1,1,,ring,Agatha’s Ring,"+1 attack, +1 defense, +1 speed.",dark raptor south of dismas’s cottage
+,,,1,ring,Ancient Ardu Ring,+1 max health. Ardu: +2 additional max health.,first dungeon chest
+,,,2,ring,Brawler’s Ring,+2 max health.,double tree in NW raptor forest
+,,-4,1,ring,Dreamer’s Ring,"Where did this come from? +1 max health, -4 speed.",chest in dream
+,,,,ring,Dryad Ring,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
+1,,,,ring,Fighter’s Ring,+1 attack.,puzcliff dungeon in raptor forest
+,,5,,ring,Tempus Ring,It hums and vibrates unnaturally. +5 speed.,puzspike dungeon in raptor forest
+,,,,shield,Dryad Shield,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
+,4,-2,,shield,Iron Shield,"A bit heavy but quite durable. +4 defense, -2 speed.",raptor forest hidden central enclosure chest
+,2,,,shield,Leather Shield,Not too shabby. +2 defense.,raptor forest n beach chest
 1,2,,,shield,Spiked Shield,"+1 attack, +2 defense.",spike dungeon in raptor forest
 ,2,,1,shield,Studded Leather Shield,"+2 defense, +1 max health.",
-,2,,1,armor,Studded Leather Tunic,"Rough yet tough. +2 defense, +1 max health.",chest north of first cave exit
-,,5,,ring,Tempus Ring,It hums and vibrates unnaturally. +5 speed.,puzspike dungeon in raptor forest
 ,1,,,shield,Wooden Shield,"Old and worn, but better than nothing. +1 defense.",west of village chest
+,,1,,shoes,Barbarian’s Footwraps,+1 speed. +1 attack if not wearing armor.,magic floor walk puzzle in raptor forest
+,1,,2,shoes,Brawler’s Boots,"+1 defense, +2 max health.",raptor forest n chest
+,1,,,shoes,Cloth Shoes,"Better than barefoot, but not by much! +1 defense.",east bridge chest
+,,,,shoes,Dryad Shoes,+5 max health if using at least three Dryad items.,triangle trees in raptor forest
+1,1,,,shoes,Fighter’s Boots,"Hidden toe blades! +1 attack, +1 defense.",raptor forest peninsula chest
+,1,1,,shoes,Ninja Shoes,"So stealthy! Call them sneak-ers? +1 speed, +1 defense.",raptor forest ne beach chest
+2,,,,weapon,Barbarian’s Axe,+2 attack. +1 additional attack if not wearing armor.,
+-1,,,,weapon,Boxing Gloves,-1 attack. Stuns target.,
+1,,,,weapon,Brass Knuckles,Is that tarnish or old blood? +1 attack.,chest outside of southwest village fence
+1,,1,,weapon,Crude Iron Dagger,"Probably could use some sharpening. +1 attack, +1 speed.",first dungeon chest
+2,,,,weapon,Crude Iron Sword,+2 attack.,raptor forest defeat skeleton at grave
+4,,2,,weapon,Katana,"For those who have been studying the blade. +4 attack, +2 speed.",
+2,,,,weapon,Large Wooden Club,+2 attack.,raptor forest e chest near path
+2,,1,,weapon,Rusty Katana,"Once a fine weapon. +2 attack, +1 speed.",raptor forest nw beach chest
+1,,,,weapon,Small Vampiric Dagger,+1 attack. Heals 1 health after each attack.,wait puzzle in raptor forest
 1,1,,,weapon,Wooden Spear,"+1 attack, +1 defense.",raptor forest chest se of island
+,,,,amulet,River Amulet,Heals 3 health when choosing to defend.,raptor forest south secret dock
+,,,,ring,River Band,Heals 3 health when choosing to defend.,secret dock west of village
+,-1,1,,helm,Old Dark Helm,"-1 defense, +1 speed.",
+,-2,2,,armor,Old Dark Armor,"-2 defense, +2 speed.",raptor forest near old dark building
+,-1,1,,shoes,Old Dark Shoes,"-1 defense, +1 speed.",

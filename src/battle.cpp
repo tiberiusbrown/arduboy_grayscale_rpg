@@ -561,13 +561,9 @@ void update_battle()
 
         // check for stun item
         {
-            static item_t const STUN_ITEMS[] PROGMEM =
-            {
-                SFLAG_ITEM_Boxing_Gloves,
-            };
-            item_t const* ptr = STUN_ITEMS;
-            uint8_t n = user_item_count(
-                attacker, STUN_ITEMS, sizeof(STUN_ITEMS) / sizeof(item_t));
+            uint8_t n = user_item_count<
+                SFLAG_ITEM_Boxing_Gloves>
+                (attacker);
             if(n > 0)
             {
                 if(d.special_attack == CIT_Ardu_s_Frenzy)
@@ -581,13 +577,10 @@ void update_battle()
 
         // check for Vampiric item (heals 1 health after each attack)
         {
-            static item_t const VAMPIRIC_ITEMS[] PROGMEM =
-            {
+            uint8_t v = user_item_count<
                 SFLAG_ITEM_Small_Vampiric_Dagger,
-                SFLAG_ITEM_Lifedrain_Necklace,
-            };
-            uint8_t v = user_item_count(attacker, VAMPIRIC_ITEMS,
-                sizeof(VAMPIRIC_ITEMS) / sizeof(item_t));
+                SFLAG_ITEM_Lifedrain_Necklace>
+                (attacker);
             take_damage(attacker, -(int8_t)v);
         }
 
@@ -611,7 +604,13 @@ void update_battle()
         uint8_t tx;
         uint8_t attacker_id = d.attacker_id;
         if(attacker_id < 4)
+        {
             tx = DEFEND_X1, di = d.pdef, d.pdef = attacker_id;
+            uint8_t n = user_item_count<
+                SFLAG_ITEM_River_Amulet>
+                (attacker_id);
+            take_damage(attacker_id, -3 * n);
+        }
         else
             tx = DEFEND_X2, di = d.edef, d.edef = attacker_id;
         move_sprite(attacker_id, tx, DEFEND_Y);

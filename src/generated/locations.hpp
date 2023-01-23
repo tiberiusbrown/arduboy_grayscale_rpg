@@ -5,7 +5,7 @@ inline void LOC_home_bed                        () { px =    96; py =  2128; }
 inline void LOC_home_outside                    () { px =   880; py =   736; }
 inline void LOC_stairs_village_outside          () { px =  1200; py =   720; }
 inline void LOC_dungeon_lightsout               () { px =  2176; py =  2272; }
-inline void LOC_entrance_lightsout              () { px =   752; py =   592; }
+inline void LOC_entrance_lightsout              () { px =  1296; py =  1472; }
 inline void LOC_stairs_village_dungeon          () { px =  2464; py =  2112; }
 inline void LOC_obj_oldcharlie                  () { px =  1152; py =  1008; }
 inline void LOC_mother_grieving                 () { px =   816; py =   704; }
@@ -19,7 +19,7 @@ inline void LOC_first_cave_inside               () { px =  2320; py =  2256; }
 inline void LOC_first_cave_ladder               () { px =  2576; py =  2112; }
 inline void LOC_first_cave_exit                 () { px =   704; py =   656; }
 inline void LOC_new_game                        () { px =  2208; py =  2416; }
-inline void LOC_dismas_house_inside             () { px =   464; py =  2128; }
+inline void LOC_dismas_house_inside             () { px =   480; py =  2144; }
 inline void LOC_dismas_house_outside            () { px =   272; py =  1584; }
 inline void LOC_out_portal_raptor               () { px =  1168; py =  1584; }
 inline void LOC_portal_raptor                   () { px =  2800; py =  2192; }
@@ -48,3 +48,7 @@ inline void LOC_puzspikedir_inside              () { px =  3344; py =  2528; }
 inline void LOC_puzspikedir_outside             () { px =   896; py =  1280; }
 inline void LOC_puzwraith_inside                () { px =  2704; py =  2544; }
 inline void LOC_puzwraith_outside               () { px =   944; py =  1504; }
+inline void LOC_puztut_inside                   () { px =  3296; py =  2112; }
+inline void LOC_puztut_outside                  () { px =   752; py =   592; }
+inline void LOC_shack_inside                    () { px =   688; py =  2128; }
+inline void LOC_shack_outside                   () { px =  1184; py =  1200; }
