@@ -66,6 +66,8 @@ void new_game()
     consumables[CIT_Ardu_s_Frenzy] = 3;
     consumables[CIT_Potion_of_Attack] = 3;
 #endif
+    LOC_out_portal_castle();
+    consumables[CIT_Scroll_of_Healing] = 3;
 }
 
 void initialize()

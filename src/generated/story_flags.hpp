@@ -94,6 +94,7 @@ constexpr uint16_t SFLAG_lightsout_pot_a = 158;
 constexpr uint16_t SFLAG_lightsout_pot_b = 159;
 constexpr uint16_t SFLAG_party_catherine = 167;
 constexpr uint16_t SFLAG_party_dismas = 121;
+constexpr uint16_t SFLAG_portal_castle = 239;
 constexpr uint16_t SFLAG_portal_raptor = 199;
 constexpr uint16_t SFLAG_portal_village = 200;
 constexpr uint16_t SFLAG_pot0 = 171;
