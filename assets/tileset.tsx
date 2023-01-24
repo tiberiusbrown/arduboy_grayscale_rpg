@@ -10,6 +10,7 @@
    <wangcolor name="Water" color="#0055ff" tile="-1" probability="1"/>
    <wangcolor name="Elevated" color="#ff00d8" tile="-1" probability="1"/>
    <wangcolor name="Fence" color="#550000" tile="-1" probability="1"/>
+   <wangcolor name="Castle" color="#ffff00" tile="-1" probability="1"/>
    <wangtile tileid="0" wangid="5,5,5,5,5,5,5,5"/>
    <wangtile tileid="1" wangid="0,0,0,0,2,0,0,0"/>
    <wangtile tileid="3" wangid="0,0,2,0,2,0,0,0"/>
@@ -65,15 +66,25 @@
    <wangtile tileid="109" wangid="4,4,4,0,0,0,0,0"/>
    <wangtile tileid="110" wangid="4,4,4,0,0,0,4,4"/>
    <wangtile tileid="111" wangid="4,0,0,0,0,0,4,4"/>
+   <wangtile tileid="112" wangid="0,0,7,0,0,0,7,0"/>
+   <wangtile tileid="113" wangid="0,0,7,0,7,0,0,0"/>
+   <wangtile tileid="114" wangid="0,0,0,0,7,0,7,0"/>
    <wangtile tileid="117" wangid="1,0,1,1,1,1,1,1"/>
    <wangtile tileid="118" wangid="1,1,1,1,1,1,1,0"/>
    <wangtile tileid="119" wangid="6,0,0,0,0,0,0,0"/>
    <wangtile tileid="125" wangid="4,4,4,0,4,4,4,0"/>
    <wangtile tileid="126" wangid="4,4,4,0,4,4,4,4"/>
    <wangtile tileid="127" wangid="4,4,4,4,4,0,4,4"/>
+   <wangtile tileid="128" wangid="7,0,0,0,7,0,0,0"/>
+   <wangtile tileid="129" wangid="7,0,7,0,0,0,0,0"/>
+   <wangtile tileid="130" wangid="7,0,0,0,0,0,7,0"/>
    <wangtile tileid="141" wangid="4,0,4,4,4,0,4,4"/>
    <wangtile tileid="142" wangid="4,0,4,4,4,4,4,4"/>
    <wangtile tileid="143" wangid="4,4,4,4,4,4,4,0"/>
+   <wangtile tileid="144" wangid="0,0,0,0,7,0,0,0"/>
+   <wangtile tileid="145" wangid="0,0,7,0,0,0,0,0"/>
+   <wangtile tileid="146" wangid="0,0,0,0,0,0,7,0"/>
+   <wangtile tileid="160" wangid="7,0,0,0,0,0,0,0"/>
    <wangtile tileid="212" wangid="0,0,3,3,3,0,0,0"/>
    <wangtile tileid="213" wangid="0,0,3,3,3,3,3,0"/>
    <wangtile tileid="214" wangid="0,0,0,0,3,3,3,0"/>
