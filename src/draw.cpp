@@ -374,7 +374,20 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
 
     uint8_t maxy = 64;
     if(state == STATE_PAUSE) maxy -= sdata.pause.ally;
-    else if(state == STATE_DIALOG) maxy = 35;
+    else if(state == STATE_DIALOG)
+    {
+        // if there is a portrait, limit x
+        if((uint8_t)sdata.dialog.name[0] < 254)
+        {
+            while(ox <= 36 - 16)
+            {
+                ++tiles;
+                ox += 16;
+                if(--nx == 0) return;
+            }
+        }
+        maxy = 35;
+    }
     do {
         t = nx;
         x = ox;

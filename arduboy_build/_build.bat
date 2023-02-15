@@ -28,11 +28,18 @@ cd ..\arduboy_build
 echo F|xcopy /S /Q /Y /F "%dir%/src.ino.hex" "ReturnOfTheArdu.hex" > nul
 if NOT %errorlevel%==0 goto error
 
+rem copy elf file to dir
+echo F|xcopy /S /Q /Y /F "%dir%/src.ino.elf" "_elf.elf" > nul
+if NOT %errorlevel%==0 goto error
+
 rem create _asm.txt file
 "C:\Program Files (x86)\Arduino\hardware\tools\avr\bin\avr-objdump.exe" -S "%dir%/src.ino.elf" > _asm.txt
 
 rem create _sizes.txt
 "C:\Program Files (x86)\Arduino\hardware\tools\avr\bin\avr-nm.exe" --size-sort -C -r -t d "%dir%/src.ino.elf" > _sizes.txt
+
+rem create _debug.txt
+"C:\Program Files (x86)\Arduino\hardware\tools\avr\bin\avr-readelf.exe" -w "%dir%/src.ino.elf" > _debug.txt
 
 rem create _ram.txt
 findstr /c:" b " /c:" B " /c:" d " /c:" D " _sizes.txt > _ram.txt

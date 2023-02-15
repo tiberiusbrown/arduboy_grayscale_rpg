@@ -393,7 +393,7 @@ uint8_t user_item_count(uint8_t i, item_t const* items, uint8_t count);
 
 template<item_t... ITEMS> uint8_t user_item_count(uint8_t i)
 {
-    static item_t const ITEMS_ARRAY[] = { ITEMS... };
+    static item_t const ITEMS_ARRAY[] PROGMEM = { ITEMS... };
     return user_item_count(i, ITEMS_ARRAY, sizeof...(ITEMS));
 }
 

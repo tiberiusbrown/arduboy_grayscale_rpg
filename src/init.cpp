@@ -55,19 +55,18 @@ void new_game()
 
 #if 0
     LOC_dismas_house_outside();
-    story_flag_set(SFLAG_ITEM_Barbarian_s_Helm);
-    story_flag_set(SFLAG_ITEM_Barbarian_s_Footwraps);
-    story_flag_set(SFLAG_ITEM_Barbarian_s_Axe);
-    story_flag_set(SFLAG_ITEM_Spiked_Shield);
-    story_flag_set(SFLAG_ITEM_Brawler_s_Ring);
-    story_flag_set(SFLAG_ITEM_Boxing_Gloves);
+    //story_flag_set(SFLAG_ITEM_Barbarian_s_Helm);
+    //story_flag_set(SFLAG_ITEM_Barbarian_s_Footwraps);
+    //story_flag_set(SFLAG_ITEM_Barbarian_s_Axe);
+    //story_flag_set(SFLAG_ITEM_Spiked_Shield);
+    //story_flag_set(SFLAG_ITEM_Brawler_s_Ring);
+    //story_flag_set(SFLAG_ITEM_Boxing_Gloves);
     consumables[CIT_Healing_Salve] = 3;
     consumables[CIT_Ardu_s_Fury] = 3;
     consumables[CIT_Ardu_s_Frenzy] = 3;
     consumables[CIT_Potion_of_Attack] = 3;
 #endif
-    LOC_out_portal_castle();
-    consumables[CIT_Scroll_of_Healing] = 3;
+
 }
 
 void initialize()
@@ -83,7 +82,12 @@ void initialize()
     uint8_t const* ptr0 = b;
     uint8_t const* ptr1 = IDENTIFIER;
     for(uint8_t i = 0; i < 8; ++i)
+    {
         if(deref_inc(ptr0) != pgm_read_byte_inc(ptr1))
+        {
+            savefile.settings.brightness = 3;
             t = STATE_BADFX;
+        }
+    }
     change_state(t);
 }

@@ -251,6 +251,7 @@ static void render_die()
 
 static void render_badfx()
 {
+    platform_fade(15);
     draw_text_noclip(33, 28, PSTR("Missing FX data!"), NOCLIPFLAG_PROG);
 }
 
