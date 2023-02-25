@@ -1,0 +1,5 @@
+peaceful        original composition
+peaceful2       Haydn, Piano Sonata in G major, Hoboken XVI:8 (1766), Movement 3
+peaceful3       Haydn, Piano Sonata in G major, Hoboken XVI:8 (1766), Movement 4
+victory         original composition
+defeat          original composition

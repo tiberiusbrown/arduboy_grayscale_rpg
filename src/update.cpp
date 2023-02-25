@@ -700,7 +700,7 @@ static void update_title()
     {
         if(d.fade_frame == 0)
         {
-            platform_audio_play_song_now(SONG_PEACEFUL);
+            platform_audio_play_song_now(SONG_PEACEFUL3);
             if(!first_loaded)
             {
                 load(true);
