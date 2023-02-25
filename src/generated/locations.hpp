@@ -54,3 +54,4 @@ inline void LOC_shack_inside                    () { px =   688; py =  2128; }
 inline void LOC_shack_outside                   () { px =  1184; py =  1200; }
 inline void LOC_portal_castle                   () { px =  2928; py =  2192; }
 inline void LOC_out_portal_castle               () { px =  3616; py =  1904; }
+inline void LOC_test                            () { px =  2688; py =  2736; }

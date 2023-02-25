@@ -1,3 +1,6 @@
+// "_RotA_XY" where XY is version (same as save IDENTIFIER)
+uint8_t FX_IDENTIFIER_A[] = { 95, 82, 111, 116, 65, 95, 0, 1 };
+
 raw_t MAPDATA = "mapdata.bin"
 
 raw_t PORTRAIT_IMG = "portrait_img.bin"
@@ -36,8 +39,10 @@ raw_t OBJECTIVE_ARROWS_IMG = "objective_arrows_img.bin"
 raw_t WORLD_IMG = "world_img.bin"
 
 raw_t SONG_PEACEFUL = "song_peaceful.bin"
+raw_t SONG_PEACEFUL2 = "song_peaceful2.bin"
 raw_t SONG_VICTORY = "song_victory.bin"
 raw_t SONG_DEFEAT = "song_defeat.bin"
+raw_t SONG_TEST2 = "song_test2.bin"
 
 uint8_t SFX_HIT[] = {
     117, 1,      // set waveform to noise
@@ -67,4 +72,4 @@ raw_t GAME_OVER_MESSAGES = "game_over_messages.bin"
 raw_t STRINGDATA = "stringdata.bin"
 
 // "_RotA_XY" where XY is version (same as save IDENTIFIER)
-uint8_t FX_IDENTIFIER[] = { 95, 82, 111, 116, 65, 95, 0, 1 };
+uint8_t FX_IDENTIFIER_B[] = { 95, 82, 111, 116, 65, 95, 0, 1 };

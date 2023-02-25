@@ -43,8 +43,6 @@ void draw_objective(int16_t diffx, int16_t diffy)
         dx = (int8_t)tx;
         dy = (int8_t)ty;
     }
-    //int8_t dx = diffx >> 4;
-    //int8_t dy = diffy >> 4;
 
     uint8_t f;
     int16_t x, y;
@@ -153,7 +151,8 @@ static bool add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
 {
     auto const& e = chunk_sprites[ci];
     if(!e.active) return false;
-    uint16_t f = e.type * 16;
+    uint16_t f = e.type;
+    if(f >= 16) f = (f - 15) * 16;
     uint8_t d = e.dir;
     bool walking = e.walking;
     if(d & 0x80) walking = false;
@@ -165,6 +164,8 @@ static bool add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
         nf >>= 1;
     if(!(flags & SF_FAST_ANIM2))
         nf >>= 1;
+    if(f < 16)
+        walking = false;
     if(walking)
     {
         f += lsl(d & 7);

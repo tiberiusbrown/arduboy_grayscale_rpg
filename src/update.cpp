@@ -13,6 +13,79 @@ void back_to_map()
         change_state(STATE_MAP);
 }
 
+static uint8_t solid_mask()
+{
+#if ARDUINO_ARCH_AVR
+    uint16_t tpx, tpy;
+    uint8_t m;
+    uint16_t zero = 0;
+    asm volatile(R"ASM(
+        clr  %[m]
+        lds  r24, %[ppx]+0
+        lds  r25, %[ppx]+1
+        adiw r24, 5
+        movw %A[px], r24
+
+        lds  r22, %[ppy]+0
+        lds  r23, %[ppy]+1
+        subi r22, lo8(-5)
+        sbci r23, hi8(-5)
+        movw %A[py], r22
+        movw r20, %[z]
+
+        %~call %x[cs]
+        cpse r24, __zero_reg__
+        ori  %[m], 1
+
+        movw r24, %[px]
+        adiw r24, 5
+        movw r22, %[py]
+        movw r20, %[z]
+        %~call %x[cs]
+        cpse r24, __zero_reg__
+        ori  %[m], 2
+
+        movw r24, %[px]
+        movw r22, %[py]
+        subi r22, lo8(-5)
+        sbci r23, hi8(-5)
+        movw %[py], r22
+        movw r20, %[z]
+        %~call %x[cs]
+        cpse r24, __zero_reg__
+        ori  %[m], 4
+
+        movw r24, %[px]
+        adiw r24, 5
+        movw r22, %[py]
+        movw r20, %[z]
+        %~call %x[cs]
+        cpse r24, __zero_reg__
+        ori  %[m], 8
+        )ASM"
+        :
+    [m] "=&d" (m),
+        [px]  "=&r" (tpx),
+        [py]  "=&r" (tpy)
+        :
+        [ppx] ""    (&px),
+        [ppy] ""    (&py),
+        [cs]  "i"   (&check_solid),
+        [z]   "r"   (zero)
+        :
+        "r18", "r19", "r20", "r21", "r22", "r23", "r24", "r25",
+        "r26", "r27", "r30", "r31", "memory"
+        );
+#else
+    uint8_t m = 0;
+    if(check_solid(px + 5, py + 5)) m |= 1;
+    if(check_solid(px + 10, py + 5)) m |= 2;
+    if(check_solid(px + 5, py + 10)) m |= 4;
+    if(check_solid(px + 10, py + 10)) m |= 8;
+#endif
+    return m;
+}
+
 static bool rect_intersect(
     uint16_t x0, uint16_t y0, uint8_t w0, uint8_t h0,
     uint16_t x1, uint16_t y1, uint8_t w1, uint8_t h1)
@@ -24,18 +97,29 @@ static bool rect_intersect(
     return true;
 }
 
+bool sprite_collides_player(active_chunk_t const& c, sprite_t const& e)
+{
+    if(!e.active) return false;
+    uint16_t ex = c.cx * 128 + e.x;
+    uint16_t ey = c.cy * 64 + e.y;
+    return rect_intersect(
+        ex + 2, ey + 4, 12, 12,
+        px + 5, py + 5, 6, 6);
+}
+
 bool sprite_contacts_player(active_chunk_t const& c, sprite_t const& e)
 {
     if(!e.active) return false;
     uint16_t ex = c.cx * 128 + e.x;
     uint16_t ey = c.cy * 64 + e.y;
 
-    if(e.type == 14)
+    uint8_t flags = pgm_read_byte(&SPRITE_FLAGS[e.type]);
+
+    if(flags & SF_SMALL_RECT)
     {
-        // make spike ball collision more forgiving
         return rect_intersect(
-        ex, ey + 2, 16, 16,
-        px + 4, py + 4, 8, 8);
+            ex, ey + 2, 16, 16,
+            px + 4, py + 4, 8, 8);
     }
 
     // sprite rect is x + 2, y + 4, 12, 12
@@ -56,17 +140,35 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
         return;
 
     // check collision with player
-    if(state == STATE_MAP || state == STATE_TITLE)
+    if(flags & SF_DONT_STOP)
+        e.walking = true;
+    else if(state == STATE_MAP || state == STATE_TITLE)
+    {
         e.walking = !sprite_contacts_player(c, e);
-    if(flags & SF_DONT_STOP) e.walking = true;
-    if(!e.walking)
-        return;
+        if(!e.walking)
+            return;
+    }
 
     if(e.dir < 8)
     {
         int8_t const* ptr = &DIRS[e.dir * 2];
-        e.x += (int8_t)pgm_read_byte_inc(ptr);
-        e.y += (int8_t)pgm_read_byte(ptr);
+        int8_t dx = (int8_t)pgm_read_byte_inc(ptr);
+        int8_t dy = (int8_t)pgm_read_byte(ptr);
+        e.x += dx;
+        e.y += dy;
+
+        if((flags & SF_DONT_STOP) && sprite_collides_player(c, e))
+        {
+            px += dx;
+            py += dy;
+            static uint8_t const DIRMASKS[4] PROGMEM = { 12, 5, 3, 10 };
+            uint8_t m = pgm_read_byte(&DIRMASKS[lsr(e.dir)]);
+            if(solid_mask() & m)
+            {
+                change_state(STATE_DIE);
+                return;
+            }
+        }
     }
 
     if(--e.frames_rem != 0)
@@ -133,79 +235,6 @@ static void update_sprites()
         update_sprite(active_chunks[i], chunk_sprites[i]);
 }
 
-static uint8_t solid_mask()
-{
-#if ARDUINO_ARCH_AVR
-    uint16_t tpx, tpy;
-    uint8_t m;
-    uint16_t zero = 0;
-    asm volatile(R"ASM(
-        clr  %[m]
-        lds  r24, %[ppx]+0
-        lds  r25, %[ppx]+1
-        adiw r24, 5
-        movw %A[px], r24
-
-        lds  r22, %[ppy]+0
-        lds  r23, %[ppy]+1
-        subi r22, lo8(-5)
-        sbci r23, hi8(-5)
-        movw %A[py], r22
-        movw r20, %[z]
-
-        %~call %x[cs]
-        cpse r24, __zero_reg__
-        ori  %[m], 1
-
-        movw r24, %[px]
-        adiw r24, 5
-        movw r22, %[py]
-        movw r20, %[z]
-        %~call %x[cs]
-        cpse r24, __zero_reg__
-        ori  %[m], 2
-
-        movw r24, %[px]
-        movw r22, %[py]
-        subi r22, lo8(-5)
-        sbci r23, hi8(-5)
-        movw %[py], r22
-        movw r20, %[z]
-        %~call %x[cs]
-        cpse r24, __zero_reg__
-        ori  %[m], 4
-
-        movw r24, %[px]
-        adiw r24, 5
-        movw r22, %[py]
-        movw r20, %[z]
-        %~call %x[cs]
-        cpse r24, __zero_reg__
-        ori  %[m], 8
-        )ASM"
-        :
-        [m]   "=&d" (m),
-        [px]  "=&r" (tpx),
-        [py]  "=&r" (tpy)
-        :
-        [ppx] ""    (&px),
-        [ppy] ""    (&py),
-        [cs]  "i"   (&check_solid),
-        [z]   "r"   (zero)
-        :
-        "r18", "r19", "r20", "r21", "r22", "r23", "r24", "r25",
-        "r26", "r27", "r30", "r31", "memory"
-        );
-#else
-    uint8_t m = 0;
-    if(check_solid(px +  5, py +  5)) m |= 1;
-    if(check_solid(px + 10, py +  5)) m |= 2;
-    if(check_solid(px +  5, py + 10)) m |= 4;
-    if(check_solid(px + 10, py + 10)) m |= 8;
-#endif
-    return m;
-}
-
 static void check_explored(int16_t x, int16_t y)
 {
     if(x < 0) return;
@@ -244,6 +273,8 @@ static void update_map()
         return;
     }
 
+    update_sprites();
+
     selx = sely = uint16_t(-1);
     if(!(btns_down & BTN_A))
         sdata.map.a_pressed = 0;
@@ -257,7 +288,7 @@ static void update_map()
         selx = (px + 8 + dx);
         sely = (py + 8 + dy);
         sdata.map.a_pressed = 1;
-    }
+    } 
 
     int8_t dx = 0, dy = 0;
     if(btns_down & BTN_UP) dy -= 1;
@@ -381,7 +412,6 @@ static void update_map()
 
     load_chunks();
     run_chunks();
-    update_sprites();
 
     // nframe update
     ++savefile.chunk_regs[4];

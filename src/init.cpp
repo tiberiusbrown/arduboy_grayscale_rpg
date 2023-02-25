@@ -67,6 +67,19 @@ void new_game()
     consumables[CIT_Potion_of_Attack] = 3;
 #endif
 
+    LOC_test();
+}
+
+static bool check_identifier(uint24_t addr)
+{
+    uint8_t b[8];
+    platform_fx_read_data_bytes(addr, b, 8);
+    uint8_t const* ptr0 = b;
+    uint8_t const* ptr1 = IDENTIFIER;
+    for(uint8_t i = 0; i < 8; ++i)
+        if(deref_inc(ptr0) != pgm_read_byte_inc(ptr1))
+            return false;
+    return true;
 }
 
 void initialize()
@@ -77,17 +90,10 @@ void initialize()
     platform_audio_init();
 #endif
     uint8_t t = STATE_TITLE;
-    uint8_t b[8];
-    platform_fx_read_data_bytes(FX_IDENTIFIER, b, 8);
-    uint8_t const* ptr0 = b;
-    uint8_t const* ptr1 = IDENTIFIER;
-    for(uint8_t i = 0; i < 8; ++i)
+    if(!check_identifier(FX_IDENTIFIER_A) || !check_identifier(FX_IDENTIFIER_B))
     {
-        if(deref_inc(ptr0) != pgm_read_byte_inc(ptr1))
-        {
-            savefile.settings.brightness = 3;
-            t = STATE_BADFX;
-        }
+        savefile.settings.brightness = 3;
+        t = STATE_BADFX;
     }
     change_state(t);
 }
