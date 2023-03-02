@@ -11,8 +11,8 @@ using uint24_t = uint32_t;
 
 // Initialize FX hardware using  FX::begin(FX_DATA_PAGE); in the setup() function.
 
-constexpr uint16_t FX_DATA_PAGE  = 0xf8c6;
-constexpr uint24_t FX_DATA_BYTES = 473505;
+constexpr uint16_t FX_DATA_PAGE  = 0xf8bc;
+constexpr uint24_t FX_DATA_BYTES = 476086;
 
 constexpr uint24_t FX_IDENTIFIER_A = 0x000000;
 constexpr uint24_t MAPDATA = 0x000008;
@@ -49,13 +49,14 @@ constexpr uint24_t WORLD_IMG = 0x06228E;
 constexpr uint24_t SONG_PEACEFUL = 0x06E290;
 constexpr uint24_t SONG_PEACEFUL2 = 0x06E840;
 constexpr uint24_t SONG_PEACEFUL3 = 0x06F15C;
-constexpr uint24_t SONG_VICTORY = 0x06FB8C;
-constexpr uint24_t SONG_DEFEAT = 0x06FC48;
-constexpr uint24_t SONG_TEST2 = 0x06FD41;
-constexpr uint24_t SFX_HIT = 0x07065D;
-constexpr uint24_t SFX_SOLVED = 0x070667;
-constexpr uint24_t ITEM_INFO = 0x070678;
-constexpr uint24_t PORTRAIT_STRINGS = 0x071C62;
-constexpr uint24_t GAME_OVER_MESSAGES = 0x071D8E;
-constexpr uint24_t STRINGDATA = 0x07229E;
-constexpr uint24_t FX_IDENTIFIER_B = 0x073999;
+constexpr uint24_t SONG_PEACEFUL4 = 0x06FB8C;
+constexpr uint24_t SONG_VICTORY = 0x0705A1;
+constexpr uint24_t SONG_DEFEAT = 0x07065D;
+constexpr uint24_t SONG_TEST2 = 0x070756;
+constexpr uint24_t SFX_HIT = 0x071072;
+constexpr uint24_t SFX_SOLVED = 0x07107C;
+constexpr uint24_t ITEM_INFO = 0x07108D;
+constexpr uint24_t PORTRAIT_STRINGS = 0x072677;
+constexpr uint24_t GAME_OVER_MESSAGES = 0x0727A3;
+constexpr uint24_t STRINGDATA = 0x072CB3;
+constexpr uint24_t FX_IDENTIFIER_B = 0x0743AE;

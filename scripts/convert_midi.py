@@ -16,7 +16,8 @@ def byte16(u16):
 def convert(
         fname,
         qnb = QUARTER_NOTE_BEATS,
-        ev = END_VOLUME):
+        ev = END_VOLUME,
+        vf = 1.0):
     mid = MidiFile(fname + '.mid')
     if mid.type == 2:
         print('asynchronous midi not supported: "%s"' % fname)
@@ -42,7 +43,7 @@ def convert(
                 t += beats
             if msg.type == 'note_on':
                 note = msg.note
-                volume = msg.velocity
+                volume = int(msg.velocity * vf)
                 if volume <= 0: continue
                 if volume > 127: volume = 127
                 if note not in now_notes:
@@ -114,7 +115,8 @@ def convert(
 
 convert('song_peaceful', ev = 0.5)
 convert('song_peaceful2', ev = 0.5, qnb = 8)
-convert('song_peaceful3', ev = 0.15, qnb = 8)
+convert('song_peaceful3', ev = 0.15, qnb = 8, vf = 2.0)
+convert('song_peaceful4', ev = 0.15, qnb = 3, vf = 2.0)
 convert('song_victory', qnb = 2)
 convert('song_defeat', qnb = 8)
 
