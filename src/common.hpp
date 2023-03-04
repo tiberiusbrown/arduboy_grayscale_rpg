@@ -533,6 +533,7 @@ struct sprite_t
     uint8_t path_index; // index of current destination
     uint8_t path_dir; // 0: closed loop, 1: forward, 2: backward
     uint8_t frames_rem;
+    uint8_t target;
     bool active;
     bool walking;
 };

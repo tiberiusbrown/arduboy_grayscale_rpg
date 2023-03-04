@@ -178,73 +178,89 @@ static bool run_chunk()
             goto pause_chunk;
 
         case CMD_ADD:
-        {
-            uint8_t t = deref_inc(instr_ptr);
-            uint8_t dst = t & 0xf;
-            uint8_t src = nibswap(t) & 0xf;
-            savefile.chunk_regs[dst] += savefile.chunk_regs[src];
-            break;
-        }
-        case CMD_ADDI:
-        {
-            uint8_t t = deref_inc(instr_ptr);
-            int8_t imm = (int8_t)deref_inc(instr_ptr);
-            uint8_t dst = t & 0xf;
-            uint8_t src = nibswap(t) & 0xf;
-            int8_t newdst = (int8_t)savefile.chunk_regs[src] + imm;
-            int8_t diff = newdst - (int8_t)savefile.chunk_regs[dst];
-            savefile.chunk_regs[dst] = (uint8_t)newdst;
-            if(!no_state_actions && dst >= 8)
-            {
-                if(diff > 0)
-                {
-                    // special message
-                    change_state(STATE_DIALOG);
-                    sdata.dialog.name[0] = (char)254;
-                    char* ptr = sdata.dialog.message;
-                    store_inc(ptr, 'x');
-                    ptr += dec_to_str(ptr, (uint8_t)diff);
-                    store_inc(ptr, ' ');
-                    platform_fx_read_data_bytes(
-                        ITEM_INFO + sizeof(item_info_t) * NUM_ITEMS +
-                        (ITEM_NAME_LEN + ITEM_DESC_LEN) * (dst - 8),
-                        ptr, ITEM_NAME_LEN + ITEM_DESC_LEN);
-                    for(uint8_t i = 0; i < ITEM_NAME_LEN - 1; ++i)
-                    {
-                        char& c = ptr[i];
-                        if(c == '\0') c = ' ';
-                    }
-                    ptr[ITEM_NAME_LEN - 1] = '\n';
-                    goto pause_chunk;
-                }
-            }
-            break;
-        }
         case CMD_SUB:
         {
             uint8_t t = deref_inc(instr_ptr);
             uint8_t dst = t & 0xf;
             uint8_t src = nibswap(t) & 0xf;
-            savefile.chunk_regs[dst] -= savefile.chunk_regs[src];
+            src = savefile.chunk_regs[src];
+            if(instr == CMD_SUB)
+                src = uint8_t(-src);
+            savefile.chunk_regs[dst] += src;
             break;
         }
+        case CMD_ADDI:
         case CMD_ANDI:
         {
             uint8_t t = deref_inc(instr_ptr);
-            uint8_t imm = deref_inc(instr_ptr);
+            int8_t imm = (int8_t)deref_inc(instr_ptr);
             uint8_t dst = t & 0xf;
             uint8_t src = nibswap(t) & 0xf;
-            savefile.chunk_regs[dst] = savefile.chunk_regs[src] & imm;
+            src = savefile.chunk_regs[src];
+            if(instr == CMD_ANDI)
+            {
+                savefile.chunk_regs[dst] = src & imm;
+                break;
+            }
+            int8_t newdst = (int8_t)src + imm;
+            int8_t diff = newdst - (int8_t)savefile.chunk_regs[dst];
+            savefile.chunk_regs[dst] = (uint8_t)newdst;
+            if(!no_state_actions && dst >= 8 && diff > 0)
+            {
+                // special message
+                change_state(STATE_DIALOG);
+                sdata.dialog.name[0] = (char)254;
+                char* ptr = sdata.dialog.message;
+                store_inc(ptr, 'x');
+                ptr += dec_to_str(ptr, (uint8_t)diff);
+                store_inc(ptr, ' ');
+                platform_fx_read_data_bytes(
+                    ITEM_INFO + sizeof(item_info_t) * NUM_ITEMS +
+                    (ITEM_NAME_LEN + ITEM_DESC_LEN) * (dst - 8),
+                    ptr, ITEM_NAME_LEN + ITEM_DESC_LEN);
+                for(uint8_t i = 0; i < ITEM_NAME_LEN - 1; ++i)
+                {
+                    char& c = ptr[i];
+                    if(c == '\0') c = ' ';
+                }
+                ptr[ITEM_NAME_LEN - 1] = '\n';
+                goto pause_chunk;
+            }
             break;
         }
+        //case CMD_ANDI:
+        //{
+        //    uint8_t t = deref_inc(instr_ptr);
+        //    uint8_t imm = deref_inc(instr_ptr);
+        //    uint8_t dst = t & 0xf;
+        //    uint8_t src = nibswap(t) & 0xf;
+        //    savefile.chunk_regs[dst] = savefile.chunk_regs[src] & imm;
+        //    break;
+        //}
 
         case CMD_FS:
+        case CMD_FC:
+        case CMD_FT:
         {
             uint16_t f = deref_inc(instr_ptr);
             f |= (uint16_t(deref_inc(instr_ptr)) << 8);
             if(no_state_actions) break;
-            bool already_have = story_flag_get(f);
-            story_flag_set(f);
+            uint8_t i = f >> 3;
+            uint8_t m = bitmask((uint8_t)f);
+            uint8_t* p = &story_flags[i];
+            i = *p;
+            if(instr == CMD_FC)
+            {
+                *p = i & ~m;
+                break;
+            }
+            if(instr == CMD_FT)
+            {
+                *p = i ^ m;
+                break;
+            }
+            uint8_t already_have = (i & m);
+            *p = i | m;
             if(!no_state_actions && !already_have && f < NUM_ITEMS)
             {
                 // special message
@@ -264,22 +280,6 @@ static bool run_chunk()
                 sdata.dialog.message[sizeof(YOU_FOUND) - 1 + ITEM_NAME_LEN - 1] = '\n';
                 goto pause_chunk;
             }
-            break;
-        }
-        case CMD_FC:
-        {
-            uint16_t f = deref_inc(instr_ptr);
-            f |= (uint16_t(deref_inc(instr_ptr)) << 8);
-            if(no_state_actions) break;
-            story_flag_clr(f);
-            break;
-        }
-        case CMD_FT:
-        {
-            uint16_t f = deref_inc(instr_ptr);
-            f |= (uint16_t(deref_inc(instr_ptr)) << 8);
-            if(no_state_actions) break;
-            story_flag_tog(f);
             break;
         }
         case CMD_EP:
@@ -313,7 +313,7 @@ static bool run_chunk()
             }
             s.path_num = n;
             s.active = (n > 0);
-            if(!open)
+            if(open == 0)
                 s.path_dir = 0;
             else if(s.path_dir == 0)
                 s.path_dir = 1;
@@ -323,6 +323,9 @@ static bool run_chunk()
             chunk_sprite_defined = true;
             break;
         }
+        case CMD_EPT:
+            sprite.target = deref_inc(instr_ptr);
+            break;
         case CMD_ST:
         case CMD_STF:
         case CMD_STR:

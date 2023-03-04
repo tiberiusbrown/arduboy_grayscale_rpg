@@ -50,11 +50,11 @@ static char const EN_DARK_RAPTOR[] PROGMEM = "Dark Raptor";
 
 enemy_info_t const ENEMY_INFO[] PROGMEM =
 {
-    {  4, 4, 2, 4, 10,  64, 128, }, //EN_DARK_GUARD },
-    {  5, 4, 0, 4,  6,   0, 255, }, //EN_DARK_WIZARD },
-    { 10, 1, 0, 1,  6,   0,   0, }, //EN_SKELETON },
-    { 13, 1, 0, 3,  3,   0,   0, }, //EN_PSY_RAPTOR },
-    { 15, 3, 1, 5,  8,   0, 128, }, //EN_DARK_RAPTOR },
+    { 20, 4, 2, 4, 10,  64, 128, }, //EN_DARK_GUARD },
+    { 21, 4, 0, 4,  6,   0, 255, }, //EN_DARK_WIZARD },
+    { 26, 1, 0, 1,  6,   0,   0, }, //EN_SKELETON },
+    { 28, 1, 0, 3,  3,   0,   0, }, //EN_PSY_RAPTOR },
+    { 30, 3, 1, 5,  8,   0, 128, }, //EN_DARK_RAPTOR },
 };
 
 static char const PN_MATTHIAS[] PROGMEM = "Matthias";
@@ -64,10 +64,10 @@ static char const PN_DISMAS[] PROGMEM = "Dismas";
 
 party_info_t const PARTY_INFO[4] PROGMEM =
 {
-    { 0, 0, 6, 1, 0, 1, PN_MATTHIAS },
-    { 1, 1, 6, 1, 0, 1, PN_CATHERINE },
-    { 2, 2, 6, 1, 0, 1, PN_LUCY },
-    { 3, 3, 6, 1, 0, 1, PN_DISMAS },
+    { 16, 0, 6, 1, 0, 1, PN_MATTHIAS },
+    { 17, 1, 6, 1, 0, 1, PN_CATHERINE },
+    { 18, 2, 6, 1, 0, 1, PN_LUCY },
+    { 19, 3, 6, 1, 0, 1, PN_DISMAS },
 };
 
 uint8_t user_item_count(uint8_t i, item_t const* items, uint8_t count)

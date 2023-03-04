@@ -136,7 +136,7 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
     if(!(flags & SF_FAST) && (nframe & 1)) return;
 
     // no path or just waiting on a single tile
-    if(e.path_num <= 1)
+    if(!e.target && e.path_num <= 1)
         return;
 
     // check collision with player
@@ -173,6 +173,27 @@ static inline void update_sprite(active_chunk_t& c, sprite_t& e)
 
     if(--e.frames_rem != 0)
         return;
+
+#if 1
+    if(e.target)
+    {
+        uint8_t target = e.target & 31;
+        uint8_t tx = (target & 7) * 16;
+        uint8_t ty = (target >> 3) * 16;
+        uint8_t ex = e.x;
+        uint8_t ey = e.y;
+        uint8_t dir;
+        if(((ex ^ tx) | (ey ^ ty)) == 0)
+            dir = 0x80;
+        else if(ex != tx)
+            dir = (ex < tx ? 6 : 2);
+        else
+            dir = (ey < ty ? 0 : 4);
+        e.dir = dir;
+        e.frames_rem = 1;
+        return;
+    }
+#endif
 
     uint8_t path_index = e.path_index;
     if(!(e.dir & 0x80))

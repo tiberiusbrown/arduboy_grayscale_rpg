@@ -78,6 +78,9 @@ Game Manipulation
     epf <flag> <enemy_sprite> <path_name>
         If <flag> is cleared, ep <enemy_sprite> <path_name>
 
+    ept <tile>
+        Set sprite target tile to <tile>
+
     st <tile> <tile_img>
         Overwrite image at <tile> with <tile_img>
 
@@ -237,6 +240,7 @@ enum script_command_t
     CMD_FT,
     CMD_EP,
     CMD_EPF,
+    CMD_EPT,
     CMD_ST,
     CMD_STF,
     CMD_STR,

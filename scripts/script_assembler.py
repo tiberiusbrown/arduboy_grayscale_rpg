@@ -115,6 +115,7 @@ class CMD(AutoNumber):
     FT   = ()
     EP   = ()
     EPF  = ()
+    EPT  = ()
     ST   = ()
     STF  = ()
     STR  = ()
@@ -362,6 +363,10 @@ def assemble(s, eps, chunk):
             addsprite(b, s[i]); i += 1
             #b.append(int(s[i])); i += 1
             addpath(b, s[i], eps); i += 1
+        
+        elif s[i] == 'ept':
+            b.append(CMD.EPT); i += 1
+            b.append(int(s[i])); i+= 1
             
         elif s[i] == 'st':
             b.append(CMD.ST); i += 1

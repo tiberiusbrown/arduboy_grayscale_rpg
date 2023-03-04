@@ -798,12 +798,14 @@ static void draw_battle_sprites()
         e.y = (uint8_t)s.y;
         e.addr = SPRITES_IMG;
 
-        uint8_t flags = pgm_read_byte(&SPRITE_FLAGS[s.sprite]);
+        uint16_t f = s.sprite;
+        uint8_t flags = pgm_read_byte(&SPRITE_FLAGS[f]);
         uint8_t nf = (nframe / 4) & 3;
         if(!(flags & SF_ALWAYS_ANIM) && (uint8_t)s.x == s.tx && (uint8_t)s.y == s.ty)
             nf = 0;
 
-        e.frame = s.sprite * 16 + s.frame_dir + nf;
+        if(f >= 16) f = uint8_t(f - 15) * 16 + s.frame_dir + nf;
+        e.frame = f;
     }
 
     sort_and_draw_sprites(entries, n);

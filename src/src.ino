@@ -259,7 +259,7 @@ void setup()
             1:  sts  %[dataPage]+0, %A[p]
                 sts  %[dataPage]+1, %B[p]
                 
-                ldi  %A[ptr], 0x18
+                ;ldi  %A[ptr], 0x18
                 ;    %B[ptr] still 0x00
                 ldi  %A[p], 0
                 ldi  %B[p], 0
@@ -275,7 +275,7 @@ void setup()
         
             )ASM"
             : [t]            "=&d" (t)
-            , [p]            "=&r" (p)
+            , [p]            "=&d" (p)
             , [ptr]          "=&z" (ptr)
             : [dataPage]     ""    (&FX::programDataPage)
             , [savePage]     ""    (&FX::programSavePage)
