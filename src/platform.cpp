@@ -444,6 +444,26 @@ void platform_fx_read_save_bytes(uint24_t addr, void* data, size_t num)
         u8data[i] = SAVE_BLOCK[addr + i];
 #endif
 }
+void platform_load_game_state(void* data, size_t num)
+{
+#ifdef ARDUINO
+    FX::loadGameState((uint8_t*)data, num);
+#else
+    if(num > sizeof(SAVE_BLOCK))
+        num = sizeof(SAVE_BLOCK);
+    memcpy(data, SAVE_BLOCK, num);
+#endif
+}
+void platform_save_game_state(void const* data, size_t num)
+{
+#ifdef ARDUINO
+    FX::saveGameState((uint8_t const*)data, num);
+#else
+    if(num > sizeof(SAVE_BLOCK))
+        num = sizeof(SAVE_BLOCK);
+    memcpy(SAVE_BLOCK, data, num);
+#endif
+}
 
 bool platform_fx_busy()
 {

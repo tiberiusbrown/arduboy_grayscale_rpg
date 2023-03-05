@@ -366,7 +366,7 @@ def assemble(s, eps, chunk):
         
         elif s[i] == 'ept':
             b.append(CMD.EPT); i += 1
-            b.append(int(s[i])); i+= 1
+            b.append(int(s[i]) + 32); i+= 1
             
         elif s[i] == 'st':
             b.append(CMD.ST); i += 1

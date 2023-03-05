@@ -190,24 +190,11 @@ void update_pause()
     }
     else if(state == OS_SAVE)
     {
-        if(d.savey >= 64)
+        if((d.savefade += FADE_SPEED) > 16)
         {
-            uint8_t save_wait = d.save_wait;
-            if(save_wait > 0)
-            {
-                if(++save_wait == 16)
-                    state = OS_RESUMING;
-            }
-            else if(is_saving())
-            {
-                if(save_done())
-                    save_wait = 1;
-            }
-            else
-            {
-                save_begin();
-            }
-            d.save_wait = save_wait;
+            save();
+            change_state(STATE_RESUME);
+            return;
         }
     }
     else if(state == OS_PARTY)
@@ -227,13 +214,12 @@ void update_pause()
     adjust(d.optionsy, state == OS_OPTIONS ? 64 : 0);
     adjust(d.quity, state == OS_QUIT ? 64 : 0);
     adjust(d.quitf, d.quitft);
-    adjust(d.savey, state == OS_SAVE ? 64 : 0);
     adjust(d.partyy, state == OS_PARTY ? 64 : 0);
     adjust(d.optionsiy, d.optionsi * 12);
     adjust(d.quitiy, d.quiti * 13);
     adjust(d.brightnessx, savefile.settings.brightness * 16);
     adjust(d.speedx, savefile.settings.game_speed * 8);
-    d.ally = d.optionsy | d.quity | d.savey | d.partyy;
+    d.ally = d.optionsy | d.quity | d.partyy;
     d.state = state;
 }
 
@@ -279,6 +265,13 @@ void render_pause()
 {
     auto const& d = sdata.pause;
     // render darkened map (exclude plane 0)
+    if(d.state == OS_SAVE)
+    {
+        uint8_t f = 16 - d.savefade;
+        if(f & 0x80) f = 0;
+        platform_fade(f);
+        if(f == 0) return;
+    }
     if(d.ally < 64 && d.mapfade < 16 / FADE_SPEED && (d.state == OS_RESUMING || plane() > 0))
         render_map();
     if(d.menuy > 0)
@@ -317,14 +310,6 @@ void render_pause()
         }
         if(d.quitfade > 16 * FADE_SPEED)
             platform_fade(16 * FADE_SPEED + 15 - d.quitfade);
-    }
-    if(d.savey > 0)
-    {
-        uint8_t y = 64 - d.savey;
-        platform_fillrect_i8(0, (int8_t)y, 128, 64, BLACK);
-        draw_text_noclip(39, y + 28, PSTR("Saving..."), NOCLIPFLAG_PROG);
-        if(d.save_wait > 0)
-            draw_text_noclip(71, y + 28, PSTR("Done!"), NOCLIPFLAG_PROG);
     }
     if(d.partyy > 0)
     {

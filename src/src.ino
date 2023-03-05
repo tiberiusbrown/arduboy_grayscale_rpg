@@ -236,7 +236,8 @@ void setup()
     Serial.begin(9600);
 #endif
     
-    //FX::begin(FX_DATA_PAGE, 0);
+    constexpr uint16_t FX_SAVE_PAGE = (FX_DATA_PAGE - 4096 / 256) & ~4095;
+    //FX::begin(FX_DATA_PAGE, FX_SAVE_PAGE);
     //FX::enableOLED();
     
     {
@@ -261,8 +262,8 @@ void setup()
                 
                 ;ldi  %A[ptr], 0x18
                 ;    %B[ptr] still 0x00
-                ldi  %A[p], 0
-                ldi  %B[p], 0
+                ldi  %A[p], lo8(%[SAVE_PAGE])
+                ldi  %B[p], hi8(%[SAVE_PAGE])
                 lpm  %[t], %a[ptr]+
                 subi %[t], lo8(%[VECTOR_KEY])
                 lpm  %[t], %a[ptr]+
@@ -280,6 +281,7 @@ void setup()
             : [dataPage]     ""    (&FX::programDataPage)
             , [savePage]     ""    (&FX::programSavePage)
             , [DATA_PAGE]    "i"   (FX_DATA_PAGE)
+            , [SAVE_PAGE]    "i"   (FX_SAVE_PAGE)
             , [VECTOR_KEY]   "i"   (FX_VECTOR_KEY_VALUE)
             );
     }

@@ -331,13 +331,6 @@ struct sdata_pause
     bool quitp;
     uint8_t quitfade;
 
-    uint8_t savey;
-    uint8_t save_wait;
-    uint8_t save_stage;
-    uint8_t save_page;
-    uint8_t save_sound;
-    bool save_sound_resume;
-
     uint8_t partyy;
     uint8_t partyi;
     uint8_t partyx;
@@ -348,6 +341,8 @@ struct sdata_pause
     sdata_items items;
     uint8_t itemsy;
     uint8_t itemsyt;
+
+    uint8_t savefade;
 
     uint8_t mapfade;
     bool map_first;
@@ -640,10 +635,8 @@ void render_pause_party();
 
 // save.cpp
 extern uint8_t const IDENTIFIER[8] PROGMEM;
-void save_begin();
-bool save_done();
-bool is_saving();
 void load(bool first);
+void save();
 uint16_t compute_checksum();
 
 // platform.cpp
@@ -676,6 +669,8 @@ void platform_drawrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c);
 void platform_fx_erase_save_sector();
 void platform_fx_write_save_page(uint16_t page, void const* data, size_t num);
 void platform_fx_read_save_bytes(uint24_t addr, void* data, size_t num);
+void platform_load_game_state(void* data, size_t num);
+void platform_save_game_state(void const* data, size_t num);
 bool platform_fx_busy();
 void platform_audio_init();
 void platform_audio_deinit();
