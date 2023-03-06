@@ -12,7 +12,7 @@ static void reset_sprite(sprite_t& e)
     e.path_index = 0;
     e.x = (e.path[0] & 7) * 16;
     e.y = ((e.path[0] >> 3) & 3) * 16;
-    e.frames_rem = 1;
+    e.frames_rem = 2;
     e.dir = 0x80;
     e.active = (e.path_num > 0);
     if(e.path_dir != 0) e.path_dir = 1;
@@ -490,6 +490,14 @@ static bool run_chunk()
             int8_t t = (int8_t)deref_inc(instr_ptr);
             if(nparty >= 4)
                 instr_ptr += t;
+            break;
+        }
+        case CMD_BNET:
+        {
+            int8_t t = (int8_t)deref_inc(instr_ptr);
+            if(sprite.target == 0 || !(sprite.dir & 0x80))
+                instr_ptr += t;
+            break;
         }
 
         default: break;

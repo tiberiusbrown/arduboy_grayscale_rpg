@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stddef.h>
 
+#include "generated/fxdata.h"
+
 uint8_t const SPRITE_FLAGS[] PROGMEM =
 {
     0, // hooded figure
@@ -275,6 +277,65 @@ uint8_t tilesheet()
 bool player_is_outside()
 {
     return tilesheet() == 0;
+}
+
+void play_music()
+{
+    uint24_t const* ptr;
+    uint8_t n;
+    static uint24_t const MUSIC_TITLE[] PROGMEM =
+    {
+        SONG_PEACEFUL,
+    };
+    static uint24_t const MUSIC_PEACEFUL[] PROGMEM =
+    {
+        SONG_PEACEFUL2,
+        SONG_PEACEFUL3,
+        SONG_PEACEFUL4,
+    };
+    static uint24_t const MUSIC_BATTLE[] PROGMEM =
+    {
+        SONG_PEACEFUL, // TODO
+    };
+    static uint24_t const MUSIC_DEFEAT[] PROGMEM =
+    {
+        SONG_DEFEAT,
+    };
+    switch(savefile.music_type)
+    {
+    case music::title:
+        ptr = MUSIC_TITLE;
+        n = sizeof(MUSIC_TITLE) / sizeof(uint24_t);
+        break;
+    case music::peaceful:
+        ptr = MUSIC_PEACEFUL;
+        n = sizeof(MUSIC_PEACEFUL) / sizeof(uint24_t);
+        break;
+    case music::battle:
+        ptr = MUSIC_BATTLE;
+        n = sizeof(MUSIC_BATTLE) / sizeof(uint24_t);
+        break;
+    case music::defeat:
+        ptr = MUSIC_DEFEAT;
+        n = sizeof(MUSIC_DEFEAT) / sizeof(uint24_t);
+        break;
+    }
+    n = u8rand(n);
+    ptr += n;
+    uint24_t song = 0;
+    song |= ((uint24_t)pgm_read_byte_inc(ptr) << 0);
+    song |= ((uint24_t)pgm_read_byte_inc(ptr) << 8);
+    song |= ((uint24_t)pgm_read_byte_inc(ptr) << 16);
+    platform_audio_play_song(song);
+}
+
+void set_music(music m)
+{
+    if(savefile.music_type != m)
+    {
+        savefile.music_type = m;
+        play_music();
+    }
 }
 
 uint16_t rand_seed;

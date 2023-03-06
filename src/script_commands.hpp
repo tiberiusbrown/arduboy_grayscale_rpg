@@ -149,6 +149,9 @@ Control Instructions
     bpf label
         If the party is full, jmp label
 
+    bnet label
+        If the sprite has no target or has not reached its target, jmp label
+
 Macros
 
     CHEST <tile> <flag>
@@ -263,4 +266,5 @@ enum script_command_t
     CMD_BNI,
     CMD_BNAI,
     CMD_BPF,
+    CMD_BNET,
 };

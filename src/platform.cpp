@@ -505,17 +505,6 @@ void platform_set_game_speed_saved()
     platform_set_game_speed(num, denom);
 }
 
-void platform_audio_play_song(uint24_t song)
-{
-    current_song = song;
-}
-
-void platform_audio_play_song_now(uint24_t song)
-{
-    current_song = song;
-    platform_audio_play_song_now_once(song);
-}
-
 #ifdef ARDUINO
 
 static void update_song_buffer(atm_pattern_state& p)
@@ -548,7 +537,7 @@ void platform_audio_update()
         update_score_channels();
     }
     else
-        platform_audio_play_song_now_once(current_song);
+        play_music();
     if(platform_audio_sfx_playing())
         update_song_buffer(atmlib_state.sfx_slot[0].channel_state[0].pstack[0]);
 }
@@ -584,7 +573,7 @@ static void init_channel(atm_channel_state& c, uint24_t addr)
     platform_fx_read_data_bytes(addr, c.pstack[0].cmds, ATM_CMD_BUF_SIZE);
 }
 
-void platform_audio_play_song_now_once(uint24_t song)
+void platform_audio_play_song(uint24_t song)
 {
     if(savefile.settings.sound & 2)
     {
@@ -647,11 +636,13 @@ void platform_set_game_speed(uint8_t num, uint8_t denom)
 
 void platform_audio_update()
 {
+#ifndef ARDUINO
     if(platform_audio_song_playing() || platform_audio_sfx_playing())
         assert(!platform_fx_busy());
+#endif
 
     if(!platform_audio_song_playing())
-        platform_audio_play_song_now(current_song);
+        play_music();
 }
 
 extern float target_frame_time, ft_rem;

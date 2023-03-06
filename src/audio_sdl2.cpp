@@ -164,7 +164,7 @@ void platform_audio_deinit()
 
 extern uint8_t const FXDATA[];
 
-void platform_audio_play_song_now_once(uint24_t song)
+void platform_audio_play_song(uint24_t song)
 {
     if(!(savefile.settings.sound & 2)) return;
     SDL_LockAudioDevice(device);

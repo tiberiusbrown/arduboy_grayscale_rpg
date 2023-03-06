@@ -612,7 +612,7 @@ static void update_game_over()
     {
         if(d.fade_frame == 0)
         {
-            platform_audio_play_song_now(SONG_DEFEAT);
+            set_music(music::defeat);
             uint8_t n = u8rand(NUM_GAME_OVER_MESSAGES);
             platform_fx_read_data_bytes(
                 GAME_OVER_MESSAGES + n * GAME_OVER_MESSAGE_LEN, d.msg,
@@ -713,15 +713,16 @@ static void update_title()
         else
         {
             load(false);
+            play_music();
             change_state(STATE_RESUME);
             return;
         }
     }
     else
     {
+        set_music(music::title);
         if(d.fade_frame == 0)
         {
-            platform_audio_play_song_now(SONG_PEACEFUL4);
             if(!first_loaded)
             {
                 load(true);

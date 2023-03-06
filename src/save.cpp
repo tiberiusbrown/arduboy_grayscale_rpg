@@ -21,6 +21,9 @@ void save()
     savefile.loaded = true;
     savefile.checksum = compute_checksum();
     platform_save_game_state(&savefile, sizeof(savefile));
+#ifdef ARDUINO
+    Arduboy2Audio::saveOnOff();
+#endif
 }
 
 void load(bool first)

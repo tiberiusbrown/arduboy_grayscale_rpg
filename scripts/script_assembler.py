@@ -138,6 +138,7 @@ class CMD(AutoNumber):
     BNI  = ()
     BNAI = ()
     BPF  = ()
+    BNET = ()
 
 def stringid(s):
     s = s[1:-1]
@@ -467,6 +468,10 @@ def assemble(s, eps, chunk):
             
         elif s[i] == 'bpf':
             b.append(CMD.BPF); i += 1
+            b.append(s[i]); i += 1
+            
+        elif s[i] == 'bnet':
+            b.append(CMD.BNET); i += 1
             b.append(s[i]); i += 1
             
         elif s[i] == 'CHEST':

@@ -263,7 +263,7 @@ static void battle_next_turn()
             if(e.id != INVALID && e.hp > 0) victory = false;
         if(victory)
         {
-            platform_audio_play_song_now_once(SONG_VICTORY);
+            platform_audio_play_song(SONG_VICTORY);
             d.next_phase = BPHASE_OUTRO;
             d.phase = BPHASE_DELAY;
             d.frame = -32;

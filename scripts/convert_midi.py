@@ -114,7 +114,7 @@ def convert(
         f.write(bytearray(bytes))
 
 convert('song_peaceful', ev = 0.5)
-convert('song_peaceful2', ev = 0.5, qnb = 8)
+convert('song_peaceful2', ev = 0.5, qnb = 8, vf = 2.0)
 convert('song_peaceful3', ev = 0.15, qnb = 8, vf = 2.0)
 convert('song_peaceful4', ev = 0.15, qnb = 3, vf = 2.0)
 convert('song_victory', qnb = 2)

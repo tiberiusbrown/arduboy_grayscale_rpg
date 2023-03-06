@@ -556,6 +556,16 @@ struct settings_t
     bool no_battery_alert;
 };
 
+enum class music : uint8_t
+{
+    title,
+    peaceful,
+    battle,
+    defeat,
+};
+void set_music(music m);
+void play_music();
+
 struct savefile_t
 {
     uint16_t checksum;
@@ -571,6 +581,7 @@ struct savefile_t
     uint8_t chunk_regs[8 + NUM_CONSUMABLES];
     sprite_t chunk_sprites[4];
     uint8_t explored[EXPLORED_BYTES];
+    music music_type;
 };
 extern savefile_t savefile;
 static_assert(sizeof(savefile.chunk_regs) <= 16, "revisit reg command encoding");
@@ -680,8 +691,6 @@ void platform_audio_toggle();
 void platform_audio_from_savefile(); // update on/off from savefile.sound
 bool platform_audio_enabled();
 void platform_audio_play_song(uint24_t song); // set loop song
-void platform_audio_play_song_now(uint24_t song); // force stop music and change to song
-void platform_audio_play_song_now_once(uint24_t song); // force stop music and play song
 void platform_audio_pause_song();
 void platform_audio_resume_song();
 void platform_audio_stop_sfx();

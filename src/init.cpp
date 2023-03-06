@@ -18,6 +18,7 @@ void new_game()
     for(auto& ac : active_chunks)
         ac.cx = ac.cy = 255;
     chunks_are_running = false;
+    savefile.music_type = music::peaceful;
 
     for(uint8_t n = 0; n < 4; ++n)
     {
@@ -67,7 +68,8 @@ void new_game()
     consumables[CIT_Potion_of_Attack] = 3;
 #endif
 
-    LOC_test();
+    //LOC_test();
+    //LOC_first_cave_outside();
 }
 
 static bool check_identifier(uint24_t addr)
