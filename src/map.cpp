@@ -72,8 +72,11 @@ static bool run_chunk()
                 sel_sprite = true;
         }
     }
-    savefile.chunk_regs[1] = sel_tile;
-    savefile.chunk_regs[2] = walk_tile;
+    if(!chunks_are_running)
+    {
+        savefile.chunk_regs[1] = sel_tile;
+        savefile.chunk_regs[2] = walk_tile;
+    }
     // TODO: optimize no_state_actions line below
     bool no_state_actions = (
         state == STATE_RESUME ||

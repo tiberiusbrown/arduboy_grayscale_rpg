@@ -70,6 +70,8 @@ void new_game()
 
     //LOC_test();
     //LOC_first_cave_outside();
+    LOC_home_outside();
+    story_flag_set(SFLAG_story_fish_delivered);
 }
 
 static bool check_identifier(uint24_t addr)
