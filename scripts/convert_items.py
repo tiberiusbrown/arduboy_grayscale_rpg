@@ -32,9 +32,9 @@ names = []
 NNAME = 0
 NMSG = 0
 for t in rows:
-    n = len(to_name(t[5])) + 1
+    n = len(to_name(t[9])) + 1
     if n > NNAME: NNAME = n
-    n = len(t[6]) + 1
+    n = len(t[10]) + 1
     if n > NMSG: NMSG = n
 for t in consumables:
     n = len(t[2]) + 1
@@ -103,20 +103,24 @@ TYPES = {
 
 with open('../arduboy_build/item_info.bin', 'wb') as f:
     for t in rows:
-        bytes = [0 for _ in range(N + 5)]
-        bytes[0] = TYPES[t[4].lower()]
+        bytes = [0 for _ in range(N + 9)]
+        bytes[0] = TYPES[t[8].lower()]
         bytes[1] = pnum(t[0])
         bytes[2] = pnum(t[1])
         bytes[3] = pnum(t[2])
         bytes[4] = pnum(t[3])
-        name = to_name(t[5])
+        bytes[5] = pnum(t[4])
+        bytes[6] = pnum(t[5])
+        bytes[7] = pnum(t[6])
+        bytes[8] = pnum(t[7])
+        name = to_name(t[9])
         check_wrap(name, 90, 1)
         for n in range(len(name)):
-            bytes[5+n] = ord(name[n])
-        desc = t[6]
+            bytes[9+n] = ord(name[n])
+        desc = t[10]
         desc = '\n'.join(check_wrap(desc, 124, 2))
         for n in range(len(desc)):
-            bytes[5+NNAME+n] = ord(desc[n])
+            bytes[9+NNAME+n] = ord(desc[n])
         f.write(bytearray(bytes))
     for t in consumables:
         name = t[2]

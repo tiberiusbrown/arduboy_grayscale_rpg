@@ -74,7 +74,7 @@ flags = {}
 
 with open('items.csv', newline='') as f:
     reader = csv.reader(f, delimiter=',', quotechar='"')
-    items = [row[5] for row in reader]
+    items = [row[9] for row in reader]
     items = items[1:]
 for i in range(len(items)):
     items[i] = re.sub('[^a-zA-Z0-9]+', '_', items[i].split('|')[0].strip())

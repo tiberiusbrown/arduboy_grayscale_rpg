@@ -284,7 +284,10 @@ struct item_info_t
 {
     uint8_t type;
     // modifiers
-    int8_t att, def, spd, mhp;
+    int8_t att, ardu_att;
+    int8_t def, ardu_def;
+    int8_t spd, ardu_spd;
+    int8_t mhp, ardu_mhp;
     char name[ITEM_NAME_LEN];
     char desc[ITEM_DESC_LEN];
 };

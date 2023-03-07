@@ -34,10 +34,12 @@ static int8_t items_stat(uint8_t user, uint8_t offset)
     for(auto i : party[user].equipped_items)
     {
         if(i == INVALID_ITEM) continue;
-        int8_t stat;
+        int8_t stat[2];
         platform_fx_read_data_bytes(
-            addr + sizeof(item_info_t) * i, &stat, 1);
-        total += stat;
+            addr + sizeof(item_info_t) * i, stat, 2);
+        total += stat[0];
+        if(user == 0)
+            total += stat[1];
     }
 
     if(total < -99) total = -99;
@@ -241,11 +243,11 @@ static inline void render_item_row(
     {
         platform_drawrect_i8((int8_t)x, rowy, 128, 10, DARK_GRAY);
         platform_fx_read_data_bytes(
-            (ITEM_INFO + 5 + ITEM_NAME_LEN) + sizeof(item_info_t) * i, d.str, ITEM_DESC_LEN);
+            (ITEM_INFO + 9 + ITEM_NAME_LEN) + sizeof(item_info_t) * i, d.str, ITEM_DESC_LEN);
         draw_text_noclip(x + 2, y + 46, d.str);
     }
     platform_fx_read_data_bytes(
-        (ITEM_INFO + 5) + sizeof(item_info_t) * i, d.str, ITEM_NAME_LEN);
+        (ITEM_INFO + 9) + sizeof(item_info_t) * i, d.str, ITEM_NAME_LEN);
     // find if there is a user who has the item equipped
     for(uint8_t user = 0; user < nparty; ++user)
     {
