@@ -13,11 +13,11 @@ inline void LOC_charlie_switch                  () { px =  1200; py =   672; }
 inline void LOC_charlie_basement                () { px =  1200; py =   704; }
 inline void LOC_charlie_after_job               () { px =  1168; py =   944; }
 inline void LOC_catherine_quest                 () { px =   944; py =   912; }
-inline void LOC_story_first_cave                () { px =   624; py =   752; }
-inline void LOC_first_cave_outside              () { px =   624; py =   768; }
+inline void LOC_story_first_cave                () { px =   240; py =   176; }
+inline void LOC_first_cave_outside              () { px =   240; py =   192; }
 inline void LOC_first_cave_inside               () { px =  2320; py =  2256; }
 inline void LOC_first_cave_ladder               () { px =  2576; py =  2112; }
-inline void LOC_first_cave_exit                 () { px =   704; py =   656; }
+inline void LOC_first_cave_exit                 () { px =   272; py =   128; }
 inline void LOC_new_game                        () { px =  2208; py =  2416; }
 inline void LOC_dismas_house_inside             () { px =   480; py =  2144; }
 inline void LOC_dismas_house_outside            () { px =   272; py =  1584; }
