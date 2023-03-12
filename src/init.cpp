@@ -68,15 +68,17 @@ void new_game()
     consumables[CIT_Potion_of_Attack] = 3;
 #endif
 
-    //LOC_test();
+    LOC_test();
     //LOC_first_cave_outside();
-    LOC_home_outside();
+    //LOC_home_outside();
     //story_flag_set(SFLAG_story_fish_delivered);
 
-    LOC_first_cave_outside();
-    story_flag_set(SFLAG_story_fish_delivered);
+    //LOC_first_cave_outside();
+    //story_flag_set(SFLAG_story_fish_delivered);
     //story_flag_set(SFLAG_story_met_catherine);
     //story_flag_set(SFLAG_party_catherine);
+
+    LOC_puzspikefollow_inside();
 }
 
 static bool check_identifier(uint24_t addr)

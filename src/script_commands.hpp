@@ -81,6 +81,9 @@ Game Manipulation
     ept <tile>
         Set sprite target tile to <tile>
 
+    eptr <reg>
+        Set sprite target tile to value in <reg>
+
     st <tile> <tile_img>
         Overwrite image at <tile> with <tile_img>
 
@@ -244,6 +247,7 @@ enum script_command_t
     CMD_EP,
     CMD_EPF,
     CMD_EPT,
+    CMD_EPTR,
     CMD_ST,
     CMD_STF,
     CMD_STR,

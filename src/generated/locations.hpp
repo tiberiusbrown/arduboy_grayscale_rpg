@@ -9,7 +9,7 @@ inline void LOC_entrance_lightsout              () { px =  1296; py =  1472; }
 inline void LOC_stairs_village_dungeon          () { px =  2464; py =  2112; }
 inline void LOC_obj_oldcharlie                  () { px =  1152; py =  1008; }
 inline void LOC_mother_grieving                 () { px =   816; py =   704; }
-inline void LOC_charlie_switch                  () { px =  1200; py =   672; }
+inline void LOC_charlie_switch                  () { px =  1248; py =   704; }
 inline void LOC_charlie_basement                () { px =  1200; py =   704; }
 inline void LOC_charlie_after_job               () { px =  1168; py =   944; }
 inline void LOC_catherine_quest                 () { px =   944; py =   912; }
@@ -55,3 +55,6 @@ inline void LOC_shack_outside                   () { px =  1184; py =  1200; }
 inline void LOC_portal_castle                   () { px =  2928; py =  2192; }
 inline void LOC_out_portal_castle               () { px =  3936; py =  1888; }
 inline void LOC_test                            () { px =  2688; py =  2736; }
+inline void LOC_puzblock_inside                 () { px =  3504; py =  2096; }
+inline void LOC_puzblockgate_inside             () { px =  3632; py =  2272; }
+inline void LOC_puzspikefollow_inside           () { px =  3840; py =  2256; }

@@ -51,7 +51,7 @@ static bool run_chunk()
         }
         //dx = div16_u16(px + 8) - tx;
         //dy = div16_u16(py + 8) - ty;
-        if((dx | dy) < 8) walk_tile = dy * 8 + dx;
+        if(dx < 8 && dy < 4) walk_tile = dy * 8 + dx;
         {
             uint16_t tpx = selx;
             uint16_t tpy = sely;
@@ -61,7 +61,7 @@ static bool run_chunk()
         }
         //dx = div16_u16(selx) - tx;
         //dy = div16_u16(sely) - ty;
-        if((dx | dy) < 8)
+        if(dx < 8 && dy < 4)
         {
             sel_tile = dy * 8 + dx;
             uint8_t ex = sprite.x;
@@ -327,8 +327,14 @@ static bool run_chunk()
             break;
         }
         case CMD_EPT:
-            sprite.target = deref_inc(instr_ptr);
+        case CMD_EPTR:
+        {
+            uint8_t t = deref_inc(instr_ptr);
+            if(instr == CMD_EPTR)
+                t = savefile.chunk_regs[t];
+            sprite.target = t;
             break;
+        }
         case CMD_ST:
         case CMD_STF:
         case CMD_STR:
@@ -690,7 +696,7 @@ bool check_solid(uint16_t tx, uint16_t ty, uint8_t* tp)
     {
         uint8_t ex = e.x;
         uint8_t ey = e.y;
-        if(uint8_t(ctx - ex - 2) < 12 && uint8_t(cty - ey - 4) < 12)
+        if(uint8_t(ctx - ex - 2) < 12 && uint8_t(cty - ey - 2) < 14)
             return true;
     }
     uint8_t const* ptr = &TILE_SOLID[0];

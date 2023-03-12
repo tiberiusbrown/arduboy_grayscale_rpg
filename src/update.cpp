@@ -103,7 +103,7 @@ bool sprite_collides_player(active_chunk_t const& c, sprite_t const& e)
     uint16_t ex = c.cx * 128 + e.x;
     uint16_t ey = c.cy * 64 + e.y;
     return rect_intersect(
-        ex + 2, ey + 4, 12, 12,
+        ex + 2, ey + 2, 12, 14,
         px + 5, py + 5, 6, 6);
 }
 

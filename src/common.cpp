@@ -24,7 +24,6 @@ uint8_t const SPRITE_FLAGS[] PROGMEM =
     0, // unused
     0, // unused
     0, // unused
-    0, // unused
 
     0, // matthias
     0, // catherine

@@ -116,6 +116,7 @@ class CMD(AutoNumber):
     EP   = ()
     EPF  = ()
     EPT  = ()
+    EPTR = ()
     ST   = ()
     STF  = ()
     STR  = ()
@@ -170,7 +171,7 @@ def append16(b, x):
 
 def reg(s):
     if s[0] != 'r':
-        print('Expected register but got "%s"' % s)
+        raise Exception('Expected register but got "%s"' % s)
         sys.exit(1)
     x = int(s[1:])
     if x < 0 or x >= 16:
@@ -367,7 +368,11 @@ def assemble(s, eps, chunk):
         
         elif s[i] == 'ept':
             b.append(CMD.EPT); i += 1
-            b.append(int(s[i]) + 32); i+= 1
+            b.append(int(s[i]) + 32); i += 1
+        
+        elif s[i] == 'eptr':
+            b.append(CMD.EPTR); i += 1
+            b.append(reg(s[i])); i += 1
             
         elif s[i] == 'st':
             b.append(CMD.ST); i += 1
