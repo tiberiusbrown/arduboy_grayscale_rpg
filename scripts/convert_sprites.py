@@ -1,15 +1,13 @@
 from extract_sprite_planes import extract
 import os
 
-triplane = True
-
 def convert(fout, sym, fname, sw, sh, num = 0, start = 0):
     if os.path.exists(fout):
         imgtime = os.path.getmtime(fname)
         outtime = os.path.getmtime(fout)
         if outtime > imgtime:
             return
-    ps = extract(fname, sw, sh, triplane, num, start)
+    ps = extract(fname, sw, sh, True, num, start)
     sbytes = sw * sh // 8
     if fout[-4:] == '.hpp':
         with open(fout, "w") as f:
@@ -29,10 +27,9 @@ def convert(fout, sym, fname, sw, sh, num = 0, start = 0):
                     f.write('\n   ')
                     for j in range(sw * sh // 8):
                         f.write(' 0x%02x,' % ps[2][i * sbytes + j])
-                    if triplane:
-                        f.write('\n   ')
-                        for j in range(sw * sh // 8):
-                            f.write(' 0x%02x,' % ps[3][i * sbytes + j])
+                    f.write('\n   ')
+                    for j in range(sw * sh // 8):
+                        f.write(' 0x%02x,' % ps[3][i * sbytes + j])
                 f.write('\n')
                 if i < ps[0] - 1:
                     f.write('   ')
@@ -48,15 +45,13 @@ def convert(fout, sym, fname, sw, sh, num = 0, start = 0):
                     for j in range(sbytes):
                         f.write(bytearray([ps[2][i * sbytes + j]]))
                         f.write(bytearray([ps[4][i * sbytes + j]]))
-                    if triplane:
-                        for j in range(sbytes):
-                            f.write(bytearray([ps[3][i * sbytes + j]]))
-                            f.write(bytearray([ps[4][i * sbytes + j]]))
+                    for j in range(sbytes):
+                        f.write(bytearray([ps[3][i * sbytes + j]]))
+                        f.write(bytearray([ps[4][i * sbytes + j]]))
                 else:
                     f.write(bytearray(ps[1][i*sbytes:(i+1)*sbytes]))
                     f.write(bytearray(ps[2][i*sbytes:(i+1)*sbytes]))
-                    if triplane:
-                        f.write(bytearray(ps[3][i*sbytes:(i+1)*sbytes]))
+                    f.write(bytearray(ps[3][i*sbytes:(i+1)*sbytes]))
 
 
 BASE = '../src/generated/'

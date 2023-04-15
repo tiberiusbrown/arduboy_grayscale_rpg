@@ -50,6 +50,6 @@ Att,,Def,,Spd,,MHP,,Type,Name,Description,Location
 1,,1,,,,,,weapon,Wooden Spear,"+1 attack, +1 defense.",raptor forest chest se of island
 ,,,,,,,,amulet,River Amulet,Heals 3 health when choosing to defend.,raptor forest south secret dock
 ,,,,,,,,ring,River Band,Heals 3 health when choosing to defend.,secret dock west of village
-,,-1,,1,,,,helm,Old Dark Helm,"-1 defense, +1 speed.",
+,,-1,,1,,,,helm,Old Dark Helm,"-1 defense, +1 speed.",raptor forest old dark building
 ,,-2,,2,,,,armor,Old Dark Armor,"-2 defense, +2 speed.",raptor forest near old dark building
-,,-1,,1,,,,shoes,Old Dark Shoes,"-1 defense, +1 speed.",
+,,-1,,1,,,,shoes,Old Dark Shoes,"-1 defense, +1 speed.",raptor forest old dark building

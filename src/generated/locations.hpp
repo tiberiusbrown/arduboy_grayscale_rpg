@@ -3,7 +3,7 @@
 inline void LOC_home_inside                     () { px =   160; py =  2160; }
 inline void LOC_home_bed                        () { px =    96; py =  2128; }
 inline void LOC_home_outside                    () { px =   880; py =   736; }
-inline void LOC_stairs_village_outside          () { px =  1200; py =   720; }
+inline void LOC_stairs_village_outside          () { px =  1216; py =   704; }
 inline void LOC_dungeon_lightsout               () { px =  2176; py =  2272; }
 inline void LOC_entrance_lightsout              () { px =  1296; py =  1472; }
 inline void LOC_stairs_village_dungeon          () { px =  2464; py =  2112; }
@@ -58,3 +58,13 @@ inline void LOC_test                            () { px =  2688; py =  2736; }
 inline void LOC_puzblock_inside                 () { px =  3504; py =  2096; }
 inline void LOC_puzblockgate_inside             () { px =  3632; py =  2272; }
 inline void LOC_puzspikefollow_inside           () { px =  3840; py =  2256; }
+inline void LOC_outpost_inside                  () { px =   672; py =  2320; }
+inline void LOC_outpost_outside                 () { px =  1200; py =  1744; }
+inline void LOC_church_inside                   () { px =   880; py =  2224; }
+inline void LOC_church_outside                  () { px =   896; py =  1008; }
+inline void LOC_ceciliahouse_inside             () { px =  1056; py =  2128; }
+inline void LOC_ceciliahouse_outside            () { px =  1008; py =   768; }
+inline void LOC_hall_inside                     () { px =  1248; py =  2128; }
+inline void LOC_hall_outside                    () { px =  1152; py =   800; }
+inline void LOC_catherinehouse_inside           () { px =  1152; py =  2288; }
+inline void LOC_catherinehouse_outside          () { px =   928; py =   864; }
