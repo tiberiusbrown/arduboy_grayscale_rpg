@@ -5,7 +5,6 @@ Each party member has a unique passive ability.
 Legends tell of an amulet which allows taking two turns in battle...
 An ancient people, the Ardu are but myths now.
 Courage shall triumph in the end.
-Strength is perfected through weakness.
 Some magical items are more powerful when used by an Ardu.
 Many Ardu champions of old gave their lives for the cause of peace.
 If you have a long distance to run, increase the game speed in the options menu!
@@ -14,3 +13,4 @@ Stunning an enemy causes them to skip their next turn.
 The Ardu created a network of portals to allow efficient travel.
 The dryads fled the raptors in the forest, leaving their gifts behind.
 The Old Dark empire has a keen interest in Ardu mythology.
+You can only save while outdoors. Save before entering a dungeon!

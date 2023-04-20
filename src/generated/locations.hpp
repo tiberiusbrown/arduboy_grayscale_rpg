@@ -26,7 +26,7 @@ inline void LOC_portal_raptor                   () { px =  2800; py =  2192; }
 inline void LOC_portal_village                  () { px =  2800; py =  2128; }
 inline void LOC_out_portal_village              () { px =   368; py =   784; }
 inline void LOC_puzright_inside                 () { px =  2384; py =  2432; }
-inline void LOC_puzright_outside                () { px =   544; py =  1712; }
+inline void LOC_puzright_outside                () { px =  1104; py =   336; }
 inline void LOC_puzwait_inside                  () { px =  2640; py =  2416; }
 inline void LOC_puzwait_outside                 () { px =   784; py =  1568; }
 inline void LOC_spike_inside                    () { px =  2992; py =  2416; }
@@ -68,3 +68,4 @@ inline void LOC_hall_outside                    () { px =  1152; py =   800; }
 inline void LOC_catherinehouse_inside           () { px =  1152; py =  2288; }
 inline void LOC_catherinehouse_outside          () { px =   928; py =   864; }
 inline void LOC_puzseq_inside                   () { px =  2928; py =  2704; }
+inline void LOC_puzseq_outside                  () { px =   544; py =  1712; }

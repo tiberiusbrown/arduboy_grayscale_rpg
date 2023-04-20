@@ -47,7 +47,7 @@ void update_pause()
                 static_assert(4 == OS_OPTIONS, "");
                 static_assert(5 == OS_QUIT, "");
                 state = menui + 1;
-                if(menui == 2 && !player_is_outside())
+                if((menui == 0 || menui == 2) && !player_is_outside())
                     state = OS_MENU;
             }
             d.menui = menui;
@@ -278,7 +278,10 @@ void render_pause()
     {
         platform_fx_drawoverwrite_i8(0, d.menuy - 16, PAUSE_MENU_IMG);
         if(plane() == 0 && !player_is_outside())
+        {
+            platform_fillrect_i8(0, int8_t(d.menuy - 16), 21, 10, BLACK);
             platform_fillrect_i8(52, int8_t(d.menuy - 16), 18, 10, BLACK);
+        }
         platform_fillrect_i8(d.ax, d.menuy - 5, (d.bx - d.ax + 1), 2, WHITE);
     }
     if(d.optionsy > 0)
