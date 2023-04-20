@@ -54,7 +54,6 @@ inline void LOC_shack_inside                    () { px =   688; py =  2128; }
 inline void LOC_shack_outside                   () { px =  1184; py =  1200; }
 inline void LOC_portal_castle                   () { px =  2928; py =  2192; }
 inline void LOC_out_portal_castle               () { px =  3936; py =  1888; }
-inline void LOC_test                            () { px =  2688; py =  2736; }
 inline void LOC_puzblock_inside                 () { px =  3504; py =  2096; }
 inline void LOC_puzblockgate_inside             () { px =  3632; py =  2272; }
 inline void LOC_puzspikefollow_inside           () { px =  3840; py =  2256; }
@@ -68,3 +67,4 @@ inline void LOC_hall_inside                     () { px =  1248; py =  2128; }
 inline void LOC_hall_outside                    () { px =  1152; py =   800; }
 inline void LOC_catherinehouse_inside           () { px =  1152; py =  2288; }
 inline void LOC_catherinehouse_outside          () { px =   928; py =   864; }
+inline void LOC_puzseq_inside                   () { px =  2928; py =  2704; }

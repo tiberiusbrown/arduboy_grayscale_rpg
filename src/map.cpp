@@ -315,7 +315,6 @@ static bool run_chunk()
                 s.path[j] = p;
             }
             s.path_num = n;
-            s.active = (n > 0);
             if(open == 0)
                 s.path_dir = 0;
             else if(s.path_dir == 0)
@@ -333,6 +332,12 @@ static bool run_chunk()
             if(instr == CMD_EPTR)
                 t = savefile.chunk_regs[t];
             sprite.target = t;
+            if(!sprite.active)
+            {
+                sprite.active = true;
+                sprite.x = (t & 7) * 16;
+                sprite.y = ((t >> 3) & 3) * 16;
+            }
             break;
         }
         case CMD_ST:

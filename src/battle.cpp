@@ -690,6 +690,17 @@ void update_battle()
     d.phase = phase;
 }
 
+static uint16_t battle_sprite_frame(battle_sprite_t const& s)
+{
+    uint16_t f = s.sprite;
+    uint8_t flags = pgm_read_byte(&SPRITE_FLAGS[f]);
+    uint8_t nf = (nframe / 4) & 3;
+    if(!(flags & SF_ALWAYS_ANIM) && (uint8_t)s.x == s.tx && (uint8_t)s.y == s.ty)
+        nf = 0;
+    if(f >= 16) f = uint8_t(f - 15) * 16 + s.frame_dir + nf;
+    return f;
+}
+
 static void draw_battle_background()
 {
     auto const& d = sdata.battle;
@@ -722,7 +733,7 @@ static void draw_battle_background()
         auto const& s = d.sprites[i];
         if(s.damaged > 0 || member(i).hp > 0) continue;
         if(plane() > 1)
-            platform_fx_drawplusmask(s.bx, s.by, 16, 16, SPRITES_IMG, s.sprite * 16);
+            platform_fx_drawplusmask(s.bx, s.by, 16, 16, SPRITES_IMG, battle_sprite_frame(s));
     }
     //platform_fillrect_i8(DEFEND_X1 + 1, DEFEND_Y + 7, 14, 12, WHITE);
     platform_drawrect_i8(DEFEND_X1 + 3, DEFEND_Y + 9, 10, 8, LIGHT_GRAY);
@@ -797,15 +808,7 @@ static void draw_battle_sprites()
         e.x = (uint8_t)s.x;
         e.y = (uint8_t)s.y;
         e.addr = SPRITES_IMG;
-
-        uint16_t f = s.sprite;
-        uint8_t flags = pgm_read_byte(&SPRITE_FLAGS[f]);
-        uint8_t nf = (nframe / 4) & 3;
-        if(!(flags & SF_ALWAYS_ANIM) && (uint8_t)s.x == s.tx && (uint8_t)s.y == s.ty)
-            nf = 0;
-
-        if(f >= 16) f = uint8_t(f - 15) * 16 + s.frame_dir + nf;
-        e.frame = f;
+        e.frame = battle_sprite_frame(s);
     }
 
     sort_and_draw_sprites(entries, n);

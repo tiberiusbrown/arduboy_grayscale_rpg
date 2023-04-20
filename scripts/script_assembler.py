@@ -212,6 +212,9 @@ def batflag(b, s, chunk):
     addflag(b, s)
 
 def addpath(b, s, eps):
+    if s == '-':
+        b += [0, 0]
+        return
     if s not in eps:
         print('Path "%s" not found' % s)
         sys.exit(1)

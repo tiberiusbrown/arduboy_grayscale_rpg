@@ -15,7 +15,7 @@ rem set "remove_timer0=-DDEBUG_MONOCHROME"
 cd ..\src
 set dir=%temp%/arduboy_grayscale_rpg_build
 if not exist "%dir%" mkdir %dir%
-arduino-cli.exe compile -v --log-level info ^
+arduino-cli.exe compile ^
     -b arduboy-homemade:avr:arduboy-fx . ^
     --output-dir "%dir%" ^
     --build-property compiler.c.elf.extra_flags="-Wl,--relax" ^
