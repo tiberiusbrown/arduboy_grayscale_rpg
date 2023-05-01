@@ -1,122 +1,133 @@
-from mido import MidiFile
-import sys
+from pretty_midi import PrettyMIDI
 
-NUM_CHANNELS = 2
-QUARTER_NOTE_BEATS = 8
-END_VOLUME = 0.0
+PERIODS = {}
+for n in range(128):
+    freq = 440 * pow(2, float(n - 69) / 12)
+    period = int(16000000.0 / freq / 4)
+    if period > 65535: period = 65535
+    PERIODS[n] = period
 
-def delay_cmd(beats):
-    if beats <= 32: return [64 + beats - 1]
-    if beats <= 256: return [128 + 5, beats - 1]
-    return [(128 | (1 << 4)) + 5, ((beats - 1) >> 8) & 0xff, (beats - 1) & 0xff]
+def vf_default(n, t):
+    return n[2]
 
-def byte16(u16):
-    return [u16 & 0xff, (u16 >> 8) & 0xff]
+def vf_fadeout(n, t):
+    v = n[2]
+    f = (float(t) - n[0]) / (n[1] - n[0])
+    k = 1 - f
+    return int(k * v)
 
-def convert(
-        fname,
-        qnb = QUARTER_NOTE_BEATS,
-        ev = END_VOLUME,
-        vf = 1.0):
-    mid = MidiFile(fname + '.mid')
-    if mid.type == 2:
-        print('asynchronous midi not supported: "%s"' % fname)
-        sys.exit(1)
+def vf_fadeout2(n, t):
+    v = n[2]
+    f = (float(t) - n[0]) / (n[1] - n[0])
+    k = 1
+    if f > 0.5: k = 1 - (f - 0.5) * 2
+    return int(k * v)
+
+def vf_fadeout4(n, t):
+    v = n[2]
+    f = (float(t) - n[0]) / (n[1] - n[0])
+    k = 1
+    if f > 0.75: k = 1 - (f - 0.75) * 4
+    return int(k * v)
+
+def convert(fin, fout, tracks=4, tps=48, vol=0.5, vf=vf_default):
+
+    # read midi data and quantize notes
+    d = PrettyMIDI(fin)
+    notes = []
+    ticks = 0
+    lownotes = 0
+    for i in d.instruments:
+        if i.is_drum: continue
+        for n in i.notes:
+            a = int(n.start * tps)
+            b = int(n.end * tps)
+            if a == b: continue
+            volume = int(vol * 2 * n.velocity)
+            period = PERIODS[n.pitch]
+            if period < 65535:
+                notes.append((a, b, volume, period))
+                if b > ticks: ticks = b
+            else:
+                lownotes += 1
+    print('low notes:', lownotes)
     
-    # collect all notes
-    t = 0 # current time
-    now_notes = {}         # note -> (time, volume)
-    outstanding_notes = {} # note -> (time, volume)
-    notes = [] # (note, start, duration, volume)
-    for i, track in enumerate(mid.tracks):
-        for msg in track:
-            if msg.is_meta: continue
-            if msg.channel > NUM_CHANNELS - 1: continue
-            beats = int(round(msg.time * qnb / 96 / 2))
-            if beats > 0:
-                for k in now_notes:
-                    if k not in outstanding_notes:
-                        outstanding_notes[k] = now_notes[k]
-                    else:
-                        print('Warning (%s): overlapping notes at time %d' % (fname, t))
-                now_notes = {}
-                t += beats
-            if msg.type == 'note_on':
-                note = msg.note
-                volume = int(msg.velocity * vf)
-                if volume <= 0: continue
-                if volume > 127: volume = 127
-                if note not in now_notes:
-                    now_notes[note] = (t, volume)
-            if msg.type == 'note_off':
-                note = msg.note
-                if note in outstanding_notes:
-                    start = outstanding_notes[note][0]
-                    volume = outstanding_notes[note][1]
-                    del outstanding_notes[note]
-                    notes.append((note, start, t - start, volume))
-    notes = sorted(notes, key=lambda x:(x[1], -x[0]))
-    
-    # assign notes to channels
-    channels = [[] for _ in range(NUM_CHANNELS)]
-    times = [0] * NUM_CHANNELS
-    for note in notes:
-        if note[0] < 36 or note[0] > 98:
-            print('Warning (%s): note out of range at time %d' % (fname, note[1]))
-            continue
-        found = False
-        for i in range(NUM_CHANNELS):
-            dt = note[1] - times[i]
-            if dt < 0: continue
+    # assign notes to tracks
+    # (notes must stay on the same track from tick to tick)
+    ta = [-1] * (ticks * tracks)
+    lost_notes = 0
+    for ni in range(len(notes)):
+        n = notes[ni]
+        for t in range(tracks):
             found = True
-            times[i] = note[1] + note[2]
-            #add note off and delay if necessary
-            if dt > 0:
-                channels[i] += [0] # note off
-                channels[i] += delay_cmd(dt)
-                pass
-            # add note and delay
-            channels[i] += [0x74, note[3]] # set volume
-            slide = int(note[3] * (1 - ev) / note[2])
-            channels[i] += [(128 | (1 << 4)) + 1, 0, (256 - slide) & 0xff]
-            channels[i] += [note[0] - 35]
-            channels[i] += delay_cmd(note[2])
-            break
+            for i in range(n[0], n[1]):
+                if ta[i * tracks + t] >= 0:
+                    found = False
+                    break
+            if found:
+                for i in range(n[0], n[1]):
+                    ta[i * tracks + t] = ni
+                break
         if not found:
-            print('Warning (%s): too many simultaneous notes at time %d' % (fname, note[1]))
-    for i in range(NUM_CHANNELS):
-        channels[i] += [97]
-        
-    # generate atmlib byte list
-    #bytes = [3]
-    #bytes += [NUM_CHANNELS]
-    #base = 2 + NUM_CHANNELS * 2 + 1 + NUM_CHANNELS
-    #for i in range(NUM_CHANNELS):
-    #    bytes += byte16(base)
-    #    base += len(channels[i])
-    #bytes += [NUM_CHANNELS]
-    #for i in range(NUM_CHANNELS):
-    #    bytes += [i]
-    #for i in range(NUM_CHANNELS):
-    #    bytes += channels[i]
-    #print(bytes)
-    #print(len(bytes))
+            lost_notes += 1
+    print('lost', lost_notes, 'out of', len(notes), 'notes')
     
-    # generate bindata
-    bytes = []
-    base = NUM_CHANNELS * 2
-    for i in range(NUM_CHANNELS):
-        bytes += byte16(base)
-        base += len(channels[i])
-    for i in range(NUM_CHANNELS):
-        bytes += channels[i]
-    with open('../arduboy_build/%s.bin' % fname, 'wb') as f:
-        f.write(bytearray(bytes))
+    # generate command sequence
+    commands = [[0, 255, 255] * tracks + [1] for _ in range(ticks)]
+    commands += [[0, 0, 0] * tracks + [1]]
+    maxvol = 0
+    for tick in range(ticks):
+        i = tick * tracks
+        totvol = 0
+        for track in range(tracks):
+            a = ta[i + track]
+            if a < 0: continue
+            n = notes[a]
+            volume = vf(n, tick)
+            period = n[3]
+            commands[tick][track * 3 + 0] = volume
+            commands[tick][track * 3 + 1] = period % 256
+            commands[tick][track * 3 + 2] = (period >> 8) % 256
+            totvol += volume
+        if totvol > maxvol: maxvol = totvol
+    print('max volume: ', maxvol)
+    
+    # merge identical commands
+    i = 0
+    while i < len(commands):
+        j = i + 1;
+        while j < len(commands):
+            if commands[i] != commands[j]:
+                break
+            j += 1
+        n = j - i
+        if n > 1:
+            if n > 255: n = 255
+            commands[i][-1] = n
+            del commands[i+1:j]
+        i += 1
+    
+    # produce output
+    bytes = bytearray()
+    for c in commands:
+        for byte in c:
+            bytes.append(byte)
+    with open(fout, 'wb') as f:
+        f.write(bytes)
 
-convert('song_peaceful', ev = 0.5)
-convert('song_peaceful2', ev = 0.5, qnb = 8, vf = 2.0)
-convert('song_peaceful3', ev = 0.15, qnb = 8, vf = 2.0)
-convert('song_peaceful4', ev = 0.15, qnb = 3, vf = 2.0)
-convert('song_victory', qnb = 2)
-convert('song_defeat', qnb = 8)
+def convert_sym(sym):
+    convert(
+        sym + '.mid',
+        '../arduboy_build/' + sym + '.bin',
+        tracks=2,
+        tps=32,
+        vol=0.5,
+        vf=vf_fadeout4)
+
+convert_sym('song_peaceful')
+convert_sym('song_peaceful2')
+convert_sym('song_peaceful3')
+convert_sym('song_peaceful4')
+convert_sym('song_victory')
+convert_sym('song_defeat')
 

@@ -47,7 +47,14 @@ constexpr uint8_t NUM_SCORE_CHANNELS = 2;
 
 #ifdef ARDUINO
 #include <ArduboyFX.h>
-#include "src/ATMlib2/ATMlib2.h"
+
+#define SYNTHU_ENABLE_VOLUME 1
+#define SYNTHU_ENABLE_CLIP 1
+#define SYNTHU_BUFFER_MIN_HZ 55
+#define SYNTHU_TICKS_HZ 32
+#define SYNTHU_NUM_CHANNELS 2
+#include "SynthU.hpp"
+
 #define ABG_TIMER1
 #define ABG_SYNC_PARK_ROW
 #define ABG_UPDATE_EVERY_N_MOD 11

@@ -68,7 +68,7 @@ void new_game()
     consumables[CIT_Potion_of_Attack] = 3;
 #endif
 
-    LOC_puzseq_inside();
+    //LOC_puzseq_inside();
     //LOC_first_cave_outside();
     //LOC_home_outside();
     //story_flag_set(SFLAG_story_fish_delivered);
