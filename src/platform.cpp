@@ -517,6 +517,7 @@ void platform_audio_update()
 void platform_audio_init()
 {
     SynthU::setup();
+    SynthU::setVolume(5);
 }
 
 void platform_audio_on()
