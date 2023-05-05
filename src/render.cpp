@@ -257,6 +257,8 @@ static void render_badfx()
 
 void render()
 {
+    platform_audio_update();
+
     using render_func = void (*)();
     static render_func const FUNCS[] PROGMEM = {
         render_title,
@@ -281,6 +283,4 @@ void render()
 
     update_battery();
     render_battery();
-
-    platform_audio_update();
 }

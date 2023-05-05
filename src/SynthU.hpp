@@ -61,7 +61,7 @@ constexpr uint24_t TICK_PERIOD = uint24_t((16000000ull >> ADV_SHIFT) / SYNTHU_TI
 constexpr uint8_t FLAG_VALID = 0x01;
 
 constexpr uint16_t OCR_MIN = 1024;
-constexpr uint16_t OCR_MAX = 65535 >> ADV_SHIFT;
+constexpr uint16_t OCR_MAX = (65535 - OCR_MIN) >> ADV_SHIFT;
 
 struct command_t
 {
@@ -135,7 +135,7 @@ static void st_u16_inc(T*& ptr, uint16_t x)
 #endif
 }
 
-static uint16_t tick(uint16_t adv)
+static void tick(uint16_t adv)
 {
     uint8_t sreg;
     command_t* bptr;
@@ -146,13 +146,10 @@ static uint16_t tick(uint16_t adv)
     if(pha < TICK_PERIOD)
     {
         g_tick_pha = pha;
-        goto end;
+        return;
     }
     pha -= TICK_PERIOD;
     g_tick_pha = pha;
-    
-    sreg = SREG;
-    sei();
     
     {
         uint8_t reps = g_buffers[0].reps;
@@ -170,7 +167,7 @@ static uint16_t tick(uint16_t adv)
     {
         uint16_t pha = cptr->pha;
         uint16_t period = bptr->period;
-        if(period == 0) g_playing = false;
+        if(period == 0) SynthU::stop();
         if(pha >= period) pha = 0;
         st_u16_inc(cptr, pha);
     }
@@ -178,17 +175,18 @@ static uint16_t tick(uint16_t adv)
     // rotate buffer if needed
     if(NUM_BUFFER_TICKS > 1)
     {
+        sei();
+        
         memmove(
             &g_buffers[0],
             &g_buffers[1],
             sizeof(tick_t) * (NUM_BUFFER_TICKS - 1));
     }
-    
-    SREG = sreg;
-    
-end:
-    uint24_t d = TICK_PERIOD - pha;
-    return d <= 65535 ? uint16_t(d) : 65535;
+}
+
+static inline uint8_t hi(uint16_t x)
+{
+    return uint8_t(x >> 8);
 }
 
 }
@@ -214,8 +212,6 @@ void SynthU::setup()
 {
     stop();
     
-    setVolume(8);
-    
     PLLFRQ = 0x56; // 96 MHz
     TCCR4A = 0x42; // PWM mode
     TCCR4D = 0x01; // dual slope PWM
@@ -236,6 +232,7 @@ void SynthU::stop()
 
 void SynthU::resume()
 {
+    synthu_detail::g_buffers[0].reps = 0;
     synthu_detail::g_playing = true;
     update();
     OCR3A = synthu_detail::OCR_MIN;
@@ -271,14 +268,10 @@ bool SynthU::update()
     return p;
 }
 
-static uint8_t t;
-
 static inline uint16_t tmin(uint16_t a, uint16_t b)
 {
     return a < b ? a : b;
 }
-
-static volatile uint8_t blah = 0;
 
 ISR(TIMER3_COMPA_vect)
 {
@@ -313,16 +306,21 @@ ISR(TIMER3_COMPA_vect)
         {
             t -= vol;
         }
-        ocr = tmin(ocr, period - pha);
         st_u16_inc(channel, pha);
+        period -= pha;
+        ocr = tmin(ocr, period);
     }
     ocr <<= synthu_detail::ADV_SHIFT;
-    {
-        uint16_t t = synthu_detail::tick(adv);
-        if(t < ocr) ocr = t;
-    }
-    if(ocr < synthu_detail::OCR_MIN)
+    
+    if(ocr <= synthu_detail::OCR_MIN)
         ocr = synthu_detail::OCR_MIN;
+    else
+    {
+        ocr -= 1;
+        ocr &= ~(synthu_detail::OCR_MIN - 1);
+        ocr += synthu_detail::OCR_MIN;
+    }
+
     OCR3A = ocr;
 #if SYNTHU_ENABLE_VOLUME
     t *= synthu_detail::g_volume;
@@ -353,6 +351,7 @@ ISR(TIMER3_COMPA_vect)
     tc += 128;
     TC4H  = 0;
     OCR4A = tc;
+    synthu_detail::tick(adv);
 }
 
 #endif
