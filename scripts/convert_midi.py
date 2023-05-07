@@ -30,7 +30,7 @@ def vf_fadeout4(n, t):
     if f > 0.75: k = 1 - (f - 0.75) * 4
     return int(k * v)
 
-def convert(fin, fout, tracks=4, tps=48, vol=0.5, vf=vf_default):
+def convert(fin, fout, tracks=4, tps=48, vol=0.5, transpose=0, slowdown=1.0, vf=vf_default):
 
     # read midi data and quantize notes
     d = PrettyMIDI(fin)
@@ -40,17 +40,34 @@ def convert(fin, fout, tracks=4, tps=48, vol=0.5, vf=vf_default):
     for i in d.instruments:
         if i.is_drum: continue
         for n in i.notes:
-            a = int(n.start * tps)
-            b = int(n.end * tps)
+            a = int(n.start * slowdown * tps)
+            b = int(n.end   * slowdown * tps)
             if a == b: continue
             volume = int(vol * 2 * n.velocity)
-            period = PERIODS[n.pitch]
+            pitch = n.pitch + transpose
+            if pitch not in PERIODS: continue
+            period = PERIODS[pitch]
             if period < 65535:
-                notes.append((a, b, volume, period))
+                notes.append([a, b, volume, period])
                 if b > ticks: ticks = b
             else:
                 lownotes += 1
     print('low notes:', lownotes)
+    
+    # sort notes by descending pitch (favor high/melody notes)
+    notes = sorted(notes, key=lambda x: x[3])
+    
+    # merge identical notes
+    for i in range(len(notes)):
+        for j in range(len(notes)):
+            if i == j: continue;
+            n1 = notes[i]
+            n2 = notes[j]
+            if n1[0] != n2[0]: continue
+            if n1[1] != n2[1]: continue
+            if n1[3] != n2[3]: continue
+            notes[i][2] = max(n1[2], n2[2])
+            notes[j][2] = 0
     
     # assign notes to tracks
     # (notes must stay on the same track from tick to tick)
@@ -58,6 +75,7 @@ def convert(fin, fout, tracks=4, tps=48, vol=0.5, vf=vf_default):
     lost_notes = 0
     for ni in range(len(notes)):
         n = notes[ni]
+        if n[2] <= 0: continue
         for t in range(tracks):
             found = True
             for i in range(n[0], n[1]):
@@ -115,19 +133,24 @@ def convert(fin, fout, tracks=4, tps=48, vol=0.5, vf=vf_default):
     with open(fout, 'wb') as f:
         f.write(bytes)
 
-def convert_sym(sym):
+def convert_sym(sym, **args):
+    kwargs = {
+        'tracks': 4,
+        'tps':    31,
+        'vol':    0.5,
+        'vf':     vf_fadeout4
+        }
+    for k, v in args.items():
+        kwargs[k] = v
     convert(
         sym + '.mid',
         '../arduboy_build/' + sym + '.bin',
-        tracks=2,
-        tps=32,
-        vol=0.5,
-        vf=vf_fadeout4)
-
-convert_sym('song_peaceful')
-convert_sym('song_peaceful2')
-convert_sym('song_peaceful3')
-convert_sym('song_peaceful4')
-convert_sym('song_victory')
-convert_sym('song_defeat')
-
+        **kwargs)
+ 
+convert_sym('song_title', vol=0.8, slowdown=1.0, transpose=6)
+convert_sym('song_peaceful' , transpose=6, vol=0.7)
+convert_sym('song_peaceful2' , transpose=4, vol=0.5)
+convert_sym('song_dungeon' , transpose=0, slowdown=1.22, vol=0.7)
+convert_sym('song_victory', slowdown=0.27)
+convert_sym('song_defeat', slowdown=1.2, transpose=6)
+convert_sym('song_battle', vol=1.0, transpose=6, vf=vf_fadeout2)

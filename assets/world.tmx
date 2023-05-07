@@ -792,7 +792,7 @@ ep S_Catherine catherine_quest
 bnse end
 
 bfs !story_met_catherine already_met
-dlg P_Catherine {Matthias! I was just looking for you! I was out exploring and found a strange cave a little ways to the west of the village. I didn't go in because it looked too scary. Wanna see?}
+dlg P_Catherine {Matthias! I was just looking for you! I was out exploring and found a strange cave northwest of the village. I didn't go in because it looked too scary. Wanna see?}
 dlg P_Matthias {Sounds exciting! Yeah, I'll go check it out.}
 obj @story_first_cave
 fs !story_met_catherine

@@ -263,6 +263,7 @@ static void battle_next_turn()
             if(e.id != INVALID && e.hp > 0) victory = false;
         if(victory)
         {
+            set_music_from_position();
             platform_audio_play_song(SONG_VICTORY);
             d.next_phase = BPHASE_OUTRO;
             d.phase = BPHASE_DELAY;
@@ -423,6 +424,7 @@ void update_battle()
         {
             d.frame = 0;
             phase = BPHASE_INTRO;
+            set_music(music::battle);
         }
         break;
     case BPHASE_INTRO:
@@ -532,7 +534,7 @@ void update_battle()
             dam = calc_attack_damage(attacker, defender);
             take_damage(defender, (int8_t)dam);
         }
-        platform_audio_play_sfx(SFX_HIT, 1);
+        //platform_audio_play_sfx(SFX_HIT, 1);
 
         // Dismas innate: strike back at 50% damage when defending
         if(d.pdef == defender &&

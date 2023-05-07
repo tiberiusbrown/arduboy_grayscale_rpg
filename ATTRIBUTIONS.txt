@@ -1,4 +1,6 @@
-Some tiles and sprites are derived from prior work:
+=============================================================================
+Tiles and Sprites
+=============================================================================
 
 Monochrome RPG
 Kenney
@@ -40,3 +42,14 @@ License: can used for anything not related to NFT/blockchain
     tokens (NFT) or blockchain related projects. Assets can be edited
     to suit your own needs. Asset packs are not to be redistributed."
 https://gumpyfunction.itch.io/game-boy-rpg-fantasy-tileset-free
+
+=============================================================================
+Music
+=============================================================================
+
+battle     NES Game: Power Blade - Boss
+title      NES Game: Final Fantasy II (Japan) - Theme
+dungeon    NES Game: Dragon Warrior - Cave
+peaceful   NES Game: Final Fantasy II (Japan) - Town (3)
+peaceful2  NES Game: Final Fantasy (Japan) - Town
+defeat     NES Game: Final Fantasy (Japan) - Dead

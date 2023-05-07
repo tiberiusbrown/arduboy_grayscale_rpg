@@ -59,6 +59,8 @@ void load(bool first)
         savefile.settings = old_settings;
     }
     platform_audio_from_savefile();
+    
+    set_music_from_position();
 }
 
 uint16_t compute_checksum()

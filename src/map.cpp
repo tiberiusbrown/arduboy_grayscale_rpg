@@ -401,7 +401,7 @@ static bool run_chunk()
                 party[i].battle.hp = party_mhp(i);
             break;
         case CMD_SOLVED:
-            platform_audio_play_sfx(SFX_SOLVED, 0);
+            //platform_audio_play_sfx(SFX_SOLVED, 0);
             break;
 
         case CMD_JMP:

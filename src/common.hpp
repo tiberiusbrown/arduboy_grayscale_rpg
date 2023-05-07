@@ -48,11 +48,8 @@ constexpr uint8_t NUM_SCORE_CHANNELS = 2;
 #ifdef ARDUINO
 #include <ArduboyFX.h>
 
-#define SYNTHU_ENABLE_VOLUME 1
-#define SYNTHU_ENABLE_CLIP 1
-#define SYNTHU_BUFFER_MIN_HZ 55
-#define SYNTHU_TICKS_HZ 32
-#define SYNTHU_NUM_CHANNELS 2
+#define SYNTHU_NUM_CHANNELS 4
+#define SYNTHU_UPDATE_EVERY_N_FRAMES 5
 #include "SynthU.hpp"
 
 #define ABG_TIMER1
@@ -568,12 +565,15 @@ struct settings_t
 
 enum class music : uint8_t
 {
-    title,
     peaceful,
+    indoors,
+    dungeon,
+    title,
     battle,
     defeat,
 };
 void set_music(music m);
+void set_music_from_position();
 void play_music();
 
 struct savefile_t

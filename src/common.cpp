@@ -282,19 +282,26 @@ void play_music()
 {
     uint24_t const* ptr;
     uint8_t n;
-    static uint24_t const MUSIC_TITLE[] PROGMEM =
-    {
-        SONG_PEACEFUL,
-    };
     static uint24_t const MUSIC_PEACEFUL[] PROGMEM =
     {
+        SONG_PEACEFUL,
         SONG_PEACEFUL2,
-        SONG_PEACEFUL3,
-        SONG_PEACEFUL4,
+    };
+    static uint24_t const MUSIC_INDOORS[] PROGMEM =
+    {
+        SONG_PEACEFUL2,
+    };
+    static uint24_t const MUSIC_DUNGEON[] PROGMEM =
+    {
+        SONG_DUNGEON,
+    };
+    static uint24_t const MUSIC_TITLE[] PROGMEM =
+    {
+        SONG_TITLE,
     };
     static uint24_t const MUSIC_BATTLE[] PROGMEM =
     {
-        SONG_PEACEFUL, // TODO
+        SONG_BATTLE,
     };
     static uint24_t const MUSIC_DEFEAT[] PROGMEM =
     {
@@ -302,13 +309,21 @@ void play_music()
     };
     switch(savefile.music_type)
     {
-    case music::title:
-        ptr = MUSIC_TITLE;
-        n = sizeof(MUSIC_TITLE) / sizeof(uint24_t);
-        break;
     case music::peaceful:
         ptr = MUSIC_PEACEFUL;
         n = sizeof(MUSIC_PEACEFUL) / sizeof(uint24_t);
+        break;
+    case music::indoors:
+        ptr = MUSIC_INDOORS;
+        n = sizeof(MUSIC_INDOORS) / sizeof(uint24_t);
+        break;
+    case music::dungeon:
+        ptr = MUSIC_DUNGEON;
+        n = sizeof(MUSIC_DUNGEON) / sizeof(uint24_t);
+        break;
+    case music::title:
+        ptr = MUSIC_TITLE;
+        n = sizeof(MUSIC_TITLE) / sizeof(uint24_t);
         break;
     case music::battle:
         ptr = MUSIC_BATTLE;
@@ -335,6 +350,16 @@ void set_music(music m)
         savefile.music_type = m;
         play_music();
     }
+}
+
+void set_music_from_position()
+{
+    static_assert(uint8_t(music::peaceful) == 0, "");
+    static_assert(uint8_t(music::indoors ) == 1, "");
+    static_assert(uint8_t(music::dungeon ) == 2, "");
+    music m = music(tilesheet());
+    if(m == music::indoors) m = music::peaceful;
+    set_music(m);
 }
 
 uint16_t rand_seed;

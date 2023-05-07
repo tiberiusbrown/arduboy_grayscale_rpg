@@ -595,7 +595,11 @@ static void update_tp()
         load_chunks();
         run_chunks();
     }
-    if(frame == TELEPORT_TRANSITION_FRAMES * 2) change_state(STATE_MAP);
+    if(frame == TELEPORT_TRANSITION_FRAMES * 2)
+    {
+        change_state(STATE_MAP);
+        set_music_from_position();
+    }
 }
 
 static void update_game_over()
