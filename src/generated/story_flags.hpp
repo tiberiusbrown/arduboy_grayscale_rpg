@@ -95,6 +95,7 @@ constexpr uint16_t SFLAG_grave_skeleton = 201;
 constexpr uint16_t SFLAG_hermit_simulation_dialog = 230;
 constexpr uint16_t SFLAG_lightsout_pot_a = 166;
 constexpr uint16_t SFLAG_lightsout_pot_b = 167;
+constexpr uint16_t SFLAG_msg_save = 259;
 constexpr uint16_t SFLAG_outpostguard1 = 151;
 constexpr uint16_t SFLAG_outpostguard2 = 150;
 constexpr uint16_t SFLAG_outpostguard3 = 147;
