@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="850">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="867">
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer id="1" name="Tiles" width="256" height="256">
   <data encoding="csv">
@@ -3776,6 +3776,108 @@ $bnwt skip
 fs !msg_save
 msg {Before entering an unknown cave, it might be a good idea to save your game, as saving is only possible while outdoors.}
 skip:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="850" x="1256.5" y="793">
+   <properties>
+    <property name="script" value="$POT !pot33 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="851" x="1208.5" y="906.5">
+   <properties>
+    <property name="script" value="$POT !pot34 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="852" x="919" y="681.5">
+   <properties>
+    <property name="script" value="$POT !pot35 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="853" x="40" y="248.333">
+   <properties>
+    <property name="script" value="$POT !pot36 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="854" x="72" y="56.6667">
+   <properties>
+    <property name="script" value="$POT !pot37 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="855" x="408" y="88.6667">
+   <properties>
+    <property name="script" value="$POT !pot38 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="856" x="905" y="72.6667">
+   <properties>
+    <property name="script" value="$POT !pot39 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="857" x="999.667" y="72.3333">
+   <properties>
+    <property name="script" value="$POT !pot40 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="858" x="1225.33" y="41.3333">
+   <properties>
+    <property name="script" value="$POT !pot41 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="859" x="1352" y="40.6667">
+   <properties>
+    <property name="script" value="$POT !pot42 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="860" x="1304.33" y="536.667">
+   <properties>
+    <property name="script" value="$POT !pot43 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="861" x="1208.33" y="344.667">
+   <properties>
+    <property name="script" value="$POT !pot44 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="862" x="775.333" y="347.333">
+   <properties>
+    <property name="script" value="$POT !pot45 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="863" x="888" y="199.333">
+   <properties>
+    <property name="script" value="$POT !pot46 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="864" x="40" y="553.5">
+   <properties>
+    <property name="script" value="$POT !pot47 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="865" x="40.5" y="952.5">
+   <properties>
+    <property name="script" value="$POT !pot48 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="866" x="312.667" y="343.667">
+   <properties>
+    <property name="script" value="$POT !pot49 r8 1"/>
    </properties>
    <point/>
   </object>
