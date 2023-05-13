@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr int STORY_FLAG_BYTES = 33;
+constexpr int STORY_FLAG_BYTES = 35;
 
 constexpr uint16_t SFLAG_Hooded_Figure_Dream = 55;
 constexpr uint16_t SFLAG_ITEM_Agatha_s_Ring = 20;
@@ -138,6 +138,23 @@ constexpr uint16_t SFLAG_pot29 = 242;
 constexpr uint16_t SFLAG_pot30 = 243;
 constexpr uint16_t SFLAG_pot31 = 244;
 constexpr uint16_t SFLAG_pot32 = 247;
+constexpr uint16_t SFLAG_pot33 = 260;
+constexpr uint16_t SFLAG_pot34 = 261;
+constexpr uint16_t SFLAG_pot35 = 262;
+constexpr uint16_t SFLAG_pot36 = 263;
+constexpr uint16_t SFLAG_pot37 = 264;
+constexpr uint16_t SFLAG_pot38 = 265;
+constexpr uint16_t SFLAG_pot39 = 266;
+constexpr uint16_t SFLAG_pot40 = 267;
+constexpr uint16_t SFLAG_pot41 = 268;
+constexpr uint16_t SFLAG_pot42 = 269;
+constexpr uint16_t SFLAG_pot43 = 270;
+constexpr uint16_t SFLAG_pot44 = 271;
+constexpr uint16_t SFLAG_pot45 = 272;
+constexpr uint16_t SFLAG_pot46 = 273;
+constexpr uint16_t SFLAG_pot47 = 274;
+constexpr uint16_t SFLAG_pot48 = 275;
+constexpr uint16_t SFLAG_pot49 = 276;
 constexpr uint16_t SFLAG_pot_first_dungeon = 194;
 constexpr uint16_t SFLAG_puzblock_gate = 250;
 constexpr uint16_t SFLAG_puzcliff_done = 229;

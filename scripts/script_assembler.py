@@ -56,7 +56,7 @@ def init():
         id = 0
         with open('../arduboy_build/portrait_strings.bin', 'wb') as fo:
             for row in reader:
-                pn = row[1]
+                pn = row[1].split('#')[0]
                 if len(pn) > MAX_NAME_LENGTH:
                     print('Portrait name too long: "%s"' % row[1])
                     sys.exit(1)

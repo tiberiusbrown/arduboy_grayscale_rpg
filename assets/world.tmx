@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="867">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="877">
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer id="1" name="Tiles" width="256" height="256">
   <data encoding="csv">
@@ -3881,6 +3881,40 @@ skip:</property>
    </properties>
    <point/>
   </object>
+  <object id="867" x="2408" y="2103.88">
+   <properties>
+    <property name="script">$bnst end
+dlg P_Matthias {I shouldn't steal the village supplies.}
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="868" x="2392" y="2104.13">
+   <properties>
+    <property name="script">$bnst end
+dlg P_Matthias {I shouldn't steal the village supplies.}
+end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="871" x="231.273" y="408.727">
+   <properties>
+    <property name="script" value="ep S_Farmer_1 path"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="873" x="328" y="680">
+   <properties>
+    <property name="script" value="ep S_Farmer_2 path"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="875" x="296.364" y="599.636">
+   <properties>
+    <property name="script" value="ep S_Boy_1 path"/>
+   </properties>
+   <point/>
+  </object>
  </objectgroup>
  <objectgroup color="#ff0000" id="3" name="Paths">
   <object id="90" name="!story_got_fish" class="S_Mother" x="154.807" y="2122.27">
@@ -4329,6 +4363,18 @@ skip:</property>
   </object>
   <object id="822" name="hooded_figure" x="1334" y="1125.82">
    <polyline points="0,0 4.25,6"/>
+  </object>
+  <object id="869" name="path" x="250" y="427">
+   <polyline points="0,0 1,-8 -6.5,-3 -8,-9 -4.5,14.5 -50,13 -51,-2.5 -68,-5 -68,-21 -84,-20.8182 -84.1818,-35.7273 -76.9091,-34.4545 -77.6364,-38.8182 -87.4545,-37.3636 -80.1818,-31.3636"/>
+  </object>
+  <object id="872" x="378.909" y="651.091">
+   <polyline points="0,0 -4.36364,-3.09091 -2.90909,-8.54545 -7.45455,0.363636 -5.63636,13.0909 -113.818,12.9091 -116.909,32.5455 -111.455,28 -111.818,33.4545 -109.455,30.5455"/>
+  </object>
+  <object id="874" name="path" x="264.182" y="588.545">
+   <polyline points="0,0 4.18182,-6.90909 -5.81818,-2.72727 -2.72727,46.9091 2.36364,41.0909 2.72727,48"/>
+  </object>
+  <object id="876" x="258.727" y="837.455">
+   <polyline points="0,0 6.18182,-3.45455 0,4.90909 8.36364,-0.909091 2.36364,8.72727 11.4545,1.27273 8,8.18182 11.0909,6.18182 21.6364,4.18182 22.7273,20.5455 69.0909,19.2727 70,48.9091 114,44.9091 112.182,50 118.545,44.9091 112.364,54.1818 121.273,47.6364 116.727,54.7273 121.273,52.1818 121.273,55.8182"/>
   </object>
  </objectgroup>
  <objectgroup color="#aaaa00" id="4" name="Locations">
