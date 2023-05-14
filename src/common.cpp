@@ -41,6 +41,14 @@ uint8_t const SPRITE_FLAGS[] PROGMEM =
     SF_DONT_STOP | SF_ALWAYS_ANIM | SF_FAST_ANIM | SF_FAST_ANIM2 | SF_FAST | SF_SMALL_RECT, // spike ball
     SF_ALWAYS_ANIM | SF_FAST_ANIM, // dark raptor
     0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
 };
 
 static char const EN_DARK_GUARD[] PROGMEM = "Dark Guard";

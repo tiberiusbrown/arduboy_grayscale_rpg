@@ -55,6 +55,7 @@ static uint16_t calc_note_period(uint8_t note)
 // produce one sample
 static int8_t sample_channel(audio_channel& c)
 {
+    return 0;
     if(!c.ptr) return 0;
     if(c.paused) return 0;
 

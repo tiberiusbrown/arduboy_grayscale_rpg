@@ -172,6 +172,7 @@ static bool add_sprite_entry(draw_sprite_entry* entry, uint8_t ci,
         if(state == STATE_MAP || state == STATE_TITLE)
             f += (nf & 3);
     }
+
     entry->addr = SPRITES_IMG;
     entry->frame = f;
     entry->x = ox + e.x;

@@ -40,7 +40,7 @@ tiles = {
     }
 
 def id_helper(x):
-    return re.sub('[^a-zA-Z]+', '_', x)
+    return re.sub('[^a-zA-Z0-9]+', '_', x)
 
 def init():
     with open('sprites.csv', newline='') as f:
@@ -216,7 +216,7 @@ def addpath(b, s, eps):
         b += [0, 0]
         return
     if s not in eps:
-        print('Path "%s" not found' % s)
+        print('Path "%s" not found at %s' % (s, str(chunk)))
         sys.exit(1)
     b += eps[s]
 

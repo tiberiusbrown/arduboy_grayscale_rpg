@@ -122,12 +122,15 @@ def convert_path(obj):
         sys.exit(1)
     return tiles
 
-# convert all enemy paths
+# convert all sprite paths
 for obj in tm.layers[2]:
     chunk = pixel_to_chunk(obj.x, obj.y)
     tiles = convert_path(obj)
     openpath = 0 if obj.closed else 1
     if obj.name is not None and obj.name[0] == '!':
+        if not hasattr(obj, 'class'):
+            print('flagged sprite path missing class attribute: (%d, %d)' % (obj.x, obj.y))
+            sys.exit(1)
         f = script_assembler.flag(obj.name)
         bs[chunk] += [script_assembler.CMD.EPF._value_]
         bs[chunk] += [(f >> 0) % 256]
@@ -135,6 +138,10 @@ for obj in tm.layers[2]:
         bs[chunk] += [script_assembler.sprite(getattr(obj, 'class'))]
         bs[chunk] += [len(tiles), openpath] + tiles
         continue
+    elif hasattr(obj, 'class'):
+        bs[chunk] += [script_assembler.CMD.EP._value_]
+        bs[chunk] += [script_assembler.sprite(getattr(obj, 'class'))]
+        bs[chunk] += [len(tiles), openpath] + tiles
     epaths[chunk][obj.name] = [len(tiles), openpath] + tiles
 
 locations = {}
