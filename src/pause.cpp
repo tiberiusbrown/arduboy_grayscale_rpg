@@ -106,15 +106,29 @@ void update_pause()
             {
                 if(optionsi == 0)
                 {
-                    savefile.settings.sound ^= 2;
-                    platform_audio_from_savefile();
+                    platform_audio_toggle();
                 }
-                else if(optionsi == 1)
+                else if(platform_audio_enabled() && optionsi == 1)
                 {
-                    savefile.settings.sound ^= 1;
+                    uint8_t music = savefile.settings.music;
+                    if(music < 6 && (btns_pressed & (BTN_A | BTN_RIGHT)))
+                        music += 1;
+                    if(music > 0 && (btns_pressed & BTN_LEFT))
+                        music -= 1;
+                    savefile.settings.music = music;
                     platform_audio_from_savefile();
                 }
-                else if(optionsi == 2)
+                else if(platform_audio_enabled() && optionsi == 2)
+                {
+                    uint8_t sfx = savefile.settings.sfx;
+                    if(sfx < 6 && (btns_pressed & (BTN_A | BTN_RIGHT)))
+                        sfx += 1;
+                    if(sfx > 0 && (btns_pressed & BTN_LEFT))
+                        sfx -= 1;
+                    savefile.settings.sfx = sfx;
+                    platform_audio_from_savefile();
+                }
+                else if(optionsi == 3)
                 {
                     uint8_t game_speed = savefile.settings.game_speed;
                     if(game_speed < 6 && (btns_pressed & (BTN_A | BTN_RIGHT)))
@@ -123,15 +137,15 @@ void update_pause()
                         --game_speed;
                     savefile.settings.game_speed = game_speed;
                 }
-                else if(optionsi == 3)
-                {
-                    uint8_t brightness = savefile.settings.brightness;
-                    if(brightness < 3 && (btns_pressed & (BTN_A | BTN_RIGHT)))
-                        ++brightness;
-                    if(brightness > 0 && (btns_pressed & BTN_LEFT))
-                        --brightness;
-                    savefile.settings.brightness = brightness;
-                }
+                //else if(optionsi == 3)
+                //{
+                //    uint8_t brightness = savefile.settings.brightness;
+                //    if(brightness < 3 && (btns_pressed & (BTN_A | BTN_RIGHT)))
+                //        ++brightness;
+                //    if(brightness > 0 && (btns_pressed & BTN_LEFT))
+                //        --brightness;
+                //    savefile.settings.brightness = brightness;
+                //}
                 else if(optionsi == 4)
                     savefile.settings.no_battery_alert = !savefile.settings.no_battery_alert;
             }
@@ -217,7 +231,8 @@ void update_pause()
     adjust(d.partyy, state == OS_PARTY ? 64 : 0);
     adjust(d.optionsiy, d.optionsi * 12);
     adjust(d.quitiy, d.quiti * 13);
-    adjust(d.brightnessx, savefile.settings.brightness * 16);
+    adjust(d.musicx, savefile.settings.music * 8);
+    adjust(d.sfxx, savefile.settings.sfx * 8);
     adjust(d.speedx, savefile.settings.game_speed * 8);
     d.ally = d.optionsy | d.quity | d.partyy;
     d.state = state;
@@ -288,17 +303,21 @@ void render_pause()
     {
         uint8_t y = 64 - d.optionsy;
         platform_fx_drawoverwrite_i8(0, y, OPTIONS_IMG);
-        platform_fx_drawoverwrite_i8(int8_t(d.brightnessx + 70), y + 38, SLIDER_IMG);
-        platform_fx_drawoverwrite_i8(int8_t(d.speedx + 70), y + 26, SLIDER_IMG);
+        //platform_fx_drawoverwrite_i8(int8_t(d.brightnessx + 70), y + 38, SLIDER_IMG);
+        platform_fx_drawoverwrite_i8(int8_t(d.musicx + 70), y + 14, SLIDER_IMG);
+        platform_fx_drawoverwrite_i8(int8_t(d.sfxx + 70), y + 26, SLIDER_IMG);
+        platform_fx_drawoverwrite_i8(int8_t(d.speedx + 70), y + 38, SLIDER_IMG);
 
-        if(savefile.settings.sound & 2)
+        if(platform_audio_enabled())
             draw_options_check(y, 4);
-        if(savefile.settings.sound & 1)
-            draw_options_check(y, 16);
         if(!savefile.settings.no_battery_alert)
             draw_options_check(y, 52);
         if(plane() == 0)
+        {
+            if(!platform_audio_enabled())
+                platform_fillrect_i8(0, 15, 128, 21, BLACK);
             platform_drawrect_i8(0, y + d.optionsiy + 2, 128, 12, DARK_GRAY);
+        }
         platform_fade(15);
     }
     if(d.quity > 0)

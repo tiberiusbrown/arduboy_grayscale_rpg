@@ -167,7 +167,7 @@ extern uint8_t const FXDATA[];
 
 void platform_audio_play_song(uint24_t song)
 {
-    if(!(savefile.settings.sound & 2)) return;
+    if(!platform_audio_enabled() || savefile.settings.music == 0) return;
     SDL_LockAudioDevice(device);
     for(int i = 0; i < NUM_SCORE_CHANNELS; ++i)
     {
@@ -183,7 +183,7 @@ void platform_audio_play_song(uint24_t song)
 
 void platform_audio_play_sfx(uint24_t sfx, uint8_t channel)
 {
-    if(!(savefile.settings.sound & 1)) return;
+    if(!platform_audio_enabled() || savefile.settings.sfx == 0) return;
     SDL_LockAudioDevice(device);
     memset(&channels[NUM_SCORE_CHANNELS], 0, sizeof(audio_channel));
     sfx_channel = channel;
@@ -242,14 +242,7 @@ bool platform_audio_enabled()
 
 void platform_audio_from_savefile()
 {
-    if(platform_audio_song_playing())
-    {
-        bool pause = ((savefile.settings.sound & 2) == 0);
-        for(int i = 0; i < NUM_SCORE_CHANNELS; ++i)
-            channels[i].paused = pause;
-    }
-    if((savefile.settings.sound != 0) != platform_audio_enabled())
-        platform_audio_toggle();
+    // TODO
 }
 
 #endif

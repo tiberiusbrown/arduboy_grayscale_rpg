@@ -39,8 +39,8 @@ void load(bool first)
     {
         new_game();
         savefile.settings.no_battery_alert = false;
-        savefile.settings.sound = 3;
-        savefile.settings.brightness = 3;
+        savefile.settings.music = 3;
+        savefile.settings.sfx = 3;
         savefile.settings.game_speed = 3;
     }
 
@@ -50,8 +50,6 @@ void load(bool first)
 #if !TITLE_ONLY_DEMO
         Arduboy2Audio::begin();
 #endif
-        if(!Arduboy2Audio::enabled())
-            savefile.settings.sound = 0;
 #endif
     }
     else

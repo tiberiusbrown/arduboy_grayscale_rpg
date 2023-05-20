@@ -103,7 +103,7 @@ void initialize()
     uint8_t t = STATE_TITLE;
     if(!check_identifier(FX_IDENTIFIER_A) || !check_identifier(FX_IDENTIFIER_B))
     {
-        savefile.settings.brightness = 3;
+        //savefile.settings.brightness = 3;
         t = STATE_BADFX;
     }
     change_state(t);

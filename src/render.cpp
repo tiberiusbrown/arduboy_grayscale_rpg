@@ -142,6 +142,8 @@ static void render_title_graphics()
     platform_fx_drawplusmask(7, 0, 114, 16, TITLE_MASKED_IMG, 0);
     if(!d.going_to_resume && (nframe & 0x3f) < 0x30)
         platform_fx_drawplusmask(47, 48, 34, 16, PRESS_A_IMG, 0);
+    platform_fx_drawplusmask(117, 55, 11, 8, AUDIO_IMG,
+        platform_audio_enabled() ? 1 : 0);
 }
 
 static void render_title()
@@ -257,7 +259,8 @@ static void render_badfx()
 
 void render()
 {
-    platform_audio_update();
+    if(platform_audio_enabled())
+        platform_audio_update();
 
     using render_func = void (*)();
     static render_func const FUNCS[] PROGMEM = {

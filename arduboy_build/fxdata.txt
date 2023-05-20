@@ -37,6 +37,7 @@ raw_t TITLE_MASKED_IMG = "title_masked_img.bin"
 raw_t PRESS_A_IMG = "press_a_img.bin"
 raw_t OBJECTIVE_ARROWS_IMG = "objective_arrows_img.bin"
 raw_t WORLD_IMG = "world_img.bin"
+raw_t AUDIO_IMG = "audio_img.bin"
 
 raw_t SONG_TITLE = "song_title.bin"
 raw_t SONG_PEACEFUL = "song_peaceful.bin"

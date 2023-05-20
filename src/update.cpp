@@ -745,6 +745,8 @@ static void update_title()
                 d.going_to_resume = true;
             }
 #endif
+            if(btns_pressed & BTN_B)
+                platform_audio_toggle();
         }
     }
 
@@ -762,7 +764,10 @@ static void update_resume()
     if(d.fade_frame < 24)
         d.fade_frame += FADE_SPEED;
     else
+    {
         change_state(STATE_MAP);
+        set_music_from_position();
+    }
 }
 
 static void update_die()

@@ -124,8 +124,8 @@ void platform_fade(uint8_t f)
 #else
     static uint8_t const CONTRAST[] PROGMEM = { 0x6f, 0x9f, 0xcf, 0xff };
 #endif
-    uint8_t brightness = pgm_read_byte(&CONTRAST[savefile.settings.brightness]);
-    f = (f * brightness + f) >> 8;
+    //uint8_t brightness = pgm_read_byte(&CONTRAST[savefile.settings.brightness]);
+    //f = (f * brightness + f) >> 8;
 
 #ifdef ARDUINO
     FX::enableOLED();
@@ -539,7 +539,7 @@ bool platform_audio_enabled()
 
 void platform_audio_play_song(uint24_t song)
 {
-    if(savefile.settings.sound & 2)
+    if(platform_audio_enabled() && savefile.settings.music != 0)
     {
         SynthU::playSong(song);
     }
@@ -551,10 +551,10 @@ void platform_audio_play_sfx(uint24_t sfx, uint8_t channel)
 
 void platform_audio_from_savefile()
 {
-    if(platform_audio_song_playing() && (savefile.settings.sound & 2) == 0)
+    if(savefile.settings.music == 0)
         platform_audio_pause_song();
-    if((savefile.settings.sound != 0) != platform_audio_enabled())
-        platform_audio_toggle();
+    else
+        SynthU::setVolume(savefile.settings.music * 3);
 }
 
 void platform_audio_pause_song()

@@ -327,7 +327,9 @@ struct sdata_pause
     uint8_t optionsy;
     uint8_t optionsi;
     uint8_t optionsiy;
-    uint8_t brightnessx;
+    //uint8_t brightnessx;
+    uint8_t musicx;
+    uint8_t sfxx;
     uint8_t speedx;
 
     uint8_t quity;
@@ -557,8 +559,9 @@ struct party_member_t
 
 struct settings_t
 {
-    uint8_t sound;
-    uint8_t brightness;
+    uint8_t music;
+    uint8_t sfx;
+    //uint8_t brightness;
     uint8_t game_speed;
     bool no_battery_alert;
 };
