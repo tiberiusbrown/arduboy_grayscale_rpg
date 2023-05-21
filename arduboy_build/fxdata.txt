@@ -39,6 +39,9 @@ raw_t OBJECTIVE_ARROWS_IMG = "objective_arrows_img.bin"
 raw_t WORLD_IMG = "world_img.bin"
 raw_t AUDIO_IMG = "audio_img.bin"
 
+raw_t SFX_DAMAGE = "sfx_damage.bin"
+raw_t SFX_ITEM = "sfx_item.bin"
+
 raw_t SONG_TITLE = "song_title.bin"
 raw_t SONG_PEACEFUL = "song_peaceful.bin"
 raw_t SONG_PEACEFUL2 = "song_peaceful2.bin"

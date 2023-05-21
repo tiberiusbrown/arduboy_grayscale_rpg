@@ -181,12 +181,12 @@ void platform_audio_play_song(uint24_t song)
     SDL_UnlockAudioDevice(device);
 }
 
-void platform_audio_play_sfx(uint24_t sfx, uint8_t channel)
+void platform_audio_play_sfx(uint24_t sfx)
 {
     if(!platform_audio_enabled() || savefile.settings.sfx == 0) return;
     SDL_LockAudioDevice(device);
     memset(&channels[NUM_SCORE_CHANNELS], 0, sizeof(audio_channel));
-    sfx_channel = channel;
+    sfx_channel = 0;
     channels[NUM_SCORE_CHANNELS].beat_period = BEAT_PERIOD;
     channels[NUM_SCORE_CHANNELS].ptr = &FXDATA[sfx];
     SDL_UnlockAudioDevice(device);

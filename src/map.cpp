@@ -227,6 +227,7 @@ static bool run_chunk()
                     if(c == '\0') c = ' ';
                 }
                 ptr[ITEM_NAME_LEN - 1] = '\n';
+                platform_audio_play_sfx(SFX_ITEM);
                 goto pause_chunk;
             }
             break;
@@ -281,6 +282,7 @@ static bool run_chunk()
                     if(c == '\0') c = ' ';
                 }
                 sdata.dialog.message[sizeof(YOU_FOUND) - 1 + ITEM_NAME_LEN - 1] = '\n';
+                platform_audio_play_sfx(SFX_ITEM);
                 goto pause_chunk;
             }
             break;

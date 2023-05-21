@@ -541,12 +541,16 @@ void platform_audio_play_song(uint24_t song)
 {
     if(platform_audio_enabled() && savefile.settings.music != 0)
     {
-        SynthU::playSong(song);
+        SynthU::play(song);
     }
 }
 
-void platform_audio_play_sfx(uint24_t sfx, uint8_t channel)
+void platform_audio_play_sfx(uint24_t sfx)
 {
+    if(platform_audio_enabled() && savefile.settings.sfx != 0)
+    {
+        SynthU::playSFX(sfx);
+    }
 }
 
 void platform_audio_from_savefile()
@@ -555,6 +559,7 @@ void platform_audio_from_savefile()
         platform_audio_pause_song();
     else
         SynthU::setVolume(savefile.settings.music * 3);
+    SynthU::setVolumeSFX(savefile.settings.sfx * 3);
 }
 
 void platform_audio_pause_song()
@@ -567,19 +572,9 @@ void platform_audio_resume_song()
     SynthU::resume();
 }
 
-void platform_audio_stop_sfx()
-{
-    SynthU::stop();
-}
-
 bool platform_audio_song_playing()
 {
     return SynthU::playing();
-}
-
-bool platform_audio_sfx_playing()
-{
-    return false;
 }
 
 void platform_set_game_speed(uint8_t num, uint8_t denom)
@@ -591,11 +586,6 @@ void platform_set_game_speed(uint8_t num, uint8_t denom)
 
 void platform_audio_update()
 {
-#ifndef ARDUINO
-    if(platform_audio_song_playing() || platform_audio_sfx_playing())
-        assert(!platform_fx_busy());
-#endif
-
     if(!platform_audio_song_playing())
         play_music();
 }
