@@ -155,5 +155,6 @@ convert_sym('song_victory', slowdown=0.27)
 convert_sym('song_defeat', slowdown=1.2, transpose=6)
 convert_sym('song_battle', vol=1.0, transpose=6, vf=vf_fadeout2)
 
+convert_sym('sfx_chatter', tracks=1, vol=0.5, slowdown=0.25, transpose=18, vf=vf_fadeout2)
 convert_sym('sfx_damage', tracks=1, vol=0.7, slowdown=0.5, transpose=6, vf=vf_fadeout2)
 convert_sym('sfx_item', tracks=1, vol=0.7, transpose=6, vf=vf_fadeout2)

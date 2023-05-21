@@ -512,6 +512,12 @@ void platform_audio_update()
 {
     if(!SynthU::update())
         play_music();
+    uint8_t music = savefile.settings.music;
+    uint8_t music2 = music * 2;
+    if(!SynthU::playingSFX())
+        music2 += music;
+    SynthU::setVolume(music2);
+    SynthU::setVolumeSFX(savefile.settings.sfx * 3);
 }
 
 void platform_audio_init()
@@ -530,6 +536,7 @@ void platform_audio_on()
 void platform_audio_off()
 {
     Arduboy2Audio::off();
+    SynthU::stop();
 }
 
 bool platform_audio_enabled()
@@ -553,23 +560,20 @@ void platform_audio_play_sfx(uint24_t sfx)
     }
 }
 
+void platform_audio_stop_sfx()
+{
+    SynthU::stopSFX();
+}
+
+bool platform_audio_sfx_playing()
+{
+    return SynthU::playingSFX();
+}
+
 void platform_audio_from_savefile()
 {
     if(savefile.settings.music == 0)
-        platform_audio_pause_song();
-    else
-        SynthU::setVolume(savefile.settings.music * 3);
-    SynthU::setVolumeSFX(savefile.settings.sfx * 3);
-}
-
-void platform_audio_pause_song()
-{
-    SynthU::stop();
-}
-
-void platform_audio_resume_song()
-{
-    SynthU::resume();
+        SynthU::stop();
 }
 
 bool platform_audio_song_playing()

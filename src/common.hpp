@@ -708,10 +708,10 @@ void platform_audio_toggle();
 void platform_audio_from_savefile(); // update on/off from savefile.sound
 bool platform_audio_enabled();
 void platform_audio_play_song(uint24_t song); // set loop song
-void platform_audio_pause_song();
-void platform_audio_resume_song();
 bool platform_audio_song_playing();
 void platform_audio_play_sfx(uint24_t sfx);
+void platform_audio_stop_sfx();
+bool platform_audio_sfx_playing();
 void platform_audio_update();
 void platform_set_game_speed(uint8_t num, uint8_t denom);
 void platform_set_game_speed_default();

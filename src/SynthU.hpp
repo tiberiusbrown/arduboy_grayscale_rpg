@@ -50,6 +50,8 @@ struct SynthU
     static void setVolume(uint8_t vol);
     
     static void playSFX(uint24_t sfx);
+    static bool playingSFX();
+    static void stopSFX();
     static uint8_t volumeSFX();
     static void setVolumeSFX(uint8_t vol);
     
@@ -337,6 +339,15 @@ bool SynthU::playing()
     return synthu_detail::g_playing;
 }
 
+bool SynthU::playingSFX()
+{
+#if SYNTHU_ENABLE_SFX
+    return synthu_detail::g_playing_sfx;
+#else
+    return false;
+#endif
+}
+
 void SynthU::playSFX(uint24_t sfx)
 {
 #if SYNTHU_ENABLE_SFX
@@ -345,6 +356,13 @@ void SynthU::playSFX(uint24_t sfx)
     synthu_detail::load_fx_data();
     if(!synthu_detail::enabled())
         synthu_detail::enable();
+#endif
+}
+
+void SynthU::stopSFX()
+{
+#if SYNTHU_ENABLE_SFX
+    synthu_detail::g_playing_sfx = false;
 #endif
 }
 

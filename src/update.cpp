@@ -452,7 +452,7 @@ static void advance_dialog_animation()
 {
     auto& d = sdata.dialog;
     uint8_t char_progress = d.char_progress;
-    for(uint8_t i = 0; i < 2; ++i)
+    for(uint8_t i = 0; i < 1; ++i)
     {
         char c = d.message[char_progress];
         if(c != '\0') ++char_progress;
@@ -481,6 +481,8 @@ done:
 static void update_dialog()
 {
     auto& d = sdata.dialog;
+    if(d.char_progress == 0 && (uint8_t)d.name[0] != 254)
+        platform_audio_play_sfx(SFX_CHATTER);
     uint8_t third_newline = 255;
     {
         uint8_t n = 0;
@@ -495,6 +497,8 @@ static void update_dialog()
     }
     char current_char = d.message[d.char_progress];
     bool message_done = (current_char == '\0');
+    if(message_done)
+        platform_audio_stop_sfx();
     if(d.question)
     {
         adjust(d.questioniy, d.questioni * 11);
