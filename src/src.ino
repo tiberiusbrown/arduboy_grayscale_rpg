@@ -236,7 +236,7 @@ void setup()
     Serial.begin(9600);
 #endif
     
-    constexpr uint16_t FX_SAVE_PAGE = (FX_DATA_PAGE - 4096 / 256) & ~4095;
+    constexpr uint16_t FX_SAVE_PAGE = (FX_DATA_PAGE - 16) & ~15;
     //FX::begin(FX_DATA_PAGE, FX_SAVE_PAGE);
     //FX::enableOLED();
     
