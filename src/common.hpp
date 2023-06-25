@@ -284,6 +284,7 @@ enum {
     IT_RING,
     IT_AMULET,
     
+    IT_EQUIPPED,
     IT_CONSUMABLE,
     IT_NUM_CATS
 };
@@ -558,7 +559,7 @@ extern active_chunk_t active_chunks[4];
 struct party_member_t
 {
     battle_member_t battle;
-    item_t equipped_items[IT_NUM_CATS - 1];
+    item_t equipped_items[IT_NUM_CATS - 2];
 };
 
 struct settings_t

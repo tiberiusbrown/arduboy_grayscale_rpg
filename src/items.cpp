@@ -64,7 +64,7 @@ bool user_is_wearing(uint8_t user, item_t i)
 {
     uint8_t const* items = party[user].equipped_items;
     static_assert(sizeof(item_t) == 1, "revisit code here");
-    for(uint8_t n = 0; n < IT_NUM_CATS - 1; ++n)
+    for(uint8_t n = 0; n < IT_NUM_CATS - 2; ++n)
         if(deref_inc(items) == i) return true;
     return false;
     //uint8_t cat = item_cat(i);
@@ -101,13 +101,28 @@ void update_items_numcat(sdata_items& d)
         d.cat_nums[IT_CONSUMABLE] = 1;
     d.item_count = 0;
 
-    // restrict access to equippable items in battle
+    // only allow access to consumable items in battle
     if(state == STATE_BATTLE)
         return;
 
+#if 1
+    // always show equipped
+    d.cat_nums[IT_EQUIPPED] = 1;
+    d.item_count = 1;
+#else
+    {
+        auto const* p = party[d.user_index].equipped_items;
+        uint8_t n = 0;
+        for(uint8_t i = 0; i < IT_NUM_CATS - 2; ++i)
+            if(deref_inc(p) != INVALID_ITEM)
+                ++n;
+        d.cat_nums[IT_EQUIPPED] = n;
+    }
+#endif
+
     ROTA_FOREACH_ITEM(i, {
         ++d.cat_nums[item_cat(i)];
-        ++d.item_count;
+        //++d.item_count;
     });
 }
 
@@ -188,7 +203,26 @@ bool update_items(sdata_items& d)
         d.off = d.n - 2;
     if((btns_pressed & BTN_A) && d.cat != IT_CONSUMABLE)
     {
-        item_t selitem = selected_item(d);
+        item_t selitem;
+        if(d.cat == IT_EQUIPPED)
+        {
+            auto const* p = party[d.user_index].equipped_items;
+            uint8_t n = 0;
+            for(uint8_t cat = 0; cat < IT_NUM_CATS - 2; ++cat)
+            {
+                selitem = deref_inc(p);
+                if(selitem != INVALID_ITEM)
+                {
+                    if(n == d.n)
+                        break;
+                    ++n;
+                }
+            }
+        }
+        else
+        {
+            selitem = selected_item(d);
+        }
         if(selitem != INVALID_ITEM)
             toggle_item(d.user_index, selitem);
     }
@@ -310,6 +344,17 @@ static void render_items_page(
             if(n >= 3) break;
             render_consumable_row(x, y, d, n, ni);
             ++n;
+        }
+    }
+    else if(cat == IT_EQUIPPED)
+    {
+        item_t const* p = &party[d.user_index].equipped_items[0];
+        uint8_t n = 0;
+        for(uint8_t cat = 0; cat < IT_NUM_CATS - 2; ++cat)
+        {
+            item_t i = (item_t)deref_inc(p);
+            if(i != INVALID_ITEM)
+                render_item_row(x, y, cat, d, i, n);
         }
     }
     else
