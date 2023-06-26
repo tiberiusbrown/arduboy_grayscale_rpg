@@ -564,8 +564,11 @@ void update_battle()
         // check for stun item
         {
             uint8_t n = user_item_count<
-                SFLAG_ITEM_Boxing_Gloves>
-                (attacker);
+                SFLAG_ITEM_Boxing_Gloves,
+                SFLAG_ITEM_Blinding_Gaze,
+                SFLAG_ITEM_Paralytic_Claws,
+                SFLAG_ITEM_Ardu_s_Brilliance
+                >(attacker);
             if(n > 0)
             {
                 if(d.special_attack == CIT_Ardu_s_Frenzy)
@@ -581,8 +584,10 @@ void update_battle()
         {
             uint8_t v = user_item_count<
                 SFLAG_ITEM_Small_Vampiric_Dagger,
-                SFLAG_ITEM_Lifedrain_Necklace>
-                (attacker);
+                SFLAG_ITEM_Lifedrain_Necklace,
+                SFLAG_ITEM_Lifedrain_Staff,
+                SFLAG_ITEM_Vampiric_Claws
+                >(attacker);
             take_damage(attacker, -(int8_t)v);
         }
 
