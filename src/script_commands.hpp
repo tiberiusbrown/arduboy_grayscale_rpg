@@ -177,6 +177,7 @@ Other Assembly Syntax
     $tdlg             tdlg $T
     $ttp              ttp $T
     $wtp              wtp $T
+    $ept              ept $T
     $bnst             bnst $T
     $bnwt             bnwt $T
     $st               st $T

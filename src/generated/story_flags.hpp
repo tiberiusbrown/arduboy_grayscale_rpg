@@ -281,6 +281,7 @@ constexpr uint16_t SFLAG_spike_done = 231;
 constexpr uint16_t SFLAG_story_charlie_job = 161;
 constexpr uint16_t SFLAG_story_fish_delivered = 178;
 constexpr uint16_t SFLAG_story_got_fish = 54;
+constexpr uint16_t SFLAG_story_guards_attack = 283;
 constexpr uint16_t SFLAG_story_met_catherine = 179;
 constexpr uint16_t SFLAG_tip_objective = 177;
 constexpr uint16_t SFLAG_tunic_tutorial_done = 158;

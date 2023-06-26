@@ -179,6 +179,7 @@ for obj in tm.layers[1]:
             t = t.replace('$wtp ', 'wtp $T ')
             t = t.replace('$bnst ', 'bnst $T ')
             t = t.replace('$bnwt ', 'bnwt $T ')
+            t = t.replace('$ept', 'ept $T ')
             t = t.replace('$st ', 'st $T ')
             t = t.replace('$stf ', 'stf $T ')
             t = t.replace('$CHEST ', 'CHEST $T ')
