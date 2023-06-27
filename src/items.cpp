@@ -62,6 +62,7 @@ uint8_t item_cat(item_t i)
 
 bool user_is_wearing(uint8_t user, item_t i)
 {
+    if(i >= 4) return false;
     uint8_t const* items = party[user].equipped_items;
     static_assert(sizeof(item_t) == 1, "revisit code here");
     for(uint8_t n = 0; n < IT_NUM_CATS - 2; ++n)

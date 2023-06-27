@@ -179,10 +179,24 @@ static void take_damage(uint8_t i, int8_t dam)
     auto& d = sdata.battle;
     auto& s = d.sprites[i];
     uint8_t& hp = member(i).hp;
+    uint8_t attacker = d.attacker_id;
 
     // defenders take half damage
-    if(dam > 0 && (i == d.pdef || i == d.edef))
-        dam = asr(dam + 1);
+    if(dam > 0)
+    {
+        // check for Mirror Shield (reflects damage)
+        if(user_is_wearing(i, SFLAG_ITEM_Mirror_Shield))
+            take_damage(attacker, dam);
+
+        if(i == d.pdef || i == d.edef)
+            dam = asr(dam + 1);
+    }
+
+    if(dam < 0)
+    {
+        if(user_is_wearing(i, SFLAG_ITEM_Necklace_of_Healing))
+            dam *= 2;
+    }
 
     int8_t new_hp = hp - dam;
     if(new_hp < 0) new_hp = 0;
@@ -194,8 +208,32 @@ static void take_damage(uint8_t i, int8_t dam)
 
     hp = new_hp;
     s.hpt = calc_hp_bar_width(hp, mhp);
-    if(dam > 0)
+
+    if(attacker < 4 && dam > 0)
+    {
         s.damaged = DAMAGED_FRAMES;
+        // check for stun item
+        {
+            uint8_t n = user_item_count<
+                SFLAG_ITEM_Boxing_Gloves,
+                SFLAG_ITEM_Blinding_Gaze,
+                SFLAG_ITEM_Paralytic_Claws,
+                SFLAG_ITEM_Ardu_s_Brilliance
+            >(attacker);
+            if(n > 0) s.flags |= BFLAG_STUNNED;
+        }
+
+        // check for Vampiric item (heals 1 health after each attack)
+        {
+            uint8_t v = user_item_count<
+                SFLAG_ITEM_Small_Vampiric_Dagger,
+                SFLAG_ITEM_Lifedrain_Necklace,
+                SFLAG_ITEM_Lifedrain_Staff,
+                SFLAG_ITEM_Vampiric_Claws
+            >(attacker);
+            take_damage(attacker, -(int8_t)v);
+        }
+    }
 }
 
 static void battle_enemy_attack(uint8_t i)
@@ -533,6 +571,10 @@ void update_battle()
         {
             dam = calc_attack_damage(attacker, defender);
             take_damage(defender, (int8_t)dam);
+            if(user_is_wearing(attacker, SFLAG_ITEM_Furious_Blade))
+                take_damage(defender ^ 1, (int8_t)dam);
+            if(user_is_wearing(attacker, SFLAG_ITEM_Oversized_Bludgeon))
+                d.sprites[attacker].flags |= BFLAG_STUNNED;
         }
         platform_audio_play_sfx(SFX_DAMAGE);
 
@@ -561,36 +603,6 @@ void update_battle()
             take_damage(ally, -int8_t(catherine_heal));
         }
 
-        // check for stun item
-        {
-            uint8_t n = user_item_count<
-                SFLAG_ITEM_Boxing_Gloves,
-                SFLAG_ITEM_Blinding_Gaze,
-                SFLAG_ITEM_Paralytic_Claws,
-                SFLAG_ITEM_Ardu_s_Brilliance
-                >(attacker);
-            if(n > 0)
-            {
-                if(d.special_attack == CIT_Ardu_s_Frenzy)
-                {
-                    for(uint8_t i = 4; i < 8; ++i)
-                        d.sprites[i].flags |= BFLAG_STUNNED;
-                }
-                else d.sprites[defender].flags |= BFLAG_STUNNED;
-            }
-        }
-
-        // check for Vampiric item (heals 1 health after each attack)
-        {
-            uint8_t v = user_item_count<
-                SFLAG_ITEM_Small_Vampiric_Dagger,
-                SFLAG_ITEM_Lifedrain_Necklace,
-                SFLAG_ITEM_Lifedrain_Staff,
-                SFLAG_ITEM_Vampiric_Claws
-                >(attacker);
-            take_damage(attacker, -(int8_t)v);
-        }
-
         d.special_attack = 0;
 
         break;
@@ -614,8 +626,12 @@ void update_battle()
         {
             tx = DEFEND_X1, di = d.pdef, d.pdef = attacker_id;
             uint8_t n = user_item_count<
-                SFLAG_ITEM_River_Amulet>
-                (attacker_id);
+                SFLAG_ITEM_River_Amulet,
+                SFLAG_ITEM_River_Band,
+                SFLAG_ITEM_River_Shield,
+                SFLAG_ITEM_River_Helm,
+                SFLAG_ITEM_River_Shoes
+                >(attacker_id);
             take_damage(attacker_id, -3 * n);
         }
         else
