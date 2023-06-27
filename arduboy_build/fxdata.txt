@@ -45,11 +45,11 @@ raw_t SFX_ITEM = "sfx_item.bin"
 
 raw_t SONG_TITLE = "song_title.bin"
 raw_t SONG_PEACEFUL = "song_peaceful.bin"
-raw_t SONG_PEACEFUL2 = "song_peaceful2.bin"
 raw_t SONG_DUNGEON = "song_dungeon.bin"
 raw_t SONG_VICTORY = "song_victory.bin"
 raw_t SONG_DEFEAT = "song_defeat.bin"
 raw_t SONG_BATTLE = "song_battle.bin"
+raw_t SONG_BATTLE2 = "song_battle2.bin"
 
 // put string data last to avoid large diffs in git when scripts are updated
 raw_t ITEM_INFO = "item_info.bin"

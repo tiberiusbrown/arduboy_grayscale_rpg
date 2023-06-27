@@ -51,7 +51,7 @@ constexpr uint8_t NUM_SCORE_CHANNELS = 2;
 void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num);
 
 #define SYNTHU_NUM_CHANNELS 4
-#define SYNTHU_UPDATE_EVERY_N_FRAMES 5
+#define SYNTHU_UPDATE_EVERY_N_FRAMES 3
 #define SYNTHU_ENABLE_SFX 1
 #define SYNTHU_FX_READDATABYTES_FUNC platform_fx_read_data_bytes
 #include "SynthU.hpp"

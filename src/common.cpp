@@ -293,11 +293,6 @@ void play_music()
     static uint24_t const MUSIC_PEACEFUL[] PROGMEM =
     {
         SONG_PEACEFUL,
-        SONG_PEACEFUL2,
-    };
-    static uint24_t const MUSIC_INDOORS[] PROGMEM =
-    {
-        SONG_PEACEFUL2,
     };
     static uint24_t const MUSIC_DUNGEON[] PROGMEM =
     {
@@ -305,11 +300,12 @@ void play_music()
     };
     static uint24_t const MUSIC_TITLE[] PROGMEM =
     {
-        SONG_TITLE,
+        SONG_BATTLE,
     };
     static uint24_t const MUSIC_BATTLE[] PROGMEM =
     {
         SONG_BATTLE,
+        SONG_BATTLE2,
     };
     static uint24_t const MUSIC_DEFEAT[] PROGMEM =
     {
@@ -320,10 +316,6 @@ void play_music()
     case music::peaceful:
         ptr = MUSIC_PEACEFUL;
         n = sizeof(MUSIC_PEACEFUL) / sizeof(uint24_t);
-        break;
-    case music::indoors:
-        ptr = MUSIC_INDOORS;
-        n = sizeof(MUSIC_INDOORS) / sizeof(uint24_t);
         break;
     case music::dungeon:
         ptr = MUSIC_DUNGEON;

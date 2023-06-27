@@ -47,9 +47,9 @@ https://gumpyfunction.itch.io/game-boy-rpg-fantasy-tileset-free
 Music
 =============================================================================
 
-battle     NES Game: Power Blade - Boss
-title      NES Game: Final Fantasy II (Japan) - Theme
-dungeon    NES Game: Dragon Warrior - Cave
-peaceful   NES Game: Final Fantasy II (Japan) - Town (3)
-peaceful2  NES Game: Final Fantasy (Japan) - Town
+battle     Boss Battle #5 by nene -- https://opengameart.org/content/boss-battle-5-8-bit (CC0)
+battle2    Long Away Home by nene -- https://opengameart.org/content/long-away-home-8bit (CC0)
+title      Remember -- https://opengameart.org/content/darkbasic-music-library (CC0)
+dungeon    Derelict by northivanastan -- https://opengameart.org/content/derelict (CC0)
+peaceful   Good Endings by northivanastan -- https://opengameart.org/content/good-endings (CC0)
 defeat     NES Game: Final Fantasy (Japan) - Dead

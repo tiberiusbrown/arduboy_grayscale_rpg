@@ -136,7 +136,7 @@ def convert(fin, fout, tracks=4, tps=48, vol=0.5, transpose=0, slowdown=1.0, vf=
 def convert_sym(sym, **args):
     kwargs = {
         'tracks': 4,
-        'tps':    31,
+        'tps':    52,
         'vol':    0.5,
         'vf':     vf_fadeout4
         }
@@ -147,13 +147,13 @@ def convert_sym(sym, **args):
         '../arduboy_build/' + sym + '.bin',
         **kwargs)
  
-convert_sym('song_title', vol=0.8, slowdown=1.0, transpose=6)
-convert_sym('song_peaceful' , transpose=6, vol=0.7)
-convert_sym('song_peaceful2' , transpose=4, vol=0.5)
-convert_sym('song_dungeon' , transpose=0, slowdown=1.22, vol=0.7)
+convert_sym('song_title', vol=0.7, slowdown=1.0, transpose=-4)
+convert_sym('song_peaceful' , transpose=0, vol=0.6)
+convert_sym('song_dungeon' , transpose=0, slowdown=1, vol=0.8)
 convert_sym('song_victory', slowdown=0.27)
 convert_sym('song_defeat', slowdown=1.2, transpose=6)
-convert_sym('song_battle', vol=1.0, transpose=6, vf=vf_fadeout2)
+convert_sym('song_battle', vol=0.8, slowdown=1, transpose=12, vf=vf_fadeout2)
+convert_sym('song_battle2', vol=0.8, slowdown=1, transpose=12, vf=vf_fadeout2)
 
 convert_sym('sfx_chatter', tracks=1, vol=0.5, slowdown=0.25, transpose=18, vf=vf_fadeout2)
 convert_sym('sfx_damage', tracks=1, vol=0.7, slowdown=0.5, transpose=6, vf=vf_fadeout2)
