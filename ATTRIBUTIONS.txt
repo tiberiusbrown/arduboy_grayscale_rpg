@@ -52,4 +52,4 @@ battle2    Long Away Home by nene -- https://opengameart.org/content/long-away-h
 title      Remember -- https://opengameart.org/content/darkbasic-music-library (CC0)
 dungeon    Derelict by northivanastan -- https://opengameart.org/content/derelict (CC0)
 peaceful   Good Endings by northivanastan -- https://opengameart.org/content/good-endings (CC0)
-defeat     NES Game: Final Fantasy (Japan) - Dead
+defeat     Own Composition (brow1067)

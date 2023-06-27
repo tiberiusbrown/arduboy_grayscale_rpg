@@ -11,8 +11,8 @@ using uint24_t = uint32_t;
 
 // Initialize FX hardware using  FX::begin(FX_DATA_PAGE); in the setup() function.
 
-constexpr uint16_t FX_DATA_PAGE  = 0xf49b;
-constexpr uint24_t FX_DATA_BYTES = 746718;
+constexpr uint16_t FX_DATA_PAGE  = 0xf4e6;
+constexpr uint24_t FX_DATA_BYTES = 727374;
 
 constexpr uint24_t FX_IDENTIFIER_A = 0x000000;
 constexpr uint24_t MAPDATA = 0x000008;
@@ -55,10 +55,10 @@ constexpr uint24_t SONG_PEACEFUL = 0x083E90;
 constexpr uint24_t SONG_DUNGEON = 0x08FFFD;
 constexpr uint24_t SONG_VICTORY = 0x09C81E;
 constexpr uint24_t SONG_DEFEAT = 0x09C9CB;
-constexpr uint24_t SONG_BATTLE = 0x0A21BF;
-constexpr uint24_t SONG_BATTLE2 = 0x0AD7CC;
-constexpr uint24_t ITEM_INFO = 0x0B23C4;
-constexpr uint24_t PORTRAIT_STRINGS = 0x0B4418;
-constexpr uint24_t GAME_OVER_MESSAGES = 0x0B4558;
-constexpr uint24_t STRINGDATA = 0x0B4A68;
-constexpr uint24_t FX_IDENTIFIER_B = 0x0B64D6;
+constexpr uint24_t SONG_BATTLE = 0x09D62F;
+constexpr uint24_t SONG_BATTLE2 = 0x0A8C3C;
+constexpr uint24_t ITEM_INFO = 0x0AD834;
+constexpr uint24_t PORTRAIT_STRINGS = 0x0AF888;
+constexpr uint24_t GAME_OVER_MESSAGES = 0x0AF9C8;
+constexpr uint24_t STRINGDATA = 0x0AFED8;
+constexpr uint24_t FX_IDENTIFIER_B = 0x0B1946;

@@ -151,7 +151,7 @@ convert_sym('song_title', vol=0.7, slowdown=1.0, transpose=-4)
 convert_sym('song_peaceful' , transpose=0, vol=0.6)
 convert_sym('song_dungeon' , transpose=0, slowdown=1, vol=0.8)
 convert_sym('song_victory', slowdown=0.27)
-convert_sym('song_defeat', slowdown=1.2, transpose=6)
+convert_sym('song_defeat', vol=0.8, slowdown=1.2, transpose=-6)
 convert_sym('song_battle', vol=0.8, slowdown=1, transpose=12, vf=vf_fadeout2)
 convert_sym('song_battle2', vol=0.8, slowdown=1, transpose=12, vf=vf_fadeout2)
 
