@@ -300,8 +300,7 @@ void play_music()
     };
     static uint24_t const MUSIC_TITLE[] PROGMEM =
     {
-        SONG_DEFEAT,
-        //SONG_TITLE,
+        SONG_TITLE,
     };
     static uint24_t const MUSIC_BATTLE[] PROGMEM =
     {
