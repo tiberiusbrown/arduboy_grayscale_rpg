@@ -105,6 +105,7 @@ constexpr uint16_t SFLAG_cave_guard = 177;
 constexpr uint16_t SFLAG_charlie_raptor = 205;
 constexpr uint16_t SFLAG_cliffdoor = 259;
 constexpr uint16_t SFLAG_dismas_sorry = 234;
+constexpr uint16_t SFLAG_dream_msg_done = 309;
 constexpr uint16_t SFLAG_dryad_lever = 210;
 constexpr uint16_t SFLAG_dryadpuz1 = 227;
 constexpr uint16_t SFLAG_dryadpuz2 = 228;

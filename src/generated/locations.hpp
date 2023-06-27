@@ -18,7 +18,7 @@ inline void LOC_first_cave_outside              () { px =   240; py =   176; }
 inline void LOC_first_cave_inside               () { px =  2320; py =  2256; }
 inline void LOC_first_cave_ladder               () { px =  2576; py =  2112; }
 inline void LOC_first_cave_exit                 () { px =   256; py =   128; }
-inline void LOC_new_game                        () { px =  2208; py =  2416; }
+inline void LOC_dream_start                     () { px =  2208; py =  2416; }
 inline void LOC_dismas_house_inside             () { px =   480; py =  2144; }
 inline void LOC_dismas_house_outside            () { px =   272; py =  1584; }
 inline void LOC_out_portal_raptor               () { px =  1168; py =  1584; }
@@ -70,3 +70,4 @@ inline void LOC_catherinehouse_outside          () { px =   928; py =   864; }
 inline void LOC_puzseq_inside                   () { px =  2928; py =  2704; }
 inline void LOC_puzseq_outside                  () { px =   544; py =  1712; }
 inline void LOC_obj_town                        () { px =  1808; py =  1424; }
+inline void LOC_new_game                        () { px =  2384; py =  2528; }
