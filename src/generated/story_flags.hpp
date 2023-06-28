@@ -189,6 +189,7 @@ constexpr uint16_t SFLAG_pot51 = 311;
 constexpr uint16_t SFLAG_pot52 = 312;
 constexpr uint16_t SFLAG_pot53 = 313;
 constexpr uint16_t SFLAG_pot54 = 314;
+constexpr uint16_t SFLAG_pot55 = 315;
 constexpr uint16_t SFLAG_pot_first_dungeon = 225;
 constexpr uint16_t SFLAG_puzblock_gate = 281;
 constexpr uint16_t SFLAG_puzcliff_done = 260;

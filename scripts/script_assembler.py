@@ -504,6 +504,9 @@ def assemble(s, eps, chunk):
             n = int(s[i]); i += 1
             b.append(CMD.BNST)
             b.append(t)
+            b.append(10)
+            b.append(CMD.BFS)
+            addflag(b, f)
             b.append(6)
             b.append(CMD.FS)
             addflag(b, f)
