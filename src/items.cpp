@@ -106,20 +106,18 @@ void update_items_numcat(sdata_items& d)
     if(state == STATE_BATTLE)
         return;
 
-#if 1
-    // always show equipped
-    d.cat_nums[IT_EQUIPPED] = 1;
     d.item_count = 1;
-#else
+
     {
         auto const* p = party[d.user_index].equipped_items;
         uint8_t n = 0;
         for(uint8_t i = 0; i < IT_NUM_CATS - 2; ++i)
             if(deref_inc(p) != INVALID_ITEM)
                 ++n;
+        // always show equipped
+        if(n == 0) n = 1;
         d.cat_nums[IT_EQUIPPED] = n;
     }
-#endif
 
     ROTA_FOREACH_ITEM(i, {
         ++d.cat_nums[item_cat(i)];
@@ -172,14 +170,15 @@ bool update_items(sdata_items& d)
 
     if(d.item_count != 0)
     {
-        d.pcat = d.cat;
+        uint8_t dcat = d.cat;
+        d.pcat = dcat;
         if(btns_pressed & BTN_LEFT)
         {
             do
             {
                 d.off = d.n = 0;
-                if(d.cat-- == 0) d.cat = IT_NUM_CATS - 1;
-            } while(d.cat_nums[d.cat] == 0);
+                if(dcat-- == 0) dcat = IT_NUM_CATS - 1;
+            } while(d.cat_nums[dcat] == 0);
             d.x = 0;
             d.xt = 128;
         }
@@ -188,20 +187,30 @@ bool update_items(sdata_items& d)
             do
             {
                 d.off = d.n = 0;
-                if(d.cat++ == IT_NUM_CATS - 1) d.cat = 0;
-            } while(d.cat_nums[d.cat] == 0);
+                if(dcat++ == IT_NUM_CATS - 1) dcat = 0;
+            } while(d.cat_nums[dcat] == 0);
             d.x = 128;
             d.xt = 0;
         }
+        d.cat = dcat;
     }
-    if((btns_pressed & BTN_UP) && d.n > 0)
-        --d.n;
-    if((btns_pressed & BTN_DOWN) && uint8_t(d.n + 1) < d.cat_nums[d.cat])
-        ++d.n;
-    if(d.off > d.n)
-        d.off = d.n;
-    if(d.off < d.n - 2)
-        d.off = d.n - 2;
+    {
+        uint8_t dn = d.n;
+        if((btns_pressed & BTN_UP) && dn > 0)
+            --dn;
+        if(btns_pressed & BTN_DOWN)
+            ++dn;
+        uint8_t maxn = d.cat_nums[d.cat];
+        if(dn >= maxn)
+            dn = maxn - 1;
+        uint8_t doff = d.off;
+        if(doff > dn)
+            doff = dn;
+        d.n = dn;
+        if(uint8_t(doff + 2) < dn)
+            doff = dn - 2;
+        d.off = doff;
+    }
     if((btns_pressed & BTN_A) && d.cat != IT_CONSUMABLE)
     {
         item_t selitem;
@@ -226,6 +235,7 @@ bool update_items(sdata_items& d)
         }
         if(selitem != INVALID_ITEM)
             toggle_item(d.user_index, selitem);
+        update_items_numcat(d);
     }
     if(d.conspause > 0)
     {

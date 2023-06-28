@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="902">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="907">
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer id="1" name="Tiles" width="256" height="256">
   <data encoding="csv">
@@ -3999,6 +3999,36 @@ msg {What... what's happening?}
 fs !dream_msg_done
 tp @dream_start
 end:</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="902" x="872.25" y="985">
+   <properties>
+    <property name="script" value="$POT !pot50 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="903" x="1208" y="2298">
+   <properties>
+    <property name="script" value="$POT !pot51 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="904" x="1128" y="2235.33">
+   <properties>
+    <property name="script" value="$POT !pot52 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="905" x="1337.33" y="2216.67">
+   <properties>
+    <property name="script" value="$POT !pot53 r8 1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="906" x="1240" y="2120.67">
+   <properties>
+    <property name="script" value="$POT !pot54 r8 1"/>
    </properties>
    <point/>
   </object>
