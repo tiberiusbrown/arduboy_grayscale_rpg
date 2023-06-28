@@ -4055,7 +4055,7 @@ end:</property>
   <object id="132" name="catherine_fountain" x="968.375" y="905">
    <polygon points="48,-2 48.75,46 0.25,46.75 -2,-0.75"/>
   </object>
-  <object id="134" name="Charlie" class="S_Old_Charlie" x="1189.2" y="1017.42">
+  <object id="134" name="Charlie" x="1189.2" y="1017.42">
    <polyline points="-31.25,0 -28,-6"/>
   </object>
   <object id="136" name="guard" x="1143.38" y="902.75">
