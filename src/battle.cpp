@@ -86,7 +86,7 @@ static void init_hp_bars()
     {
         auto& s = d.sprites[i];
         if(!s.active) continue;
-        s.hpt = calc_hp_bar_width(member(i).hp, get_mhp(i));
+        s.hpt = s.hp = calc_hp_bar_width(member(i).hp, get_mhp(i));
     }
 }
 
@@ -190,6 +190,8 @@ static void take_damage(uint8_t i, int8_t dam)
 
         if(i == d.pdef || i == d.edef)
             dam = asr(dam + 1);
+
+        s.damaged = DAMAGED_FRAMES;
     }
 
     if(dam < 0)
@@ -209,9 +211,8 @@ static void take_damage(uint8_t i, int8_t dam)
     hp = new_hp;
     s.hpt = calc_hp_bar_width(hp, mhp);
 
-    if(attacker < 4 && dam > 0)
+    if(dam > 0 && attacker < 4)
     {
-        s.damaged = DAMAGED_FRAMES;
         // check for stun item
         {
             uint8_t n = user_item_count<
@@ -402,8 +403,11 @@ static void update_battle_sprites()
             continue;
         }
         uint8_t shp = s.hp, shpt = s.hpt;
-        if(shp > shpt) shp -= uint8_t(shp - shpt + 3) / 4;
-        if(shp < shpt) shp += uint8_t(shpt - shp + 3) / 4;
+        if(d.frame & 1)
+        {
+            if(shp > shpt) shp -= 1;
+            if(shp < shpt) shp += 1;
+        }
         s.hp = shp;
         int8_t sx = s.x;
         int8_t sy = s.y;
