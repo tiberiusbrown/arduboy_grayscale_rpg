@@ -653,6 +653,7 @@ void update_battle()
             phase = BPHASE_MENU, d.msel = 2;
         if(d.itemsy != 64)
             break;
+        d.items.user_index = d.attacker_id;
         if(!update_items(d.items))
             break;
         uint8_t consumed = d.items.consumed;
