@@ -272,6 +272,7 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
     }
     int16_t x;
 #if ARDUINO_ARCH_AVR
+    uint8_t p = plane();
     asm volatile(R"ASM(
             clr %[t]
             sbrs %B[ox], 7
@@ -320,10 +321,9 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
             add  %A[tiles], %[t]
             adc  %B[tiles], __zero_reg__
             
-            lds  __tmp_reg__, %[plane]
-            swap __tmp_reg__
-            lsl  __tmp_reg__
-            add  %A[tile_img], __tmp_reg__
+            swap %[plane]
+            lsl  %[plane]
+            add  %A[tile_img], %[plane]
             adc  %B[tile_img], __zero_reg__
             adc  %C[tile_img], __zero_reg__
         )ASM"
@@ -336,7 +336,7 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
         [tiles]    "+&r" (tiles),
         [tile_img] "+&r" (tile_img)
         :
-        [plane] ""    (&abg_detail::current_plane)
+        [plane]    "r"   (p)
         );
 #else
 

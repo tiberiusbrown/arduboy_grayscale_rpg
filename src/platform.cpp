@@ -270,7 +270,7 @@ void platform_drawoverwrite(int16_t x, int16_t y, uint8_t const* bitmap,
     uint8_t frame)
 {
 #ifdef ARDUINO
-    SpritesU::drawOverwrite(x, y, bitmap, frame * PLANES + a.currentPlane());
+    SpritesU::drawOverwrite(x, y, bitmap, frame * PLANES + plane());
 #else
     uint8_t w = pgm_read_byte(bitmap++);
     uint8_t h = pgm_read_byte(bitmap++);
@@ -283,7 +283,7 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h)
 {
 #ifdef ARDUINO
-    SpritesU::drawOverwriteFX(x, y, w, h, addr, frame * PLANES + a.currentPlane());
+    SpritesU::drawOverwriteFX(x, y, w, h, addr, frame * PLANES + plane());
 #else
     auto now = SDL_GetTicks64();
     assert(now >= ticks_when_ready);
@@ -308,7 +308,7 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame)
 {
 #ifdef ARDUINO
-    SpritesU::drawOverwriteFX(x, y, addr, frame * PLANES + a.currentPlane());
+    SpritesU::drawOverwriteFX(x, y, addr, frame * PLANES + plane());
 #else
     uint8_t w = FXDATA[addr + 0];
     uint8_t h = FXDATA[addr + 1];
@@ -329,7 +329,7 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint8_t w, uint8_t h,
     uint24_t addr, uint16_t frame)
 {
 #ifdef ARDUINO
-    SpritesU::drawPlusMaskFX(x, y, w, h, addr, frame * PLANES + a.currentPlane());
+    SpritesU::drawPlusMaskFX(x, y, w, h, addr, frame * PLANES + plane());
 #else
     assert(SDL_GetTicks64() >= ticks_when_ready);
     uint8_t const* bitmap = &FXDATA[addr + 2];
@@ -354,7 +354,7 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame)
 {
 #ifdef ARDUINO
-    SpritesU::drawPlusMaskFX(x, y, addr, frame * PLANES + a.currentPlane());
+    SpritesU::drawPlusMaskFX(x, y, addr, frame * PLANES + plane());
 #else
     uint8_t w = FXDATA[addr + 0];
     uint8_t h = FXDATA[addr + 1];
