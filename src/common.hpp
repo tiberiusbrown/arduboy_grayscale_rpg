@@ -64,7 +64,6 @@ void platform_fx_read_data_bytes(uint24_t addr, void* dst, size_t num);
 #define ABG_UPDATE_EVERY_N_DENOM_DEFAULT 1
 #define ABG_PRECHARGE_CYCLES 1
 #define ABG_DISCHARGE_CYCLES 2
-#define ABG_FPS_DEFAULT 156
 #include "ArduboyG.h"
 #define FORCE_INLINE __attribute__((always_inline))
 #define FORCE_NOINLINE __attribute__((noinline))

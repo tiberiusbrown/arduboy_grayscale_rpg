@@ -23,7 +23,7 @@ arduino-cli.exe compile ^
     --board-options "display=sh1106" ^
     --board-options "based_on=promicro_alt" ^
     --build-property compiler.c.elf.extra_flags="-Wl,--relax" ^
-    --build-property compiler.c.extra_flags="-fshort-enums -frename-registers -fno-tree-scev-cprop -mcall-prologues -mstrict-X %remove_timer0%" ^
+    --build-property compiler.c.extra_flags="-DABG_L3_CONVERT_MIX -fshort-enums -frename-registers -fno-tree-scev-cprop -mcall-prologues -mstrict-X %remove_timer0%" ^
     --build-property compiler.cpp.extra_flags="{compiler.c.extra_flags}"
 if NOT %errorlevel%==0 goto error
 
