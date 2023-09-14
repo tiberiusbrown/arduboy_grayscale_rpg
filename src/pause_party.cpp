@@ -59,13 +59,43 @@ static void render_pause_party_offset(int8_t x, int8_t y, uint8_t i)
     auto const* pi = &PARTY_INFO[id];
     //char const* name = pgmptr(&pi->name);
 
-#if 1
+#if !DEBUG_PARTY_MENU
     platform_fx_drawoverwrite(x, y, INNATES_IMG, id);
 #else
+    platform_fx_drawoverwrite(x, y, INNATES_IMG, 3);
+    platform_fillrect_i8(0, 37, 128, 16, BLACK);
+    platform_fillrect_i8(36, 5, 128, 10, BLACK);
+    platform_fillrect_i8(36, 16, 128, 18, BLACK);
     {
-        char t[] = "While defending, Dismas strikes his attacker at half damage.";
+        static char const T[] PROGMEM = "While defensing, Dismas strikes his attacker at half damage.";
+        char t[sizeof(T)];
+        memcpy_P(t, T, sizeof(t));
         wrap_text(t, 128);
         draw_text_noclip(x, y + 37, t);
+    }
+    {
+        static char const T[] PROGMEM = "Dismas";
+        char t[sizeof(T)];
+        memcpy_P(t, T, sizeof(t));
+        draw_text_noclip(x + 38, y + 6, t);
+    }
+    {
+        static char const T[] PROGMEM = "Attack:";
+        char t[sizeof(T)];
+        memcpy_P(t, T, sizeof(t));
+        draw_text_noclip(x + 43, y + 17, t);
+    }
+    {
+        static char const T[] PROGMEM = "Defense:";
+        char t[sizeof(T)];
+        memcpy_P(t, T, sizeof(t));
+        draw_text_noclip(x + 38, y + 26, t);
+    }
+    {
+        static char const T[] PROGMEM = "Speed:";
+        char t[sizeof(T)];
+        memcpy_P(t, T, sizeof(t));
+        draw_text_noclip(x + 87, y + 26, t);
     }
 #endif
 

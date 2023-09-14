@@ -107,4 +107,9 @@ void initialize()
         t = STATE_BADFX;
     }
     change_state(t);
+    
+#if DEBUG_PARTY_MENU   
+    change_state(STATE_PAUSE);
+    sdata.pause.state = OS_PARTY;
+#endif
 }

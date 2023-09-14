@@ -2,8 +2,14 @@
 
 #define TILES_IN_PROG 0
 
+#if FONT_MONOCHROME
+#include "generated/font_bw_adv.hpp"
+#include "generated/font_bw_img.hpp"
+#else
 #include "generated/font_adv.hpp"
 #include "generated/font_img.hpp"
+#endif
+
 #include "generated/fxdata.h"
 #if TILES_IN_PROG > 0
 #include "generated/tile_img.hpp"
@@ -469,7 +475,11 @@ void draw_text_noclip(int8_t x, int8_t y, char const* str, uint8_t f)
 {
     char t;
     uint8_t cx = (uint8_t)x;
+#if FONT_MONOCHROME
+    uint8_t const* font_img = FONT_IMG - (' ' * 8) + 2;
+#else
     uint8_t const* font_img = FONT_IMG + plane() * 8 - (' ' * (8 * PLANES)) + 2;
+#endif
     uint8_t const* font_adv = FONT_ADV - ' ';
     uint8_t page = (uint8_t)y;
 #if ARDUINO_ARCH_AVR
@@ -516,7 +526,11 @@ void draw_text_noclip(int8_t x, int8_t y, char const* str, uint8_t f)
             cx = (uint8_t)x;
             continue;
         }
+#if FONT_MONOCHROME
+        uint8_t const* bitmap = font_img + (t * 8);
+#else
         uint8_t const* bitmap = font_img + (t * (8 * PLANES));
+#endif
         uint8_t adv = pgm_read_byte(&font_adv[t]);
         if(cx <= uint8_t(128 - adv))
         {
@@ -532,7 +546,11 @@ static void draw_text_ex(int16_t x, int16_t y, char const* str, bool prog)
     char t;
     int16_t cx = x;
     uint8_t plane8 = plane() * 8;
-    uint8_t const* font_img = FONT_IMG + plane() * 8 + - (' ' * (8 * PLANES)) + 2;
+#if FONT_MONOCHROME
+    uint8_t const* font_img = FONT_IMG - (' ' * 8) + 2;
+#else
+    uint8_t const* font_img = FONT_IMG + plane() * 8 - (' ' * (8 * PLANES)) + 2;
+#endif
     uint8_t const* font_adv = FONT_ADV - ' ';
     for(;;)
     {
@@ -547,7 +565,11 @@ static void draw_text_ex(int16_t x, int16_t y, char const* str, bool prog)
             cx = x;
             continue;
         }
+#if FONT_MONOCHROME
+        uint8_t const* bitmap = font_img + (t * 8);
+#else
         uint8_t const* bitmap = font_img + (t * (8 * PLANES));
+#endif
         uint8_t adv = pgm_read_byte(&font_adv[t]);
         platform_drawoverwritemonochrome(cx, y, adv, 8, bitmap);
         cx += adv;

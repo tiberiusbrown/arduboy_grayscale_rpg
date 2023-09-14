@@ -4,6 +4,9 @@
 #include <string.h>
 
 #define TITLE_ONLY_DEMO 0
+#define FONT_MONOCHROME 0
+
+#define DEBUG_PARTY_MENU 0
 
 constexpr uint16_t VERSION = 1;
 
