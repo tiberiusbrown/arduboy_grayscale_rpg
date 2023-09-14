@@ -309,7 +309,16 @@ static void update_map()
         selx = (px + 8 + dx);
         sely = (py + 8 + dy);
         sdata.map.a_pressed = 1;
-    } 
+    }
+    
+    bool enable_diag = false;
+    {
+        uint8_t d = diag_counter;
+        d += 7;
+        if(d >= 10)
+            enable_diag = true, d -= 10;
+        diag_counter = d;
+    }
 
     int8_t dx = 0, dy = 0;
     if(btns_down & BTN_UP) dy -= 1;
@@ -318,8 +327,9 @@ static void update_map()
     if(btns_down & BTN_RIGHT) dx += 1;
 
     pmoving = !(dx == 0 && dy == 0);
-
-    if(pmoving)
+    enable_diag |= (dx == 0 || dy == 0);
+        
+    if(pmoving && enable_diag)
     {
         if(dy < 0)
         {

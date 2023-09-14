@@ -599,6 +599,7 @@ struct savefile_t
     sprite_t chunk_sprites[4];
     uint8_t explored[EXPLORED_BYTES];
     music music_type;
+    uint8_t diag_counter;
 };
 extern savefile_t savefile;
 static_assert(sizeof(savefile.chunk_regs) <= 16, "revisit reg command encoding");
@@ -610,6 +611,7 @@ static auto& party = savefile.party;
 static auto& nparty = savefile.nparty;
 static auto& story_flags = savefile.story_flags;
 static auto& chunk_sprites = savefile.chunk_sprites;
+static auto& diag_counter = savefile.diag_counter;
 constexpr auto* consumables = &savefile.chunk_regs[8];
 
 //extern uint8_t nframe; // update frame
