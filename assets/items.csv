@@ -78,3 +78,4 @@ Att,AtkA,Def,DefA,Spd,SpdA,MHP,MHPA,Type,Name,Description,Location
 1,,-2,,,,,,weapon,Vampiric Claws,+1 attack. -2 defense. Heals 1 health after each attack.,
 1,,1,,,,,,weapon,Wooden Spear,"+1 attack, +1 defense.",raptor forest chest se of island
 8,,,,,,,,weapon,Oversized Bludgeon,+8 attack. Stuns user after each attack.,
+1,,,,,,,,weapon,Raptor Claws,+1 attack. +4 additional attack against raptors.,west tombstone

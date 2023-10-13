@@ -5,10 +5,18 @@ import sys
 import re
 from PIL import Image
 import os
+import csv
 
 import pytmx
 tm = pytmx.TiledMap('world.tmx')
 
+with open('consumables.csv', newline='') as f:
+    reader = csv.reader(f, delimiter=',', quotechar='"')
+    consumables = [row[2] for row in reader]
+    consumables = consumables[1:]
+for i in range(len(consumables)):
+    consumables[i] = re.sub('[^a-zA-Z0-9]+', '_', consumables[i])
+    
 CHUNKS_W = 32
 CHUNKS_H = 64
 CHUNK_SCRIPT_SIZE = 80
@@ -128,19 +136,19 @@ for obj in tm.layers[2]:
     tiles = convert_path(obj)
     openpath = 0 if obj.closed else 1
     if obj.name is not None and obj.name[0] == '!':
-        if not hasattr(obj, 'class'):
-            print('flagged sprite path missing class attribute: (%d, %d)' % (obj.x, obj.y))
+        if obj.type is None:
+            print('flagged sprite path missing type attribute: (%d, %d)' % (obj.x, obj.y))
             sys.exit(1)
         f = script_assembler.flag(obj.name)
         bs[chunk] += [script_assembler.CMD.EPF._value_]
         bs[chunk] += [(f >> 0) % 256]
         bs[chunk] += [(f >> 8) % 256]
-        bs[chunk] += [script_assembler.sprite(getattr(obj, 'class'))]
+        bs[chunk] += [script_assembler.sprite(obj.type)]
         bs[chunk] += [len(tiles), openpath] + tiles
         continue
-    elif hasattr(obj, 'class'):
+    elif obj.type is not None:
         bs[chunk] += [script_assembler.CMD.EP._value_]
-        bs[chunk] += [script_assembler.sprite(getattr(obj, 'class'))]
+        bs[chunk] += [script_assembler.sprite(obj.type)]
         bs[chunk] += [len(tiles), openpath] + tiles
     epaths[chunk][obj.name] = [len(tiles), openpath] + tiles
 
@@ -173,6 +181,8 @@ for obj in tm.layers[1]:
     for p,v in obj.properties.items():
         if p.startswith('scr'):
             t = v
+            for i in range(len(consumables)):
+                t = t.replace('CON_%s' % consumables[i], 'r%d' % (i + 8))
             t = t.replace('$tmsg ', 'tmsg $T ')
             t = t.replace('$tdlg ', 'tdlg $T ')
             t = t.replace('$ttp ', 'ttp $T ')

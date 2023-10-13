@@ -71,3 +71,11 @@ inline void LOC_puzseq_inside                   () { px =  2928; py =  2704; }
 inline void LOC_puzseq_outside                  () { px =   544; py =  1712; }
 inline void LOC_obj_town                        () { px =  1808; py =  1424; }
 inline void LOC_new_game                        () { px =  2384; py =  2528; }
+inline void LOC_farmhouse_inside                () { px =   144; py =  2480; }
+inline void LOC_farmhouse_outside               () { px =   368; py =   624; }
+inline void LOC_charliehouse_outside            () { px =  1056; py =   880; }
+inline void LOC_charliehouse_inside             () { px =   384; py =  2496; }
+inline void LOC_barn_outside                    () { px =   240; py =   400; }
+inline void LOC_barn_inside                     () { px =   880; py =  2336; }
+inline void LOC_barn_basement                   () { px =  2336; py =  2592; }
+inline void LOC_barn_basement_exit              () { px =   912; py =  2320; }

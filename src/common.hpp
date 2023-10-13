@@ -387,6 +387,7 @@ struct enemy_info_t
     //char const* name;
 };
 extern enemy_info_t const ENEMY_INFO[] PROGMEM;
+bool enemy_is_raptor(uint8_t id);
 
 struct party_info_t
 {

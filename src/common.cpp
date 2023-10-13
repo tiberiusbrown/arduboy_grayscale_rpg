@@ -66,6 +66,11 @@ enemy_info_t const ENEMY_INFO[] PROGMEM =
     { 30, 3, 1, 5,  8,   0, 128, }, //EN_DARK_RAPTOR },
 };
 
+bool enemy_is_raptor(uint8_t id)
+{
+    return uint8_t(id - 3) <= 1;
+}
+
 static char const PN_MATTHIAS[] PROGMEM = "Matthias";
 static char const PN_CATHERINE[] PROGMEM = "Catherine";
 static char const PN_LUCY[] PROGMEM = "Lucy";

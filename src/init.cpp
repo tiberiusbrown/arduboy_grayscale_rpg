@@ -31,54 +31,8 @@ void new_game()
     party[0].battle.id = 0;
     party[0].battle.hp = party_mhp(0);
 
-#if 0
-    for(int i = 0; i < 4; ++i)
-    {
-        party[i].battle.id = i;
-        party[i].battle.hp = party_mhp(i);
-    }
-    nparty = 4;
-
-    LOC_home_outside();
-    story_flag_set(SFLAG_story_charlie_job);
-    story_flag_set(SFLAG_tip_objective);
-    story_flag_set(SFLAG_charlie_raptor);
-    story_flag_set(SFLAG_story_got_fish);
-    story_flag_set(SFLAG_story_fish_delivered);
-    px = 500;
-    py = 1300;
-    savefile.chunk_regs[8] = 3;
-    savefile.chunk_regs[9] = 3;
-
-    story_flag_set(SFLAG_ITEM_Barbarian_s_Helm);
-    story_flag_set(SFLAG_ITEM_Boxing_Gloves);
-#endif
-
-#if 0
-    LOC_dismas_house_outside();
-    //story_flag_set(SFLAG_ITEM_Barbarian_s_Helm);
-    //story_flag_set(SFLAG_ITEM_Barbarian_s_Footwraps);
-    //story_flag_set(SFLAG_ITEM_Barbarian_s_Axe);
-    //story_flag_set(SFLAG_ITEM_Spiked_Shield);
-    //story_flag_set(SFLAG_ITEM_Brawler_s_Ring);
-    //story_flag_set(SFLAG_ITEM_Boxing_Gloves);
-    consumables[CIT_Healing_Salve] = 3;
-    consumables[CIT_Ardu_s_Fury] = 3;
-    consumables[CIT_Ardu_s_Frenzy] = 3;
-    consumables[CIT_Potion_of_Attack] = 3;
-#endif
-
-    //LOC_puzseq_inside();
-    //LOC_first_cave_outside();
-    //LOC_home_outside();
-    //story_flag_set(SFLAG_story_fish_delivered);
-
-    //LOC_first_cave_outside();
-    //story_flag_set(SFLAG_story_fish_delivered);
-    //story_flag_set(SFLAG_story_met_catherine);
-    //story_flag_set(SFLAG_party_catherine);
-
-    //LOC_puzspikefollow_inside();
+    LOC_barn_outside();
+    story_flag_set(SFLAG_story_guards_attack);
 }
 
 static bool check_identifier(uint24_t addr)

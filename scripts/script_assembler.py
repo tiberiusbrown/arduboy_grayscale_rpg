@@ -23,6 +23,7 @@ tiles = {
     'T_DungeonMagicFloor2' : 565 & 255,
     'T_OutdoorStairs'      : 58  & 255,
     'T_IndoorStairs'       : 279 & 255,
+    'T_IndoorDresserDark'  : 302 & 255,
     'T_DungeonStairs'      : 535 & 255,
     'T_DungeonBarsOpen'    : 550 & 255,
     'T_DungeonBarsClosed'  : 551 & 255,

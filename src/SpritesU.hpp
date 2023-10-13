@@ -57,7 +57,7 @@ struct SpritesU
     static void drawBasic(
         int16_t x, int16_t y, uint8_t w, uint8_t h,
         uint24_t image, uint16_t frame, uint8_t mode);
-    __attribute__((noinline)) static void drawBasicNoChecks(
+    static void drawBasicNoChecks(
         uint16_t w_and_h,
         uint24_t image, uint8_t mode,
         int16_t x, int16_t y);
@@ -375,7 +375,7 @@ void SpritesU::drawBasicNoChecks(
 #if ARDUINO_ARCH_AVR
         asm volatile(R"ASM(
 
-                cpi %[page_start], 0
+                cp %[page_start], __zero_reg__
                 brge L%=_middle
 
                 ; advance buf to next page
@@ -409,8 +409,8 @@ void SpritesU::drawBasicNoChecks(
                 breq L%=_bottom
 
                 ; need Y pointer for middle pages
-                ;push r28
-                ;push r29
+                push r28
+                push r29
                 movw r28, %[buf]
                 subi r28, lo8(-128)
                 sbci r29, hi8(-128)
@@ -447,8 +447,8 @@ void SpritesU::drawBasicNoChecks(
                 brne L%=_middle_loop_outer
 
                 ; done with Y pointer
-                ;pop r29
-                ;pop r28
+                pop r29
+                pop r28
 
             L%=_bottom:
 
@@ -503,7 +503,7 @@ void SpritesU::drawBasicNoChecks(
 #if ARDUINO_ARCH_AVR
         asm volatile(R"ASM(
 
-                cpi %[page_start], 0
+                cp %[page_start], __zero_reg__
                 brge L%=_middle
 
                 ; advance buf to next page
@@ -544,8 +544,8 @@ void SpritesU::drawBasicNoChecks(
                 breq L%=_bottom
 
                 ; need Y pointer for middle pages
-                ;push r28
-                ;push r29
+                push r28
+                push r29
                 movw r28, %[buf]
                 subi r28, lo8(-128)
                 sbci r29, hi8(-128)
@@ -589,8 +589,8 @@ void SpritesU::drawBasicNoChecks(
                 brne L%=_middle_loop_outer
 
                 ; done with Y pointer
-                ;pop r29
-                ;pop r28
+                pop r29
+                pop r28
 
             L%=_bottom:
 

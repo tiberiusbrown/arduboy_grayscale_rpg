@@ -153,6 +153,10 @@ static uint8_t calc_attack_damage(uint8_t attacker, uint8_t defender)
     uint8_t att = get_att(attacker);
     uint8_t def = get_def(defender);
 
+    // Raptor Claws: bonus to attack against raptors
+    if(user_is_wearing(attacker, SFLAG_ITEM_Raptor_Claws) && enemy_is_raptor(d.enemies[defender - 4].id))
+        att += 4;
+
     // initial damage, scaled up 16x
     int16_t dam = (att * att * 16) / uint8_t(att + def);
     

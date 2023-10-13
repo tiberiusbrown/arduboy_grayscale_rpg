@@ -1,0 +1,11 @@
+{
+    "configuration": "core=arduboy-core,boot=cathy3k",
+    "board": "arduboy-homemade:avr:arduboy-fx",
+    "sketch": "src/src.ino",
+    "output": "build/",
+    "buildPreferences": [
+        ["compiler.c.extra_flags", "-fshort-enums -frename-registers -fno-tree-scev-cprop -mcall-prologues -mstrict-X"],
+        ["compiler.cpp.extra_flags", "{compiler.c.extra_flags}"],
+        ["compiler.c.elf.extra_flags", "-Wl,--relax"]
+    ]
+}
