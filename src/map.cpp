@@ -182,30 +182,24 @@ static bool run_chunk()
 
         case CMD_ADD:
         case CMD_SUB:
-        {
-            uint8_t t = deref_inc(instr_ptr);
-            uint8_t dst = t & 0xf;
-            uint8_t src = nibswap(t) & 0xf;
-            src = savefile.chunk_regs[src];
-            if(instr == CMD_SUB)
-                src = uint8_t(-src);
-            savefile.chunk_regs[dst] += src;
-            break;
-        }
         case CMD_ADDI:
         case CMD_ANDI:
         {
             uint8_t t = deref_inc(instr_ptr);
-            int8_t imm = (int8_t)deref_inc(instr_ptr);
             uint8_t dst = t & 0xf;
-            uint8_t src = nibswap(t) & 0xf;
-            src = savefile.chunk_regs[src];
+            uint8_t srcb = savefile.chunk_regs[dst];
+            if(instr == CMD_ADDI || instr == CMD_ANDI)
+                srcb = deref_inc(instr_ptr);
+            uint8_t srca = nibswap(t) & 0xf;
+            srca = savefile.chunk_regs[srca];
+            if(instr == CMD_SUB)
+                srca = uint8_t(-srca);
             if(instr == CMD_ANDI)
             {
-                savefile.chunk_regs[dst] = src & imm;
+                savefile.chunk_regs[dst] = srca & srcb;
                 break;
             }
-            int8_t newdst = (int8_t)src + imm;
+            int8_t newdst = int8_t(srca + srcb);
             int8_t diff = newdst - (int8_t)savefile.chunk_regs[dst];
             savefile.chunk_regs[dst] = (uint8_t)newdst;
             if(!no_state_actions && dst >= 8 && diff > 0)
@@ -232,15 +226,6 @@ static bool run_chunk()
             }
             break;
         }
-        //case CMD_ANDI:
-        //{
-        //    uint8_t t = deref_inc(instr_ptr);
-        //    uint8_t imm = deref_inc(instr_ptr);
-        //    uint8_t dst = t & 0xf;
-        //    uint8_t src = nibswap(t) & 0xf;
-        //    savefile.chunk_regs[dst] = savefile.chunk_regs[src] & imm;
-        //    break;
-        //}
 
         case CMD_FS:
         case CMD_FC:

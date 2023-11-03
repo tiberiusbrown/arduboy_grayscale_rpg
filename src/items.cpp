@@ -317,6 +317,21 @@ static inline void render_consumable_row(
             (ITEM_NAME_LEN + ITEM_DESC_LEN) * ni,
             d.str, ITEM_DESC_LEN);
         draw_text_noclip(x + 2, y + 46, d.str);
+
+        // health bar
+        //if(cat == IT_CONSUMABLE)
+        {
+            uint8_t i = d.user_index;
+            auto const& p = savefile.party[i];
+            auto const& b = p.battle;
+            constexpr uint8_t W = 112;
+            constexpr uint8_t H = 2;
+            //platform_drawrect_i8(x + 38, y + 0, W + 2, H + 2, DARK_GRAY);
+            uint8_t mhp = party_mhp(i);
+            uint8_t f = (b.hp * W + mhp / 2) / mhp;
+            platform_drawrect_i8(x + 7, y + 57, W + 2, H + 2, DARK_GRAY);
+            platform_fillrect_i8(x + 8, y + 58, f, H, WHITE);
+        }
     }
     platform_fx_read_data_bytes(
         ITEM_INFO + sizeof(item_info_t) * NUM_ITEMS +
