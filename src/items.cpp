@@ -319,7 +319,7 @@ static inline void render_consumable_row(
         draw_text_noclip(x + 2, y + 46, d.str);
 
         // health bar
-        //if(cat == IT_CONSUMABLE)
+        if(ni < 3)
         {
             uint8_t i = d.user_index;
             auto const& p = savefile.party[i];

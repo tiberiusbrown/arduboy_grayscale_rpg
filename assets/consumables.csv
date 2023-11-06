@@ -1,7 +1,7 @@
 BO,AO,Name,Description
 0,0,Healing Salve,Restore 5 health.
 0,0,Elixir of Health,Restore 10 health.
-0,0,Scroll of Healing,Restore 5 health to all party members.
+0,0,Scroll of Healing,Restore 5 health to everyone.
 1,0,Potion of Attack,Gain +5 attack for the rest of the battle.
 1,1,Ardu’s Fury,Attack the enemy with the most health for double damage.
 1,1,Ardu’s Frenzy,"In a frenzy, deal half your attack as true damage to all enemies."
