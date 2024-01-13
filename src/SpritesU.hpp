@@ -25,10 +25,17 @@ struct SpritesU
         int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t const* image);
 #endif
 
-#ifdef SPRITESU_OVERWRITE
+#ifdef SPRITESU_PLUSMASK
     static void drawPlusMask(
         int16_t x, int16_t y, uint8_t const* image, uint16_t frame);
     static void drawPlusMask(
+        int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t const* image);
+#endif
+
+#if defined(SPRITESU_OVERWRITE) || defined(SPRITESU_PLUSMASK)
+    static void drawSelfMask(
+        int16_t x, int16_t y, uint8_t const* image, uint16_t frame);
+    static void drawSelfMask(
         int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t const* image);
 #endif
 
@@ -41,6 +48,10 @@ struct SpritesU
         int16_t x, int16_t y, uint24_t image, uint16_t frame);
     static void drawPlusMaskFX(
         int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame);
+    static void drawSelfMaskFX(
+        int16_t x, int16_t y, uint24_t image, uint16_t frame);
+    static void drawSelfMaskFX(
+        int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame);
 #endif
 
 #ifdef SPRITESU_RECT
@@ -51,8 +62,10 @@ struct SpritesU
 
     static constexpr uint8_t MODE_OVERWRITE   = 0;
     static constexpr uint8_t MODE_PLUSMASK    = 1;
+    static constexpr uint8_t MODE_SELFMASK    = 4;
     static constexpr uint8_t MODE_OVERWRITEFX = 2;
     static constexpr uint8_t MODE_PLUSMASKFX  = 3;
+    static constexpr uint8_t MODE_SELFMASKFX  = 6;
 
     static void drawBasic(
         int16_t x, int16_t y, uint8_t w, uint8_t h,
@@ -97,8 +110,7 @@ void SpritesU::drawBasic(
     if(x + w <= 0) return;
     if(y + h <= 0) return;
     
-    uint16_t w_and_h = (uint16_t(h) << 8) | w;
-    
+    uint8_t oldh = h;    
     
 #if ARDUINO_ARCH_AVR
 
@@ -164,7 +176,7 @@ void SpritesU::drawBasic(
     }
 #endif
 
-    drawBasicNoChecks(w_and_h, image, mode, x, y);
+    drawBasicNoChecks((uint16_t(oldh) << 8) | w, image, mode, x, y);
 }
 
 void SpritesU::drawBasicNoChecks(
@@ -172,19 +184,29 @@ void SpritesU::drawBasicNoChecks(
     uint24_t image, uint8_t mode,
     int16_t x, int16_t y)
 {
-    uint8_t w = uint8_t(w_and_h);
-    uint8_t h = uint8_t(w_and_h >> 8);
-    
-    uint8_t pages = h;
-    uint8_t shift_coef;
-    uint16_t shift_mask;
-    int8_t page_start;
+    uint8_t* buf;
+    uint8_t pages;
+    uint8_t count;
+    uint8_t buf_data;
+    uint16_t image_data;
     uint8_t cols;
-    uint8_t col_start;
-    bool bottom;
     uint8_t buf_adv;
     uint16_t image_adv;
-    uint8_t* buf = Arduboy2Base::sBuffer;
+    uint16_t shift_mask;
+    uint8_t shift_coef;
+    bool bottom;
+    int8_t page_start;
+    uint8_t w;
+    uint16_t mask_data;
+
+    {
+    uint8_t h;
+    uint8_t col_start;
+    
+    w = uint8_t(w_and_h);
+    h = uint8_t(w_and_h >> 8);
+    buf = Arduboy2Base::sBuffer;
+    pages = h;
     
 #if ARDUINO_ARCH_AVR
     asm volatile(R"ASM(
@@ -204,11 +226,16 @@ void SpritesU::drawBasicNoChecks(
             lsl  %[shift_coef]
             sbrc %A[y], 2
             swap %[shift_coef]
+            ser  %A[shift_mask]
+            ser  %B[shift_mask]
+            sbrc %[mode], 2
+            rjmp 1f
             ldi  %[buf_adv], 0xff
             mul  %[buf_adv], %[shift_coef]
             movw %A[shift_mask], r0
             com  %A[shift_mask]
             com  %B[shift_mask]
+        1:
             
             asr  %B[y]
             ror  %A[y]
@@ -287,7 +314,7 @@ void SpritesU::drawBasicNoChecks(
         :
         [pages]      "+&r" (pages),
         [shift_coef] "=&d" (shift_coef),
-        [shift_mask] "=&r" (shift_mask),
+        [shift_mask] "=&d" (shift_mask),
         [page_start] "=&a" (page_start),
         [cols]       "=&r" (cols),
         [col_start]  "=&r" (col_start),
@@ -304,7 +331,6 @@ void SpritesU::drawBasicNoChecks(
         );
     
 #else
-    page_start = int8_t(y);
     col_start = uint8_t(x);
     bottom = false;
     cols = w;
@@ -313,7 +339,10 @@ void SpritesU::drawBasicNoChecks(
 
     // precompute vertical shift coef and mask
     shift_coef = SpritesU_bitShiftLeftUInt8(y);
-    shift_mask = ~(0xff * shift_coef);
+    if(mode & 4)
+        shift_mask = 0xffff;
+    else
+        shift_mask = ~(0xff * shift_coef);
 
     // y /= 8 (round to -inf)
     y >>= 3;
@@ -322,10 +351,10 @@ void SpritesU::drawBasicNoChecks(
     page_start = int8_t(y);
     if(page_start < -1)
     {
-        uint8_t tp = (-1 - page_start);
-        pages -= tp;
-        if(mode & 1) tp *= 2;
-        image += tp * w;
+        page_start = ~page_start;
+        pages -= page_start;
+        if(mode & 1) page_start <<= 1;
+        image += (uint8_t)page_start * w;
         page_start = -1;
     }
 
@@ -338,35 +367,34 @@ void SpritesU::drawBasicNoChecks(
         col_start = 0;
     }
 
-    buf += page_start * 128 + col_start;
+    // compute buffer start address
+    buf_adv = 128;
+    buf += page_start * buf_adv + col_start;
 
     // clip against right edge
-    {
-        uint8_t max_cols = 128 - col_start;
-        if(cols > max_cols)
-            cols = max_cols;
-    }
+    buf_adv -= col_start;
+    if(cols >= buf_adv)
+        cols = buf_adv;
 
     // clip against bottom edge
-    if(pages > uint8_t(7 - page_start))
+    buf_adv = 7;
+    buf_adv -= page_start;
+    if(buf_adv < pages)
     {
-        pages = 7 - page_start;
+        pages = buf_adv;
         bottom = true;
     }
-
-    buf_adv = 128 - cols;
+    buf_adv = 128;
+    buf_adv -= cols;
     image_adv = w;
-#ifdef SPRITESU_FX
     if(!(mode & 2))
-#endif
         image_adv -= cols;
-    if(mode & 1) image_adv *= 2;
+    if(mode & 1)
+        image_adv <<= 1;
+
 #endif
 
-    uint16_t image_data;
-    uint16_t mask_data;
-    uint8_t buf_data;
-    uint8_t count;
+    }
 
 #ifdef SPRITESU_OVERWRITE
     if(mode == MODE_OVERWRITE)
@@ -375,7 +403,7 @@ void SpritesU::drawBasicNoChecks(
 #if ARDUINO_ARCH_AVR
         asm volatile(R"ASM(
 
-                cp %[page_start], __zero_reg__
+                cp  %[page_start], __zero_reg__
                 brge L%=_middle
 
                 ; advance buf to next page
@@ -478,9 +506,9 @@ void SpritesU::drawBasicNoChecks(
             [pages]      "+&r" (pages),
             [count]      "=&r" (count),
             [buf_data]   "=&r" (buf_data),
+            [cols]       "+&r"  cols),
             [image_data] "=&r" (image_data)
             :
-            [cols]       "r"   (cols),
             [buf_adv]    "r"   (buf_adv),
             [image_adv]  "r"   (image_adv),
             [shift_mask] "r"   (shift_mask),
@@ -491,7 +519,60 @@ void SpritesU::drawBasicNoChecks(
             "r28", "r29", "memory"
             );
 #else
-        // TODO: C implementation
+        if(page_start < 0)
+        {
+            buf += 128;
+            count = cols;
+            do
+            {
+                image_data = pgm_read_byte(image_ptr++);
+                uint16_t t = (uint8_t)image_data * shift_coef;
+                buf_data = *buf;
+                buf_data &= uint8_t(shift_mask >> 8);
+                buf_data |= uint8_t(t >> 8);
+                *buf++ = buf_data;
+            } while(--count != 0);
+            --pages;
+            buf -= cols;
+            image_ptr += image_adv;
+        }
+        if(pages != 0)
+        {
+            uint8_t* bufn = buf + 128;
+            do
+            {
+                count = cols;
+                do
+                {
+                    image_data = pgm_read_byte(image_ptr++);
+                    uint16_t t = (uint8_t)image_data * shift_coef;
+                    buf_data = *buf;
+                    buf_data &= uint8_t(shift_mask >> 0);
+                    buf_data |= uint8_t(t >> 0);
+                    *buf++ = buf_data;
+                    buf_data = *bufn;
+                    buf_data &= uint8_t(shift_mask >> 8);
+                    buf_data |= uint8_t(t >> 8);
+                    *bufn++ = buf_data;
+                } while(--count != 0);
+                buf += buf_adv;
+                bufn += buf_adv;
+                image_ptr += image_adv;
+            } while(--pages != 0);
+        }
+        if(bottom)
+        {
+            do
+            {
+                image_data = pgm_read_byte(image_ptr++);
+                uint16_t t = (uint8_t)image_data * shift_coef;
+                buf_data = *buf;
+                buf_data &= uint8_t(shift_mask >> 0);
+                buf_data |= uint8_t(t >> 0);
+                *buf++ = buf_data;
+            }
+            while(--cols != 0);
+        }
 #endif
     }
     else
@@ -503,7 +584,7 @@ void SpritesU::drawBasicNoChecks(
 #if ARDUINO_ARCH_AVR
         asm volatile(R"ASM(
 
-                cp %[page_start], __zero_reg__
+                cp  %[page_start], __zero_reg__
                 brge L%=_middle
 
                 ; advance buf to next page
@@ -627,9 +708,9 @@ void SpritesU::drawBasicNoChecks(
             [count]      "=&r" (count),
             [buf_data]   "=&r" (buf_data),
             [image_data] "=&r" (image_data),
+            [cols]       "+&r" (cols),
             [mask_data]  "=&r" (mask_data)
             :
-            [cols]       "r"   (cols),
             [buf_adv]    "r"   (buf_adv),
             [image_adv]  "r"   (image_adv),
             [shift_coef] "r"   (shift_coef),
@@ -639,14 +720,73 @@ void SpritesU::drawBasicNoChecks(
             "r28", "r29", "memory"
             );
 #else
-        // TODO: C implementation
+        if(page_start < 0)
+        {
+            buf += 128;
+            count = cols;
+            do
+            {
+                image_data = pgm_read_byte(image_ptr++);
+                mask_data = pgm_read_byte(image_ptr++);
+                image_data = (uint8_t)image_data * shift_coef;
+                mask_data = (uint8_t)mask_data * shift_coef;
+                buf_data = *buf;
+                buf_data &= ~uint8_t(mask_data >> 8);
+                buf_data |= uint8_t(image_data >> 8);
+                *buf++ = buf_data;
+            } while(--count != 0);
+            --pages;
+            buf -= cols;
+            image_ptr += image_adv;
+        }
+        if(pages != 0)
+        {
+            uint8_t* bufn = buf + 128;
+            do
+            {
+                count = cols;
+                do
+                {
+                    image_data = pgm_read_byte(image_ptr++);
+                    mask_data = pgm_read_byte(image_ptr++);
+                    image_data = (uint8_t)image_data * shift_coef;
+                    mask_data = (uint8_t)mask_data * shift_coef;
+                    buf_data = *buf;
+                    buf_data &= ~uint8_t(mask_data >> 0);
+                    buf_data |= uint8_t(image_data >> 0);
+                    *buf++ = buf_data;
+                    buf_data = *bufn;
+                    buf_data &= ~uint8_t(mask_data >> 8);
+                    buf_data |= uint8_t(image_data >> 8);
+                    *bufn++ = buf_data;
+                } while(--count != 0);
+                buf += buf_adv;
+                bufn += buf_adv;
+                image_ptr += image_adv;
+            } while(--pages != 0);
+        }
+        if(bottom)
+        {
+            do
+            {
+                image_data = pgm_read_byte(image_ptr++);
+                mask_data = pgm_read_byte(image_ptr++);
+                image_data = (uint8_t)image_data * shift_coef;
+                mask_data = (uint8_t)mask_data * shift_coef;
+                buf_data = *buf;
+                buf_data &= ~uint8_t(mask_data >> 0);
+                buf_data |= uint8_t(image_data >> 0);
+                *buf++ = buf_data;
+            }
+            while(--cols != 0);
+        }
 #endif
     }
     else
 #endif
 #ifdef SPRITESU_FX
     {
-        uint8_t sfc_read;
+        uint8_t sfc_read = SFC_READ;
         uint8_t* bufn;
         uint8_t reseek;
 #if ARDUINO_ARCH_AVR
@@ -662,7 +802,6 @@ void SpritesU::drawBasicNoChecks(
 
                 ; seek subroutine
                 cbi %[fxport], %[fxbit]
-                ldi %[sfc_read], %[SFC_READ]
                 out %[spdr], %[sfc_read]
                 add %A[image], %A[image_adv] ;  1
                 adc %B[image], %B[image_adv] ;  1
@@ -910,10 +1049,9 @@ void SpritesU::drawBasicNoChecks(
             [count]      "=&r" (count),
             [buf_data]   "=&r" (buf_data),
             [image_data] "=&r" (image_data),
-            [reseek]     "=&r" (reseek),
-            [sfc_read]   "=&d" (sfc_read)
+            [cols]       "+&r" (cols),
+            [reseek]     "=&r" (reseek)
             :
-            [cols]       "r"   (cols),
             [w]          "r"   (w),
             [buf_adv]    "r"   (buf_adv),
             [image_adv]  "r"   (image_adv),
@@ -922,7 +1060,7 @@ void SpritesU::drawBasicNoChecks(
             [bottom]     "r"   (bottom),
             [page_start] "r"   (page_start),
             [mode]       "r"   (mode),
-            [SFC_READ]   "I"   (SFC_READ),
+            [sfc_read]   "r"   (sfc_read),
             [fxport]     "I"   (_SFR_IO_ADDR(FX_PORT)),
             [fxbit]      "I"   (FX_BIT),
             [spdr]       "I"   (_SFR_IO_ADDR(SPDR)),
@@ -933,7 +1071,136 @@ void SpritesU::drawBasicNoChecks(
             "memory"
             );
 #else
-        // TODO: C implementation
+        reseek = false;
+        FX::seekData(image);
+        
+        if(page_start < 0)
+        {
+            // top
+            buf += 128;
+            count = cols;
+            if(!(mode & 1))
+            {
+                do
+                {
+                    image_data = FX::readPendingUInt8();
+                    image_data = (uint8_t)image_data * shift_coef;
+                    buf_data = *buf;
+                    buf_data &= uint8_t(shift_mask >> 8);
+                    buf_data |= uint8_t(image_data >> 8);
+                    *buf++ = buf_data;
+                } while(--count != 0);
+            }
+            else
+            {
+                do
+                {
+                    image_data = FX::readPendingUInt8();
+                    image_data = (uint8_t)image_data * shift_coef;
+                    shift_mask = FX::readPendingUInt8();
+                    shift_mask = (uint8_t)shift_mask * shift_coef;
+                    buf_data = *buf;
+                    buf_data &= ~uint8_t(shift_mask >> 8);
+                    buf_data |= uint8_t(image_data >> 8);
+                    *buf++ = buf_data;
+                } while(--count != 0);
+            }
+            --pages;
+            buf -= cols;
+            reseek = (w != cols);
+        }
+        
+        if(pages != 0)
+        {
+        
+            do
+            {
+                if(reseek)
+                {
+                    (void)FX::readEnd();
+                    image += image_adv;
+                    FX::seekData(image);
+                }
+                reseek = (w != cols);
+                
+                bufn = buf + 128;
+                count = cols;
+                if(!(mode & 1))
+                {
+                    do
+                    {
+                        image_data = FX::readPendingUInt8();
+                        image_data = (uint8_t)image_data * shift_coef;
+                        buf_data = *buf;
+                        buf_data &= uint8_t(shift_mask >> 0);
+                        buf_data |= uint8_t(image_data >> 0);
+                        *buf++ = buf_data;
+                        buf_data = *bufn;
+                        buf_data &= uint8_t(shift_mask >> 8);
+                        buf_data |= uint8_t(image_data >> 8);
+                        *bufn++ = buf_data;
+                    } while(--count != 0);
+                }
+                else
+                {
+                    do
+                    {
+                        image_data = FX::readPendingUInt8();
+                        image_data = (uint8_t)image_data * shift_coef;
+                        shift_mask = FX::readPendingUInt8();
+                        shift_mask = (uint8_t)shift_mask * shift_coef;
+                        buf_data = *buf;
+                        buf_data &= ~uint8_t(shift_mask >> 0);
+                        buf_data |= uint8_t(image_data >> 0);
+                        *buf++ = buf_data;
+                        buf_data = *bufn;
+                        buf_data &= ~uint8_t(shift_mask >> 8);
+                        buf_data |= uint8_t(image_data >> 8);
+                        *bufn++ = buf_data;
+                    } while(--count != 0);
+                }
+                buf += buf_adv;
+            } while(--pages != 0);
+        }
+        
+        if(bottom)
+        {
+            if(reseek)
+            {
+                (void)FX::readEnd();
+                image += image_adv;
+                FX::seekData(image);
+            }
+            
+            if(!(mode & 1))
+            {
+                do
+                {
+                    image_data = FX::readPendingUInt8();
+                    image_data = (uint8_t)image_data * shift_coef;
+                    buf_data = *buf;
+                    buf_data &= uint8_t(shift_mask >> 0);
+                    buf_data |= uint8_t(image_data >> 0);
+                    *buf++ = buf_data;
+                } while(--cols != 0);
+            }
+            else
+            {
+                do
+                {
+                    image_data = FX::readPendingUInt8();
+                    image_data = (uint8_t)image_data * shift_coef;
+                    shift_mask = FX::readPendingUInt8();
+                    shift_mask = (uint8_t)shift_mask * shift_coef;
+                    buf_data = *buf;
+                    buf_data &= ~uint8_t(shift_mask >> 0);
+                    buf_data |= uint8_t(image_data >> 0);
+                    *buf++ = buf_data;
+                } while(--cols != 0);
+            }
+        }
+    
+        (void)FX::readEnd();
 #endif
     }
 #endif
@@ -986,6 +1253,29 @@ void SpritesU::drawPlusMask(
 }
 #endif
 
+#if defined(SPRITESU_OVERWRITE) || defined(SPRITESU_PLUSMASK)
+void SpritesU::drawSelfMask(
+    int16_t x, int16_t y, uint8_t const* image, uint16_t frame)
+{
+    uint8_t w, h;
+#if ARDUINO_ARCH_AVR
+    asm volatile(
+        "lpm %[w], Z+\n"
+        "lpm %[h], Z+\n"
+        : [w] "=r" (w), [h] "=r" (h), [image] "+z" (image));
+#else
+    w = pgm_read_byte(image++);
+    h = pgm_read_byte(image++);
+#endif
+    drawBasic(x, y, w, h, (uint24_t)image, frame, MODE_SELFMASK);
+}
+void SpritesU::drawSelfMask(
+    int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t const* image)
+{
+    drawBasic(x, y, w, h, (uint24_t)image, 0, MODE_SELFMASK);
+}
+#endif
+
 #ifdef SPRITESU_FX
 void SpritesU::drawOverwriteFX(
     int16_t x, int16_t y, uint24_t image, uint16_t frame)
@@ -1012,6 +1302,19 @@ void SpritesU::drawPlusMaskFX(
     int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame)
 {
     drawBasic(x, y, w, h, image + 2, frame, MODE_PLUSMASKFX);
+}
+void SpritesU::drawSelfMaskFX(
+    int16_t x, int16_t y, uint24_t image, uint16_t frame)
+{
+    FX::seekData(image);
+    uint8_t w = FX::readPendingUInt8();
+    uint8_t h = FX::readEnd();
+    drawBasic(x, y, w, h, image + 2, frame, MODE_SELFMASKFX);
+}
+void SpritesU::drawSelfMaskFX(
+    int16_t x, int16_t y, uint8_t w, uint8_t h, uint24_t image, uint16_t frame)
+{
+    drawBasic(x, y, w, h, image + 2, frame, MODE_SELFMASKFX);
 }
 #endif
 
