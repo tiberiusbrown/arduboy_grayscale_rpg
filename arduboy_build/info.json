@@ -17,8 +17,8 @@
     {
       "title": "Return of the Ardu",
       "filename": "ReturnOfTheArdu.hex",
-      "flashdata": "fxdata.bin",
-      "flashsave": "fxsave.bin",
+      "flashdata": "fxdata-data.bin",
+      "flashsave": "fxdata-save.bin",
       "device": "ArduboyFX"
     }
   ]

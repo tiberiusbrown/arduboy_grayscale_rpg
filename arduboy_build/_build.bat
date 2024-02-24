@@ -50,7 +50,7 @@ findstr /c:" b " /c:" B " /c:" d " /c:" D " _map2.txt > _map.txt
 del _map2.txt
 
 rem create arduboy file
-tar -a -cf ReturnOfTheArdu.zip ReturnOfTheArdu.hex fxdata.bin fxsave.bin info.json LICENSE.txt banner_700x192.png banner_128x64.png
+tar -a -cf ReturnOfTheArdu.zip ReturnOfTheArdu.hex fxdata-data.bin fxdata-save.bin info.json LICENSE.txt banner_700x192.png banner_128x64.png
 if NOT %errorlevel%==0 goto error
 move /y ReturnOfTheArdu.zip ..\ReturnOfTheArdu.arduboy > nul
 if NOT %errorlevel%==0 goto error

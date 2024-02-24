@@ -1,16 +1,59 @@
-#FX data build tool version 1.07 by Mr.Blinky May 2021 - Mar 2022
+#FX data build tool version 1.15 by Mr.Blinky May 2021 - Mar.2023
 
-VERSION = '1.07'
+VERSION = '1.15'
 
 import sys
 import os
 import re
+import platform
+
+constants = [
+    #normal bitmap modes
+    ("dbmNormal",    0x00),
+    ("dbmOverwrite", 0x00),
+    ("dbmWhite",     0x01),
+    ("dbmReverse",   0x08),
+    ("dbmBlack",     0x0D),
+    ("dbmInvert",    0x02),
+    #masked bitmap modes for frame
+    ("dbmMasked",              0x10),
+    ("dbmMasked_dbmWhite",     0x11),
+    ("dbmMasked_dbmReverse",   0x18),
+    ("dbmMasked_dbmBlack",     0x1D),
+    ("dbmMasked_dbmInvert",    0x12),
+    #bitmap modes for last bitmap in a frame
+    ("dbmNormal_end",    0x40),
+    ("dbmOverwrite_end", 0x40),
+    ("dbmWhite_end",     0x41),
+    ("dbmReverse_end",   0x48),
+    ("dbmBlack_end",     0x4D),
+    ("dbmInvert_end",    0x42),
+    #masked bitmap modes for last bitmap in a frame
+    ("dbmMasked_end",              0x50),
+    ("dbmMasked_dbmWhite_end",     0x51),
+    ("dbmMasked_dbmReverse_end",   0x58),
+    ("dbmMasked_dbmBlack_end",     0x5D),
+    ("dbmMasked_dbmInvert_end",    0x52),
+    #bitmap modes for last bitmap of the last frame
+    ("dbmNormal_last",    0x80),
+    ("dbmOverwrite_last", 0x80),
+    ("dbmWhite_last",     0x81),
+    ("dbmReverse_last",   0x88),
+    ("dbmBlack_last",     0x8D),
+    ("dbmInvert_last",    0x82),
+    #masked bitmap modes for last bitmap in a frame
+    ("dbmMasked_last",              0x90),
+    ("dbmMasked_dbmWhite_last",     0x91),
+    ("dbmMasked_dbmReverse_last",   0x98),
+    ("dbmMasked_dbmBlack_last",     0x9D),
+    ("dbmMasked_dbmInvert_last",    0x92),
+    ]
 
 def print(s):
   sys.stdout.write(s + '\n')
   sys.stdout.flush()
 
-print('FX data build tool version {} by Mr.Blinky May 2021 - Mar 2022'.format(VERSION))
+print('FX data build tool version {} by Mr.Blinky May 2021 - Jan 2023\nUsing Python version {}'.format(VERSION,platform.python_version()))
 
 bytes = bytearray()
 symbols = []
@@ -19,11 +62,13 @@ label = ''
 indent =''
 blkcom = False
 namespace = False
+include = False
 try:
   toolspath = os.path.dirname(os.path.abspath(sys.argv[0]))
   sys.path.insert(0, toolspath)
   from PIL import Image
-except:
+except Exception as e:
+  sys.stderr.write(str(e) + "\n")
   sys.stderr.write("PILlow python module not found or wrong version.\n")
   sys.stderr.write("Make sure the correct module is installed or placed at {}\n".format(toolspath))
   sys.exit(-1)
@@ -34,6 +79,14 @@ def rawData(filename):
     bytes = bytearray(file.read())
     file.close()
     return bytes
+
+def includeFile(filename):
+  global path
+  print("Including file {}".format(path + filename))
+  with open(path + filename,"r") as file:
+    lines = file.readlines()
+    file.close()
+    return lines
 
 def imageData(filename):
   global path, symbols
@@ -48,20 +101,15 @@ def imageData(filename):
   #get width and height from filename
   i = lastElement
   while i > 0:
-    if "x" in elements[i]:
-      spriteWidth = int(elements[i].split("x")[0])
-      spriteHeight = int(elements[i].split("x")[1])
-      if i < lastElement:
+    subElements = list(filter(None,elements[i].split('x')))
+    if len(subElements) == 2 and subElements[0].isnumeric() and subElements[1].isnumeric():
+      spriteWidth = int(subElements[0])
+      spriteHeight = int(subElements[1])
+      if i < lastElement and elements[i+1].isnumeric():
         spacing = int(elements[i+1])
       break
     else: i -= 1
-  else:
-    i = lastElement
-  #get sprite name (may contain underscores) from filename
-  name = elements[0]
-  for j in range(1,i):
-    name += "_" + elements[j]
-  spriteName = name.replace("-","_")
+
   #load image
   img = Image.open(filename).convert("RGBA")
   pixels = list(img.getdata())
@@ -152,17 +200,21 @@ if (len(sys.argv) != 2) or (os.path.isfile(sys.argv[1]) != True) :
   sys.exit(-1)
 
 filename = os.path.abspath(sys.argv[1])
-datafilename = os.path.splitext(filename)[0] + '.bin'
+datafilename = os.path.splitext(filename)[0] + '-data.bin'
+savefilename = os.path.splitext(filename)[0] + '-save.bin'
+devfilename = os.path.splitext(filename)[0] + '.bin'
 headerfilename = os.path.splitext(filename)[0] + '.h'
 path = os.path.dirname(filename) + os.sep
+saveStart = -1
 
 with open(filename,"r") as file:
   lines = file.readlines()
   file.close()
 
 print("Building FX data using {}".format(filename))
-for lineNr in range(len(lines)):
-  parts = [p for p in re.split("([ ,]|[\\\"'].*[\\\"'])", lines[lineNr]) if p.strip() and p != ',']
+lineNr = 0
+while lineNr < len(lines):
+  parts = [p for p in re.split("([ ,]|[\\'].*[\\'])", lines[lineNr]) if p.strip() and p != ',']
   for i in range (len(parts)):
     part = parts[i]
     #strip unwanted chars
@@ -205,6 +257,9 @@ for lineNr in range(len(lines)):
       elif part == 'raw_t'   : t = 6
       elif part == 'String'  : t = 7
       elif part == 'string'  : t = 7
+      elif part == 'include' : include = True
+      elif part == 'datasection'  : pass
+      elif part == 'savesection'  : saveStart = len(bytes)
       #handle namespace
       elif part == 'namespace':
         namespace = True
@@ -220,10 +275,14 @@ for lineNr in range(len(lines)):
       elif (part[:1] == "'") or (part[:1] == '"'):
         if  part[:1] == "'": part = part[1:part.rfind("'")]
         else:  part = part[1:part.rfind('"')]
-        if   t == 1: bytes += part.encode('ANSI').decode('unicode_escape').encode('ANSI')
+        #handle include
+        if include == True:
+          lines[lineNr+1:lineNr+1] = includeFile(part)      
+          include = False
+        elif t == 1: bytes += part.encode('utf-8').decode('unicode_escape').encode('utf-8')
         elif t == 5: bytes += imageData(part)
         elif t == 6: bytes += rawData(part)
-        elif t == 7: bytes += part.encode('ANSI').decode('unicode_escape').encode('ANSI') + b'\x00'
+        elif t == 7: bytes += part.encode('utf-8').decode('unicode_escape').encode('utf-8') + b'\x00'
         else:
           sys.stderr.write('ERROR in line {}: unsupported string for type\n'.format(lineNr))
           sys.exit(-1)
@@ -255,6 +314,16 @@ for lineNr in range(len(lines)):
         if (label != '') and (i < len(parts) - 1) and (parts[i+1][:1] == '='):
           addLabel(label,len(bytes))
           label = ''
+        #handle included constants
+        if label != '':
+          for symbol in constants:
+            if symbol[0] == label:
+              if t == 4: bytes.append((symbol[1] >> 24) & 0xFF)
+              if t >= 3: bytes.append((symbol[1] >> 16) & 0xFF)
+              if t >= 2: bytes.append((symbol[1] >> 8) & 0xFF)
+              if t >= 1: bytes.append((symbol[1] >> 0) & 0xFF)
+              label = ''
+              break
         #handle symbol values
         if label != '':
           for symbol in symbols:
@@ -271,25 +340,51 @@ for lineNr in range(len(lines)):
       elif len(part) > 0:
         sys.stderr.write('ERROR unable to parse {} in element: {}\n'.format(part,str(parts)))
         sys.exit(-1)
+  lineNr += 1
 
-print("Saving FX data include file {}".format(headerfilename))
+if saveStart >= 0:
+  dataSize  = saveStart
+  dataPages = (dataSize + 255) // 256
+  saveSize = len(bytes) - saveStart
+  savePages = (saveSize + 4095) // 4096 * 16
+else:
+  dataSize  = len(bytes)
+  dataPages = (dataSize + 255) // 256
+  saveSize  = 0
+  savePages = 0
+  savePadding = 0
+dataPadding = dataPages * 256 - dataSize
+savePadding = savePages * 256 - saveSize
+
+print("Saving FX data header file {}".format(headerfilename))
 with open(headerfilename,"w") as file:
   file.write('#pragma once\n\n')
   file.write('/**** FX data header generated by fxdata-build.py tool version {} ****/\n\n'.format(VERSION))
-  file.write('#ifdef ARDUINO\n')
-  file.write('using uint24_t = __uint24;\n')
-  file.write('#else\n')
-  file.write('#include <stdint.h>\n')
-  file.write('using uint24_t = uint32_t;\n')
-  file.write('#endif\n\n')
+  file.write('using uint24_t = __uint24;\n\n')
   file.write('// Initialize FX hardware using  FX::begin(FX_DATA_PAGE); in the setup() function.\n\n')
-  file.write('constexpr uint16_t FX_DATA_PAGE  = 0x{:04x};\n'.format(65536 - (len(bytes) + 255) // 256 ))
-  file.write('constexpr uint24_t FX_DATA_BYTES = {};\n\n'.format(len(bytes)))
+  file.write('constexpr uint16_t FX_DATA_PAGE  = 0x{:04x};\n'.format(65536 - dataPages - savePages))
+  file.write('constexpr uint24_t FX_DATA_BYTES = {};\n\n'.format(dataSize))
+  if saveSize > 0: 
+    file.write('constexpr uint16_t FX_SAVE_PAGE  = 0x{:04x};\n'.format(65536 - savePages))
+    file.write('constexpr uint24_t FX_SAVE_BYTES = {};\n\n'.format(saveSize))
   for line in header:
     file.write(line + '\n')
   file.close()
 
-print("Saving {} bytes FX data to {}".format(len(bytes),datafilename))
+print("Saving {} bytes FX data to {}".format(dataSize,datafilename))
 with open(datafilename,"wb") as file:
-  file.write(bytes)
+  file.write(bytes[0:dataSize])
+  file.close()
+if saveSize > 0:
+  print("Saving {} bytes FX savedata to {}".format(saveSize,savefilename))
+  with open(savefilename,"wb") as file:
+    file.write(bytes[saveStart:len(bytes)])
+    file.close()
+print("Saving FX development data to {}".format(devfilename))
+with open(devfilename,"wb") as file:
+  file.write(bytes[0:dataSize])
+  if dataPadding > 0: file.write(b'\xFF' * dataPadding)
+  if saveSize > 0:
+    file.write(bytes[saveStart:len(bytes)])
+    if savePadding > 0: file.write(b'\xFF' * savePadding)
   file.close()

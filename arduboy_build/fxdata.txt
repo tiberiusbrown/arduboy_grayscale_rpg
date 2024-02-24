@@ -60,3 +60,7 @@ raw_t STRINGDATA = "stringdata.bin"
 
 // "_RotA_XY" where XY is version (same as save IDENTIFIER)
 uint8_t FX_IDENTIFIER_B[] = { 95, 82, 111, 116, 65, 95, 0, 1 };
+
+savesection  // Anything below here will be stored in the save block
+
+uint16_t 0xFFFF // Save state  end marker
