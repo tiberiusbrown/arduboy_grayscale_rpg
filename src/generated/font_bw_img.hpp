@@ -1,7 +1,12 @@
 #pragma once
 
 #include <stdint.h>
+
+#ifdef ARDUINO_ARCH_AVR
 #include <avr/pgmspace.h>
+#else
+#define PROGMEM
+#endif
 
 constexpr uint8_t FONT_IMG[] PROGMEM =
 {

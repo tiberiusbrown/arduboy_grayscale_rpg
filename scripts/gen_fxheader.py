@@ -1,4 +1,4 @@
-with open('fxdata.bin', 'rb') as f:
+with open('fxdata-data.bin', 'rb') as f:
     data = f.read()
     
 with open('../src/generated/fxdata_emulated.hpp', 'w') as f:

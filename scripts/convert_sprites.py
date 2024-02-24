@@ -67,7 +67,12 @@ def convert_header(fname, fout, sym, shades, sw = None, sh = None, num = None):
     bytes = convert_impl(fname, shades, sw, sh, num)
     if bytes is None: return
     with open(fout, 'w') as f:
-        f.write('#pragma once\n\n#include <stdint.h>\n#include <avr/pgmspace.h>\n\n')
+        f.write('#pragma once\n\n#include <stdint.h>\n\n')
+        f.write('#ifdef ARDUINO_ARCH_AVR\n')
+        f.write('#include <avr/pgmspace.h>\n')
+        f.write('#else\n')
+        f.write('#define PROGMEM\n')
+        f.write('#endif\n\n')
         f.write('constexpr uint8_t %s[] PROGMEM =\n{\n' % sym)
         for n in range(len(bytes)):
             if n % 16 == 0:

@@ -161,6 +161,7 @@ constexpr uint8_t LIGHT_GRAY = 2;
 constexpr uint8_t WHITE = 3;
 using int24_t = int32_t;
 using uint24_t = uint32_t;
+using __uint24 = uint32_t;
 extern int gplane;
 inline uint8_t plane()
 {

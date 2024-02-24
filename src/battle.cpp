@@ -679,8 +679,11 @@ void update_battle()
             uint8_t defender = 4;
             uint8_t dhp = d.enemies[0].hp;
             for(uint8_t i = 1; i < 4; ++i)
-                if(d.enemies[i].hp > dhp)
-                    dhp = d.enemies[i].hp, defender = i + 4;
+            {
+                auto const& e = d.enemies[i];
+                if(e.id != INVALID && e.hp > dhp)
+                    dhp = e.hp, defender = i + 4;
+            }
             d.esel = defender;
             phase = BPHASE_ATTACK1;
             break;
