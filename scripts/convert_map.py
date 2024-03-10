@@ -10,7 +10,7 @@ import csv
 import pytmx
 tm = pytmx.TiledMap('world.tmx')
 
-with open('consumables.csv', newline='') as f:
+with open('consumables.csv', newline='', encoding='cp1252') as f:
     reader = csv.reader(f, delimiter=',', quotechar='"')
     consumables = [row[2] for row in reader]
     consumables = consumables[1:]

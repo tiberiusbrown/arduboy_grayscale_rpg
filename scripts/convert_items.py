@@ -17,12 +17,12 @@ def to_ascii(x):
 def to_ascii_row(row):
     return [to_ascii(x) for x in row]
 
-with open('items.csv', newline='') as f:
+with open('items.csv', newline='', encoding='cp1252') as f:
     reader = csv.reader(f, delimiter=',', quotechar='"')
     rows = [to_ascii_row(row) for row in reader]
     rows = rows[1:]
 
-with open('consumables.csv', newline='') as f:
+with open('consumables.csv', newline='', encoding='cp1252') as f:
     reader = csv.reader(f, delimiter=',', quotechar='"')
     consumables = [to_ascii_row(row) for row in reader]
     consumables = consumables[1:]
