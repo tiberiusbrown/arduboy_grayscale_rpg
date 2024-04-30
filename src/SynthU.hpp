@@ -426,7 +426,7 @@ ISR(TIMER3_COMPA_vect)
             
             uint16_t pha = channel->pha;
             pha += adv;
-            while(pha >= period)
+            if(pha >= period)
                 pha -= period;
             uint16_t half_period = period / 2;
             if(pha < half_period)

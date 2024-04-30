@@ -8,6 +8,8 @@
 
 #define DEBUG_PARTY_MENU 0
 
+#define SLOW_DIAG 0
+
 constexpr uint16_t VERSION = 1;
 
 constexpr uint8_t TELEPORT_TRANSITION_FRAMES = 16;

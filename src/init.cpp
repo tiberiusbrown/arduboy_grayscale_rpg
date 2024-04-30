@@ -31,16 +31,17 @@ void new_game()
     party[0].battle.id = 0;
     party[0].battle.hp = party_mhp(0);
 
+#if 1
     savefile.chunk_regs[8] = 2;
     savefile.chunk_regs[9] = 2;
     savefile.chunk_regs[10] = 2;
     savefile.chunk_regs[11] = 2;
     savefile.chunk_regs[12] = 2;
     savefile.chunk_regs[13] = 2;
-    LOC_barn_outside();
-    story_flag_set(SFLAG_story_guards_attack);
-
-    px = 1336, py = 87;
+    LOC_first_cave_exit();
+    story_flag_set(SFLAG_first_cave_guard2);
+    //px = 1336, py = 87;
+#endif
 }
 
 static bool check_identifier(uint24_t addr)

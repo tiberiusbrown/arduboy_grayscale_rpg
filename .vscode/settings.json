@@ -1,5 +1,6 @@
 {
     "arduino.additionalUrls": [
         "https://raw.githubusercontent.com/MrBlinky/Arduboy-homemade-package/master/package_arduboy_homemade_index.json"
-        ]
+        ],
+        "cmake.configureOnOpen": false
 }

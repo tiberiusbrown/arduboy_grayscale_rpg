@@ -325,6 +325,7 @@ static bool run_chunk()
                 sprite.x = (t & 7) * 16;
                 sprite.y = ((t >> 3) & 3) * 16;
             }
+            chunk_sprite_defined = true;
             break;
         }
         case CMD_ST:
@@ -566,8 +567,8 @@ static void load_chunk(uint8_t index, uint8_t cx, uint8_t cy)
             sizeof(map_chunk_t) + sizeof(active_chunk.cx) + sizeof(active_chunk.cy),
             "revisit commented line below");
         //memset(&active_chunk, 0, sizeof(active_chunk));
-        if(!savefile.loaded)
-            memset(&chunk_sprites[index], 0, sizeof(sprite_t));
+        //if(!savefile.loaded)
+        //    memset(&chunk_sprites[index], 0, sizeof(sprite_t));
         active_chunk.cx = cx;
         active_chunk.cy = cy;
         platform_fx_read_data_bytes(addr, chunk, sizeof(map_chunk_t));
@@ -580,6 +581,7 @@ static void shift_chunk(uint8_t dst, uint8_t src)
            sizeof(active_chunk_t));
     memcpy(&chunk_sprites[dst], &chunk_sprites[src],
            sizeof(sprite_t));
+    memset(&chunk_sprites[src], 0, sizeof(sprite_t));
 }
 
 void load_chunks()

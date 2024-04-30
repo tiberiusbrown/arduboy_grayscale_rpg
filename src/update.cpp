@@ -311,6 +311,7 @@ static void update_map()
         sdata.map.a_pressed = 1;
     }
     
+#if SLOW_DIAG
     bool enable_diag = false;
     {
         uint8_t d = diag_counter;
@@ -319,6 +320,9 @@ static void update_map()
             enable_diag = true, d -= 10;
         diag_counter = d;
     }
+#else
+    constexpr bool enable_diag = true;
+#endif
 
     int8_t dx = 0, dy = 0;
     if(btns_down & BTN_UP) dy -= 1;
@@ -327,7 +331,9 @@ static void update_map()
     if(btns_down & BTN_RIGHT) dx += 1;
 
     pmoving = !(dx == 0 && dy == 0);
+#if SLOW_DIAG
     enable_diag |= (dx == 0 || dy == 0);
+#endif
         
     if(pmoving && enable_diag)
     {
