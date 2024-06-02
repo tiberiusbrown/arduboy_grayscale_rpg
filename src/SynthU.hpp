@@ -202,6 +202,30 @@ static void load_fx_data()
             g_buffer_addr,
             (uint8_t*)&g_tick,
             sizeof(g_tick));
+        
+        // song tbase
+        int16_t t = 0;
+        auto* bptr = g_tick.cmds;
+        for(uint8_t i = 0; i < SYNTHU_NUM_CHANNELS; ++i)
+        {
+            uint8_t vol = ld_u8_inc(bptr);
+            uint16_t period = ld_u16_inc(bptr);
+            if(period == 0) g_playing = false;
+#ifdef ARDUINO_ARCH_AVR
+            asm volatile(R"ASM(
+                    lsr %[vol]
+                    sub %A[t], %[vol]
+                    sbc %B[t], __zero_reg__
+                )ASM"
+                : [vol] "+&r" (vol)
+                , [t]   "+&r" (t)
+                );
+#else
+            vol >>= 1;
+            t -= vol;
+#endif
+        }
+        g_tbase = t;
     }
 #if SYNTHU_ENABLE_SFX
     if(g_playing_sfx && g_tick_sfx.reps == 0)
@@ -214,32 +238,9 @@ static void load_fx_data()
             g_playing_sfx = false;
     }
 #endif
-    
-    auto* bptr = g_tick.cmds;
-    int16_t t = 0;
-    
-    // song tbase
-    for(uint8_t i = 0; i < SYNTHU_NUM_CHANNELS; ++i)
-    {
-        uint8_t vol = ld_u8_inc(bptr);
-        uint16_t period = ld_u16_inc(bptr);
-        if(period == 0) SynthU::stop();
-#ifdef ARDUINO_ARCH_AVR
-        asm volatile(R"ASM(
-                lsr %[vol]
-                sub %A[t], %[vol]
-                sbc %B[t], __zero_reg__
-            )ASM"
-            : [vol] "+&r" (vol)
-            , [t]   "+&r" (t)
-            );
-#else
-        vol >>= 1;
-        t -= vol;
-#endif
-    }
-    
-    g_tbase = t;
+        
+    if(!g_playing && !g_playing_sfx)
+        SynthU::stop();
 }
 
 static void disable()

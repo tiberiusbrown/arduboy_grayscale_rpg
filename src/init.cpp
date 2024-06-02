@@ -31,7 +31,7 @@ void new_game()
     party[0].battle.id = 0;
     party[0].battle.hp = party_mhp(0);
 
-#if 1
+#if 0
     savefile.chunk_regs[8] = 2;
     savefile.chunk_regs[9] = 2;
     savefile.chunk_regs[10] = 2;
