@@ -3969,6 +3969,7 @@ bnwe skip
 dlg P_Dark_Guard {Wait! Don't be afraid. I knew this day would come, and have waited many years for the Ardu to return and deliver us from the Old Dark.}
 dlg P_Dark_Guard {Heed my warning, boy: the other Dark Guards have been alerted of your Ardu heritage, and will attack on sight. The Old Dark fears the return of the Ardu!}
 fs !story_guards_attack
+fs !bridge_guard
 obj @obj_town
 jmp warning
 
