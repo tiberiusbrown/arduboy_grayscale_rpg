@@ -4,9 +4,10 @@
 #ifdef ARDUINO
 #define SPRITESU_IMPLEMENTATION
 #define SPRITESU_OVERWRITE
-#define SPRITESU_FX
+//#define SPRITESU_FX
 #define SPRITESU_RECT
 #include "SpritesU.hpp"
+#include "SpritesABC.hpp"
 #else
 extern uint8_t const FXDATA[];
 #include "generated/fxdata_emulated.hpp"
@@ -283,7 +284,8 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame, uint8_t w, uint8_t h)
 {
 #ifdef ARDUINO
-    SpritesU::drawOverwriteFX(x, y, w, h, addr, frame * PLANES + plane());
+    //SpritesU::drawOverwriteFX(x, y, w, h, addr, frame * PLANES + plane());
+    SpritesABC::drawSizedFX(x, y, w, h, addr, SpritesABC::MODE_OVERWRITE, frame * PLANES + plane());
 #else
     auto now = SDL_GetTicks64();
     assert(now >= ticks_when_ready);
@@ -308,7 +310,8 @@ void platform_fx_drawoverwrite(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame)
 {
 #ifdef ARDUINO
-    SpritesU::drawOverwriteFX(x, y, addr, frame * PLANES + plane());
+    //SpritesU::drawOverwriteFX(x, y, addr, frame * PLANES + plane());
+    SpritesABC::drawFX(x, y, addr, SpritesABC::MODE_OVERWRITE, frame * PLANES + plane());
 #else
     uint8_t w = FXDATA[addr + 0];
     uint8_t h = FXDATA[addr + 1];
@@ -329,7 +332,8 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint8_t w, uint8_t h,
     uint24_t addr, uint16_t frame)
 {
 #ifdef ARDUINO
-    SpritesU::drawPlusMaskFX(x, y, w, h, addr, frame * PLANES + plane());
+    //SpritesU::drawPlusMaskFX(x, y, w, h, addr, frame * PLANES + plane());
+    SpritesABC::drawSizedFX(x, y, w, h, addr + 2, SpritesABC::MODE_PLUSMASK, frame * PLANES + plane());
 #else
     assert(SDL_GetTicks64() >= ticks_when_ready);
     uint8_t const* bitmap = &FXDATA[addr + 2];
@@ -354,7 +358,8 @@ void platform_fx_drawplusmask(int16_t x, int16_t y, uint24_t addr,
     uint16_t frame)
 {
 #ifdef ARDUINO
-    SpritesU::drawPlusMaskFX(x, y, addr, frame * PLANES + plane());
+    //SpritesU::drawPlusMaskFX(x, y, addr, frame * PLANES + plane());
+    SpritesABC::drawFX(x, y, addr, SpritesABC::MODE_PLUSMASK, frame * PLANES + plane());
 #else
     uint8_t w = FXDATA[addr + 0];
     uint8_t h = FXDATA[addr + 1];

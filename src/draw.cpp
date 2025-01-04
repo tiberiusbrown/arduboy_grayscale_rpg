@@ -17,6 +17,7 @@
 
 #ifdef ARDUINO
 #include "SpritesU.hpp"
+#include "SpritesABC.hpp"
 #endif
 
 static int8_t fmulshi(int8_t x, int8_t y)
@@ -404,11 +405,17 @@ static void draw_chunk_tiles(uint8_t const* tiles, int16_t ox, int16_t oy)
             MY_ASSERT(x > -16 && x < 128);
             MY_ASSERT(oy > -16 && oy < 64);
 #ifdef ARDUINO
-            SpritesU::drawBasicNoChecks(
-                (16 << 8) | 16,
+            //SpritesU::drawBasicNoChecks(
+            //    (16 << 8) | 16,
+            //    tile_img + (PLANES * 32) * deref_inc(tiles),
+            //    SpritesU::MODE_OVERWRITEFX,
+            //    x, oy);
+            SpritesABC::drawBasicFX(
+                x, oy,
+                16, 16,
                 tile_img + (PLANES * 32) * deref_inc(tiles),
-                SpritesU::MODE_OVERWRITEFX,
-                x, oy);
+                SpritesABC::MODE_OVERWRITE
+            );
 #else
             platform_fx_drawoverwrite(
                 x, oy,
