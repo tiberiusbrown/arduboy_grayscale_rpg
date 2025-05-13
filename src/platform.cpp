@@ -407,49 +407,6 @@ void platform_drawrect_i8(int8_t x, int8_t y, uint8_t w, uint8_t h, uint8_t c)
     platform_fillrect_i8(x + w - 1, y, 1, h, c);
 }
 
-void platform_fx_erase_save_sector()
-{
-#ifdef ARDUINO
-    FX::eraseSaveBlock(0);
-#else
-    uint64_t now = SDL_GetTicks64();
-    assert(now >= ticks_when_ready);
-    ticks_when_ready = now + 200;
-    for(int i = 0; i < 4096; ++i)
-        SAVE_BLOCK[i] = 0xff;
-#endif
-}
-void platform_fx_write_save_page(uint16_t page, void const* data, size_t num)
-{
-#ifdef ARDUINO
-    FX::writeEnable();
-    FX::seekCommand(SFC_WRITE, (uint24_t)(FX::programSavePage + page) << 8);
-    size_t i = 0;
-    uint8_t const* buffer = (uint8_t const*)data;
-    do
-    {
-        FX::writeByte(buffer[i]);
-    } while(++i < num);
-    FX::disable();
-#else
-    uint64_t now = SDL_GetTicks64();
-    assert(now >= ticks_when_ready);
-    ticks_when_ready = now + 2;
-    uint8_t const* u8data = (uint8_t const*)data;
-    for(size_t i = 0; i < num; ++i)
-        SAVE_BLOCK[page * 256 + i] &= u8data[i];
-#endif
-}
-void platform_fx_read_save_bytes(uint24_t addr, void* data, size_t num)
-{
-#ifdef ARDUINO
-    FX::readSaveBytes(addr, (uint8_t*)data, num);
-#else
-    uint8_t* u8data = (uint8_t*)data;
-    for(size_t i = 0; i < num; ++i)
-        u8data[i] = SAVE_BLOCK[addr + i];
-#endif
-}
 void platform_load_game_state(void* data, size_t num)
 {
 #ifdef ARDUINO

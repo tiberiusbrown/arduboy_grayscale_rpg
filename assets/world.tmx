@@ -4094,6 +4094,7 @@ Push it aside.
 Leave it be.}
 bz r1 end
 fs !moved_dresser
+tp @barn_basement_exit
 end:
 
 $wtp @barn_basement
